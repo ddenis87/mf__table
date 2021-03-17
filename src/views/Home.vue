@@ -27,9 +27,10 @@ export default {
 .home {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 100%;
+  padding-top: 56px;
   // border: thin solid black;
   &-title {
     color: #1565C0
@@ -43,9 +44,25 @@ export default {
     max-height: 490px;
     background-image: url('../assets/images/home__table.png');
     background-repeat: no-repeat;
-    background-size: 100%;
+    background-size: cover;
     border: thin solid rgba(0, 0, 0, .4);
     border-radius: 5px;
+  }
+}
+@media screen and (max-width: 450px) {
+  .home {
+    padding-top: 36px;
+    &-title {
+      font-size: 1em;
+    }
+  }
+}
+@media screen and (max-width: 850px) {
+  .home {
+    padding-top: 36px;
+    &-title {
+      font-size: 1.5em;
+    }
   }
 }
 </style>
