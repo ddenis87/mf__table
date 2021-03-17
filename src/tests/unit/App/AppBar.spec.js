@@ -25,6 +25,7 @@ describe('AppBar', () => {
       vuetify,
       store,
     });
+    console.log(wrapper.html());
     expect(wrapper.html()).toContain('<span class="app-bar__title">Демострационное приложение универсальной таблицы</span>');
 
   })
