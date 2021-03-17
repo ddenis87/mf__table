@@ -1,0 +1,30 @@
+.el-field {
+  width: 100%;
+  padding-top: 8px;
+  &_single-line {
+    padding-top: 0px;
+  }
+  &__item {
+    font-size: 14px;
+  }
+}
+
+::v-deep {
+  .v-input__control {
+    .v-input__slot {
+      padding: 0px !important;
+    }
+  }
+  
+  .v-input__append-inner {
+    padding: 0px !important;
+    margin-right: -2px;
+    margin-top: 2px !important;
+    // width: 50px;
+    cursor: pointer;
+  }
+  .v-input__append-outer {
+    margin: 0px;
+    margin-top: -4px;
+  }
+}

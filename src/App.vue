@@ -1,32 +1,66 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+  <v-app class="app">
+    <!-- <div class="app__bar">
+      <app-bar></app-bar>
     </div>
-    <router-view/>
-  </div>
+    
+    <div class="app__bar-nav">
+      <app-bar-nav></app-bar-nav>
+    </div>
+
+    <div class="app__content">
+      <router-view/>
+    </div> -->
+    <component :is="layout">
+      <router-view/>
+    </component>
+    
+  </v-app>
 </template>
 
+<script>
+
+import LayoutEmpty from '@/layout/LayoutEmpty.vue';
+import LayoutMain from '@/layout/LayoutMain.vue';
+export default {
+  name: 'App',
+  components: {
+    LayoutEmpty,
+    LayoutMain,
+  },
+  computed: {
+    layout() { return 'Layout' + (this.$route.meta.layout || 'Main') },
+  },
+};
+</script>
+
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+html, body {
+  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+  a { text-decoration: none; }
 }
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+.app {
+  overflow: hidden;
+}
+.tooltip-text {
+  display: block;
+  padding: 2px 6px;
+  width: 100%;
+  height: 100%;
+  border: thin solid rgba(0, 0, 0, .87);
+  border-radius: 4px;
+  font-size: .875rem;
+  line-height: 1.5;
+  
+  &-control {
+    background-color: rgba(0, 0, 0, .87);
+    color: rgba(255, 255, 255, 1);
+  }
+  &-body {
+    color: rgba(0, 0, 0, .87);
+    background-color: rgba(255, 255, 255, 1);
   }
 }
 </style>

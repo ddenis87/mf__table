@@ -1,18 +1,51 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1 class="home-title">Универсальная таблица mf-Table</h1>
+    <div class="home-table">
+      <v-btn class="home-table__btn"
+             dark
+             x-large
+             min-width="160"
+             color="blue darken-3"
+             @click="getStarted">Начать</v-btn>
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
 export default {
   name: 'Home',
-  components: {
-    HelloWorld
+  methods: {
+    getStarted() {
+      this.$router.push('/TablesPage?tableName=organization');
+    }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  // border: thin solid black;
+  &-title {
+    color: #1565C0
+  }
+  &-table {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    height: 60%;
+    max-height: 490px;
+    background-image: url('../assets/images/home__table.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    border: thin solid rgba(0, 0, 0, .4);
+    border-radius: 5px;
+  }
+}
+</style>

@@ -1,0 +1,9 @@
+@import '../../DataTableLazy.scss';
+
+$rowBorder: thin solid rgba(0,0,0,.12);
+
+// fonts component
+$fontSize: .875rem;
+$fontWeight: bold;
+$fontLineHeight: $dtFontLineHeight;
+$fontColor: rgba(0, 0, 0, .6);
