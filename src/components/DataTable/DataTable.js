@@ -41,12 +41,14 @@ export const DataTable = {
       if (this.listDataCount == 0) {
         this.isDialogEmptyShow = true;
       }
-      // if (this.listDataCount < 50) {
+      if (this.listDataCount < 50) {
       //   if (this.getApiNext())
       //     this.requestData({next: true});
-      //   if (this.getApiPrevious())
-      //     this.requestData({previous: true});
-      // }
+        if (this.getApiPrevious()) {
+          console.log('previous load');
+          // this.requestData({previous: true});
+        }
+      }
     },
   },
   async created() {
