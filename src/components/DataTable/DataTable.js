@@ -38,7 +38,9 @@ export const DataTable = {
     },
     listDataCount() {
       console.log(this.listDataCount);
-      if (this.listDataCount == 0) {
+      if (this.listDataCount == 0 && 
+          (this.$store.getters['DataTable/GET_FILTER_EXTENDED'](this.optionGetter) != '' ||
+            this.$store.getters['DataTable/GET_FILTER_DEFAULT_FIELD'](Object.assign(this.optionGetter, {filter: 'search'})) != null )) {
         this.isDialogEmptyShow = true;
       }
       if (this.listDataCount < 50) {
@@ -138,7 +140,7 @@ export const DataTable = {
         this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
           tableName: this.tableName,
           guid: this.guid,
-          defaultFilters: { 'search': null }
+          defaultFilters: { 'search': null, 'is_deleted': false, }
         });
       }
       this.isDialogEmptyShow = false;

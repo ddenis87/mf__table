@@ -19,7 +19,7 @@ export const DataTableLazyLoad = {
   methods: {
     eventScrollPagination() {
       // this.isScroll = !this.isScroll;
-      let bootAnchorEdge = this.parentElement.querySelector(`.${this.guid}__boot-anchor`).getBoundingClientRect().bottom - 300;
+      let bootAnchorEdge = this.parentElement.querySelector(`.${this.guid}__boot-anchor`).getBoundingClientRect().bottom - 500;
       // console.log(bootAnchorEdge / 2, ' < ', this.parentElementEdge + 300);
       // if (bootAnchorEdge / 2 < (this.parentElementEdge + 300)) {
       //   if (this.getApiNext()) {

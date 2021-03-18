@@ -79,9 +79,13 @@ export default {
   methods: {
     computedTemplate(index) {
       console.log(this.startColumn);
+      console.log(this.template);
       let element = this.startColumn;
       let columnWidth = '';
+      console.log(Array.isArray(element.width))
       if (Array.isArray(element.width)) {
+        console.log(element.width[0]);
+        console.log(element.width[1]);
         columnWidth += `minmax(${(element.width[0] != undefined) ? 
           element.width[0] + ((1) * 20) : 
           `${100 + ((index + 1) * 20)}`}px,${(element.width[1] != undefined) ? 

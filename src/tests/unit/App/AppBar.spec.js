@@ -25,8 +25,8 @@ describe('AppBar', () => {
       vuetify,
       store,
     });
-    console.log(wrapper.html());
+    // console.log(wrapper.html());
     expect(wrapper.html()).toContain('<span class="app-bar__title">Демострационное приложение универсальной таблицы</span>');
-
+    expect(wrapper.find('.profile-user-bar__user-name').html()).toContain('Denis');
   })
 })

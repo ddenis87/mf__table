@@ -108,7 +108,7 @@ export default {
     return new Promise((resolve, reject) => {
       state.dispatch('REQUEST_UPDATE', option)
         .then((response) => {
-          // Перезапросить данные ????
+          // Перезапрос данные
           state.commit('CLEAR_DATA', option);
           state.dispatch('REQUEST_DATA', option);
         })
@@ -185,8 +185,8 @@ export default {
       guid: option.guid,
     };
     return new Promise((resolve, reject) => {
-      if (!'hidden' in option)
-        state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+      // if (!'hidden' in option)
+      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
       axios
         .get(addressApi)
         .then(response => {
@@ -240,18 +240,18 @@ export default {
     return new Promise((resolve, reject) => {
       state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
       axios
-       .post(addressApi, option.formData)
-       .then(response => {
-         console.log(response);
-         resolve(response);
-       })
-       .catch(err => {
-        console.log(err);
-        reject(err);
-      })
-      .finally(() => {
-        state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-      });
+        .post(addressApi, option.formData)
+        .then(response => {
+          console.log(response);
+          resolve(response);
+        })
+        .catch(err => {
+          console.log(err);
+          reject(err);
+        })
+        .finally(() => {
+          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+        });
     });
   },
 
@@ -268,11 +268,11 @@ export default {
           resolve();
         })
         .catch(err => {
-         console.log(err);
-         reject(err);
+          console.log(err);
+          reject(err);
         })
         .finally(() => {
-         state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
         });
     });
   },
@@ -293,9 +293,9 @@ export default {
           console.log(err);
           reject(err);
          })
-         .finally(() => {
+        .finally(() => {
           state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-         });
+        });
     });
   }
 }

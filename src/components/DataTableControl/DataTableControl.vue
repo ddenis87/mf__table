@@ -1,7 +1,7 @@
 <template>
   <div class="data-table-control">
     <v-toolbar class="toolbar"
-               height="40"
+               height="48"
                flat>
       <!-- ACTIONS FOR TABLE -->
       <data-table-control-table class="toolbar-group"
@@ -68,38 +68,23 @@
 </template>
 
 <script>
-// import DialogFullPage from '@/components/Dialogs/DialogFullPage.vue';
-// import DialogBarRight from '@/components/Dialogs/DialogBarRight.vue';
-
-// import ElBtnIcon from '@/components/Elements/ElBtn/ElBtnIcon.vue';
 import DataTableControlTable from './DataTableControlTable.vue';
 import DataTableControlElement from './DataTableControlElement.vue';
 import DataTableControlView from './DataTableControlView.vue';
 
 import { DataTableControl } from './DataTableControl.js';
-// 
-// import DataTableControlActionsTable from './DataTableControlActionsTable.vue';
-// import DataTableControlActionsElement from './DataTableControlActionsElement.vue';
 
 export default {
   name: 'DataTableControl',
   components: {
-    // DialogFullPage,
-    // DialogBarRight,
-    // ElBtnIcon,
     DataTableControlTable,
     DataTableControlView,
-    // DataTableControlActionsTable,
     DataTableControlElement,
   },
   mixins: [
     DataTableControl,
   ],
   props: {
-    // guid: { type: String, default: null },
-    // tableName: { type: String, default: null },
-    // focusedElement: null,
-    // formProperties: Object,
 
     typeHeightNumber: { type: Number, default: 0 },
     typeColumn: { type: String, default: 'fixed' },
@@ -111,37 +96,12 @@ export default {
   data() {
     return {
       focusedElementForm: null,
-      // isOpenFilterExtended: false,
-      // isMarkDeleted: false,
-      // typeHeight: ['fixed', 'dense', 'auto'],
-
       snackBar: {
         show: false,
         text: '',
         status: false,
       },
-      
     }
-  },
-  computed: {
-    // isMountTable() { return (this.guid) ? true : false },
-    // tableName() { return (this.formProperties) ? this.formProperties.tableName : null },
-    // componentFilterExtended() {
-    //   if (!this.formProperties?.tableName) return null;
-    //   return () => import('@/components/DataFilter/DataFilterExtended/DataFilterExtended.vue')
-    //   // return () => import('@/components/Filters/DataFilter/DataFilter.vue')
-    // },
-    // isFilterExtendedActive() {
-    //   if (this.formProperties) {
-    //     let filterExtended = this.$store.getters[`DataTable/GET_FILTER_EXTENDED`]({tableName: this.formProperties.tableName, guid: this.guid});
-    //     console.log(filterExtended);
-    //     if (filterExtended == null || filterExtended == '') return false;
-    //     else return true;
-    //   } else {
-    //     return false;
-    //   }
-    //   // return (this.formProperties) ? (this.$store.getters[`DataTable/GET_FILTER_EXTENDED`]({tableName: this.formProperties.tableName, guid: this.guid}) == null) ? false : true : false;
-    // },
   },
   watch: {
     focusedElement() {

@@ -17,7 +17,7 @@
     <div class="data-table__body-group">
       <data-table-body-group :table-name="tableName"
                              :template="dataTableTemplate"
-                             :start-column="(isExpansion) ? properties.headers[1] : properties.headers[0]"
+                             :start-column="(isHierarchyMode) ? properties.headers[0][0] : (isExpansion) ? properties.headers[1] : properties.headers[0]"
                              :type-height="typeHeight"
                              :type-column="typeColumn"
                              :is-expansion="isExpansion"
@@ -73,14 +73,6 @@ import DataTableBody from './components/DataTableBody/DataTableBody.vue';
 import DataTableFooter from './components/DataTableFooter/DataTableFooter.vue';
 import DataTableEmptyData from './components/DataTableEmptyData.vue';
 
-// import { DataTableStore } from './DataTableStore.js';
-
-// import { LoadingData } from './mixins/LoadingData.js';
-// import { GettingData } from './mixins/GettingData.js';
-// import { ComputedTemplate } from './mixins/ComputedTemplate.js'; // computedTemplateTable
-// import { EventsComponent } from './mixins/EventsComponent.js';
-// import { HierarchyGroup } from './mixins/HierarchyGroup.js';
-
 import { DataTable } from './DataTable.js';
 import { DataTableEvents } from './mixins/DataTableEvents.js';
 import { DataTableTemplate } from './mixins/DataTableTemplate.js';
@@ -101,13 +93,6 @@ export default {
     DataTableEvents,
     DataTableTemplate,
     DataTableLazyLoad,
-    
-    // DataTableStore,
-    // LoadingData,
-    // GettingData,
-    // ComputedTemplate,
-    // EventsComponent,
-    // HierarchyGroup,
   ],
   props: {
     
@@ -129,9 +114,6 @@ export default {
       isDialogEmptyShow: false,
     }
   },
-  // created() {
-  //   this.eventComponentCreated();
-  // },
 }
 </script>
 

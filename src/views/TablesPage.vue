@@ -18,7 +18,7 @@
                           :focused-element="focusedElement"
                           :guid="guid"
 
-                          :type-row-number="typeHeightNumber"
+                          :type-height-number="typeHeightNumber"
                           :type-column="typeColumn"
                           :is-footer="isFooter"
                           :is-expansion="isExpansion"
@@ -114,6 +114,7 @@ export default {
       console.log(option);
       switch(option) {
         case 'toggle-type-row': {
+          console.log(option)
           this.isExpansion = false;
           if (this.typeHeightNumber == this.typeHeight.length - 1) this.typeHeightNumber = 0;
           else this.typeHeightNumber = this.typeHeightNumber + 1;
@@ -146,7 +147,7 @@ export default {
   display: grid;
   grid-template-areas: "tables-page__header" "tables-page__control" "tables-page__body";
   grid-template-columns: 1fr;
-  grid-template-rows: 42px 40px 1fr;
+  grid-template-rows: 42px 44px 1fr;
   width: 100%;
   height: 100%;
 
