@@ -5,7 +5,7 @@
                 'el-field_hide-underline': isHideUnderline}">
     <v-textarea class="el-field__item"
                 dense
-                tabindex="1"
+
                 auto-grow
                 rows="3"
                 :single-line="isSingleLine"

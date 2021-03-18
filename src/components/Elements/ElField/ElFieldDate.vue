@@ -5,7 +5,7 @@
                 'el-field_hide-underline': isHideUnderline}">
     <v-text-field class="el-field__item"
                   dense
-                  tabindex="1"
+                  
                   
                   :single-line="isSingleLine"
                   :hide-details="isHideMessage"
@@ -27,7 +27,7 @@
                   @blur="eventBlurField"
                   >
       <template v-slot:append>
-        <el-btn-icon-small tabindex="2" icon="mdi-calendar-range" no-tooltip @keydown="eventOpenDialog" @click="eventOpenDialog"></el-btn-icon-small>
+        <el-btn-icon-small  icon="mdi-calendar-range" no-tooltip @keydown="eventOpenDialog" @click="eventOpenDialog"></el-btn-icon-small>
       </template>
     </v-text-field>
     <v-menu offset-y

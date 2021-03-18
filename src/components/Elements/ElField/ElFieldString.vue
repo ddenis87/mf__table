@@ -5,7 +5,7 @@
                 'el-field_hide-underline': isHideUnderline}">
     <v-text-field class="el-field__item"
                   dense
-                  tabindex="1"
+
                   :single-line="isSingleLine"
                   :hide-details="isHideMessage"
                   :disabled="isDisabled"

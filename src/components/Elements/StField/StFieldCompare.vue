@@ -1,7 +1,7 @@
 <template>
   <div class="el-field">
     <v-autocomplete class="el-field__item"
-                    tabindex="1"
+
                     placeholder="Выбрать"
                     no-data-text="Значение отсутствует"
                     background-color="rgba(242, 242, 242, 1)"

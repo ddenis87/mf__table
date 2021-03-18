@@ -5,7 +5,7 @@
                 'el-field_hide-underline': isHideUnderline}">
     <v-text-field class="el-field__item"
                   dense
-                  tabindex="1"
+
                   :single-line="isSingleLine"
                   :hide-details="isHideMessage"
                   :disabled="isDisabled"
@@ -16,12 +16,9 @@
                   :rules="(fieldRequired) ? [rules.required] : []"
                   v-model="fieldValue"
                   @click:clear="eventClearValue"
-                  @click.stop
+
                   @input="eventInputValue"
-                  @keydown.enter="eventKeyEnter"
-                  @keydown.tab="eventKeyTab"
-                  @keydown.esc="eventKeyEsc"
-                  @keydown.stop="eventKey"
+                  @keydown="eventKeydown"
                   @blur="eventBlurField">
     </v-text-field>
   </div>
@@ -35,6 +32,36 @@ export default {
     ElField,
   ],
   methods: {
+    eventKeydown(event) {
+      switch(event.code) {
+        case 'Tab': {
+          this.eventKeyTab(event);
+          break;
+        }
+        case 'Enter': {
+          this.eventKeyEnter(event);
+          break;
+        }
+        case 'NumpadDecimal':
+        case 'Slash': {
+          if ((this.fieldValue.match(/[\.\,]/g)) && (this.fieldValue.match(/[\.\,]/g).length > 0)) { event.preventDefault(); return; }
+          break;
+        }
+        default: {
+          if (event.code.includes('Key') || 
+              event.code == 'BracketLeft' || 
+              event.code == 'BracketRight' ||
+              event.code == 'Backslash' ||
+              event.code == 'Space' ||
+              event.code == 'Semicolon' || 
+              event.code == 'Quote' || 
+              event.code == 'Comma' ||
+              event.code == 'Period' ||
+              event.key == '/') { event.preventDefault(); return; }
+        }
+      }
+      console.log(event);
+    },
     eventKeyEnter(event) {
       if (this.checkRequiredField(event)) return;
 
@@ -47,22 +74,22 @@ export default {
       this.emitKeyEnter(sendOption);
       this.emitNextElement(event);
     },
-    eventKey(event) {
-      if (event.code.includes('Key') || 
-          event.code == 'BracketLeft' || 
-          event.code == 'BracketRight' ||
-          event.code == 'Backslash' ||
-          event.code == 'Space' ||
-          event.code == 'Semicolon' || 
-          event.code == 'Quote' || 
-          event.code == 'Comma' ||
-          event.code == 'Period' ||
-          event.key == '/') { event.preventDefault(); return; }
+    // eventKey(event) {
+    //   if (event.code.includes('Key') || 
+    //       event.code == 'BracketLeft' || 
+    //       event.code == 'BracketRight' ||
+    //       event.code == 'Backslash' ||
+    //       event.code == 'Space' ||
+    //       event.code == 'Semicolon' || 
+    //       event.code == 'Quote' || 
+    //       event.code == 'Comma' ||
+    //       event.code == 'Period' ||
+    //       event.key == '/') { event.preventDefault(); return; }
 
-      if (event.code == 'NumpadDecimal' || event.code == 'Slash') {
-        if ((this.fieldValue.match(/[\.\,]/g)) && (this.fieldValue.match(/[\.\,]/g).length > 0)) { event.preventDefault(); return; }
-      }
-    },
+    //   if (event.code == 'NumpadDecimal' || event.code == 'Slash') {
+    //     if ((this.fieldValue.match(/[\.\,]/g)) && (this.fieldValue.match(/[\.\,]/g).length > 0)) { event.preventDefault(); return; }
+    //   }
+    // },
   },
 }
 </script>

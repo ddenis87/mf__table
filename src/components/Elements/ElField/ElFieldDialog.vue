@@ -9,7 +9,7 @@
                     return-object
                     no-data-text="Значение отсутствует"
                     append-icon="mdi-dots-horizontal"
-                    tabindex="1"
+                    
                     :single-line="isSingleLine"
                     :hide-details="isHideMessage"
                     :disabled="isDisabled"

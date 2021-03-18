@@ -7,7 +7,7 @@
                     dense
                     return-object
                     no-data-text="Значение отсутствует"
-                    tabindex="1"
+
                     :single-line="isSingleLine"
                     :hide-details="isHideMessage"
                     :disabled="isDisabled"
