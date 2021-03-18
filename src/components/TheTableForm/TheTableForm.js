@@ -55,25 +55,29 @@ export const TheTableForm = {
   methods: {
     // NAVIGATION
     eventNextElement(event) {
-      let target = event.event.target;
-      let eventClick = new Event('click');
-      target.closest('.el-field').dispatchEvent(eventClick);
-      let currentFieldIndex = this.fieldArray.indexOf(target);
-      if (currentFieldIndex + 1 == this.fieldArray.length) {
-        target.closest('.table-form').querySelector('.tabspace-end button').focus();
-        return;
-      }
-      setTimeout(() => {
-        document.querySelectorAll('.table-form .el-field__item input[tabindex="1"]')[currentFieldIndex + 1].focus();
-      }, 100);
+      // let target = event.event.target;
+      // let eventClick = new Event('click');
+      // target.closest('.el-field').dispatchEvent(eventClick);
+      // let currentFieldIndex = this.fieldArray.indexOf(target);
+      // if (currentFieldIndex + 1 == this.fieldArray.length) {
+      //   target.closest('.table-form').querySelector('.tabspace-end button').focus();
+      //   return;
+      // }
+      // setTimeout(() => {
+      //   document.querySelectorAll('.table-form .el-field__item input[tabindex="1"]')[currentFieldIndex + 1].focus();
+      // }, 100);
     },
     eventKeydownAccept(event) {
       switch(event.key) {
         case 'Enter': {this.eventClickActionAccept(); break;}
         case 'Tab': {
-          setTimeout(() => {
-            event.target.closest('.table-form').querySelectorAll('.el-field__item input[tabindex="1"]')[0].focus();
-          }, 100);
+          console.log('end form tab');
+          console.log(event.target.closest('.table-form').querySelector('.tabspace-start input'));
+          let eventClick = new Event('click');
+          event.target.closest('.table-form').querySelector('.tabspace-start input').focus();
+          // setTimeout(() => {
+          //   event.target.closest('.table-form').querySelector('.tabspace-start input').focus();
+          // }, 100);
           break;
         }
       }

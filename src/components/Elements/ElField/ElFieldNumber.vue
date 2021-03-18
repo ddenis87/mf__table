@@ -73,6 +73,7 @@ export default {
       this.isEmit = true;
       this.emitKeyEnter(sendOption);
       this.emitNextElement(event);
+      this.$emit('keydown', event);
     },
     // eventKey(event) {
     //   if (event.code.includes('Key') || 

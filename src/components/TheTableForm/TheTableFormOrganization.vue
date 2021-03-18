@@ -4,7 +4,8 @@
       <v-container fluid>
         <v-row dense>
           <v-col cols="3" >
-            <el-field-date :input-properties="fieldForm.registry_date" 
+            <el-field-date class="tabspace-start"
+                           :input-properties="fieldForm.registry_date" 
                            v-model="fieldFormValue.registry_date"
                            @next-element="eventNextElement"></el-field-date>
           </v-col>
