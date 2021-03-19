@@ -15,13 +15,14 @@ class TableDataSpace {
     'page_size': '',
     'is_deleted': false,
     'parent__isnull': null,
-    'ordering': null,
+    // 'ordering': null,
     'search': null,
     'parent': null,
     'is_group': null,
   };
   filtersExtended = null;
-
+  filtersSorting = {
+  };
   addingMode = {
     index: null,
     id: null,
@@ -137,6 +138,12 @@ export default {
   //   state[option.tableName][option.guid].filters['parent__isnull'] = true;
   //   state[option.tableName][option.guid].filters['ordering'] = `-is_group`;
   // },
+  SET_FILTER_SORTING(state, option) {
+    if (state[option.tableName][option.guid].filtersSorting.indexOf(option.value) -1)
+      state[option.tableName][option.guid].filtersSorting.push(option.value)
+    else
+      state[option.tableName][option.guid].filtersSorting.slice(state[option.tableName][option.guid].filtersSorting.indexOf(option.value), 1);
+  },
   SET_FILTER_PARENT(state, option) {
     if (state[option.tableName][option.guid].listDataGroup.length) {
       state[option.tableName][option.guid].filters['parent__isnull'] = null;

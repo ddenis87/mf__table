@@ -104,6 +104,7 @@ export const DataTableControl = {
       };
       sendOption.formData = bFormData;
       delete sendOption.values;
+      sendOption.previous = true;
       this.eventCloseDialog();
       if (sendOption.actionName == 'editing') 
         this.$store.dispatch(`DataTable/UPDATE_ELEMENT`, sendOption);

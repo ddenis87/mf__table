@@ -111,7 +111,7 @@ export const DataTable = {
       };
       console.log(sendOption);
       sendOption.formData = bFormData;
-      // sendOption.previous = true;
+      sendOption.previous = true;
       await this.$store.dispatch('DataTable/ADDING_NEW_ELEMENT', sendOption)
         .then((id) => {
           // console.log(id);

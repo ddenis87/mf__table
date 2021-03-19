@@ -241,7 +241,8 @@ export default {
     console.log(option);
     let filterApi = state.getters.GET_FILTER_API(option);
     let filterExtended = state.getters.GET_FILTER_EXTENDED(option);
-    let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName) + filterApi + filterExtended;
+    let filterSorting = state.getters.GET_FILTER_SORTING(option);
+    let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName) + filterApi + filterExtended + filterSorting;
     if ('next' in option) addressApi = state.getters.GET_ADDRESS_API_NEXT(option);
     // if ('previous' in option) addressApi = state.getters.GET_ADDRESS_API_PREVIOUS(option);
     if ('id' in option) addressApi += `&page_by_id=${option.id}`;
@@ -264,7 +265,7 @@ export default {
           // console.log(state.state[option.guid]);
           // console.log(state.state[option.guid].filters['page_size']);
           // if (response.data.results) {
-          if (response.data.results.length < state.state[option.tableName][option.guid].filters['page_size']) {
+          if ((response.data.results.length < state.state[option.tableName][option.guid].filters['page_size']) && ('previous' in option)) {
             
             // sendOption.currentPage = response.data.results;
             state.dispatch('REQUEST_DATA_PRELOAD', sendOption)
