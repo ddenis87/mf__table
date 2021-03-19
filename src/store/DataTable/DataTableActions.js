@@ -75,8 +75,9 @@ export default {
           // Отчистить Data запросить данные если добавляем не в строке
           // response должен содержать id созданного элемента
           state.commit('CLEAR_DATA', option);
-          state.dispatch('REQUEST_DATA', Object.assign(option, {id: response.data.id}))
+          state.dispatch('REQUEST_DATA', Object.assign(option, {id: response.data.id, previous: true}))
             .then(() => {
+              console.log('request data iz adding element')
               resolve(response.data.id);
             })
         })
@@ -171,12 +172,78 @@ export default {
       });
   },
 
+  REQUEST_DATA_PRELOAD(state, option) {
+    // return new Promise((resolve, reject) => {
+      console.log('preload data');
+      // console.log(option);
+      let addressApi = option.data.previous;
+      let sendOption = { // Заменить на option
+        tableName: option.tableName,
+        guid: option.guid,
+      };
+      console.log(addressApi);
+      return new Promise((resolve, reject) => {
+        axios
+          .get(addressApi)
+          .then(response => {
+            response.data.next = null;
+            state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: response.data}));
+            let joinResponse = response.data.results.concat(option.data.results);
+            console.log(joinResponse);
+            joinResponse.forEach(element => {
+              for (let key of Object.keys(element)) {
+                let options = state.state[option.tableName].listOptions[key];
+                switch(options.type) {
+                  case 'choice': {
+                    element[key] = options.choices.find(item => item.value == element[key]);
+                    break;
+                  }
+                  case 'field': {
+                    if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
+                    let relatedModelName = options['related_model_name']
+                    if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
+                      state.commit('SET_DATA', {
+                        tableName: relatedModelName,
+                        value: element[key],
+                      });
+                    } // else Если есть, то возможно обновляем
+                    element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
+                  }
+                }
+              }
+
+              if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
+                state.commit('SET_DATA', {
+                  tableName: option.tableName,
+                  value: element,
+                });
+              }
+              sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
+              state.commit('SET_DATA', sendOption);
+            });
+            console.log('resolve preload');
+            resolve();
+          })
+          .catch(error => {
+            console.log(error);
+            reject();
+          })
+          .finally(() => {
+            state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+          });
+      });
+      // resolve();
+    // });
+    
+  },
+
   REQUEST_DATA(state, option) {
+    console.log(option);
     let filterApi = state.getters.GET_FILTER_API(option);
     let filterExtended = state.getters.GET_FILTER_EXTENDED(option);
     let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName) + filterApi + filterExtended;
     if ('next' in option) addressApi = state.getters.GET_ADDRESS_API_NEXT(option);
-    if ('previous' in option) addressApi = state.getters.GET_ADDRESS_API_PREVIOUS(option);
+    // if ('previous' in option) addressApi = state.getters.GET_ADDRESS_API_PREVIOUS(option);
     if ('id' in option) addressApi += `&page_by_id=${option.id}`;
 
     console.log(addressApi);
@@ -191,39 +258,56 @@ export default {
         .get(addressApi)
         .then(response => {
           state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: response.data}));
-          response.data.results.forEach(element => {
-            for (let key of Object.keys(element)) {
-              let options = state.state[option.tableName].listOptions[key];
-              switch(options.type) {
-                case 'choice': {
-                  element[key] = options.choices.find(item => item.value == element[key]);
-                  break;
-                }
-                case 'field': {
-                  if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
-                  let relatedModelName = options['related_model_name']
-                  if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
-                    state.commit('SET_DATA', {
-                      tableName: relatedModelName,
-                      value: element[key],
-                    });
-                  } // else Если есть, то возможно обновляем
-                  element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
+
+          console.log(response.data.results);
+          // console.log(response.data.results.length);
+          // console.log(state.state[option.guid]);
+          // console.log(state.state[option.guid].filters['page_size']);
+          // if (response.data.results) {
+          if (response.data.results.length < state.state[option.tableName][option.guid].filters['page_size']) {
+            
+            // sendOption.currentPage = response.data.results;
+            state.dispatch('REQUEST_DATA_PRELOAD', sendOption)
+              .then(() => {
+                console.log('resolve load iz preload');
+                resolve();
+              })
+          } else {
+            response.data.results.forEach(element => {
+              for (let key of Object.keys(element)) {
+                let options = state.state[option.tableName].listOptions[key];
+                switch(options.type) {
+                  case 'choice': {
+                    element[key] = options.choices.find(item => item.value == element[key]);
+                    break;
+                  }
+                  case 'field': {
+                    if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
+                    let relatedModelName = options['related_model_name']
+                    if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
+                      state.commit('SET_DATA', {
+                        tableName: relatedModelName,
+                        value: element[key],
+                      });
+                    } // else Если есть, то возможно обновляем
+                    element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
+                  }
                 }
               }
-            }
 
-            if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
-              state.commit('SET_DATA', {
-                tableName: option.tableName,
-                value: element,
-              });
-            }
-            sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
-            state.commit('SET_DATA', sendOption);
-          });
-          console.log(state.state);
-          resolve();
+              if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
+                state.commit('SET_DATA', {
+                  tableName: option.tableName,
+                  value: element,
+                });
+              }
+              sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
+              state.commit('SET_DATA', sendOption);
+            });
+            console.log(state.state);
+            console.log('resolve load iz preload');
+            resolve();
+          }
         })
         .catch(error => {
           console.log(error);

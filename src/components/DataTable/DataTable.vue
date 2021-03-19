@@ -17,7 +17,7 @@
     <div class="data-table__body-group">
       <data-table-body-group :table-name="tableName"
                              :template="dataTableTemplate"
-                             :start-column="(isHierarchyMode) ? properties.headers[0][0] : (isExpansion) ? properties.headers[1] : properties.headers[0]"
+                             :start-column="(isExpansion) ? properties.headers[1] : properties.headers[0]"
                              :type-height="typeHeight"
                              :type-column="typeColumn"
                              :is-expansion="isExpansion"
@@ -33,6 +33,7 @@
       <data-table-body :guid="guid"
                        :table-name="tableName"
                        :template="dataTableTemplate"
+                       :group-level="listDataGroupLevel"
                        :type-height="typeHeight"
                        :type-column="typeColumn"
                        :items="listData"

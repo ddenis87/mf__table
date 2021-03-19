@@ -37,20 +37,20 @@ export const DataTable = {
         setTimeout(() => this.eventScrollPagination(), 300);
     },
     listDataCount() {
-      console.log(this.listDataCount);
+      // console.log(this.listDataCount);
       if (this.listDataCount == 0 && 
           (this.$store.getters['DataTable/GET_FILTER_EXTENDED'](this.optionGetter) != '' ||
             this.$store.getters['DataTable/GET_FILTER_DEFAULT_FIELD'](Object.assign(this.optionGetter, {filter: 'search'})) != null )) {
         this.isDialogEmptyShow = true;
       }
-      if (this.listDataCount < 50) {
+      // if (this.listDataCount < 50) {
       //   if (this.getApiNext())
       //     this.requestData({next: true});
-        if (this.getApiPrevious()) {
-          console.log('previous load');
+        // if (this.getApiPrevious()) {
+        //   console.log('previous load');
           // this.requestData({previous: true});
-        }
-      }
+      //   }
+      // }
     },
   },
   async created() {
@@ -84,6 +84,8 @@ export const DataTable = {
       }, option));
     },
     async addingNewElement() {
+      this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
+      console.log('adding element for table');
       let index = this.$store.getters['DataTable/GET_ADDING_MODE']({
         tableName: this.tableName,
         guid: this.guid,
@@ -109,9 +111,13 @@ export const DataTable = {
       };
       console.log(sendOption);
       sendOption.formData = bFormData;
+      // sendOption.previous = true;
       await this.$store.dispatch('DataTable/ADDING_NEW_ELEMENT', sendOption)
         .then((id) => {
+          // console.log(id);
           let addingElement = document.querySelectorAll(`.${this.guid} .body [data-rowId="${id}"]`)[0];
+
+          // console.log(addingElement);
           let eventClick = new Event('click', {bubbles: false});
           addingElement.focus();
           addingElement.dispatchEvent(eventClick);

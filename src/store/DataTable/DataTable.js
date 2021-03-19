@@ -11,7 +11,7 @@ class TableDataBase {
   isHierarchyMode = null;  // HIERARCHICAL TABLE SET WHEN LOADING OPTIONS
   relatedModelView = ''; // шаблон представление таблицы в других таблицах, компонентах, и т.д. ///DELETE
   listOptions = {};
-  listData = [];  // МАССИВ ССЫЛОК ДЛЯ ДРУГИХ ТАБЛИЦ  !!!!!
+  listData = [];  // МАССИВ ДАННЫХ  !!!!!
 }
 
 export default {

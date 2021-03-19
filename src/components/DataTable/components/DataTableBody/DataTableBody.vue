@@ -59,7 +59,7 @@
            class="body-column"
            :class="`body-column_${typeColumn}`"
            :key="`body-column-${indexColumn}`"
-           :style="itemColumn.position_in_template"
+           :style="computedPadding(itemColumn.position_in_template)"
            :tabindex="(isEditable) ? indexColumn : ''"
            :data-overflow-text="gettingValueForType(itemColumn, itemRow[itemColumn.value])"
            @focus="(event) => eventColumnFocus(event, itemRow)"
@@ -124,6 +124,7 @@ export default {
   ],
   props: {
     isHierarchyMode: {type: Boolean, default: false},
+    groupLevel: { type: Number, default: 0 },
     tableName: { type: String, default: '' },
     template: Object,
     items: { type: Array, default: () => [] },
@@ -195,6 +196,11 @@ export default {
     // }
   },
   methods: {
+    computedPadding(option) {
+      // console.log(this.groupLevel);
+      // console.log(option);
+      return option;// + ` padding-left= calc(0px + ${this.groupLevel * 10}px);`;
+    },
     // toggleGroup(event, option) {
     //   let sendOption = {
     //     tableName: this.tableName,

@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 class TableDataSpace {
-  constructor({pageSize = 300, isDeleted = false}) {
+  constructor({pageSize = 40, isDeleted = false}) {
     this.filters['page_size'] = pageSize;
     this.filters['is_deleted'] = isDeleted;
   };
@@ -64,8 +64,10 @@ export default {
   },
   SET_DATA_OPTIONS(state, option) {
     state[option.tableName][option.guid].tableDataCount = option.data.count;
-    state[option.tableName][option.guid].apiNext = option.data.next
-    state[option.tableName][option.guid].apiPrevious = option.data.previous;
+    // if ('nextLnk' in option)
+      state[option.tableName][option.guid].apiNext = option.data.next
+    // if('prevLnk' in option)
+      state[option.tableName][option.guid].apiPrevious = option.data.previous;
   },
   CLEAR_DATA(state, option) {
     state[option.tableName][option.guid].tableDataCount = -1;

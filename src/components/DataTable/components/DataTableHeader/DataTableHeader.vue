@@ -19,7 +19,7 @@
 
     <div class="header-row" 
          :class="`header-row_${typeHeight}`"
-         :style="computedTemplate" @click="(event) => eventClickColumn(event)">
+         :style="template" @click="(event) => eventClickColumn(event)">
       
       <div class="header-column header-column__action-max"
            :class="`header-column_${typeColumn}`"

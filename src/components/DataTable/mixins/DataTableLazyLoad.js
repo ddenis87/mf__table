@@ -33,7 +33,7 @@ export const DataTableLazyLoad = {
       if (bootAnchorEdge < this.parentElementEdge) {
         console.log('remote listener scroll');
         this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
-        // console.log('next');
+        console.log('next');
         if (this.getApiNext())
           this.requestData({next: true});
       }

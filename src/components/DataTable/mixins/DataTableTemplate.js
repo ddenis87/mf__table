@@ -66,8 +66,8 @@ export const DataTableTemplate = {
       let columnWidth = '';
       if (this.computedActionMax) columnWidth += 'minmax(22px,22px) ';
       // let groupLevel = this.listDataGroupLevel;
-      // if (this.isHierarchy) columnWidth += `minmax(${(groupLevel * 25) + 50}px,${(groupLevel * 25) + 50}px) `;
-      if (this.isHierarchyMode) columnWidth += `${(this.listDataGroupLevel * 20) + 40}px `;
+      // if (this.isHierarchyMode) columnWidth += `minmax(${(groupLevel * 25) + 50}px,${(groupLevel * 25) + 50}px) `;
+      if (this.isHierarchyMode) columnWidth += `${(this.listDataGroupLevel * 10) + 40}px `;
       array.forEach((element, index) => {
         if (element.width) {
           if (Array.isArray(element.width)) {
@@ -89,7 +89,7 @@ export const DataTableTemplate = {
       for (let i = 0; i < countRow; i++) columnWidthArray.push([]);
 
       for (let i = 0; i < countRow; i++) {
-        if (this.isHierarchyMode) columnWidthArray[i].push('40px')
+        // if (this.isHierarchyMode) columnWidthArray[i].push(`${(this.listDataGroupLevel * 20) + 40}px `)
         array[i].forEach(element => {
           if (element.value) {
             if (!element.column) {
