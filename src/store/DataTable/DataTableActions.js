@@ -186,7 +186,6 @@ export default {
           .get(addressApi)
           .then(response => {
             let buferData = [];
-            // response.data.next = null;
             state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
             response.data.results.forEach(element => {
               for (let key of Object.keys(element)) {
@@ -235,9 +234,7 @@ export default {
   },
 
   REQUEST_DATA_PRELOAD(state, option) {
-    // return new Promise((resolve, reject) => {
       console.log('preload data');
-      // console.log(option);
       let addressApi = option.data.previous;
       let sendOption = { // Заменить на option
         tableName: option.tableName,
@@ -249,7 +246,6 @@ export default {
         axios
           .get(addressApi)
           .then(response => {
-            // response.data.next = null;
             state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
             let joinResponse = response.data.results.concat(option.data.results);
             console.log(joinResponse);
@@ -298,13 +294,10 @@ export default {
   },
 
   REQUEST_DATA(state, option) {
-    console.log(option);
     let filterApi = state.getters.GET_FILTER_API(option);
     let filterExtended = state.getters.GET_FILTER_EXTENDED(option);
-    // let filterSorting = state.getters.GET_FILTER_SORTING(option);
     let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName) + filterApi + filterExtended;
     if ('next' in option) addressApi = state.getters.GET_ADDRESS_API_NEXT(option);
-    // if ('previous' in option) addressApi = state.getters.GET_ADDRESS_API_PREVIOUS(option);
     if ('id' in option) addressApi += `&page_by_id=${option.id}`;
 
     console.log(addressApi);
@@ -313,7 +306,6 @@ export default {
       guid: option.guid,
     };
     return new Promise((resolve, reject) => {
-      // if (!'hidden' in option)
       state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
       axios
         .get(addressApi)

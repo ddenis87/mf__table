@@ -21,7 +21,6 @@ class TableDataSpace {
     'is_group': null,
   };
   filtersExtended = null;
-  filtersSorting = [];
   addingMode = {
     index: null,
     id: null,
@@ -63,16 +62,21 @@ export default {
     else state[option.tableName].listData.push(option.value);
   },
   SET_DATA_PREVIOUS(state, option) {
+    // console.time('For join');
     state[option.tableName][option.guid].listData = option.buferData.concat(state[option.tableName][option.guid].listData);
+    // state[option.tableName][option.guid].listData = [...option.buferData, ...state[option.tableName][option.guid].listData];
+    // for (let i = 0; i < state[option.tableName][option.guid].listData.length - 1; i++) {
+    //   option.buferData.push(state[option.tableName][option.guid].listData[i])
+    // }
+    // state[option.tableName][option.guid].listData = option.buferData;
+    // console.timeEnd('For join');
   },
   SET_DATA_OPTIONS(state, option) {
     state[option.tableName][option.guid].tableDataCount = option.data.count;
-    // if ('nextLnk' in option)
-      state[option.tableName][option.guid].apiNext = option.data.next
-    // if('prevLnk' in option)
-      // state[option.tableName][option.guid].apiPrevious = option.data.previous;
+    state[option.tableName][option.guid].apiNext = option.data.next
   },
   SET_DATA_OPTIONS_PRELOAD(state, option) {
+    state[option.tableName][option.guid].tableDataCount = option.data.count;
     state[option.tableName][option.guid].apiPrevious = option.data.previous;
   },
   CLEAR_DATA(state, option) {
@@ -131,23 +135,12 @@ export default {
   },
   // ---------------------------------------------------------------------------
 
-
   // ----FILTERS----------------------------------------------------------------
   // ----УСТАНОВКА ФИЛЬТРОВ ПО УМОЛЧАНИЮ----------------------------------------
   SET_FILTER_DEFAULT(state, option) {
     for (let item of Object.entries(option.defaultFilters)) {
       state[option.tableName][option.guid].filters[item[0]] = item[1];
     }
-  },
-  // SET_FILTER_HIERARCHY(state, option) {
-  //   state[option.tableName][option.guid].filters['parent__isnull'] = true;
-  //   state[option.tableName][option.guid].filters['ordering'] = `-is_group`;
-  // },
-  SET_FILTER_SORTING(state, option) {
-    if (state[option.tableName][option.guid].filtersSorting.indexOf(option.value) -1)
-      state[option.tableName][option.guid].filtersSorting.push(option.value)
-    else
-      state[option.tableName][option.guid].filtersSorting.slice(state[option.tableName][option.guid].filtersSorting.indexOf(option.value), 1);
   },
   SET_FILTER_PARENT(state, option) {
     if (state[option.tableName][option.guid].listDataGroup.length) {
