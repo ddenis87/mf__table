@@ -29,19 +29,19 @@ export default {
     if (state[option.tableName][option.guid].filtersFields) filtersApi += state[option.tableName][option.guid].filtersFields;
     return filtersApi;
   },
-  GET_FILTER_SORTING:(state) => (option) => {
-    let filtersSorting = state[option.tableName][option.guid].filtersSorting;
-    let filtersSortingString = (state[option.tableName].isHierarchyMode) ? '&ordering=-is_group,' : (state[option.tableName][option.guid].filtersSorting.length > 0) ? '&ordering=' : '';
-    state[option.tableName][option.guid].filtersSorting.forEach(item => {
-      filtersSortingString += `${item}`;
-    })
-    return filtersSortingString;
-    // Object.keys(filtersSorting).forEach(key => {
-    //   if(filtersSorting[key] != null) {
+  // GET_FILTER_SORTING:(state) => (option) => {
+  //   // let filtersSorting = state[option.tableName][option.guid].filtersSorting;
+  //   let filtersSortingString = (state[option.tableName].isHierarchyMode) ? '&ordering=-is_group' : '';
+  //   // state[option.tableName][option.guid].filtersSorting.forEach(item => {
+  //   //   filtersSortingString += `${item}`;
+  //   // })
+  //   return filtersSortingString;
+  //   // Object.keys(filtersSorting).forEach(key => {
+  //   //   if(filtersSorting[key] != null) {
 
-    //   }
-    // })
-  },
+  //   //   }
+  //   // })
+  // },
 
   GET_TABLE_DESCRIPTION:(state) => (option) => { return (state[option.tableName]) ? state[option.tableName].description : ''; },
   GET_HIERARCHY_MODE:(state) => (option) => { return state[option.tableName].isHierarchyMode; },

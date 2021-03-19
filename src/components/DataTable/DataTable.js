@@ -128,7 +128,7 @@ export const DataTable = {
       this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
         tableName: this.tableName,
         guid: this.guid,
-        defaultFilters: {'ordering': `${(option.ordering) ? '' : '-'}${option.key}`}
+        defaultFilters: {'ordering': `${(this.isHierarchyMode) ? '-is_group,' : ''}${(option.ordering) ? '' : '-'}${option.key}`}
       });
     },
     closeEmptyDialog(option) {

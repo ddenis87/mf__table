@@ -15,14 +15,13 @@ class TableDataSpace {
     'page_size': '',
     'is_deleted': false,
     'parent__isnull': null,
-    // 'ordering': null,
+    'ordering': null,
     'search': null,
     'parent': null,
     'is_group': null,
   };
   filtersExtended = null;
-  filtersSorting = {
-  };
+  filtersSorting = [];
   addingMode = {
     index: null,
     id: null,
@@ -54,7 +53,7 @@ export default {
     if ('parent' in option.data) {
       state[option.tableName].isHierarchyMode = true;
       state[option.tableName][option.guid].filters['parent__isnull'] = true;
-      // state[option.tableName][option.guid].filters['ordering'] = `-is_group`;
+      state[option.tableName][option.guid].filters['ordering'] = `-is_group`;
     } else {
       state[option.tableName].isHierarchyMode = false;
     }
@@ -69,6 +68,9 @@ export default {
       state[option.tableName][option.guid].apiNext = option.data.next
     // if('prevLnk' in option)
       state[option.tableName][option.guid].apiPrevious = option.data.previous;
+  },
+  SET_DATA_OPTIONS_PRELOAD(state, option) {
+    state[option.tableName][option.guid].apiPrevious = option.data.previous;
   },
   CLEAR_DATA(state, option) {
     state[option.tableName][option.guid].tableDataCount = -1;

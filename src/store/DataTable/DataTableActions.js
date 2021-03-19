@@ -187,7 +187,7 @@ export default {
           .get(addressApi)
           .then(response => {
             response.data.next = null;
-            state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: response.data}));
+            state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
             let joinResponse = response.data.results.concat(option.data.results);
             console.log(joinResponse);
             joinResponse.forEach(element => {
@@ -241,8 +241,8 @@ export default {
     console.log(option);
     let filterApi = state.getters.GET_FILTER_API(option);
     let filterExtended = state.getters.GET_FILTER_EXTENDED(option);
-    let filterSorting = state.getters.GET_FILTER_SORTING(option);
-    let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName) + filterApi + filterExtended + filterSorting;
+    // let filterSorting = state.getters.GET_FILTER_SORTING(option);
+    let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName) + filterApi + filterExtended;
     if ('next' in option) addressApi = state.getters.GET_ADDRESS_API_NEXT(option);
     // if ('previous' in option) addressApi = state.getters.GET_ADDRESS_API_PREVIOUS(option);
     if ('id' in option) addressApi += `&page_by_id=${option.id}`;
