@@ -110,8 +110,10 @@ export default {
       state.dispatch('REQUEST_UPDATE', option)
         .then((response) => {
           // Перезапрос данные
-          state.commit('CLEAR_DATA', option);
-          state.dispatch('REQUEST_DATA', option);
+          let newOption = Object.assign({}, option);
+          delete newOption.id;
+          state.commit('CLEAR_DATA', newOption);
+          state.dispatch('REQUEST_DATA', newOption);
         })
     });
   },
@@ -172,6 +174,66 @@ export default {
       });
   },
 
+  REQUEST_DATA_PREVIOUS(state, option) {
+    let addressApi = state.getters.GET_ADDRESS_API_PREVIOUS(option);
+    let sendOption = { // Заменить на option
+      tableName: option.tableName,
+      guid: option.guid,
+    };
+    return new Promise((resolve, reject) => {
+      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+      axios
+          .get(addressApi)
+          .then(response => {
+            let buferData = [];
+            // response.data.next = null;
+            state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
+            response.data.results.forEach(element => {
+              for (let key of Object.keys(element)) {
+                let options = state.state[option.tableName].listOptions[key];
+                switch(options.type) {
+                  case 'choice': {
+                    element[key] = options.choices.find(item => item.value == element[key]);
+                    break;
+                  }
+                  case 'field': {
+                    if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
+                    let relatedModelName = options['related_model_name']
+                    if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
+                      state.commit('SET_DATA', {
+                        tableName: relatedModelName,
+                        value: element[key],
+                      });
+                    } // else Если есть, то возможно обновляем
+                    element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
+                  }
+                }
+              }
+
+              if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
+                state.commit('SET_DATA', {
+                  tableName: option.tableName,
+                  value: element,
+                });
+              }
+              buferData.push(state.state[option.tableName].listData.find(item => item.id == element.id));
+              // sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
+              // state.commit('SET_DATA', sendOption);
+            });
+            sendOption.buferData = buferData;
+            state.commit('SET_DATA_PREVIOUS', sendOption);
+            resolve();
+          })
+          .catch(error => {
+            console.log(error);
+            reject();
+          })
+          .finally(() => {
+            state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+          });
+    });
+  },
+
   REQUEST_DATA_PRELOAD(state, option) {
     // return new Promise((resolve, reject) => {
       console.log('preload data');
@@ -183,10 +245,11 @@ export default {
       };
       console.log(addressApi);
       return new Promise((resolve, reject) => {
+        state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
         axios
           .get(addressApi)
           .then(response => {
-            response.data.next = null;
+            // response.data.next = null;
             state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
             let joinResponse = response.data.results.concat(option.data.results);
             console.log(joinResponse);
@@ -232,9 +295,6 @@ export default {
             state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
           });
       });
-      // resolve();
-    // });
-    
   },
 
   REQUEST_DATA(state, option) {
@@ -261,16 +321,9 @@ export default {
           state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: response.data}));
 
           console.log(response.data.results);
-          // console.log(response.data.results.length);
-          // console.log(state.state[option.guid]);
-          // console.log(state.state[option.guid].filters['page_size']);
-          // if (response.data.results) {
-          if ((response.data.results.length < state.state[option.tableName][option.guid].filters['page_size']) && ('previous' in option)) {
-            
-            // sendOption.currentPage = response.data.results;
+          if ((response.data.results.length < state.state[option.tableName][option.guid].filters['page_size']) && ('previous' in option) && ('id' in option)) {
             state.dispatch('REQUEST_DATA_PRELOAD', sendOption)
               .then(() => {
-                console.log('resolve load iz preload');
                 resolve();
               })
           } else {

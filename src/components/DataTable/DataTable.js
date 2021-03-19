@@ -83,6 +83,12 @@ export const DataTable = {
         guid: this.guid,
       }, option));
     },
+    requestDataPrevious(option) {
+      this.$store.dispatch('DataTable/REQUEST_DATA_PREVIOUS', Object.assign({
+        tableName: this.tableName,
+        guid: this.guid,
+      }, option));
+    },
     async addingNewElement() {
       this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
       console.log('adding element for table');

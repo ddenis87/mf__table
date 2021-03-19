@@ -62,12 +62,15 @@ export default {
     if ('guid' in option) state[option.tableName][option.guid].listData.push(option.value);
     else state[option.tableName].listData.push(option.value);
   },
+  SET_DATA_PREVIOUS(state, option) {
+    state[option.tableName][option.guid].listData = option.buferData.concat(state[option.tableName][option.guid].listData);
+  },
   SET_DATA_OPTIONS(state, option) {
     state[option.tableName][option.guid].tableDataCount = option.data.count;
     // if ('nextLnk' in option)
       state[option.tableName][option.guid].apiNext = option.data.next
     // if('prevLnk' in option)
-      state[option.tableName][option.guid].apiPrevious = option.data.previous;
+      // state[option.tableName][option.guid].apiPrevious = option.data.previous;
   },
   SET_DATA_OPTIONS_PRELOAD(state, option) {
     state[option.tableName][option.guid].apiPrevious = option.data.previous;

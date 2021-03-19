@@ -6,7 +6,7 @@
              height="30"
              color="blue darken-3">
     <v-btn class="app-bar__btn" icon x-small @click="routeHome"><v-icon>mdi-menu</v-icon></v-btn>
-    <span class="app-bar__title">Демострационное приложение универсальной таблицы</span>
+    <span class="app-bar__title">Демонстрационное приложение универсальной таблицы</span>
     <v-spacer></v-spacer>
     <profile-user></profile-user>
   </v-app-bar>

@@ -14,28 +14,29 @@ export const DataTableLazyLoad = {
   mounted() {
     this.parentElement = document.querySelector(`.${this.guid}`);
     this.parentElementEdge = this.parentElement.getBoundingClientRect().bottom;
+    this.parentElementEdgeTop = this.parentElement.getBoundingClientRect().top;
   },
-  updated() { this.parentElementEdge = this.parentElement.getBoundingClientRect().bottom;},
+  updated() {
+    this.parentElementEdge = this.parentElement.getBoundingClientRect().bottom;
+  },
   methods: {
     eventScrollPagination() {
-      // this.isScroll = !this.isScroll;
       let bootAnchorEdge = this.parentElement.querySelector(`.${this.guid}__boot-anchor`).getBoundingClientRect().bottom - 500;
-      // console.log(bootAnchorEdge / 2, ' < ', this.parentElementEdge + 300);
-      // if (bootAnchorEdge / 2 < (this.parentElementEdge + 300)) {
-      //   if (this.getApiNext()) {
-      //     console.log('remote listener scroll');
-      //     this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
-      //     console.log('start lazy load');
-      //     this.requestData({next: true, hidden: true});
-      //   }
-      // }
-      // console.log(bootAnchorEdge, ' < ', this.parentElementEdge);
+      let bootAnchorPreviousEdge = this.parentElement.querySelector(`.${this.guid}__boot-anchor-previous`).getBoundingClientRect().top + 10;
+      // console.log(this.parentElementEdgeTop, ' - ', bootAnchorPreviousEdge);
+      if (bootAnchorPreviousEdge > this.parentElementEdgeTop) {
+        console.log('preload');
+        if(this.getApiPrevious()) {
+          this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
+          this.requestDataPrevious();
+        }
+      }
       if (bootAnchorEdge < this.parentElementEdge) {
-        console.log('remote listener scroll');
-        this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
-        console.log('next');
-        if (this.getApiNext())
+        console.log('load next');
+        if (this.getApiNext()) {
+          this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
           this.requestData({next: true});
+        }
       }
     },
   },

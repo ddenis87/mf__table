@@ -1,6 +1,5 @@
 <template>
   <div class="profile-user-bar">
-    <!-- <v-icon color="white">mdi-account-outline</v-icon> -->
     <span class="profile-user-bar__user-name">{{ userName }}</span>
     <v-tooltip bottom>
       <template v-slot:activator="{ on }">

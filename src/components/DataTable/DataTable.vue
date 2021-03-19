@@ -13,7 +13,7 @@
                           @set-sorting="setSorting"></data-table-header>
       <el-progress-bar :is-show="isLoadingData"></el-progress-bar>
     </div>
-    <div :class="`${guid}__boot-anchor-previous`"></div>
+    <div :class="`${guid}__boot-anchor-previous data-table__boot-anchor-previous`"></div>
     <div class="data-table__body-group">
       <data-table-body-group :table-name="tableName"
                              :template="dataTableTemplate"
@@ -156,6 +156,10 @@ export default {
     display: flex;
     min-height: 5px;
     z-index: 300;
+  }
+  &__boot-anchor-previous {
+    // height: 5px;
+    width: 5px;
   }
   &__body-group {
     position: relative;
