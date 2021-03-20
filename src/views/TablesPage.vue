@@ -90,7 +90,7 @@ export default {
       this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
         tableName: this.tableName,
         guid: this.guid,
-        defaultFilters: { 'search': option.value, 'ordering': null }
+        defaultFilters: { 'search': option.value }
       });
     },
     clearValueFreeSearch() {

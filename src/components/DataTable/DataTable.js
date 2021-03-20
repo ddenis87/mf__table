@@ -158,6 +158,7 @@ export const DataTable = {
       this.isDialogEmptyShow = false;
     },
     toggleGroup(option) {
+      this.eventBodyBlur();
       this.$store.dispatch('DataTable/SELECTED_GROUP', {
         tableName: this.tableName,
         guid: this.guid,

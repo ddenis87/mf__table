@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 class TableDataSpace {
-  constructor({pageSize = 40, isDeleted = false}) {
+  constructor({pageSize = 100, isDeleted = false}) {
     this.filters['page_size'] = pageSize;
     this.filters['is_deleted'] = isDeleted;
   };
