@@ -109,11 +109,16 @@ export const DataTableControl = {
       if (sendOption.actionName == 'editing') 
         this.$store.dispatch(`DataTable/UPDATE_ELEMENT`, sendOption);
       if (sendOption.actionName == 'adding') {
-        
+        this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
+          tableName: this.tableName,
+          guid: this.guid,
+          defaultFilters: {'parent__isnull': null, ordering: null}
+        });
         await this.$store.dispatch(`DataTable/ADDING_NEW_ELEMENT`, sendOption)
           .then((id) => {
             // console.log(document.querySelectorAll(`.${this.guid} .body [data-rowId="${id}"]`)[0]);
             let addingElement = document.querySelectorAll(`.${this.guid} .body [data-rowId="${id}"]`)[0];
+            if (!addingElement) return;
             let eventClick = new Event('click', {bubbles: false});
             addingElement.focus();
             addingElement.dispatchEvent(eventClick);

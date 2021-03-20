@@ -60,7 +60,7 @@ export default {
   },
   ADDING_NEW_ELEMEN_INLINE_FIELD(state, option) {
     return new Promise((resolve, reject) => {
-      console.log('action ADDING_NEW_ELEMEN_INLINE_FIELD')
+      // console.log('action ADDING_NEW_ELEMEN_INLINE_FIELD')
       state.commit('ADDING_NEW_ELEMEN_INLINE_FIELD', option);
       resolve();
     });
@@ -313,7 +313,7 @@ export default {
           state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: response.data}));
 
           // console.log(response.data.results);
-          if ((response.data.results.length < state.state[option.tableName][option.guid].filters['page_size']) && ('previous' in option) && ('id' in option)) {
+          if ((response.data.results.length < state.state[option.tableName][option.guid].filters['page_size']) && ('previous' in option) && ('id' in option) && (response.data.previous != null)) {
             state.dispatch('REQUEST_DATA_PRELOAD', sendOption)
               .then(() => {
                 resolve();
@@ -357,6 +357,7 @@ export default {
         })
         .catch(error => {
           console.log(error);
+          // state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: {count: 0, next: null}}));
           reject();
         })
         .finally(() => {

@@ -63,7 +63,7 @@ export default {
   },
   methods: {
     eventKeydown(option) {
-      console.log(option);
+      // console.log(option);
       switch(option.key) {
         case 'Escape': {
           this.editingCanceled();
@@ -91,9 +91,9 @@ export default {
 
     async editingAccepted(option) {
       // option.event.preventDefault();
-      console.log(option);
+      // console.log(option);
       if (this.$store.getters['DataTable/GET_ADDING_MODE']({tableName: this.properties.tableName, guid: this.properties.guid}).index) {
-        console.log('in line');
+        // console.log('in line');
         if (option.ev == 'blur') { this.editingCanceled(); return; }
         this.editingAcceptedStore(option);
         return;
@@ -166,8 +166,8 @@ export default {
         id: this.properties.itemRow.id,
         value: option.value,
       }
-      console.log(sendOption);
-      console.log(flag);
+      // console.log(sendOption);
+      // console.log(flag);
       if (option.value == null && this.properties.columnProperties.required == true) return;
       if (flag == 'element') {
         // this.$store.dispatch('DataTable/ADDING_INLINE_ELEMENT', sendOption);
