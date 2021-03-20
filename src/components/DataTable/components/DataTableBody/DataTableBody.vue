@@ -1,7 +1,8 @@
 <template>
+
   <div class="body"
        @mouseover="eventMouseOver"
-       @mouseout="eventMouseOut" @scroll="scrollBody">
+       @mouseout="eventMouseOut">
 
     <!-- TOOLTIP -->
     <data-table-tooltip :is-show="isTooltipShow"
@@ -41,25 +42,25 @@
       <!-- EXPANSION ROW -->
       <div class="body-column__action-max"
            :class="`body-column_${typeColumn}`"
-           v-if="computedActionMax && !isMultiline">
+           v-if="computedActionMax">
         <v-btn x-small icon class="action-btn" @click="eventExpansionRow">
           <v-icon small>mdi-chevron-down</v-icon>
         </v-btn>
       </div> <!---->
 
       <!-- GROUP ELEMENT class="body-column__group"--> 
-      <hierarchy-column class="body-column__group"
+      <!-- <hierarchy-column class="body-column__group"
                         v-if="isHierarchyMode"
                         :item-row="itemRow"
                         :data-id="itemRow.id"
                         @toggle-group="$emit('toggle-group', itemRow)"
-                        ></hierarchy-column>
+                        ></hierarchy-column> -->
 
       <div v-for="(itemColumn, indexColumn) in itemsHeader"
            class="body-column"
            :class="`body-column_${typeColumn}`"
            :key="`body-column-${indexColumn}`"
-           :style="computedPadding(itemColumn.position_in_template)"
+           :style="(indexColumn == 0) ? computedTemplateItem(itemColumn.position_in_template) : itemColumn.position_in_template"
            :tabindex="(isEditable) ? indexColumn : ''"
            :data-overflow-text="gettingValueForType(itemColumn, itemRow[itemColumn.value])"
            @focus="(event) => eventColumnFocus(event, itemRow)"
@@ -68,13 +69,17 @@
            @keydown.stop="(event) => eventColumnKeydown(event, itemRow, itemColumn, itemRow[itemColumn.value])"
            @editing-canceled="editingCanceled"
            @editing-accepted="editingAccepted">
-
+        <hierarchy-column class="body-column__group"
+                          v-if="isHierarchyMode && indexColumn == 0"
+                          :item-row="itemRow"
+                          :data-id="itemRow.id"
+                          @toggle-group="$emit('toggle-group', itemRow)"
+                          ></hierarchy-column>
         <div class="box-editing display-none">
           <div class="box-editing-default">
             <!-- includes default component editing -->
           </div>
         </div>
-
         <div class="box-display">
           <data-table-content-display :value="itemRow[itemColumn.value]"
                                       :properties="itemColumn"
@@ -147,75 +152,14 @@ export default {
       isTimerLoad: null,
     }
   },
-  computed: {
-    // isHierarchyMode() { return this.$store.getters[`DataTable/GET_HIERARCHY_MODE`](this.tableName); },
-    // isAddingMode() {
-    //   return (this.$store.getters['DataTable/GET_ADDING_MODE']({tableName: this.tableName, guid: this.guid}).index == null) ? false : true;
-    // },
-    // // isLoadingData() {
-    // //   return this.$store.getters[`DataTable/GET_STATUS_PROCESSING`];
-    // // },
-    // // isEmptyData() {
-    // //   clearTimeout(this.isTimerLoad);
-    // //   if (!this.$store.getters[`DataTable/GET_STATUS_PROCESSING`] && this.items.length == 0) {
-    // //     this.isTimerLoad = setTimeout(() => {this.isDataLoad = true}, 1000);
-    // //   } else {
-    // //     this.isDataLoad = false;
-    // //   }
-    // //   return this.isDataLoad;
-    // // },
-  },
-  watch: {
-    // isScroll() {
-    //   this.isTooltipShow = false;
-    // },
-  },
-  updated() {
-    // let addingModeId = this.$store.getters['DataTable/GET_ADDING_MODE']({
-    //   tableName: this.tableName, 
-    //   guid: this.guid,
-    // }).id;
-    // console.log('body update');
-    // if (addingModeId) {
-    //   let addingIndex = this.$store.getters['DataTable/GET_ADDING_MODE']({
-    //     tableName: this.tableName, 
-    //     guid: this.guid,
-    //   }).index;
-    //   console.log(addingIndex);
-    //   // let index = this.$store.getters['DataTable/GET_DATA_INDEX'](this.tableName, {id: addingMode.id});
-    //   if (document.querySelectorAll(`.${this.guid} .body .body-row`)[addingIndex] &&
-    //       document.querySelectorAll(`.${this.guid} .body .body-row`)[addingIndex].querySelectorAll('.body-column')) {
-    //     let firstElement = document.querySelectorAll(`.${this.guid} .body .body-row`)[addingIndex].querySelectorAll('.body-column')[0];
-    //     if (firstElement) {
-    //       setTimeout(() => {
-    //         firstElement.focus();
-    //         this.$store.commit('DataTable/SET_ADDING_ELEMENT_ID', { tableName: this.tableName, id: null, guid: this.guid });
-    //       }, 500);
-    //     }
-    //   }
-    // }
-  },
   methods: {
-    computedPadding(option) {
-      // console.log(this.groupLevel);
-      // console.log(option);
-      return option;// + ` padding-left= calc(0px + ${this.groupLevel * 10}px);`;
-    },
-    // toggleGroup(event, option) {
-    //   let sendOption = {
-    //     tableName: this.tableName,
-    //     guid: this.guid,
-    //     value: option,
-    //   };
-      
-    //   // ------
-    //   this.storeToggleGroup(sendOption);
-    //   // this.$emit('toggle-group', sendOption);
-    //   // ------
-
-    // },
-    scrollBody() {
-      console.log('scroll');
+    computedTemplateItem(option) {
+      console.log('computedTemplateItem');
+      let newStyle = {
+        [option.split(': ')[0]]: option.split(': ')[1],
+        'padding-left': `${(this.groupLevel * 20)}px`,
+      }
+      return newStyle;
     },
   },
 }
@@ -255,10 +199,13 @@ export default {
     &_focus { background-color: $rowBackgroundFocus; }
 
     .body-column {
+      display: flex;
+      gap: 5px;
       border: thin solid rgba(0, 0, 255, 0);
+      width: 100%;
       outline: none;
       overflow: hidden;
-
+      box-sizing: border-box;
       &_fixed { padding-left: $columnPaddingLRFixed; padding-right: $columnPaddingLRFixed; }
       &_dense { padding-left: $columnPaddingLRDense; padding-right: $columnPaddingLRDense; }
       &_auto  { padding-left: $columnPaddingLRAuto;  padding-right: $columnPaddingLRAuto;  }
@@ -283,6 +230,7 @@ export default {
         justify-content: flex-end;
         // gap: 3px;
         align-items: flex-start;
+        min-width: 45px;
         // .action-btn {
         //   margin-right: 5px;
         //   &_action {
@@ -294,6 +242,8 @@ export default {
       .box-editing, .box-display {
         width: 100%;
         height: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
       }
       .box-display {
         position: relative;

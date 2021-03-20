@@ -10,6 +10,7 @@
                :is-hide-label="true"
                :is-selected="true"
                :is-btn-clear="false"
+               @keydown="eventKeydown"
                @keydown-enter="editingAccepted"
                @keydown-tab="editingAccepted"
                @keydown-esc="editingCanceled"
@@ -61,6 +62,15 @@ export default {
     // },
   },
   methods: {
+    eventKeydown(option) {
+      console.log(option);
+      switch(option.key) {
+        case 'Escape': {
+          this.editingCanceled();
+          break;
+        }
+      }
+    },
     editingCanceled() {
       let editableElement = document.querySelector('.body-column_editing');
       let eventEditingCanceled = new CustomEvent('editing-canceled')

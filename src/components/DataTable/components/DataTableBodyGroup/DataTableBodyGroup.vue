@@ -4,7 +4,7 @@
          class="body-group-row"
          :class="`body-group-row_${typeHeight}`"
          :key="`body-group-row-${indexRow}`"
-         :style="computedTemplate(indexRow)"
+         :style="template"
          :tabindex="indexRow">
       
       <div class="body-group-column__action-max"
@@ -14,22 +14,27 @@
       </div>
 
       <!-- GROUP ELEMENT class="body-group-column__group"--> 
-      <hierarchy-column class="body-group-column__group"
+      <!-- <hierarchy-column class="body-group-column__group"
                         v-if="isHierarchyMode"
                         :item-row="itemRow"
                         :data-id="itemRow.id"
                         @toggle-group="$emit('toggle-group', itemRow)"
-                        ></hierarchy-column>
+                        ></hierarchy-column> -->
 
       <div v-for="(itemColumn, indexColumn) in itemsHeader"
            class="body-group-column"
            :class="`body-group-column_${typeColumn}`"
            :key="`body-group-column-${indexColumn}`"
-           :style="itemColumn.position_in_template"
+           :style="(indexColumn == 0) ? computedTemplateItem(itemColumn.position_in_template, indexRow) : itemColumn.position_in_template"
            :tabindex="(isEditable) ? indexColumn : ''"
            :data-overflow-text="gettingValueForType(itemColumn, itemRow[itemColumn.value])">
+           <hierarchy-column class="body-group-column__group"
+                        v-if="isHierarchyMode && indexColumn == 0"
+                        :item-row="itemRow"
+                        :data-id="itemRow.id"
+                        @toggle-group="$emit('toggle-group', itemRow)"
+                        ></hierarchy-column>
         <div class="box-display">
-          
           <data-table-content-display :value="itemRow[itemColumn.value]"
                                       :properties="itemColumn"
                                       :type-height="typeHeight"></data-table-content-display>
@@ -61,6 +66,7 @@ export default {
   props: {
     guid: { type: String, default: '' },
     tableName: { type: String, default: '' },
+    groupLevel: { type: Number, default: 0 },
     template: Object,
     startColumn: '',
     typeHeight: { type: String, default: 'fixed' },
@@ -72,50 +78,15 @@ export default {
     isEditable: {type: Boolean, default: false},
     isHierarchyMode: {type: Boolean, default: false},
   },
-  data() {
-    return {
-    }
-  },
-  methods: {
-    computedTemplate(index) {
-      console.log(this.startColumn);
-      console.log(this.template);
-      let element = this.startColumn;
-      let columnWidth = '';
-      console.log(Array.isArray(element.width))
-      if (Array.isArray(element.width)) {
-        console.log(element.width[0]);
-        console.log(element.width[1]);
-        columnWidth += `minmax(${(element.width[0] != undefined) ? 
-          element.width[0] + ((0) * 20) : 
-          `${100 + ((index + 0) * 0)}`}px,${(element.width[1] != undefined) ? 
-            element.width[1] + 'px' : 
-            '100vw'}) `;
-      } else {
-        columnWidth += `${element.width + ((index + 1) * 20)}px `
-      }
-      let newTemplate = {
-        'grid-template-areas': this.template['grid-template-areas'],
-        'grid-template-columns': '',
-      };
-      console.log(newTemplate);
-      // let widthStartColumn = this.templateGroup['grid-template-columns'].split(' ')[1];
-      let newGridTemplateColumns = this.template['grid-template-columns'].split(' ');
-      newGridTemplateColumns[1] = columnWidth;
-      newGridTemplateColumns[0] = `${40 + (20 * index)}px`;
 
-      newTemplate['grid-template-columns'] = ((this.isExpansion) ? '25px ' : '') + newGridTemplateColumns.join(' ');
-      console.log(newTemplate);
-      return newTemplate;
+  methods: {
+    computedTemplateItem(option, index) {
+      let newStyle = {
+        [option.split(': ')[0]]: option.split(': ')[1],
+        'padding-left': `${(index * 20)}px`,
+      }
+      return newStyle;
     },
-    // toggleGroup(event, option) {
-    //   let sendOption = {
-    //     tableName: this.tableName,
-    //     guid: this.guid,
-    //     value: option,
-    //   };
-    //   this.storeToggleGroup(sendOption);
-    // },
   },
 }
 </script>
@@ -143,6 +114,8 @@ export default {
     &_focus { background-color: $rowBackgroundFocus; }
 
     .body-group-column {
+      display: flex;
+      gap: 5px;
       border: thin solid rgba(0, 0, 255, 0);
       outline: none;
       overflow: hidden;
@@ -171,6 +144,7 @@ export default {
         justify-content: flex-end;
         // gap: 3px;
         align-items: flex-start;
+        min-width: 45px;
         // .action-btn {
         //   margin-right: 5px;
         //   &_action {

@@ -25,7 +25,7 @@ export const DataTableTemplate = {
     computedAreaUnoLine(array) {
       let area = '"';
       if (this.computedActionMax) area += 'action_max ';
-      if (this.isHierarchyMode) area += 'group ';
+      // if (this.isHierarchyMode) area += 'group ';
       array.forEach(element => area += `${element.value} `);
       area = area.trim();
       area += `"`;
@@ -37,7 +37,8 @@ export const DataTableTemplate = {
       let areaArray = [];
       for (let i = 0; i < countRow; i++) areaArray.push([]); // initial array
       for (let i = 0; i < countRow; i++) {
-        if (this.isHierarchyMode) areaArray[i].push('group');
+        if (this.computedActionMax) areaArray[i].push('action_max ');
+        // if (this.isHierarchyMode) areaArray[i].push('group');
         array[i].forEach(element => {
           if (element.column) {
             for (let k = 0; k < element.column; k++) areaArray[i].push(element.value);
@@ -65,9 +66,10 @@ export const DataTableTemplate = {
     computedWidthUnoLine(array) {
       let columnWidth = '';
       if (this.computedActionMax) columnWidth += 'minmax(22px,22px) ';
-      // let groupLevel = this.listDataGroupLevel;
-      // if (this.isHierarchyMode) columnWidth += `minmax(${(groupLevel * 25) + 50}px,${(groupLevel * 25) + 50}px) `;
-      if (this.isHierarchyMode) columnWidth += `${(this.listDataGroupLevel * 10) + 40}px `;
+
+      // if (this.isHierarchyMode) columnWidth += `${(this.listDataGroupLevel * 10) + 40}px `;
+      // if (this.isHierarchyMode) columnWidth += `${40}px `;
+
       array.forEach((element, index) => {
         if (element.width) {
           if (Array.isArray(element.width)) {
@@ -87,9 +89,11 @@ export const DataTableTemplate = {
 
       let columnWidthArray = [];
       for (let i = 0; i < countRow; i++) columnWidthArray.push([]);
-
       for (let i = 0; i < countRow; i++) {
-        // if (this.isHierarchyMode) columnWidthArray[i].push(`${(this.listDataGroupLevel * 20) + 40}px `)
+        if (this.computedActionMax) columnWidthArray[i].push(`minmax(22px,22px) `);
+        // if (this.isHierarchyMode) columnWidthArray[i].push(`${(this.listDataGroupLevel * 10) + 40}px `)
+        // if (this.isHierarchyMode) columnWidthArray[i].push(`${40}px `)
+
         array[i].forEach(element => {
           if (element.value) {
             if (!element.column) {

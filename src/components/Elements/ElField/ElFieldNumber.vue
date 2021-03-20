@@ -42,6 +42,10 @@ export default {
           this.eventKeyEnter(event);
           break;
         }
+        case 'Escape': {
+          this.eventKeyEsc();
+          break;
+        }
         case 'NumpadDecimal':
         case 'Slash': {
           if ((this.fieldValue.match(/[\.\,]/g)) && (this.fieldValue.match(/[\.\,]/g).length > 0)) { event.preventDefault(); return; }

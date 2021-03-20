@@ -11,7 +11,7 @@ export const DataTable = {
     isLoadingData() {
       let status = this.$store.getters['DataTable/GET_LOADING_API'](this.optionGetter);
       if (!status) {
-        console.log('add listener scroll');
+        // console.log('add listener scroll');
         this.parentElement.addEventListener('scroll', this.eventScrollPagination);
         if (this.getDataCount() != 0)
           setTimeout(() => this.eventScrollPagination(), 300);

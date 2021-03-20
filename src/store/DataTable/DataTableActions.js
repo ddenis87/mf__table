@@ -248,7 +248,7 @@ export default {
           .then(response => {
             state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
             let joinResponse = response.data.results.concat(option.data.results);
-            console.log(joinResponse);
+            // console.log(joinResponse);
             joinResponse.forEach(element => {
               for (let key of Object.keys(element)) {
                 let options = state.state[option.tableName].listOptions[key];
@@ -280,7 +280,7 @@ export default {
               sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
               state.commit('SET_DATA', sendOption);
             });
-            console.log('resolve preload');
+            // console.log('resolve preload');
             resolve();
           })
           .catch(error => {
@@ -312,7 +312,7 @@ export default {
         .then(response => {
           state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: response.data}));
 
-          console.log(response.data.results);
+          // console.log(response.data.results);
           if ((response.data.results.length < state.state[option.tableName][option.guid].filters['page_size']) && ('previous' in option) && ('id' in option)) {
             state.dispatch('REQUEST_DATA_PRELOAD', sendOption)
               .then(() => {
@@ -350,8 +350,8 @@ export default {
               sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
               state.commit('SET_DATA', sendOption);
             });
-            console.log(state.state);
-            console.log('resolve load iz preload');
+            // console.log(state.state);
+            // console.log('resolve load iz preload');
             resolve();
           }
         })

@@ -32,6 +32,7 @@ export default {
 .content-display {
   // position: relative;
   width: 100%;
+  // box-sizing: border-box;
   -webkit-user-select: none;
   // user-select: none;
   text-overflow: ellipsis;
@@ -49,7 +50,11 @@ export default {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
-  &_dense { white-space: nowrap; }
+  &_dense {
+    // display: inline-flex;
+    // width: 100%;
+    white-space: nowrap;
+  }
   &_auto { 
     display: block;
     -webkit-box-orient: unset;
