@@ -49,7 +49,7 @@ export default {
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 1);
   
-  z-index: 100;
+  z-index: 900;
   visibility: hidden;
   &_show {
     visibility: visible;

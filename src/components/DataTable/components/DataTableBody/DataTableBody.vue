@@ -5,22 +5,22 @@
        @mouseout="eventMouseOut">
 
     <!-- TOOLTIP -->
-    <data-table-tooltip :is-show="isTooltipShow"
+    <!-- <data-table-tooltip :is-show="isTooltipShow"
                         :data-properties="isTooltipProperties"
                         @click="isTooltipShow = false" 
                         @mousemove="isTooltipShow = false">
       {{ isTooltipProperties.text }}
-    </data-table-tooltip>
+    </data-table-tooltip> -->
 
     <!-- NO ELEMENT FOR DISPLAY -->
     <!-- <empty-content :tableName="tableName"
                    :guid="guid"></empty-content> -->
 
     <!-- OVERFLOW TEXT -->
-    <data-table-overflow :d-id="`${id}-body`"
+    <!-- <data-table-overflow :d-id="`${id}-body`"
                          :data-properties="isTooltipProperties"
                          @is-show="isTooltipShow = true" 
-                         @is-hide="isTooltipShow = false"></data-table-overflow>
+                         @is-hide="isTooltipShow = false"></data-table-overflow> -->
     
     <!-- NO ELEMENT FOR DISPLAY -->
     <!-- <div class="body-empty"
@@ -42,7 +42,7 @@
       <!-- EXPANSION ROW -->
       <div class="body-column__action-max"
            :class="`body-column_${typeColumn}`"
-           v-if="computedActionMax">
+           v-if="computedActionMax && !isMultiline">
         <v-btn x-small icon class="action-btn" @click="eventExpansionRow">
           <v-icon small>mdi-chevron-down</v-icon>
         </v-btn>

@@ -134,6 +134,8 @@ export default {
         }
         case 'toggle-multiline': {
           this.isMultiline = !this.isMultiline;
+          if (this.isMultiline == true) this.typeHeightNumber = 1;
+          else this.typeHeightNumber = 0;
           break;
         }
       }

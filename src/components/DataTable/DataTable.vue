@@ -1,5 +1,15 @@
 <template>
   <div class="data-table" :class="`${guid}`" >
+    <data-table-tooltip :is-show="isTooltipShow"
+                        :data-properties="isTooltipProperties"
+                        @click="isTooltipShow = false" 
+                        @mousemove="isTooltipShow = false">
+      {{ isTooltipProperties.text }}
+    </data-table-tooltip>
+    <data-table-overflow :d-id="`${id}-body`"
+                         :data-properties="isTooltipProperties"
+                         @is-show="isTooltipShow = true" 
+                         @is-hide="isTooltipShow = false"></data-table-overflow>
     <div class="data-table__header">
        <data-table-header 
                           :table-name="tableName"
@@ -48,7 +58,9 @@
                        @event-row-selected="eventRowSelected"
                        @event-row-keydown="eventRowKeydown"
                        @event-body-blur="eventBodyBlur"
-                       @adding-new-element="addingNewElement"></data-table-body>
+                       @adding-new-element="addingNewElement"
+                       @show-tooltip="tooltipShow"
+                       @hide-tooltip="tooltipHide"></data-table-body>
     </div>
 
     <!-- ANCHOR FOR LAZY LOAD DATA -->
@@ -68,6 +80,9 @@
 </template>
 
 <script>
+import DataTableOverflow from './components/DataTableOverflow.vue';
+import DataTableTooltip from './components/DataTableTooltip.vue'; 
+
 import ElProgressBar from '@/components/Elements/ElProgressBar/ElProgressBar.vue';
 import DataTableHeader from './components/DataTableHeader/DataTableHeader.vue';
 import DataTableBodyGroup from './components/DataTableBodyGroup/DataTableBodyGroup.vue';
@@ -83,6 +98,9 @@ import { DataTableLazyLoad } from './mixins/DataTableLazyLoad.js';
 export default {
   name: 'DataTable',
   components: {
+    DataTableOverflow,
+    DataTableTooltip,
+
     ElProgressBar,
     DataTableHeader,
     DataTableBodyGroup,
@@ -114,8 +132,48 @@ export default {
     return {
       tableName: this.properties.tableName,
       isDialogEmptyShow: false,
+
+      isTooltipShow: false,
+      isTooltipProperties: { top: -300, left: -300, width: 0, height: 0, text: '' },
     }
   },
+  computed: {
+    computedTooltipShift() {
+      // console.log(this.typeHeight, ' - ', this.typeColumn);
+      // let calcTooltipShift = {};
+      // if (this.isTooltipShow == false) calcTooltipShift = { left: -300, top: -300, }
+      let calcTooltipShift = { left: -1, top: -2, };
+      if (this.typeHeight == 'fixed' && this.typeColumn == 'fixed') { calcTooltipShift.left = -1; calcTooltipShift.top = -2; return calcTooltipShift};
+      if (this.typeHeight == 'fixed' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
+      if (this.typeHeight == 'auto' && this.typeColumn == 'fixed') { calcTooltipShift.left = 3; calcTooltipShift.top = -3; return calcTooltipShift};
+      if (this.typeHeight == 'dense' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
+      if (this.typeHeight == 'auto' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
+      return calcTooltipShift;
+    },
+  },
+  methods: {
+    tooltipShow(parent) {
+      // console.log(parent);
+      this.isTooltipProperties = {
+        top: (!parent.top) ? -300 : parent.top + this.computedTooltipShift.top,
+        left: parent.left + this.computedTooltipShift.left,
+        width: parent.width,
+        height: parent.height,
+        text: parent.text,
+      };
+    },
+    tooltipHide(event) {
+      this.isTooltipProperties = {
+        top: -300,
+        left: -300,
+        width: 0,
+        height: 0,
+      };
+      // if (event.relatedTarget?.classList?.contains('tooltip')) return;
+      this.isTooltipShow = false;
+      // clearTimeout(this.isTooltipTimer);
+    },
+  }
 }
 </script>
 

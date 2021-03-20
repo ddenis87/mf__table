@@ -14,6 +14,7 @@
       <data-table-control-element class="toolbar-group"
                                   :table-name="tableName"
                                   :focused-element="focusedElementForm"
+                                  :is-mark-deleted-view="isViewRecucleBin"
                                   :guid="guid"
                                   @event-mark-deleted="eventMarkDeleted"
                                   @blur-element="elementFocusedClear"></data-table-control-element>

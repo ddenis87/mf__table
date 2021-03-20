@@ -130,7 +130,7 @@ export default {
 
   // ----ПОМЕТКА НА УДАЛЕНИЕ ЭЛЕМЕНТА-------------------------------------------
   MARK_DELETED_ELEMENT(state, option) {
-    let index = state[option.tableName][option.guid].listData.findIndex(item => item.id == option.elementId);
+    let index = state[option.tableName][option.guid].listData.findIndex(item => item.id == option.id);
     state[option.tableName][option.guid].listData.splice(index, 1);
   },
   // ---------------------------------------------------------------------------

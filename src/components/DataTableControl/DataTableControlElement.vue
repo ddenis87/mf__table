@@ -60,7 +60,7 @@ export default {
       };
       await this.$store.dispatch('DataTable/MARK_DELETED_ELEMENT', sendOption)
         .then(() => {
-           snackBar.text = (this.isMarkDeletedRecord) ? 'Пометка на удаление снята' : 'Пометка на удаление установлена';
+           snackBar.text = (this.isMarkDeletedView) ? 'Пометка на удаление снята' : 'Пометка на удаление установлена';
            snackBar.status = true;
          })
          .catch(() => {

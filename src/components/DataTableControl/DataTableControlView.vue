@@ -4,7 +4,7 @@
                     @click="toggleView('toggle-type-row')">{{ (typeHeight[typeHeightNumber] == 'fixed') ? 'Строки сжато' : (typeHeight[typeHeightNumber] == 'dense') ? 'Строки свободно' : 'Строки фиксировано' }}</el-btn-icon>
     <el-btn-icon icon="mdi-view-split-horizontal"
                     :icon-color="(isExpansion) ? 'blue' : ''"
-                    :disabled="(isMountTable )"
+                    :disabled="(isMountTable || isMultiline)"
                     @click="toggleView('toggle-expansion')">Раскрытие строк</el-btn-icon>
     <el-btn-icon :icon="(typeColumn == 'fixed') ? 'mdi-view-parallel-outline' : 'mdi-view-parallel'" 
                     @click="toggleView('toggle-type-column')">{{ (typeColumn == 'fixed') ? 'Столбцы сжато' : 'Столбцы фиксировано' }}</el-btn-icon>

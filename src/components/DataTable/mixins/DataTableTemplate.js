@@ -37,7 +37,7 @@ export const DataTableTemplate = {
       let areaArray = [];
       for (let i = 0; i < countRow; i++) areaArray.push([]); // initial array
       for (let i = 0; i < countRow; i++) {
-        if (this.computedActionMax) areaArray[i].push('action_max ');
+        // if (this.computedActionMax) areaArray[i].push('action_max ');
         // if (this.isHierarchyMode) areaArray[i].push('group');
         array[i].forEach(element => {
           if (element.column) {
@@ -90,7 +90,7 @@ export const DataTableTemplate = {
       let columnWidthArray = [];
       for (let i = 0; i < countRow; i++) columnWidthArray.push([]);
       for (let i = 0; i < countRow; i++) {
-        if (this.computedActionMax) columnWidthArray[i].push(`minmax(22px,22px) `);
+        // if (this.computedActionMax) columnWidthArray[i].push(`minmax(22px,22px) `);
         // if (this.isHierarchyMode) columnWidthArray[i].push(`${(this.listDataGroupLevel * 10) + 40}px `)
         // if (this.isHierarchyMode) columnWidthArray[i].push(`${40}px `)
 
