@@ -142,11 +142,11 @@ export default {
       // console.log(this.typeHeight, ' - ', this.typeColumn);
       // let calcTooltipShift = {};
       // if (this.isTooltipShow == false) calcTooltipShift = { left: -300, top: -300, }
-      let calcTooltipShift = { left: -1, top: -2, };
-      if (this.typeHeight == 'fixed' && this.typeColumn == 'fixed') { calcTooltipShift.left = -1; calcTooltipShift.top = -2; return calcTooltipShift};
-      if (this.typeHeight == 'fixed' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
+      let calcTooltipShift = { left: -7, top: -3, };
+      // if (this.typeHeight == 'fixed' && this.typeColumn == 'fixed') { calcTooltipShift.left = -1; calcTooltipShift.top = -2; return calcTooltipShift};
+      if (this.typeHeight == 'fixed' && this.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift};
       if (this.typeHeight == 'auto' && this.typeColumn == 'fixed') { calcTooltipShift.left = 3; calcTooltipShift.top = -3; return calcTooltipShift};
-      if (this.typeHeight == 'dense' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
+      if (this.typeHeight == 'dense' && this.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift};
       if (this.typeHeight == 'auto' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
       return calcTooltipShift;
     },

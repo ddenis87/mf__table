@@ -154,12 +154,11 @@ export default {
   },
   methods: {
     computedTemplateItem(option) {
-      console.log('computedTemplateItem');
-      let newStyle = {
-        [option.split(': ')[0]]: option.split(': ')[1],
-        'padding-left': `${(this.groupLevel * 20)}px`,
-      }
-      return newStyle;
+      // console.log('option');
+      option['padding-left'] = `${(this.groupLevel * 20)}px`;
+      // let newStyle = Object.assign(option, {'padding-left': `${(this.groupLevel * 20)}px`});
+      
+      return option;
     },
   },
 }

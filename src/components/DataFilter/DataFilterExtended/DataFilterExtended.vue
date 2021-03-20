@@ -68,7 +68,7 @@ export default {
         target.closest('.data-filter-extended').querySelector('.tabspace-end button').focus();
         return;
       }
-      console.log(target.nextElementSibling);
+      // console.log(target.nextElementSibling);
       target.nextElementSibling.querySelector('.item .item-compare .el-field__item input').focus();
       // target.nextElementSibling.focus();
     },
@@ -82,6 +82,7 @@ export default {
       
     },
     eventKeydown(event) {
+      // if (event.key == 'Enter') this.nextElement(event.target);
       console.log(event);
       console.log(document.activeElement);
     },

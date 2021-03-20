@@ -7,6 +7,7 @@
                        :input-properties="{label: 'Начало'}"
                        v-model="fieldValue.start"
                        @input-value="eventInputValue"
+                       @keydown="eventKeydown"
                        @clear-value="eventClearValue"></el-field-number>
     
       <el-field-number class="el-field__item range-end"
@@ -31,6 +32,14 @@ export default {
   mixins: [
     ElFieldRange,
   ],
+  methods: {
+    eventKeydown(event) {
+      console.log(event);
+      // let eventTab = new Event('keydown', {key: 'Tab', code: 'Tab'})
+      // event.target.dispatchEvent(eventTab);
+
+    }
+  },
 }
 </script>
 

@@ -81,11 +81,12 @@ export default {
 
   methods: {
     computedTemplateItem(option, index) {
-      let newStyle = {
-        [option.split(': ')[0]]: option.split(': ')[1],
-        'padding-left': `${(index * 20)}px`,
-      }
-      return newStyle;
+      option['padding-left'] = `${(index * 20)}px`;
+      // let newStyle = {
+      //   [option.split(': ')[0]]: option.split(': ')[1],
+      //   'padding-left': `${(index * 20)}px`,
+      // }
+      return option;
     },
   },
 }

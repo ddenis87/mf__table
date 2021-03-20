@@ -133,9 +133,9 @@ export const DataTableBodyEvents = {
 
     // EVENTS MOUSE
     eventMouseOver(event) {
-      if (!this.isColumnEditing)
+      if (!this.isColumnEditing && this.typeHeight != 'auto')
         this.isTooltipTimer = setTimeout(() => {
-          let parent = event.target.closest('.body-column').getBoundingClientRect();
+          let parent = event.target.closest('.body-column > .box-display').getBoundingClientRect();
           // console.log(parent);
           this.$emit('show-tooltip', Object.assign(parent, {text: event.target.closest('.body-column').getAttribute('data-overflow-text')}));
         }, 1100);

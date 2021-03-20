@@ -52,7 +52,7 @@ export default {
     }
     newheaderBase.forEach(element => {
       if (element.value in headerStore) {
-        headerReturn.push(Object.assign(element, headerStore[element.value], {'position_in_template': `grid-area: ${element.value}`}));
+        headerReturn.push(Object.assign(element, headerStore[element.value], {'position_in_template': {'grid-area': element.value}}));
       }
     });
     return headerReturn;

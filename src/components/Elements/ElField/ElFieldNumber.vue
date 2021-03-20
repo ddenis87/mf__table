@@ -33,13 +33,14 @@ export default {
   ],
   methods: {
     eventKeydown(event) {
-      switch(event.code) {
+      switch(event.key) {
         case 'Tab': {
           this.eventKeyTab(event);
           break;
         }
         case 'Enter': {
           this.eventKeyEnter(event);
+          this.emitNextElement(event);
           break;
         }
         case 'Escape': {
