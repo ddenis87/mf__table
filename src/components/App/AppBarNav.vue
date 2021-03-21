@@ -23,6 +23,13 @@
             <v-list-item-icon><v-icon small>mdi-home</v-icon></v-list-item-icon>
             <v-list-item-title>Домашняя страница</v-list-item-title>
           </v-list-item>
+          <v-list-item class="app-bar-nav__item"
+                      dense
+                      tag="router-link"
+                      to="/test">
+            <v-list-item-icon><v-icon small>mdi-test-tube</v-icon></v-list-item-icon>
+            <v-list-item-title>TEST</v-list-item-title>
+          </v-list-item>
         </v-list-item-group>
       </v-list>
     </v-toolbar-items>

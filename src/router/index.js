@@ -41,6 +41,12 @@ const routes = [
     meta: { layout: 'Main' },
     component: () => import('@/views/TablesPage.vue'),
   },
+  {
+    path: '/Test',
+    name: 'Test',
+    meta: { layout: 'Main' },
+    component: () => import('@/views/Test.vue'),
+  },
   // {
   //   path: '/about',
   //   name: 'About',
