@@ -65,7 +65,7 @@ export default {
               event.key == '/') { event.preventDefault(); return; }
         }
       }
-      console.log(event);
+      // console.log(event);
     },
     eventKeyEnter(event) {
       if (this.checkRequiredField(event)) return;

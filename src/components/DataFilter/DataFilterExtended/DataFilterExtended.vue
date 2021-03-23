@@ -83,8 +83,8 @@ export default {
     },
     eventKeydown(event) {
       // if (event.key == 'Enter') this.nextElement(event.target);
-      console.log(event);
-      console.log(document.activeElement);
+      // console.log(event);
+      // console.log(document.activeElement);
     },
     inputFilter(option) {
       if (option.key == 'is_deleted') { return; }

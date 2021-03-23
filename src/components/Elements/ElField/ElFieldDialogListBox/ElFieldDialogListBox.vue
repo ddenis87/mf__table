@@ -24,7 +24,7 @@
     </v-text-field>
     <dialog-bar-right :is-dialog-name="`Список значений - ${inputProperties.label}`"
                       :is-dialog-show="isDialogShow"
-                      width="586"
+                      width="600"
                       @close-dialog="eventCloseDialog">
       <el-field-dialog-list-box-item :input-properties="inputProperties"
                                      :count-select-value="countSelectValue"
