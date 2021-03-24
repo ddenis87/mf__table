@@ -87,6 +87,7 @@ export default {
         guid: this.properties.guid,
       };
       this.$store.dispatch('DataTable/DELETING_NEW_ELEMENT_INLINE', sendOption);
+      // this.$emit('event-body-blur');
     },
 
     async editingAccepted(option) {

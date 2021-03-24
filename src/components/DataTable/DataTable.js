@@ -4,6 +4,7 @@ export const DataTable = {
   data() {
     return {
       guid: 'd' + Guid.newGuid().StringGuid,
+      isBlockTable: false,
     }
   },
   computed: {
@@ -15,6 +16,9 @@ export const DataTable = {
         this.parentElement.addEventListener('scroll', this.eventScrollPagination);
         if (this.getDataCount() != 0)
           setTimeout(() => this.eventScrollPagination(), 300);
+      } else {
+        if (this.parentElement)
+          this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
       }
       return status; //this.$store.getters['DataTable/GET_LOADING_API'](this.optionGetter);
     },
@@ -90,6 +94,7 @@ export const DataTable = {
       }, option));
     },
     async addingNewElement() {
+      this.isBlockTable = true;
       this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
       console.log('adding element for table');
       let index = this.$store.getters['DataTable/GET_ADDING_MODE']({
@@ -127,6 +132,9 @@ export const DataTable = {
           let eventClick = new Event('click', {bubbles: false});
           addingElement.focus();
           addingElement.dispatchEvent(eventClick);
+        })
+        .finally(() => {
+          this.isBlockTable = false;
         });
     },
     setSorting(option) {

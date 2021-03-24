@@ -100,6 +100,7 @@ export const DataTableBodyEvents = {
       editableElement.classList.remove('body-column_focus');
       editableElement.parentElement.classList.remove('body-row_focus');
       this.switchDecorationToDisplay();
+      this.$emit('event-body-blur');
     },
     editingAccepted(event) {
       switch(event.detail.key) {

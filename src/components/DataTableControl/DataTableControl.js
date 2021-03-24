@@ -21,7 +21,39 @@ export const DataTableControl = {
     }
   },
   computed: {
-    isMountTable() { return (this.guid) ? true : false },
+    isDisabledControl() {
+      if (!this.guid) return true;
+      let statusLoading = this.$store.getters['DataTable/GET_LOADING_API']({
+        tableName: this.tableName,
+        guid: this.guid,
+      });
+      let statusAdding = this.$store.getters['DataTable/GET_ADDING_MODE']({
+        tableName: this.tableName,
+        guid: this.guid,
+      }).index;
+      // if (!statusAdding) this.focusedElement = null;
+      return (!statusLoading && !statusAdding) ? false : true;
+    },
+    isFocusedElement() {
+      let statusAdding = this.$store.getters['DataTable/GET_ADDING_MODE']({
+        tableName: this.tableName,
+        guid: this.guid,
+      }).index;
+      return (this.focusedElement && !statusAdding) ? false : true;
+    },
+    // isLoadingData() {
+    //   if (!this.guid) return true;
+    //   let statusLoading = this.$store.getters['DataTable/GET_LOADING_API']({
+    //     tableName: this.tableName,
+    //     guid: this.guid,
+    //   });
+    //   let statusAdding = this.$store.getters['DataTable/GET_ADDING_MODE']({
+    //     tableName: this.tableName,
+    //     guid: this.guid,
+    //   }).index;
+    //   return (!statusLoading && !statusAdding) ? false : true;
+    // },
+    // isMountTable() { return (this.guid) ? true : false },
     isHierarchyMode() {
       return this.$store.getters['DataTable/GET_HIERARCHY_MODE']({
         tableName: this.tableName,
@@ -109,11 +141,11 @@ export const DataTableControl = {
       if (sendOption.actionName == 'editing') 
         this.$store.dispatch(`DataTable/UPDATE_ELEMENT`, sendOption);
       if (sendOption.actionName == 'adding') {
-        this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
-          tableName: this.tableName,
-          guid: this.guid,
-          defaultFilters: {'parent__isnull': null, ordering: null}
-        });
+        // this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
+        //   tableName: this.tableName,
+        //   guid: this.guid,
+        //   defaultFilters: {'parent__isnull': null, ordering: null}
+        // });
         await this.$store.dispatch(`DataTable/ADDING_NEW_ELEMENT`, sendOption)
           .then((id) => {
             // console.log(document.querySelectorAll(`.${this.guid} .body [data-rowId="${id}"]`)[0]);

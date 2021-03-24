@@ -14,16 +14,6 @@ class TableDataBase {
   listData = [];  // МАССИВ ДАННЫХ  !!!!!
 };
 
-class DataHistory {
-  constructor({relatedModelView = '{id}'}) {
-    this.relatedModelView = relatedModelView;
-  }
-  description = null;
-  listOptions = {};
-  listData = [];  // МАССИВ ДАННЫХ  !!!!!
-
-};
-
 export default {
   namespaced: true,
   state: {

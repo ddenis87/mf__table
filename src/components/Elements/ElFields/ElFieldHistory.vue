@@ -89,6 +89,7 @@ export default {
     // },
   },
   async created() {
+    if (!this.idElement) return;
     this.isLoadingData = true;
     let relatedModelView = this.$store.getters['DataTable/GET_RELATED_MODEL_VIEW']({ tableName: this.relatedModelName });
     let templateValue = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1).split('}{');

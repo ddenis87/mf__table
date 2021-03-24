@@ -1,19 +1,19 @@
 <template>
   <div class="data-table-control-view">
     <el-btn-icon :icon="(this.typeHeight[typeHeightNumber] == 'fixed') ? 'mdi-view-sequential' : (this.typeHeight[typeHeightNumber] == 'dense') ? 'mdi-view-sequential-outline' : 'mdi-view-agenda'" 
-                    @click="toggleView('toggle-type-row')">{{ (typeHeight[typeHeightNumber] == 'fixed') ? 'Строки сжато' : (typeHeight[typeHeightNumber] == 'dense') ? 'Строки свободно' : 'Строки фиксировано' }}</el-btn-icon>
+                 @click="toggleView('toggle-type-row')">{{ (typeHeight[typeHeightNumber] == 'fixed') ? 'Строки сжато' : (typeHeight[typeHeightNumber] == 'dense') ? 'Строки свободно' : 'Строки фиксировано' }}</el-btn-icon>
     <el-btn-icon icon="mdi-view-split-horizontal"
-                    :icon-color="(isExpansion) ? 'blue' : ''"
-                    :disabled="(isMountTable || isMultiline)"
-                    @click="toggleView('toggle-expansion')">Раскрытие строк</el-btn-icon>
+                 :icon-color="(isExpansion) ? 'blue' : ''"
+                 :disabled="(!isDisabledControl || isMultiline)"
+                 @click="toggleView('toggle-expansion')">Раскрытие строк</el-btn-icon>
     <el-btn-icon :icon="(typeColumn == 'fixed') ? 'mdi-view-parallel-outline' : 'mdi-view-parallel'" 
-                    @click="toggleView('toggle-type-column')">{{ (typeColumn == 'fixed') ? 'Столбцы сжато' : 'Столбцы фиксировано' }}</el-btn-icon>
+                 @click="toggleView('toggle-type-column')">{{ (typeColumn == 'fixed') ? 'Столбцы сжато' : 'Столбцы фиксировано' }}</el-btn-icon>
     <el-btn-icon icon="mdi-page-layout-footer"
-                    :icon-color="(isFooter) ? 'blue' : ''"
-                    @click="toggleView('toggle-footer')">Итоги</el-btn-icon>
+                 :icon-color="(isFooter) ? 'blue' : ''"
+                 @click="toggleView('toggle-footer')">Итоги</el-btn-icon>
     <el-btn-icon icon="mdi-view-quilt"
-                    :icon-color="(isMultiline) ? 'blue' : ''"
-                    @click="toggleView('toggle-multiline')">Многострочность</el-btn-icon>
+                 :icon-color="(isMultiline) ? 'blue' : ''"
+                 @click="toggleView('toggle-multiline')">Многострочность</el-btn-icon>
   </div>
 </template>
 

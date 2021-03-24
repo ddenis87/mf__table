@@ -1,8 +1,8 @@
 <template>
   <div class="data-table-control-actions-table">
-    <el-btn-icon icon="mdi-plus" :disabled="!isMountTable" @click="addingElement">Добавить элемент</el-btn-icon>
-    <el-btn-icon icon="mdi-table-row-plus-after" :disabled="!isMountTable" @click="addingElementInline">Добавить строку</el-btn-icon>
-    <el-btn-icon icon="mdi-folder-plus-outline" :disabled="!isMountTable || !isHierarchyMode" @click="addingGroup">Добавить группу</el-btn-icon>
+    <el-btn-icon icon="mdi-plus" :disabled="isDisabledControl" @click="addingElement">Добавить элемент</el-btn-icon>
+    <el-btn-icon icon="mdi-table-row-plus-after" :disabled="isDisabledControl" @click="addingElementInline">Добавить строку</el-btn-icon>
+    <el-btn-icon icon="mdi-folder-plus-outline" :disabled="isDisabledControl || !isHierarchyMode" @click="addingGroup">Добавить группу</el-btn-icon>
     
      <dialog-full-page :is-dialog-name="`Добавление ${(typeElement == 'element') ? 'записи' : 'группы'}`" 
                        :is-dialog-show="isDialogShow" 

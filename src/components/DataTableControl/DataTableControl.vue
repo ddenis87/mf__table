@@ -1,9 +1,11 @@
 <template>
   <div class="data-table-control">
+    
     <v-toolbar class="toolbar"
                height="48"
                flat>
       <!-- ACTIONS FOR TABLE -->
+      <!-- <v-overlay :value="isLoadingData" opacity="0.02" light z-index="999"></v-overlay> -->
       <data-table-control-table class="toolbar-group"
                                 :table-name="tableName"
                                 :focused-element="focusedElementForm"
@@ -21,8 +23,9 @@
       <v-divider vertical></v-divider>
       <div class="toolbar-group">
         <el-btn-icon icon="mdi-delete-variant"
-                   :icon-color="(isViewRecucleBin) ? 'blue' : ''"
-                   @click="toggleRecycleBin">{{ (isViewRecucleBin) ? 'Выйти из корзины' : 'Показать помеченные на удаление' }}</el-btn-icon>
+                     :disabled="isDisabledControl"
+                     :icon-color="(isViewRecucleBin) ? 'blue' : ''"
+                     @click="toggleRecycleBin">{{ (isViewRecucleBin) ? 'Выйти из корзины' : 'Показать помеченные на удаление' }}</el-btn-icon>
       </div>
       <v-divider vertical></v-divider>
       <v-spacer></v-spacer> 
@@ -40,7 +43,7 @@
       <div class="toolbar-group">
         <el-btn-icon icon="mdi-filter-outline" 
                    :icon-color="(isFilterFilds) ? 'blue' : ''"
-                   :disabled="!isMountTable"
+                   :disabled="isDisabledControl"
                    @click="isDialogFilterShow = !isDialogFilterShow">Фильтр</el-btn-icon>
       </div>
     </v-toolbar>

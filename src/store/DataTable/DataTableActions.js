@@ -68,13 +68,15 @@ export default {
   ADDING_NEW_ELEMENT(state, option) {
     // state.commit('SET_FILTER_DEFAULT', Object.assign(option, {})); ????
     // state.commit('CLEAR_DATA', option);
+    
     return new Promise((resolve, reject) => {
       state.dispatch('REQUEST_ADDING', option)
         .then((response) => {
           console.log(response);
+          state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
           // Отчистить Data запросить данные если добавляем не в строке
           // response должен содержать id созданного элемента
-          state.commit('CLEAR_DATA', option);
+          state.commit('CLEAR_DATA', option); // перенесено в REQUEST_DATA ???
           state.dispatch('REQUEST_DATA', Object.assign(option, {id: response.data.id, previous: true}))
             .then(() => {
               console.log('request data iz adding element')
@@ -228,7 +230,9 @@ export default {
             reject();
           })
           .finally(() => {
-            state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+            setTimeout(() => {
+              state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+            }, 800);
           });
     });
   },
@@ -288,7 +292,9 @@ export default {
             reject();
           })
           .finally(() => {
-            state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+            setTimeout(() => {
+              state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+            }, 800);
           });
       });
   },
@@ -297,7 +303,8 @@ export default {
     let filterApi = state.getters.GET_FILTER_API(option);
     let filterExtended = state.getters.GET_FILTER_EXTENDED(option);
     let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName) + filterApi + filterExtended;
-    if ('next' in option) addressApi = state.getters.GET_ADDRESS_API_NEXT(option);
+    if ('next' in option) { addressApi = state.getters.GET_ADDRESS_API_NEXT(option); }
+    // else { state.commit('CLEAR_DATA', option); };
     if ('id' in option) addressApi += `&page_by_id=${option.id}`;
 
     console.log(addressApi);
@@ -361,7 +368,9 @@ export default {
           reject();
         })
         .finally(() => {
-          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+          setTimeout(() => {
+            state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+          }, 800);
         });
     });
   },

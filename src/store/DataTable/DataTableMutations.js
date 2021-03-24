@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 class TableDataSpace {
-  constructor({pageSize = 100, isDeleted = false}) {
+  constructor({pageSize = 80, isDeleted = false}) {
     this.filters['page_size'] = pageSize;
     this.filters['is_deleted'] = isDeleted;
   };
@@ -29,6 +29,8 @@ class TableDataSpace {
   markersEvents = {
     filterExtendedReset: null,
     filterExtendedOff: null,
+    modeAdding: null,
+    modeEditing: null,
   };
 }
 

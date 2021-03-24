@@ -67,7 +67,11 @@ export default {
   },
   GET_DATA_GROUP:(state) => (option) => { return state[option.tableName][option.guid].listDataGroup; },
   GET_DATA_GROUP_LEVEL:(state) => (option) => { return state[option.tableName][option.guid].listDataGroup.length; },
-  GET_ADDING_MODE:(state) => (option) => { return state[option.tableName][option.guid].addingMode; },
+  GET_ADDING_MODE:(state) => (option) => {
+    if (option.guid)
+      return state[option.tableName][option.guid].addingMode;
+    return {index: null, id: null};
+  },
 
   GET_FILTER_DEFAULT_FIELD:(state) => (option) => {
     if (!option.guid) return false;

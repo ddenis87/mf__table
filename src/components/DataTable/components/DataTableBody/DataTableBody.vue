@@ -152,6 +152,9 @@ export default {
       isTimerLoad: null,
     }
   },
+  mounted() {
+    console.log('mount');
+  },
   methods: {
     computedTemplateItem(option) {
       // console.log('option');
