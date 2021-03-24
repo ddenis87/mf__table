@@ -7,10 +7,10 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <el-btn @click="closeDialogModal('cancel')">Отменить</el-btn>
-        <el-btn @click="closeDialogModal('off')">Отключить</el-btn>
-        <el-btn class="tabspace-end" 
+        <el-btn class="tabspace-end" @click="closeDialogModal('off')" @keydown="closeDialogModal('off')">Отключить</el-btn>
+        <!-- <el-btn class="tabspace-end" 
                     @click="closeDialogModal('reset')"
-                    @keydown="closeDialogModal('reset')">Сбросить</el-btn>
+                    @keydown="closeDialogModal('reset')">Сбросить</el-btn> -->
       </v-card-actions>
     </v-card>
     

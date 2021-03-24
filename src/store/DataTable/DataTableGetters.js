@@ -88,5 +88,24 @@ export default {
   GET_MARK_EVENTS_FILTER_EXTENDE_OFF:(state) => (option) => {
     if (!option.guid) return null;
     return state[option.tableName][option.guid].markersEvents.filterExtendedOff;
-  }
+  },
+
+
+  // HISTORY DATA -------------------------------------------------------
+  // ------------ -------------------------------------------------------
+  // ------------ -------------------------------------------------------
+  GET_HISTORY_ADDRESS_API:(state, getters, rootState, rootGetters) => (option) => {
+    let addressApi = `${rootGetters.GET_ADDRESS_API}api/v1/${option.tableName}/`;
+    switch(option.mode) {
+      case 'element': {
+        addressApi += `retrieve_actual/?`;
+        break;
+      }
+      case 'element_list': {
+        addressApi += `?`;
+        break;
+      }
+    }
+    return addressApi;
+  },
 }

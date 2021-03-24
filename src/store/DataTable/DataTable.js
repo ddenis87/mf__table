@@ -12,13 +12,25 @@ class TableDataBase {
   relatedModelView = ''; // шаблон представление таблицы в других таблицах, компонентах, и т.д. ///DELETE
   listOptions = {};
   listData = [];  // МАССИВ ДАННЫХ  !!!!!
-}
+};
+
+class DataHistory {
+  constructor({relatedModelView = '{id}'}) {
+    this.relatedModelView = relatedModelView;
+  }
+  description = null;
+  listOptions = {};
+  listData = [];  // МАССИВ ДАННЫХ  !!!!!
+
+};
 
 export default {
   namespaced: true,
   state: {
     "budgetclassification": new TableDataBase({ relatedModelView: '{head_code} - {head_name}' }),
     "organization": new TableDataBase({ relatedModelView: '{title}' }),
+
+    "actualdesc": new TableDataBase({ relatedModelView: '{some_desc}' }),
   },
   getters,
   mutations,

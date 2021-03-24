@@ -9,6 +9,12 @@
                            v-model="fieldFormValue.registry_date"
                            @next-element="eventNextElement"></el-field-date>
           </v-col>
+          <!-- <v-col cols="3" ></v-col> -->
+          <v-col cols="3" >
+            <el-field-history input-custom-label="История"
+                              related-model-name="actualdesc"
+                              :id-element="fieldFormValue.id"></el-field-history>
+          </v-col>
         </v-row>
          <v-row dense>
           <v-col cols="3">

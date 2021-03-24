@@ -428,5 +428,29 @@ export default {
           state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
         });
     });
-  }
+  },
+
+
+  // HISTORY DATA -------------------------------------------------------
+  // ------------ -------------------------------------------------------
+  // ------------ -------------------------------------------------------
+
+  HISTORY_REQUEST_DATA(state, option) {
+    let addressApi = state.getters.GET_HISTORY_ADDRESS_API(option);
+    if (option.mode == 'element') addressApi += `id=${option.id}`;
+    if (option.mode == 'element_list') addressApi += `related=${option.id}`;
+    console.log(addressApi);
+    return new Promise((resolve, reject) => {
+      axios
+        .get(addressApi)
+        .then(response => {
+          console.log(response);
+          resolve(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        })
+    })
+  },
 }
