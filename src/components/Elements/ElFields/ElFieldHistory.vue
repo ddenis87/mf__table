@@ -25,13 +25,13 @@
     </v-text-field>
     <dialog-modal is-dialog-name="История изменений"
                   :width="800"
-                  
+
                   :is-dialog-show="isShowDialog"
                   @close-dialog="closeDialog">
-      <v-card class="history-table">
+      <!-- <v-card class="history-table"> -->
         <component :is="componentTable"
                    :default-filters="filters"></component>
-      </v-card>
+      <!-- </v-card> -->
     </dialog-modal>
   </div>
 </template>

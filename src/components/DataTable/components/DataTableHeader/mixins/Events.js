@@ -42,10 +42,16 @@ export const Events = {
       clearTimeout(this.isTooltipTimer);
     },
     eventClickColumn(event) {
-      if (document.querySelector('.header-row').querySelector('.header-column__sort_active')) {
-        document.querySelector('.header-row').querySelector('.header-column__sort_active').classList.remove('header-column__sort_active_asc');
-        document.querySelector('.header-row').querySelector('.header-column__sort_active').classList.remove('header-column__sort_active');
+      console.log(event);
+      if (event.target.closest('.header-row').querySelector('.header-column__sort_active')) {
+        event.target.closest('.header-row').querySelector('.header-column__sort_active').classList.remove('header-column__sort_active_asc');
+        event.target.closest('.header-row').querySelector('.header-column__sort_active').classList.remove('header-column__sort_active');
       }
+
+      // if (document.querySelector('.header-row').querySelector('.header-column__sort_active')) {
+      //   document.querySelector('.header-row').querySelector('.header-column__sort_active').classList.remove('header-column__sort_active_asc');
+      //   document.querySelector('.header-row').querySelector('.header-column__sort_active').classList.remove('header-column__sort_active');
+      // }
 
       let targetColumn = event.target.closest('.header-column');
       targetColumn.querySelector('.header-column__sort').classList.add('header-column__sort_active');

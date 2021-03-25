@@ -4,11 +4,12 @@
             v-model="isDialogShow"
             max-width="800"
             @click:outside="$emit('close-dialog')">
-  <v-card >
-    <dialog-toolbar :is-dialog-name="isDialogName"
+  <v-card min-height="300" class="dialog-body">
+    <dialog-toolbar class="dialog-body__header"
+                    :is-dialog-name="isDialogName"
                     :height="44"
                     @close-dialog="$emit('close-dialog')"></dialog-toolbar>
-    <div class="dialog__body">
+    <div class="dialog-body__body">
       <slot></slot>
     </div>
   </v-card>
@@ -30,3 +31,20 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.dialog-body {
+  display: grid;
+  grid-template-areas: "header" "body";
+  grid-template-columns: 100%;
+  grid-template-rows: 44px 1fr;
+  &__header {
+    grid-area: header;
+  }
+  &__body {
+    grid-area: body;
+    padding: 5px;
+  }
+}
+
+</style>

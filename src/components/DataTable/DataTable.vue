@@ -1,6 +1,6 @@
 <template>
   <div class="data-table" :class="`${guid}`" >
-    <v-overlay :value="isLoadingData" light z-index="999" opacity="0.1"></v-overlay>
+    <v-overlay :value="isLoadingData" light z-index="999" opacity="0.08" :absolute="true"></v-overlay>
     <data-table-tooltip :is-show="isTooltipShow"
                         :data-properties="isTooltipProperties"
                         @click="isTooltipShow = false" 
