@@ -2,8 +2,9 @@
   <v-dialog class="dialog-modal" hide-overlay
             :width="width"
             v-model="isDialogShow"
+            max-width="800"
             @click:outside="$emit('close-dialog')">
-  <v-card>
+  <v-card >
     <dialog-toolbar :is-dialog-name="isDialogName"
                     :height="44"
                     @close-dialog="$emit('close-dialog')"></dialog-toolbar>
@@ -25,6 +26,7 @@ export default {
     isDialogShow: { type: Boolean, default: false },
     isDialogName: { type: String, default: '' },
     width: { type: Number, default: 500 },
+    
   }
 }
 </script>

@@ -30,6 +30,7 @@ export default {
       listTable: [
         {value: 'Организации', path: 'TableOrganization', tableName: 'organization'},
         {value: 'Главные распорядители', path: 'TableBudgetclassification', tableName: 'budgetclassification'},
+        {value: 'Actual descs', path: 'TableActualdesc', tableName: 'actualdesc'},
       ],
     }
   },

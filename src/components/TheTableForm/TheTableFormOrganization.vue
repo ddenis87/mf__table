@@ -78,14 +78,14 @@
         </v-row>
         <v-row dense>
           <v-col cols="12">
-            <el-field-dialog :inputProperties="assingObject(fieldForm.bk, {related_model_view: '{head_code} - {head_name}'})"
+            <el-field-dialog :inputProperties="assingObject(fieldForm.bk, {})"
                              v-model="fieldFormValue.bk"
                              @next-element="eventNextElement"></el-field-dialog>
           </v-col>
         </v-row>
         <v-row dense>
           <v-col cols="12">
-            <el-field-dialog :inputProperties="assingObject(fieldForm.parent, {related_model_view: '{title} - {id}'})"
+            <el-field-dialog :inputProperties="assingObject(fieldForm.parent, {})"
                              :filters="{ 'is_group': true }"
                              customLabel="Группа"
                              v-model="fieldFormValue.parent"

@@ -171,11 +171,12 @@ export const DataTable = {
     },
     toggleGroup(option) {
       this.eventBodyBlur();
-      this.$store.dispatch('DataTable/SELECTED_GROUP', {
-        tableName: this.tableName,
-        guid: this.guid,
-        value: option
-      });
+      if (!this.$store.getters['DataTable/GET_FILTER_DEFAULT_FIELD'](Object.assign(this.optionGetter, {filter: 'is_deleted'})))
+        this.$store.dispatch('DataTable/SELECTED_GROUP', {
+          tableName: this.tableName,
+          guid: this.guid,
+          value: option
+        });
     }
   }
 }
