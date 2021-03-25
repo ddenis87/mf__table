@@ -6,25 +6,8 @@ import ContentEditing from '../components/ContentEditing.vue';
 export const DataTableBodyEvents = {
   data() {
     return {
-      // isSorting: false,
-      isSortingOrderAsc: false,
-      isSortingCurrentField: '',
-      // isTooltipShow: false,
       isTooltipTimer: null,
-      // isTooltipProperties: { top: 0, left: 0, width: 0, height: 0, text: '' },
     }
-  },
-  computed: {
-    // computedTooltipShift() {
-    //   // console.log(this.typeHeight, ' - ', this.typeColumn);
-    //   let calcTooltipShift = { left: -2, top: -3, };
-    //   // if (this.typeHeight == 'fixed' && this.typeColumn == 'fixed') { calcTooltipShift.left = 4; calcTooltipShift.top = -2; return calcTooltipShift};
-    //   if (this.typeHeight == 'fixed' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
-    //   if (this.typeHeight == 'auto' && this.typeColumn == 'fixed') { calcTooltipShift.left = 3; calcTooltipShift.top = -3; return calcTooltipShift};
-    //   if (this.typeHeight == 'dense' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
-    //   if (this.typeHeight == 'auto' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
-    //   return calcTooltipShift;
-    // },
   },
   methods: {
     // EVENT EXPANSION ROW
@@ -211,8 +194,6 @@ export const DataTableBodyEvents = {
       }
     },
 
-
-
     // EVENT FOCUS/SELECT/BLUR ROW
     eventRowFocus(event, itemRow) {
       this.isRowFocus = true;
@@ -245,32 +226,5 @@ export const DataTableBodyEvents = {
       if (!event.relatedTarget) this.$emit('event-body-blur');
       // this.emitBlurBody(event);
     },
-
-    // FUNCTION TOOLTIP
-    // tooltipShow(parent) {
-    //   // if (event.target.classList.contains('content-display')) {
-    //   //   let parent = event.target.closest('.body-column');
-    //   //   // this.isTooltipTimer = setTimeout(() => {
-    //       this.isTooltipProperties = {
-    //   //       top: parent.getBoundingClientRect().top + this.computedTooltipShift.top,
-    //   //       left: parent.getBoundingClientRect().left + this.computedTooltipShift.left,
-    //   //       width: parent.getBoundingClientRect().width,
-    //   //       height: parent.getBoundingClientRect().height,
-    //   //       text: parent.getAttribute('data-overflow-text'),
-    //       };
-    //   //   // }, 1100);
-    //   // }
-    // },
-    // tooltipHide(event) {
-    //   // this.isTooltipProperties = {
-    //   //   top: -300,
-    //   //   left: -300,
-    //   //   width: 0,
-    //   //   height: 0,
-    //   // };
-    //   // if (event.relatedTarget?.classList?.contains('tooltip')) return;
-    //   // this.isTooltipShow = false;
-    //   clearTimeout(this.isTooltipTimer);
-    // },
   }
 }

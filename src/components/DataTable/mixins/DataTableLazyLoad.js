@@ -3,13 +3,7 @@ export const DataTableLazyLoad = {
     return {
       parentElement: null,
       parentElementEdge: 0,
-      // isScroll: false,
     }
-  },
-  watch: {
-    // isLoadingData() {
-    //   // console.log(this.isLoadingData);
-    // },
   },
   mounted() {
     this.parentElement = document.querySelector(`.${this.guid}`);
@@ -23,7 +17,6 @@ export const DataTableLazyLoad = {
     eventScrollPagination() {
       let bootAnchorEdge = this.parentElement.querySelector(`.${this.guid}__boot-anchor`).getBoundingClientRect().bottom - 1500;
       let bootAnchorPreviousEdge = this.parentElement.querySelector(`.${this.guid}__boot-anchor-previous`).getBoundingClientRect().top + 10;
-      // console.log(this.parentElementEdgeTop, ' - ', bootAnchorPreviousEdge);
       if (bootAnchorPreviousEdge > this.parentElementEdgeTop) {
         // console.log('preload');
         if(this.getApiPrevious()) {

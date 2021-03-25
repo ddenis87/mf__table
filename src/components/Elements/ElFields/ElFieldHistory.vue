@@ -28,11 +28,8 @@
                   :is-dialog-show="isShowDialog"
                   @close-dialog="closeDialog">
       <v-card height="300" class="history-table">
-      <!-- <div class="history-table"> -->
         <component :is="componentTable" 
                    :default-filters="filters"></component>
-      <!-- </div> -->
-        <!-- 123 -->
       </v-card>
     </dialog-modal>
   </div>
@@ -100,17 +97,6 @@ export default {
       })
   },
   methods: {
-    // async loadHistoryDataList() {
-    //   await this.$store.dispatch('DataTable/HISTORY_REQUEST_DATA',{
-    //       tableName: this.relatedModelName,
-    //       mode: 'element_list',
-    //       id: this.idElement
-    //     })
-    //     .then(response => {
-    //       console.log(response.results);
-    //       this.tableItem = response.results;
-    //     })
-    // },
     openDialog() {
       this.isShowDialog = true;
     },

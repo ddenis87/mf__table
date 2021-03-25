@@ -1,7 +1,7 @@
 <template>
-  <div :class="`data-overflow ${dId}-data-overflow`" :style="styleParent">
-    <div :class="`data-overflow-block ${dId}-data-overflow-block`">{{ content }}</div>
-    <div :class="`data-overflow-line ${dId}-data-overflow-line`">{{ content }}</div>
+  <div :class="`data-overflow ${guid}-data-overflow`" :style="styleParent">
+    <div :class="`data-overflow-block ${guid}-data-overflow-block`">{{ content }}</div>
+    <div :class="`data-overflow-line ${guid}-data-overflow-line`">{{ content }}</div>
   </div>
 </template>
 
@@ -9,8 +9,8 @@
 export default {
   name: 'DataTableOverflow',
   props: {
-    dId: '',
-    dataProperties: Object,
+    guid: '',
+    properties: { type: Object, default() { return { width: 0, height: 0, text: '' } }},
   },
   data() {
     return {
@@ -22,24 +22,24 @@ export default {
       this.$emit('is-hide');
       setTimeout(() => this.computedOverflow(), 50);
       return {
-        width: this.dataProperties.width - 24 + 'px',
-        height: this.dataProperties.height + 'px',
+        width: this.properties.width - 24 + 'px',
+        height: this.properties.height + 'px',
       }
     },
     content() {
       this.$emit('is-hide');
-      return this.dataProperties.text;
+      return this.properties.text;
     },
   },
   methods: {
     computedOverflow() {
-      let overflow = document.querySelector(`.${this.dId}-data-overflow`);
-      let overflowBlock = document.querySelector(`.${this.dId}-data-overflow-block`);
+      let overflow = document.querySelector(`.${this.guid}-data-overflow`);
+      let overflowBlock = document.querySelector(`.${this.guid}-data-overflow-block`);
       if (overflow.getBoundingClientRect().height + 10 < overflowBlock.getBoundingClientRect().height) {
         this.$emit('is-show');
         return;
       }
-      let overflowLine = document.querySelector(`.${this.dId}-data-overflow-line`);
+      let overflowLine = document.querySelector(`.${this.guid}-data-overflow-line`);
       if (overflow.getBoundingClientRect().width + 4 < overflowLine.getBoundingClientRect().width) {
         this.$emit('is-show');
         return;

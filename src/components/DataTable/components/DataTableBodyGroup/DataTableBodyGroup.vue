@@ -13,14 +13,6 @@
         <span style="visibility: hidden">1</span>
       </div>
 
-      <!-- GROUP ELEMENT class="body-group-column__group"--> 
-      <!-- <hierarchy-column class="body-group-column__group"
-                        v-if="isHierarchyMode"
-                        :item-row="itemRow"
-                        :data-id="itemRow.id"
-                        @toggle-group="$emit('toggle-group', itemRow)"
-                        ></hierarchy-column> -->
-
       <div v-for="(itemColumn, indexColumn) in itemsHeader"
            class="body-group-column"
            :class="`body-group-column_${typeColumn}`"
@@ -28,12 +20,11 @@
            :style="(indexColumn == 0) ? computedTemplateItem(itemColumn.position_in_template, indexRow) : itemColumn.position_in_template"
            :tabindex="(isEditable) ? indexColumn : ''"
            :data-overflow-text="gettingValueForType(itemColumn, itemRow[itemColumn.value])">
-           <hierarchy-column class="body-group-column__group"
-                        v-if="isHierarchyMode && indexColumn == 0"
-                        :item-row="itemRow"
-                        :data-id="itemRow.id"
-                        @toggle-group="$emit('toggle-group', itemRow)"
-                        ></hierarchy-column>
+        <hierarchy-column class="body-group-column__group"
+                          v-if="isHierarchyMode && indexColumn == 0"
+                          :item-row="itemRow"
+                          :data-id="itemRow.id"
+                          @toggle-group="$emit('toggle-group', itemRow)"></hierarchy-column>
         <div class="box-display">
           <data-table-content-display :value="itemRow[itemColumn.value]"
                                       :properties="itemColumn"

@@ -3,20 +3,6 @@
        @mouseover="eventMouseOver"
        @mouseout="eventMouseOut">
 
-    <!-- TOOLTIP -->
-    <data-table-tooltip :is-show="isTooltipShow"
-                        :data-properties="isTooltipProperties"
-                        @click="isTooltipShow = false" 
-                        @mousemove="isTooltipShow = false">
-      {{ isTooltipProperties.text }}
-    </data-table-tooltip>
-
-    <!-- OVERFLOW TEXT -->
-    <data-table-overflow :d-id="`${id}-header`"
-                         :data-properties="isTooltipProperties"
-                         @is-show="isTooltipShow = true" 
-                         @is-hide="isTooltipShow = false"></data-table-overflow>
-
     <div class="header-row" 
          :class="`header-row_${typeHeight}`"
          :style="template" @click="(event) => eventClickColumn(event)">
@@ -46,8 +32,6 @@
 </template>
 
 <script>
-import DataTableOverflow from '../DataTableOverflow.vue';
-import DataTableTooltip from '../DataTableTooltip.vue'; 
 import DataTableContentDisplay from '../DataTableContentDisplay.vue';
 
 import { DataTable } from '../DataTable.js';
@@ -56,8 +40,6 @@ import { Events } from './mixins/Events.js';
 export default {
   name: 'DataTableHeader',
   components: {
-    DataTableOverflow,
-    DataTableTooltip,
     DataTableContentDisplay,
   },
   mixins: [
@@ -65,19 +47,13 @@ export default {
     Events,
   ],
   props: {
-    id: { type: String, default: 'dataTable' },
-    guid: { type: String, default: '' },
-    tableName: { type: String, default: '' },
     template: Object,
     typeHeight: { type: String, default: 'fixed' },
     typeColumn: { type: String, default: 'fixed' },
     items: { type: Array, default: () => [] },
-    isExpansion: {type: Boolean, default: false},
     isMultiline: {type: Boolean, default: false},
-    isHierarchyMode: {type: Boolean, default: false},
   },
   computed: {
-    // isHierarchyMode() { return this.$store.getters[`DataTable/GET_HIERARCHY_MODE`](this.tableName); },
     computedTemplate() {
       let newTemplate = Object.assign({}, this.template);
       if (this.items.length != 0)

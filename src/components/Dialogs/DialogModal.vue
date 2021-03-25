@@ -34,11 +34,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.dialog-modal {
-  // &__body {
-  //   padding: 5px;
-  //   max-height: 100px;
-    border: 5px solid green;
-  // }
-}
+
 </style>

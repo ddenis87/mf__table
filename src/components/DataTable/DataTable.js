@@ -45,7 +45,7 @@ export const DataTable = {
       if (this.listDataCount == 0 && 
           (this.$store.getters['DataTable/GET_FILTER_EXTENDED'](this.optionGetter) != '' ||
             this.$store.getters['DataTable/GET_FILTER_DEFAULT_FIELD'](Object.assign(this.optionGetter, {filter: 'search'})) != null )) {
-        this.isDialogEmptyShow = true;
+        this.isShowDialogEmpty = true;
       }
       // if (this.listDataCount < 50) {
       //   if (this.getApiNext())
@@ -167,7 +167,7 @@ export const DataTable = {
           defaultFilters: { 'search': null, 'is_deleted': false, }
         });
       }
-      this.isDialogEmptyShow = false;
+      this.isShowDialogEmpty = false;
     },
     toggleGroup(option) {
       this.eventBodyBlur();

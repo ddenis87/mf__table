@@ -4,29 +4,6 @@
        @mouseover="eventMouseOver"
        @mouseout="eventMouseOut">
 
-    <!-- TOOLTIP -->
-    <!-- <data-table-tooltip :is-show="isTooltipShow"
-                        :data-properties="isTooltipProperties"
-                        @click="isTooltipShow = false" 
-                        @mousemove="isTooltipShow = false">
-      {{ isTooltipProperties.text }}
-    </data-table-tooltip> -->
-
-    <!-- NO ELEMENT FOR DISPLAY -->
-    <!-- <empty-content :tableName="tableName"
-                   :guid="guid"></empty-content> -->
-
-    <!-- OVERFLOW TEXT -->
-    <!-- <data-table-overflow :d-id="`${id}-body`"
-                         :data-properties="isTooltipProperties"
-                         @is-show="isTooltipShow = true" 
-                         @is-hide="isTooltipShow = false"></data-table-overflow> -->
-    
-    <!-- NO ELEMENT FOR DISPLAY -->
-    <!-- <div class="body-empty"
-         :class="`body-empty_${typeColumn}`"
-         v-if="isEmptyData">Нет элементов для отображения</div> -->
-
     <div v-for="(itemRow, indexRow) in items"
          class="body-row"
          :class="`body-row_${typeHeight}`"
@@ -48,14 +25,6 @@
         </v-btn>
       </div> <!---->
 
-      <!-- GROUP ELEMENT class="body-column__group"--> 
-      <!-- <hierarchy-column class="body-column__group"
-                        v-if="isHierarchyMode"
-                        :item-row="itemRow"
-                        :data-id="itemRow.id"
-                        @toggle-group="$emit('toggle-group', itemRow)"
-                        ></hierarchy-column> -->
-
       <div v-for="(itemColumn, indexColumn) in itemsHeader"
            class="body-column"
            :class="`body-column_${typeColumn}`"
@@ -69,17 +38,19 @@
            @keydown.stop="(event) => eventColumnKeydown(event, itemRow, itemColumn, itemRow[itemColumn.value])"
            @editing-canceled="editingCanceled"
            @editing-accepted="editingAccepted">
+
         <hierarchy-column class="body-column__group"
                           v-if="isHierarchyMode && indexColumn == 0"
                           :item-row="itemRow"
                           :data-id="itemRow.id"
-                          @toggle-group="$emit('toggle-group', itemRow)"
-                          ></hierarchy-column>
+                          @toggle-group="$emit('toggle-group', itemRow)"></hierarchy-column>
+
         <div class="box-editing display-none">
           <div class="box-editing-default">
             <!-- includes default component editing -->
           </div>
         </div>
+        
         <div class="box-display">
           <data-table-content-display :value="itemRow[itemColumn.value]"
                                       :properties="itemColumn"
@@ -97,16 +68,9 @@ import DataTableOverflow from '../DataTableOverflow.vue';
 import DataTableTooltip from '../DataTableTooltip.vue'; 
 import DataTableContentDisplay from '../DataTableContentDisplay.vue';
 import HierarchyColumn from './components/HierarchyColumn.vue';
-// import EmptyContent from './components/EmptyContent.vue';
-
-// import { DataTableBodyStore } from './DataTableBodyStore.js';
 
 import { DataTable } from '../DataTable.js';
 import { DataTableBodyEvents } from './mixins/DataTableBodyEvents.js';
-// import { EventsMouse } from './mixins/EventsMouse.js';
-// import { EventsKeyboard } from './mixins/EventsKeyboard.js';
-// import { Editing } from './mixins/Editing.js';
-// import { Hierarchy } from './mixins/Hierarchy.js';
 
 export default {
   name: 'DataTableBody',
@@ -119,33 +83,23 @@ export default {
   },
   mixins: [
     DataTableBodyEvents,
-    // DataTableBodyStore,
     DataTable, // gettingValueForType, computedActionMax
-    // Events,
-    // EventsMouse,
-    // EventsKeyboard,
-    // Editing,
-    // Hierarchy,
   ],
   props: {
-    isHierarchyMode: {type: Boolean, default: false},
-    groupLevel: { type: Number, default: 0 },
+    guid: { type: String, default: '' },
     tableName: { type: String, default: '' },
     template: Object,
-    items: { type: Array, default: () => [] },
-    itemsHeader: { type: Array, default: () => [] },
-
-
-    guid: { type: String, default: '' },
-    id: { type: String, default: 'dataTable' },
     typeHeight: { type: String, default: 'fixed' },
     typeColumn: { type: String, default: 'fixed' },
+    items: { type: Array, default: () => [] },
+    itemsHeader: { type: Array, default: () => [] },
+    groupLevel: { type: Number, default: 0 },
+    
     isEditable: { type: Boolean, default: false },
     isAddingInline: { type: Boolean, default: false },
     isExpansion: { type: Boolean, default: false },
     isMultiline: { type: Boolean, default: false },
-    // isHierarchyMode: {type: Function, default() { return () => false }},
-    // isScroll: { type: Boolean, default: false },
+    isHierarchyMode: {type: Boolean, default: false},
   },
   data() {
     return {
