@@ -5,6 +5,7 @@
               :type-height="typeRow[typeRowNumber]"
               :type-column="typeColumn"
               :is-editable="isEditable"
+              :is-adding-inline="isAddingInline"
               :is-footer="isFooter"
               :is-expansion="isExpansion"
               :is-multiline="isMultiline"

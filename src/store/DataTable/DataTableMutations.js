@@ -103,18 +103,21 @@ export default {
     Object.keys(state[option.tableName].listOptions).forEach(item => {
       newElement[item] = null;
     });
+    // если в группе, проставляем сразу группу
     let indexLastGroup = state[option.tableName][option.guid].listDataGroup.length - 1;
     if (indexLastGroup > -1) {
       newElement.parent = state[option.tableName][option.guid].listDataGroup[indexLastGroup];
     }
     
     let indexCurrentElement = state[option.tableName][option.guid].listData.findIndex(item => item.id == option.id);
-    console.log(option.id);
-    console.log(indexCurrentElement);
-    let countData = state[option.tableName][option.guid].listData.length;
-    state[option.tableName][option.guid].listData.splice(((indexCurrentElement > -1) ? indexCurrentElement : 0) + 1, 0, newElement);
-    state[option.tableName][option.guid].addingMode.index = ((indexCurrentElement > -1) ? indexCurrentElement : 0) + (countData != 0) ? 1 : 0;
-    console.log(state[option.tableName][option.guid].addingMode.index);
+
+    if (indexCurrentElement == -1) {
+      state[option.tableName][option.guid].listData.splice(0, 0, newElement);
+      state[option.tableName][option.guid].addingMode.index = 0;
+    } else {
+      state[option.tableName][option.guid].listData.splice(indexCurrentElement + 1, 0, newElement);
+      state[option.tableName][option.guid].addingMode.index = indexCurrentElement + 1;
+    }
   },
   // ----СОХРАНЕНИЕ ПОЛЯ СТРОКИ В ДАННЫЕ----------------------------------------
   ADDING_NEW_ELEMEN_INLINE_FIELD(state, option) {

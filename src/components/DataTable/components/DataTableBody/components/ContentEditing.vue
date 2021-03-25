@@ -77,7 +77,7 @@ export default {
       editableElement.dispatchEvent(eventEditingCanceled);
       this.isComponentNull = true;
       if (document.querySelector('.content-editing')) document.querySelector('.content-editing').remove();
-      if (this.$store.getters['DataTable/GET_ADDING_MODE']({tableName: this.properties.tableName, guid: this.properties.guid}).index >= 0)
+      if (this.$store.getters['DataTable/GET_ADDING_MODE']({tableName: this.properties.tableName, guid: this.properties.guid}).index != null)
         this.editingCanceledStore();
     },
 
@@ -93,7 +93,7 @@ export default {
     async editingAccepted(option) {
       // option.event.preventDefault();
       // console.log(option);
-      if (this.$store.getters['DataTable/GET_ADDING_MODE']({tableName: this.properties.tableName, guid: this.properties.guid}).index >= 0) {
+      if (this.$store.getters['DataTable/GET_ADDING_MODE']({tableName: this.properties.tableName, guid: this.properties.guid}).index != null) {
         // console.log('in line');
         if (option.ev == 'blur') { this.editingCanceled(); return; }
         this.editingAcceptedStore(option);

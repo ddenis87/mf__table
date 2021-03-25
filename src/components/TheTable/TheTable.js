@@ -14,6 +14,7 @@ export const TheTable = {
     isMultiline: { type: Boolean, default: false },
     isHierarchy: { type: Boolean, default: false },
     isEditable: { type: Boolean, default: true },
+    isAddingInline: { type: Boolean, default: true },
   },
   data() {
     return {

@@ -6,7 +6,7 @@
                   :solo="isHideUnderline"
                   :flat="isHideUnderline"
                   :hide-details="isHideMessage"
-                  :disabled="isDisabled"
+                  :disabled="(idElement) ? false : true"
                   :clearable="isBtnClear"
                   :label="fieldLabel"
                   :rules="fieldRequired"
@@ -25,7 +25,6 @@
     </v-text-field>
     <dialog-modal is-dialog-name="История изменений"
                   :width="800"
-
                   :is-dialog-show="isShowDialog"
                   @close-dialog="closeDialog">
       <!-- <v-card class="history-table"> -->
@@ -68,6 +67,7 @@ export default {
     componentTable() {
       if (!this.isShowDialog) return null;
       if (!this.relatedModelName) return null;
+      // if (!this.idElement) return null
       return () => import(`@/components/TheTable/TheTable${this.relatedModelName[0].toUpperCase() + this.relatedModelName.slice(1)}`);
     }
   },

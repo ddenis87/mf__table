@@ -51,6 +51,7 @@
                        :items="listData"
                        :items-header="listOptions"
                        :is-editable="isEditable"
+                       :is-adding-inline="isAddingInline"
                        :is-expansion="isExpansion"
                        :is-multiline="isMultiline"
                        :is-hierarchy-mode="isHierarchyMode"
@@ -125,6 +126,7 @@ export default {
     typeHeight: { type: String, default: 'fixed' },
     typeColumn: { type: String, default: 'fixed' },
     isEditable: { type: Boolean, default: false },
+    isAddingInline: { type: Boolean, default: false },
     isFooter: { type: Boolean, default: false },
     isExpansion: { type: Boolean, default: false },
     isMultiline: { type: Boolean, default: false },

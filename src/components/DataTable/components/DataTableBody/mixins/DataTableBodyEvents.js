@@ -192,6 +192,7 @@ export const DataTableBodyEvents = {
         this.eventColumnDblclick(event, itemRow, itemColumn, columnValue); // ПЕРЕКЛЮЧАЕМСЯ В РЕЖИМ РЕДАКТИРОВАНИЯ
       }
       if (event.code == 'Insert') {
+        if (!this.isAddingInline) return;
         await this.$store.dispatch('DataTable/ADDING_NEW_ELEMEN_INLINE', {
           tableName: this.tableName,
           guid: this.guid,
