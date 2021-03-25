@@ -85,6 +85,9 @@ export default {
     state[option.tableName][option.guid].tableDataCount = -1;
     state[option.tableName][option.guid].listData = [];
   },
+  CLEAR_DATA_GROUP_LEGEND(state, option) {
+    state[option.tableName][option.guid].listDataGroup = [];
+  },
   CHANGE_DATA_GROUP_LEGEND(state, option) {
     let index = state[option.tableName][option.guid].listDataGroup.findIndex(item => item.id == option.value.id);
     if (index == -1)
@@ -121,6 +124,11 @@ export default {
     state[option.tableName][option.guid].addingMode.index = null;
   },
   // ---------------------------------------------------------------------------
+  RESET_ADDING_MODE(state, option) {
+    state[option.tableName][option.guid].addingMode.id = null;
+    state[option.tableName][option.guid].addingMode.index = null;
+  },
+
 
   // ----ДОБАВЛЕНИЕ ССЫЛКИ В ССЫЛОЧНУЮ ТАБЛИЦУ----------------------------------
   ADDING_DATA_LINK(state, option) {

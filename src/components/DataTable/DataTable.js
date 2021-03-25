@@ -135,6 +135,10 @@ export const DataTable = {
         })
         .finally(() => {
           this.isBlockTable = false;
+          this.$store.commit('DataTable/RESET_ADDING_MODE',{
+            tableName: this.tableName,
+            guid: this.guid,
+          })
         });
     },
     setSorting(option) {

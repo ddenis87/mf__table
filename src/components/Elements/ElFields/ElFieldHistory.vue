@@ -100,13 +100,18 @@ export default {
     })
       .then(element => {
         let newValue = relatedModelView;
+        console.log(element);
         templateValue.forEach(item => {
           newValue = newValue.replace(`{${item}}`, element[item]);
         });
         console.log(newValue);
-        this.fieldValue = newValue;
+        if (!newValue) {
+          this.fieldValue = newValue;
+          this.loadHistoryDataList();
+        } else {
+          this.fieldValue = '';
+        }
         this.isLoadingData = false;
-        this.loadHistoryDataList();
       })
     
   },

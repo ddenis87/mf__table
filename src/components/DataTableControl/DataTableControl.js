@@ -93,10 +93,31 @@ export const DataTableControl = {
       this.$emit('blur-element');
     },
     toggleRecycleBin() {
+      this.$store.commit('DataTable/CLEAR_DATA_GROUP_LEGEND', {
+        tableName: this.tableName,
+        guid: this.guid,
+      });
+      let filterParams = {
+        'is_deleted': !this.isViewRecucleBin,
+        'parent': null,
+      };
+      if (!this.isViewRecucleBin) {
+        filterParams.is_deleted = true;
+        filterParams.parent = null;
+        filterParams.parent__isnull = null;
+      } else {
+        filterParams.is_deleted = false;
+        filterParams.parent__isnull = (this.isHierarchyMode) ? true : null;
+
+      }
+      // let filterParams = {
+      //   'is_deleted': !this.isViewRecucleBin,
+      //   'parent': null,
+      // }
       this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
         tableName: this.tableName,
         guid: this.guid,
-        defaultFilters: {'is_deleted': !this.isViewRecucleBin}
+        defaultFilters: filterParams,
       });
     },
 

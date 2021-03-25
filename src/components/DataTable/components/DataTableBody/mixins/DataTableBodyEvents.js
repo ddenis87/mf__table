@@ -136,9 +136,11 @@ export const DataTableBodyEvents = {
     eventMouseOver(event) {
       if (!this.isColumnEditing && this.typeHeight != 'auto')
         this.isTooltipTimer = setTimeout(() => {
-          let parent = event.target.closest('.body-column > .box-display').getBoundingClientRect();
+          if (event.target.closest('.body-column > .box-display')) {
+            let parent = event.target.closest('.body-column > .box-display').getBoundingClientRect();
           // console.log(parent);
-          this.$emit('show-tooltip', Object.assign(parent, {text: event.target.closest('.body-column').getAttribute('data-overflow-text')}));
+            this.$emit('show-tooltip', Object.assign(parent, {text: event.target.closest('.body-column').getAttribute('data-overflow-text')}));
+          }
         }, 1100);
       if (!this.isColumnFocus && !this.isColumnEditing && !this.isRowFocus)
         event.target.closest('.body-row')?.classList.add('body-row_hover');
@@ -171,7 +173,7 @@ export const DataTableBodyEvents = {
       // console.log('event column keydown');
       if (event.code.includes('Arrow') || event.code == 'Tab') {
         event.preventDefault();
-        if ((event.code == 'ArrowRight' && event.target.nextElementSibling) || (event.code =='Tab' && event.shiftKey == false)) { event.target.nextElementSibling.focus(); return; }
+        if ((event.code == 'ArrowRight' && event.target.nextElementSibling) || (event.code =='Tab' && event.shiftKey == false && event.target.nextElementSibling)) { event.target.nextElementSibling.focus(); return; }
         if ((event.code == 'ArrowLeft' && event.target.previousElementSibling) || (event.code =='Tab' && event.shiftKey == true)) { event.target.previousElementSibling.focus(); return; }
         if (event.code == 'ArrowDown' || event.code == 'ArrowUp') {
           let currentIndex = event.target.getAttribute('tabindex');
