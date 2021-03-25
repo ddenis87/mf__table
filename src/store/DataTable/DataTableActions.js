@@ -10,6 +10,7 @@ export default {
         .then(() => {
           state.dispatch('REQUEST_DATA', option)
             .then(() => {
+              console.log(state);
               resolve();
             })
         })
@@ -157,6 +158,7 @@ export default {
       axios
         .options(addressApi)
         .then(response => {
+          console.log(response);
           let sendOption = {
             tableName: option.tableName,
             guid: option.guid,
@@ -164,6 +166,8 @@ export default {
             data: JSON.parse(response.request.response).actions.POST
           };
           state.commit('SET_OPTIONS', sendOption);
+          sendOption.data = response.data.extra_actions;
+          state.commit('SET_EXTRA_ACTIONS', sendOption);
           resolve();
         })
         .catch(error => {

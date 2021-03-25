@@ -11,7 +11,7 @@ class TableDataSpace {
   apiPrevious = null;
   listData = [];
   listDataGroup = [];
-  filters = {
+  filters = { // сменить название
     'page_size': '',
     'is_deleted': false,
     'parent__isnull': null,
@@ -58,6 +58,9 @@ export default {
     } else {
       state[option.tableName].isHierarchyMode = false;
     }
+  },
+  SET_EXTRA_ACTIONS(state, option) {
+    state[option.tableName].extra_actions = option.data;
   },
   SET_DATA(state, option) {
     if ('guid' in option) state[option.tableName][option.guid].listData.push(option.value);

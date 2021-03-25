@@ -12,6 +12,8 @@ class TableDataBase {
   relatedModelView = ''; // шаблон представление таблицы в других таблицах, компонентах, и т.д. ///DELETE
   listOptions = {};
   listData = [];  // МАССИВ ДАННЫХ  !!!!!
+
+  extra_actions = {};
 };
 
 export default {
