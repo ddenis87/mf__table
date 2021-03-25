@@ -145,7 +145,7 @@ export default {
         justify-content: flex-end;
         // gap: 3px;
         align-items: flex-start;
-        min-width: 45px;
+        min-width: 37px;
         // .action-btn {
         //   margin-right: 5px;
         //   &_action {

@@ -27,10 +27,13 @@
                   :width="800"
                   :is-dialog-show="isShowDialog"
                   @close-dialog="closeDialog">
-      <!-- <v-card class="history-table"> -->
-        <component :is="componentTable"
+      <v-card height="300" class="history-table">
+      <!-- <div class="history-table"> -->
+        <component :is="componentTable" 
                    :default-filters="filters"></component>
-      <!-- </v-card> -->
+      <!-- </div> -->
+        <!-- 123 -->
+      </v-card>
     </dialog-modal>
   </div>
 </template>
@@ -121,6 +124,13 @@ export default {
 <style lang="scss">
 @import './ElField.scss';
 .history-table {
-  padding: 2px;
+  padding: 5px;
+  // height: calc(100% + 44px);
+  // height: auto;
+  // padding: 2px;
+  // min-height: 300px;
+  // &__table {
+  //   height: 100%;
+  // }
 }
 </style>

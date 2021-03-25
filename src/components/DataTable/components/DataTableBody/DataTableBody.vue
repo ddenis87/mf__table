@@ -159,7 +159,7 @@ export default {
   methods: {
     computedTemplateItem(option) {
       // console.log('option');
-      option['padding-left'] = `${(this.groupLevel * 20)}px`;
+      option['padding-left'] = (!this.isHierarchyMode) ? '5px' :`${(this.groupLevel * 20)}px`;
       // let newStyle = Object.assign(option, {'padding-left': `${(this.groupLevel * 20)}px`});
       
       return option;
@@ -233,7 +233,7 @@ export default {
         justify-content: flex-end;
         // gap: 3px;
         align-items: flex-start;
-        min-width: 45px;
+        min-width: 37px;
         // .action-btn {
         //   margin-right: 5px;
         //   &_action {
