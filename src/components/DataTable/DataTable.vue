@@ -54,6 +54,7 @@
 
                        :is-editable="isEditable"
                        :is-adding-inline="isAddingInline"
+
                        :is-expansion="isExpansion"
                        :is-multiline="isMultiline"
                        :is-hierarchy-mode="isHierarchyMode"
@@ -76,7 +77,7 @@
                             :listDataCountLoad="listDataCountLoad"
                             :type-column="typeColumn"></data-table-footer>
       </slot>
-    </div> <!---->
+    </div>
     <div class="data-table__dialog-modal">
       <data-table-empty-data :is-show="isShowDialogEmpty" @close-dialog="closeEmptyDialog"></data-table-empty-data>
     </div>
@@ -172,9 +173,7 @@ export default {
         width: 0,
         height: 0,
       };
-      // if (event.relatedTarget?.classList?.contains('tooltip')) return;
       this.isShowTooltip = false;
-      // clearTimeout(this.isTooltipTimer);
     },
   }
 }

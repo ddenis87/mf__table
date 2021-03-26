@@ -5,8 +5,8 @@ export const TheTable = {
     DataTable,
   },
   props: {
+    defaultOptions: null,
     defaultFilters: null,
-
     typeRowNumber: { type: Number, default: 0 },
     typeColumn: { type: String, default: 'fixed' },
     isFooter: { type: Boolean, default: false },
@@ -19,20 +19,24 @@ export const TheTable = {
   data() {
     return {
       typeRow: ['fixed', 'dense', 'auto'],
-      focusedElement: {},
     }
   },
   computed: {
-    tableProperties() {
-      return (this.isMultiline) ? (this.tablePropertiesMultiline) ? this.tablePropertiesMultiline : this.tablePropertiesUno : this.tablePropertiesUno;
+    propertiesTable() {
+      return {
+        properties: (this.isMultiline) ? (this.propertiesTableMultiline) ? this.propertiesTableMultiline : this.propertiesTableUno : this.propertiesTableUno,
+        'default-options': this.defaultOptions,
+        'default-filters': this.defaultFilters,
+        'type-height': this.typeRow[this.typeRowNumber],
+        'type-column': this.typeColumn,
+        'is-editable': this.isEditable,
+        'is-adding-inline': this.isAddingInline,
+        'is-footer': this.isFooter,
+        'is-expansion': this.isExpansion,
+        'is-multiline': this.isMultiline,
+      }
     },
   },
-  created() {
-    // this.$store.dispatch('DataTable/REQUEST_OPTIONS', {tableName: this.tableName});
-  },
-  // mounted() {
-  //   this.$emit('table-mount', this.$data, this.tableProperties);
-  // },
   methods: {
     componentMounted(option) {
       this.$emit('component-mounted', option);

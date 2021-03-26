@@ -1,12 +1,5 @@
 <template>
-  <data-table id="budgetclassification" 
-              :properties="tableProperties"
-              :type-height="typeRow[typeRowNumber]"
-              :type-column="typeColumn"
-              :is-editable="isEditable"
-              :is-footer="isFooter"
-              :is-expansion="isExpansion"
-              :is-multiline="isMultiline"
+  <data-table v-bind="propertiesTable"
               @event-row-focused="eventRowFocused"
               @event-row-selected="eventRowSelected"
               @event-row-keydown="eventRowKeydown"
@@ -23,14 +16,13 @@ export default {
     TheTable,
   ],
   props: {
-    // typeRowNumber: { type: Number, default: 1 },
     isEditable: { type: Boolean, default: false },
   },
   data() {
     return {
-      tablePropertiesUno: {
+      propertiesTableUno: {
         tableName: 'budgetclassification',
-        relatedModelView: '{head_code} - {head_name}',
+        // relatedModelView: '{head_code} - {head_name}',
         headers: [
           {value: 'head_code', align: 'end', width: [200, 200], },
           {value: 'id', width: [60, 60], },

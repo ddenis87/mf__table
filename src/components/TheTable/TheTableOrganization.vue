@@ -1,14 +1,5 @@
 <template>
-  <data-table id="organization" 
-              :properties="tableProperties"
-              :default-filters="defaultFilters"
-              :type-height="typeRow[typeRowNumber]"
-              :type-column="typeColumn"
-              :is-editable="isEditable"
-              :is-adding-inline="isAddingInline"
-              :is-footer="isFooter"
-              :is-expansion="isExpansion"
-              :is-multiline="isMultiline"
+  <data-table v-bind="propertiesTable"
               @event-row-focused="eventRowFocused"
               @event-row-selected="eventRowSelected"
               @event-row-keydown="eventRowKeydown"
@@ -28,17 +19,12 @@ export default {
   },
   data() {
     return {
-      tablePropertiesUno: {
+      propertiesTableUno: {
         tableName: 'organization',
         headers: [
-          // {value: 'id', width: 60,},
           {value: 'title', align: 'start', width: [350,],},
           {value: 'institution_code', align: 'end', width: 94, },
           {value: 'registry_date', align: 'start', width: 120,},
-          // {value: 'parent', align: 'start', width: 120,},
-          // {value: 'last_visited', align: 'start', width: 146,},
-          // {value: 'organization_type', align: 'start', width: 115, },
-          
           {value: 'inn', width: [104, 104]},
           {value: 'kpp', width: [94, 94],},
           {value: 'rubpnubp_status', width: [104, 104]},
@@ -49,11 +35,10 @@ export default {
           {value: 'bk', width: [145, 145], relatedModelView: '{head_code} - {head_name}'},
         ],
       },
-      tablePropertiesMultiline: {
+      propertiesTableMultiline: {
         tableName: 'organization',
         headers: [
           [ 
-            // {value: 'id', width: [140, 140],},
             {value: 'title', align: 'start', column: 4, width: [100,],},
           ], [
             {value: 'institution_code', align: 'end', width: 140},

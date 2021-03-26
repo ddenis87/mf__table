@@ -1,13 +1,5 @@
 <template>
-  <data-table id="actualdesc" 
-              :properties="tableProperties"
-              :default-filters="defaultFilters"
-              :type-height="typeRow[typeRowNumber]"
-              :type-column="typeColumn"
-              :is-editable="isEditable"
-              :is-footer="isFooter"
-              :is-expansion="isExpansion"
-              :is-multiline="isMultiline"
+  <data-table v-bind="propertiesTable"
               @event-row-focused="eventRowFocused"
               @event-row-selected="eventRowSelected"
               @event-row-keydown="eventRowKeydown"
@@ -27,7 +19,7 @@ export default {
   },
   data() {
     return {
-      tablePropertiesUno: {
+      propertiesTableUno: {
         tableName: 'actualdesc',
         headers: [
           {value: 'start_date', width: [200, 200] },
