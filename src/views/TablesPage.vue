@@ -14,28 +14,13 @@
       </v-toolbar>
     </div>
     <div class="tables-page__control">
-      <data-table-control :tableName="tableName"
-                          :focused-element="focusedElement"
-                          :guid="guid"
-
-                          :type-height-number="typeHeightNumber"
-                          :type-column="typeColumn"
-                          :is-footer="isFooter"
-                          :is-expansion="isExpansion"
-                          :is-multiline="isMultiline"
-
+      <data-table-control v-bind="propertiesControl"
                           @toggle-view="toggleView"></data-table-control>
     </div>
     <div class="tables-page__body">
       <component class="table" 
                  :is="componentTheTables"
-
-                 :type-row-number="typeHeightNumber"
-                 :type-column="typeColumn"
-                 :is-footer="isFooter"
-                 :is-expansion="isExpansion"
-                 :is-multiline="isMultiline"
-
+                 v-bind="propertiesTable"
                  @component-mounted="componentTableMouted"
                  @row-focused="rowFocused"
                  @component-blur="componentBlur"></component>
@@ -68,6 +53,27 @@ export default {
     }
   },
   computed: {
+    propertiesControl() {
+      return {
+        'table-name': this.tableName,
+        guid: this.guid,
+        'focused-element': this.focusedElement,
+        'type-height-number': this.typeHeightNumber,
+        'type-column': this.typeColumn,
+        'is-footer': this.isFooter,
+        'is-expansion': this.isExpansion,
+        'is-multiline': this.isMultiline,
+      }
+    },
+    propertiesTable() {
+      return {
+        'type-row-number': this.typeHeightNumber,
+        'type-column': this.typeColumn,
+        'is-footer': this.isFooter,
+        'is-expansion': this.isExpansion,
+        'is-multiline': this.isMultiline,
+      }
+    },
     eventFilterExtendedReset() {
       if (this.$store.getters['DataTable/GET_MARK_EVENTS_FILTER_EXTENDE_RESET']({tableName: this.tableName, guid: this.guid}))
         return true;

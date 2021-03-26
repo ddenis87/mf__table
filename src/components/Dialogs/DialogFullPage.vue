@@ -44,12 +44,12 @@ export default {
 
 <style lang="scss" scoped>
 .dialog {
-  &__title {
-    color: white;
-  }
+  // &__title {
+  //   color: white;
+  // }
   &__body {
     height: calc(100vh - 66px);
-    border: thin solid green;
+    // border: thin solid green;
   }
 }
 </style>
