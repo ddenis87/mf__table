@@ -177,8 +177,6 @@ export const DataTableControl = {
             addingElement.dispatchEvent(eventClick);
           })
       }
-        
-      
     },
 
     eventActionCancel() {

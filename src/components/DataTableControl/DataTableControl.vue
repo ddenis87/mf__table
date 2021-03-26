@@ -37,7 +37,8 @@
                                :is-footer="isFooter"
                                :is-expansion="isExpansion"
                                :is-multiline="isMultiline"
-                               @toggle-view="(option) => $emit('toggle-view', option)"></data-table-control-view> <!-- -->
+                               :is-hierarchy="isHierarchyMode"
+                               @toggle-view="toggleView"></data-table-control-view> <!-- -->
       <!-- FILTER TABLE -->
       <v-divider vertical></v-divider>
       <div class="toolbar-group">
@@ -115,6 +116,22 @@ export default {
     },
   },
   methods: {
+    toggleView(option) {
+      switch(option) {
+        case 'toggle-hierarchy': {
+          this.toggleHierarchy();
+          break;
+        }
+        default: this.$emit('toggle-view', option);
+      }
+      console.log(option);
+    },
+    toggleHierarchy() {
+      this.$store.dispatch('DataTable/TOGGLE_HIERARCHY_MODE', {
+        tableName: this.tableName,
+        guid: this.guid,
+      })
+    },
     eventMarkDeleted(option) {
       this.focusedElementForm = null;
       this.snackBar = option;

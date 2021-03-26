@@ -11,6 +11,9 @@
     <el-btn-icon icon="mdi-page-layout-footer"
                  :icon-color="(isFooter) ? 'blue' : ''"
                  @click="toggleView('toggle-footer')">Итоги</el-btn-icon>
+    <el-btn-icon icon="mdi-file-tree"
+                 :icon-color="(isHierarchy) ? 'blue' : ''"
+                 @click="toggleView('toggle-hierarchy')">Иерархический вид</el-btn-icon>
     <el-btn-icon icon="mdi-view-quilt"
                  :icon-color="(isMultiline) ? 'blue' : ''"
                  @click="toggleView('toggle-multiline')">Многострочность</el-btn-icon>
@@ -31,6 +34,7 @@ export default {
     isFooter: { type: Boolean, default: false },
     isExpansion: { type: Boolean, default: false },
     isMultiline: { type: Boolean, default: false },
+    isHierarchy: { type: Boolean, default: false },
   },
   data() {
     return {

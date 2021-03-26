@@ -29,6 +29,31 @@ export default {
   },
   // ---------------------------------------------------------------------------
 
+  // ----TOGGLE HIERARCHY MODE--------------------------------------------------
+  TOGGLE_HIERARCHY_MODE(state, option) {
+    if (state.state[option.tableName].isHierarchyMode) {
+      state.state[option.tableName].isHierarchyMode = false;
+      state.commit('CLEAR_DATA_GROUP_LEGEND', option);
+      state.dispatch('SET_FILTER_DEFAULT', Object.assign(option, {
+        defaultFilters: {
+          'ordering': null,
+          'parent__isnull': null,
+          'parent': null,
+          'is_group': null,
+        }
+      }));
+    } else {
+      state.state[option.tableName].isHierarchyMode = true;
+      state.dispatch('SET_FILTER_DEFAULT', Object.assign(option, {
+        defaultFilters: {
+          'ordering': '-is_group',
+          'parent__isnull': true,
+        }
+      }));
+    }
+  },
+  // ---------------------------------------------------------------------------
+
   // ----FILTERS----------------------------------------------------------------
   // ----УСТАНОВКА ФИЛЬТРОВ ПО УМОЛЧАНИЮ----------------------------------------
   SET_FILTER_DEFAULT(state, option) {
