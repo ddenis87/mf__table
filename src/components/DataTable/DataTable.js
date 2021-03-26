@@ -4,7 +4,7 @@ export const DataTable = {
   data() {
     return {
       guid: 'd' + Guid.newGuid().StringGuid,
-      isBlockTable: false,
+      // isBlockTable: false,
     }
   },
   computed: {
@@ -81,11 +81,14 @@ export const DataTable = {
     getApiNext() { return this.$store.getters['DataTable/GET_ADDRESS_API_NEXT'](this.optionGetter); },
     getApiPrevious() { return this.$store.getters['DataTable/GET_ADDRESS_API_PREVIOUS'](this.optionGetter); },
     getDataCount() { return this.$store.getters['DataTable/GET_DATA'](this.optionGetter); },
-    requestData(option) {
-      this.$store.dispatch('DataTable/REQUEST_DATA', Object.assign({
+    async requestData(option) {
+      await this.$store.dispatch('DataTable/REQUEST_DATA', Object.assign({
         tableName: this.tableName,
         guid: this.guid,
-      }, option));
+      }, option))
+        .then(() => {
+          this.isBlock = true;
+        });
     },
     requestDataPrevious(option) {
       this.$store.dispatch('DataTable/REQUEST_DATA_PREVIOUS', Object.assign({
@@ -94,7 +97,7 @@ export const DataTable = {
       }, option));
     },
     async addingNewElement() {
-      this.isBlockTable = true;
+      // this.isBlockTable = true;
       this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
       console.log('adding element for table');
       let index = this.$store.getters['DataTable/GET_ADDING_MODE']({
@@ -134,7 +137,7 @@ export const DataTable = {
           addingElement.dispatchEvent(eventClick);
         })
         .finally(() => {
-          this.isBlockTable = false;
+          // this.isBlockTable = false;
           this.$store.commit('DataTable/RESET_ADDING_MODE',{
             tableName: this.tableName,
             guid: this.guid,

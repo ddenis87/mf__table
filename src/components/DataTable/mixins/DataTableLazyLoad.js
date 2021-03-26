@@ -27,6 +27,7 @@ export const DataTableLazyLoad = {
       if (bootAnchorEdge < this.parentElementEdge) {
         // console.log('load next');
         if (this.getApiNext()) {
+          this.isBlock = false;
           this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
           this.requestData({next: true});
         }
