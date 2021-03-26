@@ -10,24 +10,26 @@
                                 :table-name="tableName"
                                 :focused-element="focusedElementForm"
                                 :guid="guid"
+                                :type-control="typeControl"
                                 @blur-element="elementFocusedClear"></data-table-control-table>
 
-      <v-divider vertical></v-divider>
+      <!-- <v-divider vertical></v-divider> -->
       <data-table-control-element class="toolbar-group"
                                   :table-name="tableName"
                                   :focused-element="focusedElementForm"
                                   :is-mark-deleted-view="isViewRecucleBin"
                                   :guid="guid"
+                                  :type-control="typeControl"
                                   @event-mark-deleted="eventMarkDeleted"
                                   @blur-element="elementFocusedClear"></data-table-control-element>
-      <v-divider vertical></v-divider>
+      <!-- <v-divider vertical></v-divider> -->
       <div class="toolbar-group">
         <el-btn-icon icon="mdi-delete-variant"
                      :disabled="isDisabledControl"
                      :icon-color="(isViewRecucleBin) ? 'blue' : ''"
-                     @click="toggleRecycleBin">{{ (isViewRecucleBin) ? 'Выйти из корзины' : 'Показать помеченные на удаление' }}</el-btn-icon>
+                     @click="toggleRecycleBin" v-if="accessControl.has('recycle')">{{ (isViewRecucleBin) ? 'Выйти из корзины' : 'Показать помеченные на удаление' }}</el-btn-icon>
       </div>
-      <v-divider vertical></v-divider>
+      <!-- <v-divider vertical></v-divider> -->
       <v-spacer></v-spacer> 
 
       <!-- VIEW TABLE -->
@@ -45,7 +47,7 @@
         <el-btn-icon icon="mdi-filter-outline" 
                    :icon-color="(isFilterFilds) ? 'blue' : ''"
                    :disabled="isDisabledControl"
-                   @click="isDialogFilterShow = !isDialogFilterShow">Фильтр</el-btn-icon>
+                   @click="isDialogFilterShow = !isDialogFilterShow" v-if="accessControl.has('filters')">Фильтр</el-btn-icon>
       </div>
     </v-toolbar>
 

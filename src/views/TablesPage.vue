@@ -21,9 +21,9 @@
       <component class="table" 
                  :is="componentTheTables"
                  v-bind="propertiesTable"
-                 @component-mounted="componentTableMouted"
-                 @row-focused="rowFocused"
-                 @component-blur="componentBlur"></component>
+                 @component-mounted="mountedTable"
+                 @row-focused="focusedElement"
+                 @component-blur="blurTable"></component>
     </div>
   </div>
 </template>
@@ -31,49 +31,26 @@
 <script>
 import DataTableControl from '@/components/DataTableControl/DataTableControl.vue';
 import ElFieldSearch from '@/components/Elements/ElField/ElFieldSearch.vue';
+
+import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
 export default {
   name: 'TablesPage',
   components: {
     DataTableControl,
     ElFieldSearch,
   },
+  mixins: [
+    DataTableControl_DataTable,
+  ],
   data() {
     return {
       tableName: this.$route.query.tableName,
       guid: null,
-      focusedElement: null,
       freeSearchValue: '',
-      // Убрать на стор!!!!!!!
-      typeHeightNumber: 0,
-      typeHeight: ['fixed', 'dense', 'auto'],
-      typeColumn: 'fixed',
-      isFooter: false,
-      isExpansion: false,
-      isMultiline: false,
+      typeControl: 'catalog',
     }
   },
   computed: {
-    propertiesControl() {
-      return {
-        'table-name': this.tableName,
-        guid: this.guid,
-        'focused-element': this.focusedElement,
-        'type-height-number': this.typeHeightNumber,
-        'type-column': this.typeColumn,
-        'is-footer': this.isFooter,
-        'is-expansion': this.isExpansion,
-        'is-multiline': this.isMultiline,
-      }
-    },
-    propertiesTable() {
-      return {
-        'type-row-number': this.typeHeightNumber,
-        'type-column': this.typeColumn,
-        'is-footer': this.isFooter,
-        'is-expansion': this.isExpansion,
-        'is-multiline': this.isMultiline,
-      }
-    },
     eventFilterExtendedReset() {
       if (this.$store.getters['DataTable/GET_MARK_EVENTS_FILTER_EXTENDE_RESET']({tableName: this.tableName, guid: this.guid}))
         return true;
@@ -90,8 +67,8 @@ export default {
         this.freeSearchValue = '';
     }
   },
-  mounted() {},
   methods: {
+
     freeSearch(option) {
       this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
         tableName: this.tableName,
@@ -106,45 +83,6 @@ export default {
         guid: this.guid,
         defaultFilters: { 'search': null, 'ordering': (isHierarchyMode) ? '-is_group' : null }
       });
-    },
-    rowFocused(option) {
-      this.focusedElement = Object.assign({}, option);
-    },
-    componentBlur() {
-      this.focusedElement = null;
-    },
-    componentTableMouted(option) {
-      this.guid = option.guid;
-    },
-    toggleView(option) {
-      console.log(option);
-      switch(option) {
-        case 'toggle-type-row': {
-          console.log(option)
-          this.isExpansion = false;
-          if (this.typeHeightNumber == this.typeHeight.length - 1) this.typeHeightNumber = 0;
-          else this.typeHeightNumber = this.typeHeightNumber + 1;
-          break;
-        }
-        case 'toggle-expansion': {
-          this.isExpansion = !this.isExpansion;
-          break;
-        }
-        case 'toggle-type-column': {
-          (this.typeColumn == 'fixed') ? this.typeColumn = 'dense' : this.typeColumn = 'fixed';
-          break;
-        }
-        case 'toggle-footer': {
-          this.isFooter = !this.isFooter;
-          break;
-        }
-        case 'toggle-multiline': {
-          this.isMultiline = !this.isMultiline;
-          if (this.isMultiline == true) this.typeHeightNumber = 1;
-          else this.typeHeightNumber = 0;
-          break;
-        }
-      }
     },
   }
 }

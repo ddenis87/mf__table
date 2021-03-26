@@ -108,7 +108,7 @@ export default {
     }
   },
   mounted() {
-    console.log('mount');
+    // console.log('mount');
   },
   methods: {
     computedTemplateItem(option) {

@@ -16,7 +16,7 @@ export default {
     TheTable,
   ],
   props: {
-    isEditable: { type: Boolean, default: false },
+    // isEditable: { type: Boolean, default: false },
   },
   data() {
     return {

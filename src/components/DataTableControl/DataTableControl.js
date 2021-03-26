@@ -12,6 +12,7 @@ export const DataTableControl = {
     guid: { type: String, default: null },
     tableName: { type: String, default: null },
     focusedElement: null, //{ type: Object, default() { return null } },
+    typeControl: null,
   },
   data() {
     return {
@@ -21,6 +22,10 @@ export const DataTableControl = {
     }
   },
   computed: {
+    accessControl() {
+      if (!this.typeControl) return new Set();
+      return this.$store.getters['AccessControl/GET_DATATABLE_CONTROL']({ type: this.typeControl });
+    },
     isDisabledControl() {
       if (!this.guid) return true;
       let statusLoading = this.$store.getters['DataTable/GET_LOADING_API']({

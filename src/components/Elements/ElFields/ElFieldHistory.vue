@@ -27,9 +27,21 @@
                   :width="800"
                   :is-dialog-show="isShowDialog"
                   @close-dialog="closeDialog">
-      <v-card height="300" class="history-table">
-        <component :is="componentTable" 
-                   :default-filters="filters"></component>
+      <v-card height="400" class="history-table">
+        <div class="history-table__control">
+          <data-table-control v-bind="propertiesControl"
+                              type-control="informationRegister"
+                              @toggle-view="toggleView"></data-table-control>
+        </div>
+        <div class="history-table__body">
+          <component :is="componentTable"
+                     :default-filters="filters"
+                     v-bind="propertiesTable"
+                     @component-mounted="mountedTable"
+                     @row-focused="focusedElement"
+                     @component-blur="blurTable"></component>
+        </div>
+        
       </v-card>
     </dialog-modal>
   </div>
@@ -37,15 +49,20 @@
 
 <script>
 import DialogModal from '@/components/Dialogs/DialogModal.vue';
+import DataTableControl from '@/components/DataTableControl/DataTableControl.vue';
+
 
 import { ElField } from './ElFiled.js';
+import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
 export default {
   name: 'ElFieldHistory',
   mixins: [
     ElField,
+    DataTableControl_DataTable,
   ],
   components: {
     DialogModal,
+    DataTableControl,
   },
   props: {
     // isDisabled: { type: Boolean, default: true },
@@ -53,14 +70,18 @@ export default {
     idElement: { type: Number, default: null },
     relatedModelName: { type: String, default: null },
 
+    // isEditable: { type: Boolean, default: false },
     // filters: null,
   },
   data() {
     return {
+      tableName: this.relatedModelName,
+      guid: null,
       fieldValue: '',
       isLoadingData: false,
       isShowDialog: false,
       filters: (this.idElement) ? {related: this.idElement} : null,
+      isEditable: false,
     }
   },
   computed: {
@@ -83,11 +104,11 @@ export default {
     })
       .then(element => {
         let newValue = relatedModelView;
-        console.log(element);
+        // console.log(element);
         templateValue.forEach(item => {
           newValue = newValue.replace(`{${item}}`, element[item]);
         });
-        console.log(newValue);
+        // console.log(newValue);
         if (newValue != 'undefined') {
           this.fieldValue = newValue;
         } else {
@@ -110,13 +131,20 @@ export default {
 <style lang="scss">
 @import './ElField.scss';
 .history-table {
+  display: grid;
+  grid-template-areas: "control" "body";
+  grid-template-columns: 1fr;
+  grid-template-rows: 44px 1fr;
+  width: 100%;
+  height: 100%;
   padding: 5px;
-  // height: calc(100% + 44px);
-  // height: auto;
-  // padding: 2px;
-  // min-height: 300px;
-  // &__table {
-  //   height: 100%;
-  // }
+  gap: 8px;
+  &__control {
+    grid-area: control;
+  }
+  &__body {
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>

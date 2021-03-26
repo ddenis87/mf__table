@@ -58,7 +58,7 @@ export default {
     return headerReturn;
   },
   GET_FIELD:(state) => (tableName) => {
-    console.log(tableName);
+    // console.log(tableName);
     return state[tableName].listOptions;
   },
   GET_DATA:(state) => (option) => {

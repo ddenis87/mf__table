@@ -171,7 +171,7 @@ export const DataTableBodyEvents = {
           return;
         }
       }
-      if (event.code.includes('Key') || event.code.includes('Digit') || event.code == 'Enter') {
+      if (event.code.includes('Key') || event.code.includes('Numpad') || event.code.includes('Digit') || event.code == 'Enter') {
         this.eventColumnDblclick(event, itemRow, itemColumn, columnValue); // ПЕРЕКЛЮЧАЕМСЯ В РЕЖИМ РЕДАКТИРОВАНИЯ
       }
       if (event.code == 'Insert') {

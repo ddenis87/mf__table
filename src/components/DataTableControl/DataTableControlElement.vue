@@ -1,10 +1,10 @@
 <template>
   <div class="data-table-control-actions-element">
-    <el-btn-icon icon="mdi-pencil" :disabled="isFocusedElement" @click="editingElement">Изменить</el-btn-icon>
+    <el-btn-icon icon="mdi-pencil" :disabled="isFocusedElement" @click="editingElement" v-if="accessControl.has('editing')">Изменить</el-btn-icon>
     <el-btn-icon :icon="(isViewRecucleBin) ? 'mdi-text-box-remove-outline' : 'mdi-text-box-remove-outline'" 
                  :disabled="(isDisabledControl || !focusedElement)" 
-                 @click="eventActionMarkDeleting">{{ (isViewRecucleBin) ? 'Снять пометку на удаление' : 'Установить пометку на удаление'}}</el-btn-icon>
-  
+                 @click="eventActionMarkDeleting" v-if="accessControl.has('markDelete')">{{ (isViewRecucleBin) ? 'Снять пометку на удаление' : 'Установить пометку на удаление'}}</el-btn-icon>
+    <v-divider vertical></v-divider>
     <dialog-full-page :is-dialog-name="`Редактирование ${(typeElement == 'element') ? 'записи' : 'группы'} ${(isMarkDeletedRecord) ? '(помечен на удаление)' : ''}`"
                       :is-dialog-show="isDialogShow" 
                       @close-dialog="eventCloseDialog">
