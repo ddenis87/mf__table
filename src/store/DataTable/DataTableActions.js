@@ -371,7 +371,12 @@ export default {
                         tableName: relatedModelName,
                         value: element[key],
                       });
-                    } // else Если есть, то возможно обновляем
+                    } else {  // else Если есть, то возможно обновляем
+                      state.commit('UPDATE_DATA', {
+                        tableName: relatedModelName,
+                        value: element[key],
+                      });
+                    }
                     element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
                   }
                 }
@@ -379,6 +384,11 @@ export default {
 
               if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
                 state.commit('SET_DATA', {
+                  tableName: option.tableName,
+                  value: element,
+                });
+              } else {
+                state.commit('UPDATE_DATA', {
                   tableName: option.tableName,
                   value: element,
                 });

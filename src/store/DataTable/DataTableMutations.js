@@ -66,6 +66,10 @@ export default {
     if ('guid' in option) state[option.tableName][option.guid].listData.push(option.value);
     else state[option.tableName].listData.push(option.value);
   },
+  UPDATE_DATA(state, option) {
+    let index = state[option.tableName].listData.findIndex(item => item.id == option.value.id);
+    state[option.tableName].listData[index] = option.value;
+  },
   SET_DATA_PREVIOUS(state, option) {
     // console.time('For join');
     state[option.tableName][option.guid].listData = option.buferData.concat(state[option.tableName][option.guid].listData);
