@@ -8,13 +8,14 @@ export const DataTable = {
     }
   },
   computed: {
-    optionGetter() { return { tableName: this.properties.tableName, guid: this.guid } },
+    optionGetter() { return { tableName: this.tableName, guid: this.guid } },
+    propsTable() { return this.$store.getters['DataTable/GET_PROPS_TABLE'](this.optionGetter); },
     isLoadingData() {
       let status = this.$store.getters['DataTable/GET_LOADING_API'](this.optionGetter);
       if (!status) {
         // console.log('add listener scroll');
         this.parentElement.addEventListener('scroll', this.eventScrollPagination);
-        if (this.getDataCount() != 0)
+        if (this.getCountDataTotal() != 0)
           setTimeout(() => this.eventScrollPagination(), 300);
       } else {
         if (this.parentElement)
@@ -22,32 +23,32 @@ export const DataTable = {
       }
       return status; //this.$store.getters['DataTable/GET_LOADING_API'](this.optionGetter);
     },
-    isHierarchyMode() { 
-      return this.$store.getters['DataTable/GET_HIERARCHY_MODE'](this.optionGetter); 
-    },
+    // isHierarchyMode() { 
+    //   return this.$store.getters['DataTable/GET_HIERARCHY_MODE'](this.optionGetter); 
+    // },
 
-    listOptions() { return this.$store.getters['DataTable/GET_OPTIONS'](this.tableName, this.properties.headers); },
-    listData() { return this.$store.getters['DataTable/GET_DATA'](this.optionGetter); },
-    listDataCount() { return this.$store.getters['DataTable/GET_TABLE_DATA_COUNT'](this.optionGetter); },
-    listDataCountLoad() {return this.$store.getters['DataTable/GET_DATA'](this.optionGetter).length; },
+    listOptions() { return this.$store.getters['DataTable/GET_LIST_OPTIONS'](this.optionGetter); },
+    listData() { return this.$store.getters['DataTable/GET_LIST_DATA'](this.optionGetter); },
+    countDataTotal() { return this.$store.getters['DataTable/GET_COUNT_DATA_TOTAL'](this.optionGetter); },
+    countDataLoaded() {return this.$store.getters['DataTable/GET_COUNT_DATA_LOADED'](this.optionGetter); },
 
     listDataGroup() { return this.$store.getters['DataTable/GET_DATA_GROUP'](this.optionGetter); },
     listDataGroupLevel() { return this.$store.getters['DataTable/GET_DATA_GROUP_LEVEL'](this.optionGetter); },
 
   },
   watch: {
-    typeHeight() {
-      if (this.typeHeight == 'dense')
+    propsTable() {
+      if (this.propsTable.typeRow == 'dense')
         setTimeout(() => this.eventScrollPagination(), 300);
     },
-    listDataCount() {
-      // console.log(this.listDataCount);
-      if (this.listDataCount == 0 && 
+    countDataTotal() {
+      // console.log(this.countDataTotal);
+      if (this.countDataTotal == 0 && 
           (this.$store.getters['DataTable/GET_FILTER_EXTENDED'](this.optionGetter) != '' ||
-            this.$store.getters['DataTable/GET_FILTER_DEFAULT_FIELD'](Object.assign(this.optionGetter, {filter: 'search'})) != null )) {
+            this.$store.getters['DataTable/GET_FILTER_DEFAULT_FIELD'](Object.assign({ filter: 'search' }, this.optionGetter)) != null )) {
         this.isShowDialogEmpty = true;
       }
-      // if (this.listDataCount < 50) {
+      // if (this.countDataTotal < 50) {
       //   if (this.getApiNext())
       //     this.requestData({next: true});
         // if (this.getApiPrevious()) {
@@ -61,13 +62,31 @@ export const DataTable = {
     await this.$store.dispatch('DataTable/CREATE_TABLE_DATA_SPACE', {
       tableName: this.tableName,
       guid: this.guid,
-      tableOption: {relatedModelView: this.properties.relatedModelView},
+      tableOption: {
+        propsTable: {
+          typeRow: this.typeRow,
+          typeColumn: this.typeColumn,
+          isAdding: this.isAdding,
+          isAddingForm: this.isAddingForm,
+          isAddingInline: this.isAddingInline,
+          isEditable: this.isEditable,
+          isEditableForm: this.isEditableForm,
+          isEditableInline: this.isEditableInline,
+          isFooter: this.isFooter,
+          isExpansion: this.isExpansion,
+          isMultiline: this.isMultiline,
+          isHierarchy: this.isHierarchy,
+        },
+        
+      },
       defaultFilters: this.defaultFilters
     })
-      .then(() => {});
+      .then(() => {
+        // properties in stor
+      });
   },
   mounted() { // Сообщаем в родителя что компонент смонтирован
-    this.eventComponentMounted({
+    this.mountedComponent({
       guid: this.guid,
     });
   },
@@ -80,7 +99,8 @@ export const DataTable = {
   methods: {
     getApiNext() { return this.$store.getters['DataTable/GET_ADDRESS_API_NEXT'](this.optionGetter); },
     getApiPrevious() { return this.$store.getters['DataTable/GET_ADDRESS_API_PREVIOUS'](this.optionGetter); },
-    getDataCount() { return this.$store.getters['DataTable/GET_DATA'](this.optionGetter); },
+    // getDataCount() { return this.$store.getters['DataTable/GET_DATA'](this.optionGetter); },
+    getCountDataTotal() { return this.$store.getters['DataTable/GET_COUNT_DATA_TOTAL'](this.optionGetter); },
     async requestData(option) {
       await this.$store.dispatch('DataTable/REQUEST_DATA', Object.assign({
         tableName: this.tableName,
@@ -149,7 +169,7 @@ export const DataTable = {
       this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
         tableName: this.tableName,
         guid: this.guid,
-        defaultFilters: {'ordering': `${(this.isHierarchyMode) ? '-is_group,' : ''}${(option.ordering) ? '' : '-'}${option.key}`}
+        defaultFilters: {'ordering': `${(this.propsTable.isHierarchy) ? '-is_group,' : ''}${(option.ordering) ? '' : '-'}${option.key}`}
       });
     },
     closeEmptyDialog(option) {
@@ -173,8 +193,8 @@ export const DataTable = {
       this.isShowDialogEmpty = false;
     },
     toggleGroup(option) {
-      this.eventBodyBlur();
-      if (!this.$store.getters['DataTable/GET_FILTER_DEFAULT_FIELD'](Object.assign(this.optionGetter, {filter: 'is_deleted'})))
+      this.blurComponent();
+      if (!this.$store.getters['DataTable/GET_FILTER_DEFAULT_FIELD'](Object.assign({ filter: 'is_deleted' }, this.optionGetter)))
         this.$store.dispatch('DataTable/SELECTED_GROUP', {
           tableName: this.tableName,
           guid: this.guid,

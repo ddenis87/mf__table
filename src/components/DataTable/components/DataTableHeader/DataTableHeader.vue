@@ -4,7 +4,7 @@
        @mouseout="eventMouseOut">
 
     <div class="header-row" 
-         :class="`header-row_${typeHeight}`"
+         :class="`header-row_${typeRow}`"
          :style="template" @click="(event) => eventClickColumn(event)">
       
       <div class="header-column header-column__action-max"
@@ -22,7 +22,7 @@
            :data-key="item.value">
         <data-table-content-display :value="item.label"
                                     :properties="{type: 'string'}"
-                                    :type-height="typeHeight"></data-table-content-display>
+                                    :type-row="typeRow"></data-table-content-display>
         <div class="header-column__sort">
           <v-icon>mdi-menu-down</v-icon>
         </div>
@@ -48,7 +48,7 @@ export default {
   ],
   props: {
     template: Object,
-    typeHeight: { type: String, default: 'fixed' },
+    typeRow: { type: String, default: 'fixed' },
     typeColumn: { type: String, default: 'fixed' },
     items: { type: Array, default: () => [] },
     isMultiline: {type: Boolean, default: false},

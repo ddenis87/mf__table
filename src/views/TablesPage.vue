@@ -14,13 +14,12 @@
       </v-toolbar>
     </div>
     <div class="tables-page__control">
-      <data-table-control v-bind="propertiesControl"
-                          @toggle-view="toggleView"></data-table-control>
+      <data-table-control v-bind="propertiesControl"></data-table-control>
     </div>
     <div class="tables-page__body">
       <component class="table" 
-                 :is="componentTheTables"
-                 v-bind="propertiesTable"
+                 :is="componentTables"
+                 
                  @component-mounted="mountedTable"
                  @row-focused="focusedElement"
                  @component-blur="blurTable"></component>
@@ -29,7 +28,7 @@
 </template>
 
 <script>
-import DataTableControl from '@/components/DataTableControl/DataTableControl.vue';
+import DataTableControl from '@/components/DataTableControls/DataTableControl.vue';
 import ElFieldSearch from '@/components/Elements/ElField/ElFieldSearch.vue';
 
 import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
@@ -51,15 +50,13 @@ export default {
     }
   },
   computed: {
+    optionGetter() { return { tableName: this.tableName, guid: this.guid } },
     eventFilterExtendedReset() {
       if (this.$store.getters['DataTable/GET_MARK_EVENTS_FILTER_EXTENDE_RESET']({tableName: this.tableName, guid: this.guid}))
         return true;
       return null;
     },
-    tableDiscription() { return this.$store.getters['DataTable/GET_TABLE_DESCRIPTION']({tableName: this.tableName}) },
-    componentTheTables() {
-      return () => import(`@/components/TheTable/TheTable${this.tableName[0].toUpperCase() + this.tableName.slice(1)}`);
-    }
+    tableDiscription() { return this.$store.getters['DataTable/GET_DESCRIPTION'](this.optionGetter) },
   },
   watch: {
     eventFilterExtendedReset() {
@@ -68,7 +65,6 @@ export default {
     }
   },
   methods: {
-
     freeSearch(option) {
       this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
         tableName: this.tableName,

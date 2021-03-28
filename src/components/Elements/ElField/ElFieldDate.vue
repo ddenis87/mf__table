@@ -243,7 +243,7 @@ export default {
           this.fieldElementDOM = event.target;
           return;
         } else {
-          this.emitBlurField({value: this.fieldValue, key: 'Enter', shift: false, ev: 'blur'});
+          this.emitBlurField({value: this.fieldValue.split('.').reverse().join('-'), key: 'Enter', shift: false, ev: 'blur'});
         }
       if (!this.isEmit) {
         this.isDialogShow = false;

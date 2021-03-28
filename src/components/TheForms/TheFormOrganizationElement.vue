@@ -108,7 +108,7 @@
 import { TheTableForm } from './TheTableForm.js';
 
 export default {
-  name: 'TableFormOrganization',
+  name: 'TheFormOrganizationElement',
   mixins: [
     TheTableForm,
   ],

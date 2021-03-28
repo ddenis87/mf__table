@@ -1,23 +1,38 @@
 export const DataTableEvents = {
   methods: {
     eventComponentCreated(option) {
-      this.$emit('component-created', option);
+      // this.eventComponent('')
+      // this.$emit('component-created', option);
     },
-    eventComponentMounted(option) {
-      this.$emit('component-mounted', option);
+    mountedComponent(option) {
+      this.eventComponent('mounted-component', option)
+      // this.$emit('component-mounted', option);
     },
-    eventRowFocused(event, option) {
-      this.$emit('event-row-focused', option);
+    focusedElement(event, value) {
+      this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', Object.assign({ value: value }, this.optionGetter));
+      // console.log(option);
+      // this.eventComponent('focused-element', option)
+      // this.$emit('event-row-focused', option);
     },
-    eventRowSelected(event, option) {
-      this.$emit('event-row-selected', option, this.properties.tableName);
+    selectedElement(event, value) {
+      this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', Object.assign({ value: value }, this.optionGetter));
+      // console.log(option);
+      // this.eventComponent('selected-element', option)
+      // this.$emit('event-row-selected', option, this.properties.tableName);
     },
     eventRowKeydown(event, option) {
       // console.log(option);
-      this.$emit('event-row-keydown', event, option);
+      // this.$emit('event-row-keydown', event, option);
     },
-    eventBodyBlur() {
-      this.$emit('event-component-blur');
-    }
+    blurComponent() {
+      // console.log(this.optionGetter);
+      this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', this.optionGetter);
+      // this.eventComponent('blur-component');
+      // this.$emit('event-component-blur');
+    },
+
+    eventComponent(eventName, option) {
+      this.$emit('event-component', eventName, option);
+    },
   },
 }

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { ElField } from './ElFiled.js';
+import { ElField } from './ElField.js';
 export default {
   name: 'ElFieldChoice',
   mixins: [

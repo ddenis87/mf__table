@@ -34,12 +34,11 @@
 
       <!-- VIEW TABLE -->
       <data-table-control-view class="toolbar-group"
+                               :table-name="tableName"
+                               :guid="guid"
                                :type-height-number="typeHeightNumber"
                                :type-column="typeColumn"
-                               :is-footer="isFooter"
-                               :is-expansion="isExpansion"
-                               :is-multiline="isMultiline"
-                               :is-hierarchy="isHierarchyMode"
+                               
                                @toggle-view="toggleView"></data-table-control-view> <!-- -->
       <!-- FILTER TABLE -->
       <v-divider vertical></v-divider>
@@ -126,7 +125,7 @@ export default {
         }
         default: this.$emit('toggle-view', option);
       }
-      console.log(option);
+      // console.log(option);
     },
     toggleHierarchy() {
       this.$store.dispatch('DataTable/TOGGLE_HIERARCHY_MODE', {

@@ -2,14 +2,14 @@ import getters from './DataTableGetters.js';
 import mutations from './DataTableMutations.js';
 import actions from './DataTableActions.js';
 
-class TableDataBase {
+class DataTable {
   constructor({relatedModelView = '{id}'}) {
     this.relatedModelView = relatedModelView;
   }
   description = null;
-  // tableDataCount = 0; // в GUID
-  isHierarchyMode = null;  // HIERARCHICAL TABLE SET WHEN LOADING OPTIONS
   relatedModelView = ''; // шаблон представление таблицы в других таблицах, компонентах, и т.д. ///DELETE
+  isHierarchyMode = false;  // HIERARCHICAL TABLE SET WHEN LOADING OPTIONS
+
   listOptions = {};
   listData = [];  // МАССИВ ДАННЫХ  !!!!!
 
@@ -19,10 +19,10 @@ class TableDataBase {
 export default {
   namespaced: true,
   state: {
-    "budgetclassification": new TableDataBase({ relatedModelView: '{head_code} - {head_name}' }),
-    "organization": new TableDataBase({ relatedModelView: '{title}' }),
+    "budgetclassification": new DataTable({ relatedModelView: '{head_code} - {head_name}' }),
+    "organization": new DataTable({ relatedModelView: '{title}' }),
 
-    "actualdesc": new TableDataBase({ relatedModelView: '{some_desc}' }),
+    "actualdesc": new DataTable({ relatedModelView: '{some_desc}' }),
   },
   getters,
   mutations,

@@ -1,6 +1,6 @@
 <template>
   <div class="content-display"
-       :class="`content-display_${typeHeight}`"
+       :class="`content-display_${typeRow}`"
        :style="`text-align: ${properties['align']}`">
     {{ displayValue }}
   </div>
@@ -17,7 +17,7 @@ export default {
   props: {
     value: null,
     properties: { type: Object, default: () => {} },
-    typeHeight: { type: String, default: 'fixed' },
+    typeRow: { type: String, default: 'fixed' },
   },
   computed: {
     displayValue() {

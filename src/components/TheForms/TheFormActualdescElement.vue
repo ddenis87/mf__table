@@ -15,6 +15,13 @@
                              v-model="fieldFormValue.some_desc"></el-field-string>
           </v-col>
         </v-row>
+        <v-row dense>
+          <v-col cols="12">
+            <el-field-dialog :inputProperties="assingObject(fieldForm.related, {})"
+                             v-model="fieldFormValue.related"
+                             @next-element="eventNextElement"></el-field-dialog>
+          </v-col>
+        </v-row>
       </v-container>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -30,7 +37,7 @@
 <script>
 import { TheTableForm } from './TheTableForm.js';
 export default {
-  name: 'TheTableActualdesc',
+  name: 'TheActualdescElement',
   mixins: [
     TheTableForm,
   ],

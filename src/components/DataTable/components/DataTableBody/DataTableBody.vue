@@ -6,7 +6,7 @@
 
     <div v-for="(itemRow, indexRow) in items"
          class="body-row"
-         :class="`body-row_${typeHeight}`"
+         :class="`body-row_${typeRow}`"
          :key="`body-row-${indexRow}`"
          :style="template"
          :tabindex="indexRow"
@@ -54,7 +54,7 @@
         <div class="box-display">
           <data-table-content-display :value="itemRow[itemColumn.value]"
                                       :properties="itemColumn"
-                                      :type-height="typeHeight"></data-table-content-display>
+                                      :type-row="typeRow"></data-table-content-display>
         </div>
       </div>
     </div>
@@ -89,7 +89,7 @@ export default {
     guid: { type: String, default: '' },
     tableName: { type: String, default: '' },
     template: Object,
-    typeHeight: { type: String, default: 'fixed' },
+    typeRow: { type: String, default: 'fixed' },
     typeColumn: { type: String, default: 'fixed' },
     items: { type: Array, default: () => [] },
     itemsHeader: { type: Array, default: () => [] },
@@ -105,6 +105,11 @@ export default {
     return {
       isDataLoad: false,
       isTimerLoad: null,
+    }
+  },
+  watch: {
+    typeRow() {
+      console.log(this.typeRow);
     }
   },
   mounted() {

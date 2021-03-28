@@ -31,8 +31,8 @@ export default {
 
   // ----TOGGLE HIERARCHY MODE--------------------------------------------------
   TOGGLE_HIERARCHY_MODE(state, option) {
-    if (state.state[option.tableName].isHierarchyMode) {
-      state.state[option.tableName].isHierarchyMode = false;
+    if (state.state[option.tableName][option.guid].propsTable.isHierarchy) {
+      state.state[option.tableName][option.guid].propsTable.isHierarchy = false;
       state.commit('CLEAR_DATA_GROUP_LEGEND', option);
       state.dispatch('SET_FILTER_DEFAULT', Object.assign(option, {
         defaultFilters: {
@@ -43,7 +43,7 @@ export default {
         }
       }));
     } else {
-      state.state[option.tableName].isHierarchyMode = true;
+      state.state[option.tableName][option.guid].propsTable.isHierarchy = true;
       state.dispatch('SET_FILTER_DEFAULT', Object.assign(option, {
         defaultFilters: {
           'ordering': '-is_group',
@@ -148,7 +148,7 @@ export default {
   // ---------------------------------------------------------------------------
 
   // ----ПОМЕТКА НА УДАЛЕНИЕ ЭЛЕМЕНТА-------------------------------------------
-  MARK_DELETED_ELEMENT(state, option) {
+  DELETED_ELEMENT(state, option) {
     return new Promise((resolve, reject) => {
       state.dispatch('REQUEST_MARK_DELETED', option)
         .then(() => {

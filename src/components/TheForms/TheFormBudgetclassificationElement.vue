@@ -29,7 +29,7 @@
 import { TheTableForm } from './TheTableForm.js';
 
 export default {
-  name: 'TableFormBudgetclassification',
+  name: 'TheFormBudgetclassificationElement',
   mixins: [
     TheTableForm,
   ],

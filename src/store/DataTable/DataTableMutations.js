@@ -1,16 +1,31 @@
 import Vue from "vue";
 
-class TableDataSpace {
-  constructor({pageSize = 80, isDeleted = false}) {
+class DataTableSpace {
+  constructor({
+    pageSize = 80,
+    isDeleted = false,
+
+    propsTable,
+  }) {
     this.filters['page_size'] = pageSize;
     this.filters['is_deleted'] = isDeleted;
+
+    this.propsTable = Object.assign(this.propsTable, propsTable) ;
   };
+
   apiLoading = false;
-  tableDataCount = -1;
-  apiNext = null;
-  apiPrevious = null;
+  propsTable = {
+    isMarkDeleted: null,
+  }; // props table
+
+  countDataTotal = -1;
   listData = [];
   listDataGroup = [];
+  activeElement = null;
+
+  apiNext = null;
+  apiPrevious = null;
+  
   filters = { // сменить название
     'page_size': '',
     'is_deleted': false,
@@ -37,27 +52,53 @@ class TableDataSpace {
 export default {
   // ----СОЗДАНИЕ/УДАЛЕНИЕ ТАБЛИЧНОГО ПРОСТРАНСТВА------------------------------
   CREATE_TABLE_DATA_SPACE(state, option) {
-    Vue.set(state[option.tableName], option.guid, new TableDataSpace(option.tableOption));
+    Vue.set(state[option.tableName], option.guid, new DataTableSpace(option.tableOption));
+    console.log(state[option.tableName]);
   },
   DELETE_TABLE_DATA_SPACE(state, option) {
     delete state[option.tableName][option.guid];
   },
   // ---------------------------------------------------------------------------
 
+  SET_PROPS_TABLE(state, option) {
+    for (let key of Object.keys(option.propsTable)) {
+      state[option.tableName][option.guid].propsTable[key] = option.propsTable[key];
+    }
+    console.log(state[option.tableName][option.guid].propsTable);
+  },
+
+  SET_ACTIVE_ELEMENT(state, option) {
+    state[option.tableName][option.guid].activeElement = (option.value) ? option.value : null;
+    // console.log(state[option.tableName][option.guid]);
+  },
+
   SET_LOADING_API(state, option) {
     state[option.tableName][option.guid].apiLoading = option.status;
   },
 
   SET_OPTIONS(state, option) {
+    console.log(option.data);
     state[option.tableName].listOptions = option.data;
     state[option.tableName].description = option.description;
     if ('parent' in option.data) {
-      state[option.tableName].isHierarchyMode = true;
+      state[option.tableName][option.guid].propsTable.isHierarchy = (state[option.tableName][option.guid].propsTable.isHierarchy == null) ? 
+        null : 
+        (state[option.tableName][option.guid].propsTable.isHierarchy && true);
       state[option.tableName][option.guid].filters['parent__isnull'] = true;
       state[option.tableName][option.guid].filters['ordering'] = `-is_group`;
     } else {
-      state[option.tableName].isHierarchyMode = false;
+      state[option.tableName][option.guid].propsTable.isHierarchy = (state[option.tableName][option.guid].propsTable.isHierarchy == null) ? 
+        null :
+        (state[option.tableName][option.guid].propsTable.isHierarchy && false);
     }
+    state[option.tableName][option.guid].propsTable.isMarkDeleted = ('is_deleted' in option.data) ? true : false;
+    // if ('is_deleted' in option.data) {
+    //   // Vue.set(state[option.tableName][option.guid].propsTable, isMarkDeleted, true);
+    //   state[option.tableName][option.guid].propsTable.isMarkDeleted = true;
+    // } else {
+    //   // Vue.set(state[option.tableName][option.guid].propsTable, isMarkDeleted, false);
+    //   state[option.tableName][option.guid].propsTable.isMarkDeleted = false;
+    // }
   },
   SET_EXTRA_ACTIONS(state, option) {
     state[option.tableName].extra_actions = option.data;
@@ -81,15 +122,15 @@ export default {
     // console.timeEnd('For join');
   },
   SET_DATA_OPTIONS(state, option) {
-    state[option.tableName][option.guid].tableDataCount = option.data.count;
+    state[option.tableName][option.guid].countDataTotal = option.data.count;
     state[option.tableName][option.guid].apiNext = option.data.next
   },
   SET_DATA_OPTIONS_PRELOAD(state, option) {
-    state[option.tableName][option.guid].tableDataCount = option.data.count;
+    state[option.tableName][option.guid].countDataTotal = option.data.count;
     state[option.tableName][option.guid].apiPrevious = option.data.previous;
   },
   CLEAR_DATA(state, option) {
-    state[option.tableName][option.guid].tableDataCount = -1;
+    state[option.tableName][option.guid].countDataTotal = -1;
     state[option.tableName][option.guid].listData = [];
   },
   CLEAR_DATA_GROUP_LEGEND(state, option) {

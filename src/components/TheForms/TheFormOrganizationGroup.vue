@@ -58,7 +58,7 @@
 <script>
 import { TheTableForm } from './TheTableForm.js';
 export default {
-  name: 'TheTableFormOrganizationGroup',
+  name: 'TheFormOrganizationGroup',
   mixins: [
     TheTableForm,
   ],

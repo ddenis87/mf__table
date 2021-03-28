@@ -30,12 +30,16 @@
       <v-card height="400" class="history-table">
         <div class="history-table__control">
           <data-table-control v-bind="propertiesControl"
-                              type-control="informationRegister"></data-table-control>
+                              type-control="informationRegister"
+                              @toggle-view="toggleView"></data-table-control>
         </div>
         <div class="history-table__body">
           <component :is="componentTables"
                      :default-filters="filters"
-                     @component-mounted="mountedTable"></component>
+                     v-bind="propertiesTable"
+                     @component-mounted="mountedTable"
+                     @row-focused="focusedElement"
+                     @component-blur="blurTable"></component>
         </div>
         
       </v-card>
@@ -45,7 +49,7 @@
 
 <script>
 import DialogModal from '@/components/Dialogs/DialogModal.vue';
-import DataTableControl from '@/components/DataTableControls/DataTableControl.vue';
+import DataTableControl from '@/components/DataTableControl/DataTableControl.vue';
 
 
 import { ElField } from './ElField.js';

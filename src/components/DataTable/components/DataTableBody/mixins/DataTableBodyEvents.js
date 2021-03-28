@@ -117,7 +117,7 @@ export const DataTableBodyEvents = {
 
     // EVENTS MOUSE
     eventMouseOver(event) {
-      if (!this.isColumnEditing && this.typeHeight != 'auto')
+      if (!this.isColumnEditing && this.typeRow != 'auto')
         this.isTooltipTimer = setTimeout(() => {
           if (event.target.closest('.body-column > .box-display')) {
             let parent = event.target.closest('.body-column > .box-display').getBoundingClientRect();

@@ -76,7 +76,7 @@ export default {
       return (this.relatedModelView != '{id}') ? 'text' : 'id'; },
     fieldList() {
       console.log();
-      let fieldListStore = this.$store.getters[`DataTable/GET_DATA`]({
+      let fieldListStore = this.$store.getters[`DataTable/GET_LIST_DATA`]({
         tableName: this.relatedModelName,
       });
       if (this.relatedModelView != '{id}') {
@@ -96,7 +96,7 @@ export default {
 
       return (this.isItemGroup) ? fieldListStore.filter(item => item.is_group) : fieldListStore;
     },
-    dialogTableName() { return this.$store.getters[`DataTable/GET_TABLE_DESCRIPTION`]({ tableName: this.relatedModelName }); },
+    dialogTableName() { return this.$store.getters[`DataTable/GET_DESCRIPTION`]({ tableName: this.relatedModelName }); },
     componentTable() {
       if (!this.isDialogShow) return null;
       if (!this.relatedModelName) return null;

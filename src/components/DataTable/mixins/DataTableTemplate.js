@@ -1,25 +1,46 @@
 export const DataTableTemplate = {
   computed: {
+    headers() {
+      return (this.propsTable.isMultiline) ? this.properties.templateMultiline : this.properties.templateUno;
+    },
+    listHeaders() {
+      let headerStore = this.listOptions;
+      let headerBase = this.headers;
+      let newheaderBase = [];
+      let headerReturn = [];
+      if (Array.isArray(headerBase[0])) {
+        for (let i = 0; i < headerBase.length; i++) { newheaderBase.push(...headerBase[i]) }
+      } else {
+        newheaderBase = headerBase;
+      }
+      newheaderBase.forEach(element => {
+        if (element.value in headerStore) {
+          headerReturn.push(Object.assign(element, headerStore[element.value], {'position_in_template': {'grid-area': element.value}}));
+        }
+      });
+      return headerReturn;
+      return [];
+    },
     dataTableTemplate() {
-      if (this.isHierarchyMode == null) return null;
+      // if (this.isHierarchyMode == null) return null;
 
       let template = {
         'grid-template-areas': '',
         'grid-template-columns': '',
       };
-      let headers = this.properties.headers;
+      let headers = this.headers;
       if (!headers[0].length) {
         template['grid-template-areas'] = this.computedAreaUnoLine(headers);
         template['grid-template-columns'] = this.computedWidthUnoLine(headers);
       } else {
         template['grid-template-areas'] = this.computedAreaMultiLine(headers);
         template['grid-template-columns'] = this.computedWidthMultiLine(headers);
-        template['grid-template-rows'] = `repeat(${headers.length}, ${(this.typeHeight == 'fixed') ? '43px' : (this.typeHeight == 'dense') ? '22px' : 'auto'})`;
+        template['grid-template-rows'] = `repeat(${headers.length}, ${(this.propsTable.typeRow == 'fixed') ? '43px' : (this.propsTable.typeRow == 'dense') ? '22px' : 'auto'})`;
       }
       // console.log(template);
       return template;
     },
-    computedActionMax() { return (this.typeHeight != 'auto' && this.isExpansion == true) ? true : false; },
+    computedActionMax() { return (this.propsTable.typeRow != 'auto' && this.propsTable.isExpansion == true) ? true : false; },
   },
   methods: {
     computedAreaUnoLine(array) {

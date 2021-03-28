@@ -1,6 +1,6 @@
 export const DataTable = {
   computed: {
-    computedActionMax() { return (this.typeHeight != 'auto' && this.isExpansion == true) ? true : false; },
+    computedActionMax() { return (this.typeRow != 'auto' && this.isExpansion == true) ? true : false; },
   },
   methods: {
     gettingValueForType(properties, value) {

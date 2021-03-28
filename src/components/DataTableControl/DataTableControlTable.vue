@@ -1,6 +1,8 @@
 <template>
   <div class="data-table-control-actions-table">
-    <el-btn-icon icon="mdi-plus" :disabled="isDisabledControl" @click="addingElement" v-if="accessControl.has('adding')">Добавить элемент</el-btn-icon>
+    <el-btn-icon icon="mdi-plus" :disabled="isDisabledControl"
+                 @click="addingElement"
+                 v-if="accessControl.has('adding')">Добавить элемент</el-btn-icon>
     <el-btn-icon icon="mdi-table-row-plus-after" :disabled="isDisabledControl" @click="addingElementInline" v-if="accessControl.has('addingInline')">Добавить строку</el-btn-icon>
     <el-btn-icon icon="mdi-folder-plus-outline" :disabled="isDisabledControl || !isHierarchyMode" @click="addingGroup" v-if="accessControl.has('addingGroup')">Добавить группу</el-btn-icon>
     <v-divider vertical></v-divider>

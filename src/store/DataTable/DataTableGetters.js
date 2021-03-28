@@ -1,4 +1,68 @@
 export default {
+  // ---- dataTable -----------------------------------------------------------
+  GET_DESCRIPTION:(state) => (option) => {
+    if (option.tableName)
+      return state[option.tableName].description;
+    return false;
+  },
+
+  GET_RELATED_MODEL_VIEW:(state) => (option) => {
+    if (option.tableName)
+      return state[option.tableName].relatedModelView;
+    return false;
+  },
+  
+  GET_HIERARCHY_MODE:(state) => (option) => {
+    if (option.tableName)
+      return state[option.tableName].isHierarchyMode;
+    return false;
+  },
+  
+  GET_LIST_OPTIONS:(state) => (option) => {
+    if (option.tableName)
+      return state[option.tableName].listOptions;
+    return {};
+  },
+  // --------------------------------------------------------------------------
+
+  // ---- dataTableSpace ------------------------------------------------------
+  GET_PROPS_TABLE:(state) => (option) => {
+    if (state[option.tableName][option.guid])
+      return state[option.tableName][option.guid].propsTable;
+    return {};
+  },
+  
+  GET_COUNT_DATA_TOTAL:(state) => (option) => {
+    if (state[option.tableName][option.guid])
+      return state[option.tableName][option.guid].countDataTotal;
+    return -1;
+  },
+
+  GET_COUNT_DATA_LOADED:(state) => (option) => {
+    if (option.tableName)
+      if (option.guid)
+        return state[option.tableName][option.guid].listData.length;
+    return -1;
+  },
+
+  GET_LIST_DATA:(state) => (option) => {
+    if (option.tableName) {
+      if (option.guid)
+        return state[option.tableName][option.guid].listData;
+      return state[option.tableName].listData;
+    }
+    return [];
+  },
+  
+  GET_ACTIVE_ELEMENT:(state) => (option) => {
+    if (option.guid)
+      return state[option.tableName][option.guid].activeElement;
+    return null;
+  },
+
+  
+  // --------------------------------------------------------------------------
+
   GET_LOADING_API:(state) => (option) => {
     return state[option.tableName][option.guid].apiLoading;
   },
@@ -30,42 +94,42 @@ export default {
     return filtersApi;
   },
 
-  GET_TABLE_DESCRIPTION:(state) => (option) => { return (state[option.tableName]) ? state[option.tableName].description : ''; },
-  GET_HIERARCHY_MODE:(state) => (option) => { return state[option.tableName].isHierarchyMode; },
-  GET_RELATED_MODEL_VIEW:(state) => (option) => { return state[option.tableName].relatedModelView; },
+  // GET_TABLE_DESCRIPTION:(state) => (option) => { return (state[option.tableName]) ? state[option.tableName].description : ''; },
+  // GET_HIERARCHY_MODE:(state) => (option) => { return state[option.tableName].isHierarchyMode; },
+  // GET_RELATED_MODEL_VIEW:(state) => (option) => { return state[option.tableName].relatedModelView; },
 
-  GET_TABLE_DATA_COUNT:(state) => (option) => {
-    if (state[option.tableName][option.guid])
-      return state[option.tableName][option.guid].tableDataCount;
-    return -1;
-  },
+  // GET_TABLE_DATA_COUNT:(state) => (option) => {
+  //   if (state[option.tableName][option.guid])
+  //     return state[option.tableName][option.guid].tableDataCount;
+  //   return -1;
+  // },
 
-  GET_OPTIONS:(state) => (tableName, headers) => {
-    let headerStore = state[tableName].listOptions;
-    let headerBase = headers;
-    let newheaderBase = [];
-    let headerReturn = [];
-    if (Array.isArray(headerBase[0])) {
-      for (let i = 0; i < headerBase.length; i++) { newheaderBase.push(...headerBase[i]) }
-    } else {
-      newheaderBase = headerBase;
-    }
-    newheaderBase.forEach(element => {
-      if (element.value in headerStore) {
-        headerReturn.push(Object.assign(element, headerStore[element.value], {'position_in_template': {'grid-area': element.value}}));
-      }
-    });
-    return headerReturn;
-  },
-  GET_FIELD:(state) => (tableName) => {
-    // console.log(tableName);
-    return state[tableName].listOptions;
-  },
-  GET_DATA:(state) => (option) => {
-    if (option.guid)
-      return state[option.tableName][option.guid].listData;
-    return state[option.tableName].listData;
-  },
+  // GET_OPTIONS:(state) => (tableName, headers) => {
+  //   let headerStore = state[tableName].listOptions;
+  //   let headerBase = headers;
+  //   let newheaderBase = [];
+  //   let headerReturn = [];
+  //   if (Array.isArray(headerBase[0])) {
+  //     for (let i = 0; i < headerBase.length; i++) { newheaderBase.push(...headerBase[i]) }
+  //   } else {
+  //     newheaderBase = headerBase;
+  //   }
+  //   newheaderBase.forEach(element => {
+  //     if (element.value in headerStore) {
+  //       headerReturn.push(Object.assign(element, headerStore[element.value], {'position_in_template': {'grid-area': element.value}}));
+  //     }
+  //   });
+  //   return headerReturn;
+  // },
+  // GET_FIELD:(state) => (tableName) => {
+  //   // console.log(tableName);
+  //   return state[tableName].listOptions;
+  // },
+  // GET_DATA:(state) => (option) => {
+  //   if (option.guid)
+  //     return state[option.tableName][option.guid].listData;
+  //   return state[option.tableName].listData;
+  // },
   GET_DATA_GROUP:(state) => (option) => { return state[option.tableName][option.guid].listDataGroup; },
   GET_DATA_GROUP_LEVEL:(state) => (option) => { return state[option.tableName][option.guid].listDataGroup.length; },
   GET_ADDING_MODE:(state) => (option) => {

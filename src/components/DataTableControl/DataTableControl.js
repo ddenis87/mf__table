@@ -71,12 +71,15 @@ export const DataTableControl = {
         guid: this.guid,
       })) ? true : false;
     },
+    buildFormName() {
+      return this.tableName[0].toUpperCase() + this.tableName.slice(1)
+    },
     componentTableForm() {
       if (!this.isDialogShow) return null;
       if (this.typeElement == 'element')
-        return () => import(`@/components/TheTableForm/TheTableForm${this.tableName[0].toUpperCase() + this.tableName.slice(1)}`);
+        return () => import(`@/components/TheForms/TheForm${this.buildFormName}`);
       else 
-        return () => import(`@/components/TheTableForm/TheTableForm${this.tableName[0].toUpperCase() + this.tableName.slice(1)}Group`);
+        return () => import(`@/components/TheForms/TheForm${this.tableName[0].toUpperCase() + this.tableName.slice(1)}Group`);
     },
     componentFilter() {
       if (this.guid)

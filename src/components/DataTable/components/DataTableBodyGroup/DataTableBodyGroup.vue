@@ -2,7 +2,7 @@
   <div class="body-group">
     <div v-for="(itemRow, indexRow) in items"
          class="body-group-row"
-         :class="`body-group-row_${typeHeight}`"
+         :class="`body-group-row_${typeRow}`"
          :key="`body-group-row-${indexRow}`"
          :style="template"
          :tabindex="indexRow">
@@ -28,7 +28,7 @@
         <div class="box-display">
           <data-table-content-display :value="itemRow[itemColumn.value]"
                                       :properties="itemColumn"
-                                      :type-height="typeHeight"></data-table-content-display>
+                                      :type-row="typeRow"></data-table-content-display>
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@ export default {
     groupLevel: { type: Number, default: 0 },
     template: Object,
     startColumn: '',
-    typeHeight: { type: String, default: 'fixed' },
+    typeRow: { type: String, default: 'fixed' },
     typeColumn: { type: String, default: 'fixed' },
     isExpansion: {type: Boolean, default: false},
     isMultiline: {type: Boolean, default: false},

@@ -1,10 +1,6 @@
 <template>
   <data-table v-bind="propertiesTable"
-              @event-row-focused="eventRowFocused"
-              @event-row-selected="eventRowSelected"
-              @event-row-keydown="eventRowKeydown"
-              @event-component-blur="eventComponentBlur"
-              @component-mounted="componentMounted"></data-table>
+              @event-component="eventComponent"></data-table>
 </template>
 
 <script>
@@ -15,13 +11,15 @@ export default {
   mixins: [
     TheTable,
   ],
-  props: {
-  },
   data() {
     return {
-      propertiesTableUno: {
+      disEditableInline: false,
+      disHierarchy: null,
+      disMultiline: null,
+      disFooter: null,
+      optionTable: {
         tableName: 'actualdesc',
-        headers: [
+        templateUno: [
           {value: 'start_date', width: [200, 200] },
           {value: 'some_desc', width: [200, ], },
         ],

@@ -41,7 +41,7 @@ export default {
     // tableNameDescription() { return (!this.tableName) ? '' : this.$store.getters[`DataTable/GET_DESCRIPTION`](this.tableName); },
     filterList() {
       let filterListArray = [];
-      let filterList = this.$store.getters[`DataTable/GET_FIELD`](this.tableName);
+      let filterList = this.$store.getters[`DataTable/GET_LIST_OPTIONS`]({tableName: this.tableName});
       for (let key of Object.keys(filterList))
         if (!this.listException.includes(key))
           filterListArray.push(Object.assign({key: key}, filterList[key]));

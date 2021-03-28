@@ -1,6 +1,6 @@
 <template>
   <div class="data-table" :class="guid" >
-    <v-overlay :value="isLoadingData && isBlock" light z-index="999" opacity="0.08" :absolute="true"></v-overlay>
+    <v-overlay :value="isLoadingData && isBlock" light z-index="999" opacity="0.5" color="white" :absolute="true"></v-overlay>
 
     <data-table-tooltip :is-show="isShowTooltip"
                         :data-properties="propertiesTooltip"
@@ -16,10 +16,10 @@
     <div class="data-table__header">
 
       <data-table-header :template="dataTableTemplate"
-                         :type-height="typeHeight"
-                         :type-column="typeColumn"
-                         :items="listOptions"
-                         :is-multiline="isMultiline"
+                         :type-row="propsTable.typeRow"
+                         :type-column="propsTable.typeColumn"
+                         :items="listHeaders"
+                         :is-multiline="propsTable.isMultiline"
                          @set-sorting="setSorting"
                          @show-tooltip="showTooltip"
                          @hide-tooltip="hideTooltip"></data-table-header>
@@ -30,15 +30,15 @@
       <data-table-body-group :table-name="tableName"
                              :template="dataTableTemplate"
                              :group-level="listDataGroupLevel"
-                             :start-column="(isExpansion) ? properties.headers[1] : properties.headers[0]"
-                             :type-height="typeHeight"
-                             :type-column="typeColumn"
-                             :is-expansion="isExpansion"
-                             :is-multiline="isMultiline"
+                             :start-column="(propsTable.typeColumn) ? headers[1] : headers[0]"
+                             :type-row="propsTable.typeRow"
+                             :type-column="propsTable.typeColumn"
+                             :is-expansion="propsTable.isExpansion"
+                             :is-multiline="propsTable.isMultiline"
                              :is-editable="isEditable"
-                             :is-hierarchy-mode="isHierarchyMode"
+                             :is-hierarchy-mode="propsTable.isHierarchy"
                              :items="listDataGroup"
-                             :items-header="listOptions"
+                             :items-header="listHeaders"
                              @toggle-group="toggleGroup"></data-table-body-group>
     </div>
 
@@ -46,23 +46,23 @@
       <data-table-body :guid="guid"
                        :table-name="tableName"
                        :template="dataTableTemplate"
-                       :type-height="typeHeight"
-                       :type-column="typeColumn"
+                       :type-row="propsTable.typeRow"
+                       :type-column="propsTable.typeColumn"
                        :items="listData"
-                       :items-header="listOptions"
+                       :items-header="listHeaders"
                        :group-level="listDataGroupLevel"
 
                        :is-editable="isEditable"
                        :is-adding-inline="isAddingInline"
 
-                       :is-expansion="isExpansion"
-                       :is-multiline="isMultiline"
-                       :is-hierarchy-mode="isHierarchyMode"
+                       :is-expansion="propsTable.isExpansion"
+                       :is-multiline="propsTable.isMultiline"
+                       :is-hierarchy-mode="propsTable.isHierarchy"
                        @toggle-group="toggleGroup"
-                       @event-row-focused="eventRowFocused"
-                       @event-row-selected="eventRowSelected"
+                       @event-row-focused="focusedElement"
+                       @event-row-selected="selectedElement"
                        @event-row-keydown="eventRowKeydown"
-                       @event-body-blur="eventBodyBlur"
+                       @event-body-blur="blurComponent"
                        @adding-new-element="addingNewElement"
                        @show-tooltip="showTooltip"
                        @hide-tooltip="hideTooltip"></data-table-body>
@@ -71,11 +71,11 @@
     <!-- ANCHOR FOR LAZY LOAD DATA -->
     <div :class="`${guid}__boot-anchor`"></div>
 
-    <div class="data-table__footer" v-show="isFooter">
+    <div class="data-table__footer" v-show="propsTable.isFooter">
       <slot name="component-footer">
-        <data-table-footer :listDataCount="listDataCount"
-                            :listDataCountLoad="listDataCountLoad"
-                            :type-column="typeColumn"></data-table-footer>
+        <data-table-footer :listDataCount="countDataTotal"
+                           :listDataCountLoad="countDataLoaded"
+                           :type-column="propsTable.typeColumn"></data-table-footer>
       </slot>
     </div>
     <div class="data-table__dialog-modal">
@@ -121,20 +121,23 @@ export default {
   ],
   props: {
     properties: Object,
-    
-    defaultFilters: Object, // заменить
 
     defaultOptions: { type: Object, default: () => {}},
     defaultFilters: { type: Object, default: () => {}},
 
-    typeHeight: { type: String, default: 'fixed' },
+    typeRow: { type: String, default: 'fixed' },
     typeColumn: { type: String, default: 'fixed' },
 
+    isAdding: { type: Boolean, default: true },
+    isAddingForm: { type: Boolean, default: true },
+    isAddingInline: { type: Boolean, default: true },
     isEditable: { type: Boolean, default: true },
-    isAddingInline: { type: Boolean, default: false },
+    isEditableForm: { type: Boolean, default: true },
+    isEditableInline: { type: Boolean, default: true },
     isFooter: { type: Boolean, default: false },
     isExpansion: { type: Boolean, default: false },
     isMultiline: { type: Boolean, default: false },
+    isHierarchy: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -148,11 +151,11 @@ export default {
   computed: {
     computedTooltipShift() {
       let calcTooltipShift = { left: -7, top: -3, };
-      // if (this.typeHeight == 'fixed' && this.typeColumn == 'fixed') { calcTooltipShift.left = -1; calcTooltipShift.top = -2; return calcTooltipShift};
-      if (this.typeHeight == 'fixed' && this.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift};
-      if (this.typeHeight == 'auto' && this.typeColumn == 'fixed') { calcTooltipShift.left = 3; calcTooltipShift.top = -3; return calcTooltipShift};
-      if (this.typeHeight == 'dense' && this.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift};
-      if (this.typeHeight == 'auto' && this.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
+      // if (this.propsTable.typeRow == 'fixed' && this.propsTable.typeColumn == 'fixed') { calcTooltipShift.left = -1; calcTooltipShift.top = -2; return calcTooltipShift};
+      if (this.propsTable.typeRow == 'fixed' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift};
+      if (this.propsTable.typeRow == 'auto' && this.propsTable.typeColumn == 'fixed') { calcTooltipShift.left = 3; calcTooltipShift.top = -3; return calcTooltipShift};
+      if (this.propsTable.typeRow == 'dense' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift};
+      if (this.propsTable.typeRow == 'auto' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
       return calcTooltipShift;
     },
   },

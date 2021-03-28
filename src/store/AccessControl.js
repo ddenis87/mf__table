@@ -1,6 +1,21 @@
 export default {
   namespaced: true,
   state: {
+    // dataTableControl: {
+    //   catalog: new Set([
+    //     'adding',
+    //     'addingInline',
+    //     'addingGroup',
+    //     'editing',
+    //     'markDelete',
+    //     'recycle',
+    //     'filters',
+    //   ]),
+    //   informationRegister: new Set([
+    //     'adding',
+    //     'editing',
+    //   ]),
+    // },
     catalog: {
       dataTableControl: new Set([
         'adding',
@@ -10,30 +25,14 @@ export default {
         'markDelete',
         'recycle',
         'filters',
-      ])
-      // dataTableControl: {
-      //   adding: true,
-      //   addingInline: true,
-      //   addingGroup: true,
-      //   editing: true,
-      //   markDelete: true,
-      //   recycle: true,
-      //   filter: true,
-      // },
+      ]),
+      dataTable: {},
     },
     informationRegister: {
       dataTableControl: new Set([
         'adding',
         'editing',
       ])
-      // {
-      //   adding: true,
-      //   addingInline: false,
-      //   edititng: true,
-      //   markDelete: true,
-      //   recycle: true,
-      //   filter: true,
-      // },
     },
   },
   getters: {

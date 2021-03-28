@@ -1,6 +1,8 @@
 <template>
   <div class="data-table-control-actions-element">
-    <el-btn-icon icon="mdi-pencil" :disabled="isFocusedElement" @click="editingElement" v-if="accessControl.has('editing')">Изменить</el-btn-icon>
+    <el-btn-icon icon="mdi-pencil" 
+                 :disabled="isFocusedElement" 
+                 @click="editingElement" v-if="accessControl.has('editing')">Изменить</el-btn-icon>
     <el-btn-icon :icon="(isViewRecucleBin) ? 'mdi-text-box-remove-outline' : 'mdi-text-box-remove-outline'" 
                  :disabled="(isDisabledControl || !focusedElement)" 
                  @click="eventActionMarkDeleting" v-if="accessControl.has('markDelete')">{{ (isViewRecucleBin) ? 'Снять пометку на удаление' : 'Установить пометку на удаление'}}</el-btn-icon>

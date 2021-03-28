@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer temporary fixed hide-overlay right 
+  <v-navigation-drawer temporary fixed hide-overlay right
                        :width="width"
                        v-model="isOpen">
     <dialog-toolbar :is-dialog-name="dialogName"
