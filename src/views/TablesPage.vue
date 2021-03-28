@@ -18,11 +18,8 @@
     </div>
     <div class="tables-page__body">
       <component class="table" 
-                 :is="componentTables"
-                 
-                 @component-mounted="mountedTable"
-                 @row-focused="focusedElement"
-                 @component-blur="blurTable"></component>
+                 :is="componentTable"
+                 @component-mounted="mountedTable"></component>
     </div>
   </div>
 </template>
@@ -39,24 +36,25 @@ export default {
     ElFieldSearch,
   },
   mixins: [
-    DataTableControl_DataTable,
+    DataTableControl_DataTable, // propertiesControl, componentTable, @mountedTable
   ],
   data() {
     return {
       tableName: this.$route.query.tableName,
       guid: null,
       freeSearchValue: '',
-      typeControl: 'catalog',
     }
   },
   computed: {
-    optionGetter() { return { tableName: this.tableName, guid: this.guid } },
+    optionTable() { return { tableName: this.tableName, guid: this.guid } },
+
+    tableDiscription() { return this.$store.getters['DataTable/GET_DESCRIPTION'](this.optionTable) },
+
     eventFilterExtendedReset() {
-      if (this.$store.getters['DataTable/GET_MARK_EVENTS_FILTER_EXTENDE_RESET']({tableName: this.tableName, guid: this.guid}))
+      if (this.$store.getters['DataTable/GET_MARK_EVENTS_FILTER_EXTENDE_RESET'](this.optionTable))
         return true;
       return null;
     },
-    tableDiscription() { return this.$store.getters['DataTable/GET_DESCRIPTION'](this.optionGetter) },
   },
   watch: {
     eventFilterExtendedReset() {
@@ -66,19 +64,11 @@ export default {
   },
   methods: {
     freeSearch(option) {
-      this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
-        tableName: this.tableName,
-        guid: this.guid,
-        defaultFilters: { 'search': option.value }
-      });
+      this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', Object.assign({ defaultFilters: { 'search': option.value } }, this.optionTable));
     },
     clearValueFreeSearch() {
-      let isHierarchyMode = this.$store.getters['DataTable/GET_HIERARCHY_MODE']({tableName: this.tableName});
-      this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
-        tableName: this.tableName,
-        guid: this.guid,
-        defaultFilters: { 'search': null, 'ordering': (isHierarchyMode) ? '-is_group' : null }
-      });
+      let isHierarchy = this.$store.getters['DataTable/GET_PROP_TABLE_VALUE'](Object.assign({ key: 'isHierarchy' }, this.optionTable));
+      this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', Object.assign({ defaultFilters: { 'search': null, 'ordering': (isHierarchy) ? '-is_group' : null } }, this.optionTable));
     },
   }
 }

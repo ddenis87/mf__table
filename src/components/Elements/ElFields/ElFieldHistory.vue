@@ -33,7 +33,7 @@
                               type-control="informationRegister"></data-table-control>
         </div>
         <div class="history-table__body">
-          <component :is="componentTables"
+          <component :is="componentTable"
                      :default-filters="filters"
                      @component-mounted="mountedTable"></component>
         </div>

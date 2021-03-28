@@ -1,9 +1,9 @@
 <template>
-  <v-dialog class="dialog-modal" hide-overlay
+  <v-dialog class="dialog-modal" hide-overlay persistent
             :width="width"
             v-model="isDialogShow"
             max-width="800"
-            @click:outside="$emit('close-dialog')">
+            >
   
   <v-card calss="dialog-modal__body">
     <dialog-toolbar class="dm__header"

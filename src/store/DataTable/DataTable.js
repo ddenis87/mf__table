@@ -8,7 +8,7 @@ class DataTable {
   }
   description = null;
   relatedModelView = ''; // шаблон представление таблицы в других таблицах, компонентах, и т.д. ///DELETE
-  isHierarchyMode = false;  // HIERARCHICAL TABLE SET WHEN LOADING OPTIONS
+  // isHierarchyMode = false;  // HIERARCHICAL TABLE SET WHEN LOADING OPTIONS
 
   listOptions = {};
   listData = [];  // МАССИВ ДАННЫХ  !!!!!

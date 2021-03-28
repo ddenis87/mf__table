@@ -6,10 +6,6 @@ export const DataTableControlFilter = {
     ElBtnIcon,
     DialogBarRight,
   },
-  props: {
-    tableName: { type: String, default: '' },
-    guid: { type: String, default: '' },
-  },
   data() {
     return {
       isShowDialogFilter: false,

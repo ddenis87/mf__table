@@ -24,7 +24,7 @@
                   @keydown.tab="eventKeyTab"
                   @keydown.esc="eventKeyEsc"
                   @keydown.stop
-                  @blur="eventBlurField"
+                  @blur.stop="eventBlurField"
                   >
       <template v-slot:append>
         <el-btn-icon-small  icon="mdi-calendar-range" no-tooltip @keydown="eventOpenDialog" @click="eventOpenDialog"></el-btn-icon-small>
@@ -238,7 +238,8 @@ export default {
 
     eventBlurField(event) {
       if (event.relatedTarget)
-        if (event.relatedTarget.closest(`.el-field-date__date-time`)) { 
+        if (event.relatedTarget.closest(`.el-field-date__date-time`)) {
+          event.preventDefault();
           event.relatedTarget.closest(`.el-field-date__date-time`).focus();
           this.fieldElementDOM = event.target;
           return;
