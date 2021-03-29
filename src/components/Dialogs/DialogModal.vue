@@ -35,4 +35,18 @@ export default {
 
 <style lang="scss" scoped>
 
+::v-deep {
+  .v-dialog {
+    overflow-x: hidden;
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+      &-thumb {
+        border-radius: 3px;
+        background-color: rgba(0,0,0,0.2);
+      }
+    }
+  }
+}
 </style>

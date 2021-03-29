@@ -17,7 +17,7 @@ export const DataTableEvents = {
     selectedElement(event, value) {
       this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', Object.assign({ value: value }, this.optionGetter));
       // console.log(option);
-      // this.eventComponent('selected-element', option)
+      this.eventComponent('selected-element', value)
       // this.$emit('event-row-selected', option, this.properties.tableName);
     },
     eventRowKeydown(event, option) {

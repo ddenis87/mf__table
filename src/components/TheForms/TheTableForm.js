@@ -51,8 +51,8 @@ export const TheTableForm = {
   // },
   mounted() {
 
-    console.log(this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid}));
-    console.log(this.$store.getters[`DataTable/GET_LIST_OPTIONS`]({tableName: this.tableName}));
+    // console.log(this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid}));
+    // console.log(this.$store.getters[`DataTable/GET_LIST_OPTIONS`]({tableName: this.tableName}));
     if (this.focusedElement == null) {
       let filtersStor = this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid});
       Object.keys(this.fieldFormValue).forEach(key => {
@@ -60,7 +60,7 @@ export const TheTableForm = {
       })
     }
     if (this.focusedElement == null && this.filtersForm) {
-      console.log('fill filters');
+      // console.log('fill filters');
       Object.keys(this.filtersForm).forEach(key => {
         this.fieldFormValue[key] = this.filtersForm[key];
       });

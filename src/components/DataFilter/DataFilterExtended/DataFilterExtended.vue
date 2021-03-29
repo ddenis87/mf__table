@@ -30,7 +30,7 @@ export default {
     tableName: { type: String, default: null, },
     guid: { type: String, default: null },
     isOpen: { type: Boolean, default: false, },
-    listException: { type: Array, default() { return ['id', 'is_deleted', 'is_group', 'parent'] } },
+    listException: { type: Array, default() { return ['id', 'is_deleted', 'is_group', 'parent','related'] } },
   },
   data() {
     return {
@@ -133,7 +133,7 @@ export default {
   padding-left: 10px;
   height: calc(100vh - 64px);
   overflow: hidden;
-
+  background-color: white;
   &__body {
     grid-area: data-filter-extended__body;
     padding: 0px 8px;

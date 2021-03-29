@@ -1,6 +1,6 @@
 <template>
   <div class="data-table" :class="guid" >
-    <v-overlay :value="isLoadingData && isBlock" light z-index="999" opacity="0.5" color="white" :absolute="true"></v-overlay>
+    <v-overlay :value="isLoadingData && isBlock" light z-index="999" opacity="0.01" color="white" :absolute="true"></v-overlay>
 
     <data-table-tooltip :is-show="isShowTooltip"
                         :data-properties="propertiesTooltip"
@@ -35,7 +35,7 @@
                              :type-column="propsTable.typeColumn"
                              :is-expansion="propsTable.isExpansion"
                              :is-multiline="propsTable.isMultiline"
-                             :is-editable="isEditable"
+                             :is-editable="propsTable.isEditableinline"
                              :is-hierarchy-mode="propsTable.isHierarchy"
                              :items="listDataGroup"
                              :items-header="listHeaders"
@@ -52,8 +52,8 @@
                        :items-header="listHeaders"
                        :group-level="listDataGroupLevel"
 
-                       :is-editable="isEditable"
-                       :is-adding-inline="isAddingInline"
+                       :is-editable="propsTable.isEditableInline"
+                       :is-adding-inline="propsTable.isAddingInline"
 
                        :is-expansion="propsTable.isExpansion"
                        :is-multiline="propsTable.isMultiline"

@@ -119,6 +119,7 @@ export default {
       this.isDialogShow = true;
     },
     async eventSelectedRowDialog(option) {
+      console.log('select element');
       await this.$store.dispatch('DataTable/ADDING_DATA_LINK', {
         tableName: this.relatedModelName,
         value: option

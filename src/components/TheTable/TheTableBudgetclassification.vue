@@ -16,7 +16,7 @@ export default {
       disHierarchy: null,
       disMultiline: null,
       disAddingInline: null,
-      disEditingInline: null,
+      disEditableInline: null,
       optionTable: {
         tableName: 'budgetclassification',
         templateUno: [

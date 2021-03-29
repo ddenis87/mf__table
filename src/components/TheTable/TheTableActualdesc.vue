@@ -13,14 +13,18 @@ export default {
   ],
   data() {
     return {
+      disAddingInline: null,
       disEditableInline: false,
+           
+      disExpansion: null,
       disHierarchy: null,
       disMultiline: null,
       disFooter: null,
+
       optionTable: {
         tableName: 'actualdesc',
         templateUno: [
-          {value: 'start_date', width: [200, 200] },
+          {value: 'start_date', width: [210, 210] },
           {value: 'some_desc', width: [200, ], },
         ],
       },

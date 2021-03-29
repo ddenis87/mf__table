@@ -1,11 +1,11 @@
 <template>
-  <v-navigation-drawer temporary fixed hide-overlay right
+  <v-navigation-drawer temporary hide-overlay right fixed
                        :width="width"
                        v-model="isOpen">
     <dialog-toolbar :is-dialog-name="dialogName"
                     orientation="right"
                     @close-dialog="$emit('close-dialog')"></dialog-toolbar>
-    <slot></slot>
+      <slot></slot>
   </v-navigation-drawer>
 </template>
 

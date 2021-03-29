@@ -23,7 +23,8 @@
         <v-progress-linear v-if="isLoadingData" indeterminate absolute></v-progress-linear>
       </template>
     </v-text-field>
-    <dialog-modal is-dialog-name="История изменений"
+    <dialog-modal class="history-dialog"
+                  is-dialog-name="История изменений"
                   :width="800"
                   :is-dialog-show="isShowDialog"
                   @close-dialog="closeDialog">
@@ -168,6 +169,7 @@ export default {
 <style lang="scss">
 @import './ElField.scss';
 .history-table {
+  position: relative;
   display: grid;
   grid-template-areas: "control" "body";
   grid-template-columns: 1fr;
@@ -176,12 +178,25 @@ export default {
   height: 100%;
   padding: 5px;
   gap: 8px;
-  &__control {
-    grid-area: control;
-  }
-  &__body {
-    width: 100%;
-    height: 100%;
+  .history-dialog {
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+      &-thumb {
+        border-radius: 3px;
+        background-color: rgba(0,0,0,0.2);
+      }
+    }
+    &__control {
+      grid-area: control;
+      z-index: 100;
+    }
+    &__body {
+      width: 100%;
+      height: 100%;
+      z-index: 50;
+    }
   }
 }
 </style>
