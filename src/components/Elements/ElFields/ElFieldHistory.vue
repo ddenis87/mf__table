@@ -28,14 +28,14 @@
                   :width="800"
                   :is-dialog-show="isShowDialog"
                   @close-dialog="closeDialog">
-      <v-card height="400" class="history-table">
+      <v-card class="history-table">
         <div class="history-table__control">
           <data-table-control v-bind="propertiesControl"
                               :filters-form="filter"
                               type-control="informationRegister"></data-table-control>
         </div>
         <div class="history-table__body">
-          <component :is="componentTable"
+          <component :is="componentTable" class="table"
                      :default-filters="filter"
                      @component-mounted="mountedTable"></component>
         </div>
@@ -87,51 +87,15 @@ export default {
     filter() {
       return { [this.dimension]: this.dimensionValue };
     }
-    // componentTable() {
-    //   if (!this.isShowDialog) return null;
-    //   if (!this.relatedModelName) return null;
-    //   // if (!this.idElement) return null
-    //   return () => import(`@/components/TheTable/TheTable${this.relatedModelName[0].toUpperCase() + this.relatedModelName.slice(1)}`);
-    // }
   },
   async created() {
     this.getCurrentHistoryValue();
-    // if (!this.dimensionValue) return;
-    // this.isLoadingData = true;
-    // let relatedModelView = this.$store.getters['DataTable/GET_RELATED_MODEL_VIEW']({ tableName: this.relatedModelName });
-    // let templateValue = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1).split('}{');
-    // await this.$store.dispatch('DataTable/HISTORY_REQUEST_DATA',{
-    //   tableName: this.relatedModelName,
-    //   mode: 'element',
-    //   id: this.dimensionValue
-    // })
-    //   .then(element => {
-    //     let newValue = relatedModelView;
-    //     // console.log(element);
-    //     templateValue.forEach(item => {
-    //       newValue = newValue.replace(`{${item}}`, element[item]);
-    //     });
-    //     // console.log(newValue);
-    //     if (newValue != 'undefined') {
-    //       this.fieldValue = newValue;
-    //     } else {
-    //       this.fieldValue = '';
-    //     }
-    //     this.isLoadingData = false;
-    //   })
-  },
-  mounted() {
-    console.log(this.fieldValue);
-    console.log(this.filter);
-    // console.log(this.idElement);
-    console.log(this.relatedModelName);
-
   },
   methods: {
     openDialog() {
       this.isShowDialog = true;
     },
-    
+
     closeDialog() {
       this.isShowDialog = false;
       this.getCurrentHistoryValue();
@@ -175,28 +139,21 @@ export default {
   grid-template-columns: 1fr;
   grid-template-rows: 44px 1fr;
   width: 100%;
-  height: 100%;
+  height: 400px;
   padding: 5px;
   gap: 8px;
-  .history-dialog {
-    &::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-      border-radius: 4px;
-      &-thumb {
-        border-radius: 3px;
-        background-color: rgba(0,0,0,0.2);
-      }
-    }
-    &__control {
-      grid-area: control;
-      z-index: 100;
-    }
-    &__body {
-      width: 100%;
-      height: 100%;
-      z-index: 50;
-    }
+
+  &__control {
+    grid-area: control;
+    z-index: 100;
+  }
+  &__body {
+
+    grid-area: body;
+    width: 100%;
+    height: 338px;
+    z-index: 50;
+    // border: thin solid red;
   }
 }
 </style>
