@@ -8,7 +8,8 @@
       <!-- ACTIONS -->
       <data-table-control-actions :table-name="tableName"
                                   :guid="guid"
-                                  :props-table="propsTable"></data-table-control-actions>
+                                  :props-table="propsTable"
+                                  :filters-form="filtersForm"></data-table-control-actions>
       <v-spacer></v-spacer>
       <!-- VIEWS -->
       <data-table-control-views :table-name="tableName"

@@ -35,6 +35,7 @@
       <component :is="importComponentForm"
                  :guid="guid"
                  :focused-element="activeElement"
+                 :filters-form="filtersForm"
                  @event-action-accept="eventActionAccept"
                  @event-action-cancel="closeDialog"></component>
     </dialog-full-page>

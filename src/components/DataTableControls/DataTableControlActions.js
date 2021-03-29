@@ -23,6 +23,7 @@ export const DataTableControlActions = {
         }
       }
     },
+    filtersForm: { type: Object, default: () => {} },
   },
   data() {
     return {

@@ -104,6 +104,10 @@ export default {
     if (!option.guid) return false;
     return state[option.tableName][option.guid].filters[option.filter];
   },
+  GET_FILTERS:(state) => (option) => {
+    if (!option.guid) return false;
+    return state[option.tableName][option.guid].filters;
+  },
   GET_FILTER_EXTENDED:(state) => (option) => {
     if (!option.guid) return '';
     if (state[option.tableName][option.guid].filtersExtended == null) return '';

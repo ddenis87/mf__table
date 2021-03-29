@@ -129,6 +129,11 @@ export const DataTable = {
         guid: this.guid,
       };
       let bFormData = new FormData();
+
+      for (let key of Object.keys(this.defaultFilters)) {
+        bFormData.set(`${key}`, this.defaultFilters[key]);
+      }
+
       for (let key of Object.keys(this.listData[index])) {
         if (this.listData[index][key]) {
           let newCurrentValue = null;

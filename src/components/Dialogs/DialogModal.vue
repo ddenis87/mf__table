@@ -1,5 +1,5 @@
 <template>
-  <v-dialog class="dialog-modal" hide-overlay persistent
+  <v-dialog class="dialog-modal" overlay-color="white" overlay-opacity="0.5" persistent no-click-animation
             :width="width"
             v-model="isDialogShow"
             max-width="800"

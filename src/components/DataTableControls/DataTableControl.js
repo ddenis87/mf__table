@@ -17,6 +17,8 @@ export const DataTableControl = {
   props: {
     tableName: { type: String, default: null },
     guid: { type: String, default: null },
+
+    filtersForm: { type: Object, default: () => {} },
   },
   computed: {
     isDisabledControl() {

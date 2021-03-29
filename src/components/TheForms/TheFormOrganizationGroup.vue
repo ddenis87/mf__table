@@ -11,7 +11,8 @@
           <v-col cols="3" >
             <el-field-history input-custom-label="История"
                               related-model-name="actualdesc"
-                              :id-element="fieldFormValue.id"></el-field-history>
+                              dimension="related"
+                              :dimensionValue="fieldFormValue.id"></el-field-history>
           </v-col>
         </v-row>
         <v-row dense>

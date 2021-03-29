@@ -10,18 +10,18 @@
           </v-col>
         </v-row>
         <v-row dense>
-          <v-col cols="6" >
+          <v-col cols="12" >
             <el-field-string :inputProperties="fieldForm.some_desc" 
                              v-model="fieldFormValue.some_desc"></el-field-string>
           </v-col>
         </v-row>
-        <v-row dense>
+        <!-- <v-row dense>
           <v-col cols="12">
-            <el-field-dialog :inputProperties="assingObject(fieldForm.related, {})"
+            <el-field-dialog :inputProperties="fieldForm.related"
                              v-model="fieldFormValue.related"
                              @next-element="eventNextElement"></el-field-dialog>
           </v-col>
-        </v-row>
+        </v-row> -->
       </v-container>
       <v-card-actions>
         <v-spacer></v-spacer>

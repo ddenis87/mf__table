@@ -6,7 +6,7 @@
                   :solo="isHideUnderline"
                   :flat="isHideUnderline"
                   :hide-details="isHideMessage"
-                  :disabled="(idElement) ? false : true"
+                  :disabled="(dimensionValue) ? false : true"
                   :clearable="isBtnClear"
                   :label="fieldLabel"
                   :rules="fieldRequired"
@@ -30,11 +30,12 @@
       <v-card height="400" class="history-table">
         <div class="history-table__control">
           <data-table-control v-bind="propertiesControl"
+                              :filters-form="filter"
                               type-control="informationRegister"></data-table-control>
         </div>
         <div class="history-table__body">
           <component :is="componentTable"
-                     :default-filters="filters"
+                     :default-filters="filter"
                      @component-mounted="mountedTable"></component>
         </div>
         
@@ -63,11 +64,12 @@ export default {
   props: {
     // isDisabled: { type: Boolean, default: true },
     isBtnClear: { type: Boolean, default: false },
-    idElement: { type: Number, default: null },
+    // idElement: { type: Number, default: null },
     relatedModelName: { type: String, default: null },
 
     // isEditable: { type: Boolean, default: false },
-    // filters: null,
+    dimension: { type: String, default: '' },
+    dimensionValue: null, // { type: String, default: '' },
   },
   data() {
     return {
@@ -76,11 +78,14 @@ export default {
       fieldValue: '',
       isLoadingData: false,
       isShowDialog: false,
-      filters: (this.idElement) ? {related: this.idElement} : null,
+      // filtersForm: (this.idElement) ? {related: this.idElement} : null,
       isEditable: false,
     }
   },
   computed: {
+    filter() {
+      return { [this.dimension]: this.dimensionValue };
+    }
     // componentTable() {
     //   if (!this.isShowDialog) return null;
     //   if (!this.relatedModelName) return null;
@@ -89,37 +94,73 @@ export default {
     // }
   },
   async created() {
-    if (!this.idElement) return;
-    this.isLoadingData = true;
-    let relatedModelView = this.$store.getters['DataTable/GET_RELATED_MODEL_VIEW']({ tableName: this.relatedModelName });
-    let templateValue = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1).split('}{');
-    await this.$store.dispatch('DataTable/HISTORY_REQUEST_DATA',{
-      tableName: this.relatedModelName,
-      mode: 'element',
-      id: this.idElement
-    })
-      .then(element => {
-        let newValue = relatedModelView;
-        // console.log(element);
-        templateValue.forEach(item => {
-          newValue = newValue.replace(`{${item}}`, element[item]);
-        });
-        // console.log(newValue);
-        if (newValue != 'undefined') {
-          this.fieldValue = newValue;
-        } else {
-          this.fieldValue = '';
-        }
-        this.isLoadingData = false;
-      })
+    this.getCurrentHistoryValue();
+    // if (!this.dimensionValue) return;
+    // this.isLoadingData = true;
+    // let relatedModelView = this.$store.getters['DataTable/GET_RELATED_MODEL_VIEW']({ tableName: this.relatedModelName });
+    // let templateValue = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1).split('}{');
+    // await this.$store.dispatch('DataTable/HISTORY_REQUEST_DATA',{
+    //   tableName: this.relatedModelName,
+    //   mode: 'element',
+    //   id: this.dimensionValue
+    // })
+    //   .then(element => {
+    //     let newValue = relatedModelView;
+    //     // console.log(element);
+    //     templateValue.forEach(item => {
+    //       newValue = newValue.replace(`{${item}}`, element[item]);
+    //     });
+    //     // console.log(newValue);
+    //     if (newValue != 'undefined') {
+    //       this.fieldValue = newValue;
+    //     } else {
+    //       this.fieldValue = '';
+    //     }
+    //     this.isLoadingData = false;
+    //   })
+  },
+  mounted() {
+    console.log(this.fieldValue);
+    console.log(this.filter);
+    // console.log(this.idElement);
+    console.log(this.relatedModelName);
+
   },
   methods: {
     openDialog() {
       this.isShowDialog = true;
     },
+    
     closeDialog() {
       this.isShowDialog = false;
+      this.getCurrentHistoryValue();
     },
+
+    async getCurrentHistoryValue() {
+      if (!this.dimensionValue) return;
+      this.isLoadingData = true;
+      let relatedModelView = this.$store.getters['DataTable/GET_RELATED_MODEL_VIEW']({ tableName: this.relatedModelName });
+      let templateValue = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1).split('}{');
+      await this.$store.dispatch('DataTable/HISTORY_REQUEST_DATA',{
+        tableName: this.relatedModelName,
+        mode: 'element',
+        id: this.dimensionValue
+      })
+        .then(element => {
+          let newValue = relatedModelView;
+          // console.log(element);
+          templateValue.forEach(item => {
+            newValue = newValue.replace(`{${item}}`, element[item]);
+          });
+          // console.log(newValue);
+          if (newValue != 'undefined') {
+            this.fieldValue = newValue;
+          } else {
+            this.fieldValue = '';
+          }
+          this.isLoadingData = false;
+        })
+    }
   }
 }
 </script>

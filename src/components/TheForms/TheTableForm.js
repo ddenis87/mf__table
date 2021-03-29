@@ -22,10 +22,12 @@ export const TheTableForm = {
     actionName: 'adding',
     guid: null,
     focusedElement: Object,
+
+    filtersForm: { type: Object, default: () => {} },
   },
   data() {
     return {
-      fieldArray: null,
+      // fieldArray: null,
     }
   },
   computed: {
@@ -47,9 +49,24 @@ export const TheTableForm = {
   // },
   // created() {
   // },
-  // mounted() {
-  //   this.fieldArray = Array.from(document.querySelectorAll('.table-form .el-field__item input[tabindex="1"]'));
-  // },
+  mounted() {
+
+    console.log(this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid}));
+    console.log(this.$store.getters[`DataTable/GET_LIST_OPTIONS`]({tableName: this.tableName}));
+    if (this.focusedElement == null) {
+      let filtersStor = this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid});
+      Object.keys(this.fieldFormValue).forEach(key => {
+        if (key in filtersStor) this.fieldFormValue[key] = filtersStor[key];
+      })
+    }
+    if (this.focusedElement == null && this.filtersForm) {
+      console.log('fill filters');
+      Object.keys(this.filtersForm).forEach(key => {
+        this.fieldFormValue[key] = this.filtersForm[key];
+      });
+    }
+    // this.fieldArray = Array.from(document.querySelectorAll('.table-form .el-field__item input[tabindex="1"]'));
+  },
   methods: {
     eventNextElement() {},
     eventKeydownAccept(event) {
