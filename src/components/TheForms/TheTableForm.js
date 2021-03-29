@@ -1,9 +1,9 @@
 import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory.vue';
-import ElFieldNumber from '@/components/Elements/ElField/ElFieldNumber.vue';
+import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber.vue';
 import ElFieldString from '@/components/Elements/ElField/ElFieldString.vue';
 import ElFieldStringArea from '@/components/Elements/ElField/ElFieldStringArea.vue';
 import ElFieldDate from '@/components/Elements/ElField/ElFieldDate.vue';
-import ElFieldChoice from '@/components/Elements/ElField/ElFieldChoice.vue';
+import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice.vue';
 import ElFieldDialog from '@/components/Elements/ElField/ElFieldDialog.vue';
 import ElBtn from '@/components/Elements/ElBtn/ElBtn.vue';
 
@@ -25,11 +25,7 @@ export const TheTableForm = {
 
     filtersForm: { type: Object, default: () => {} },
   },
-  data() {
-    return {
-      // fieldArray: null,
-    }
-  },
+
   computed: {
     fieldForm() {
       if (!this.guid) return null;
@@ -42,17 +38,7 @@ export const TheTableForm = {
       return fieldForm;
     },
   },
-  // watch: {
-  //   focusedElement() {
-  //     if (this.focusedElement == null) this.fieldFormValueClear();
-  //   },
-  // },
-  // created() {
-  // },
   mounted() {
-
-    // console.log(this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid}));
-    // console.log(this.$store.getters[`DataTable/GET_LIST_OPTIONS`]({tableName: this.tableName}));
     if (this.focusedElement == null) {
       let filtersStor = this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid});
       Object.keys(this.fieldFormValue).forEach(key => {
@@ -68,6 +54,26 @@ export const TheTableForm = {
     // this.fieldArray = Array.from(document.querySelectorAll('.table-form .el-field__item input[tabindex="1"]'));
   },
   methods: {
+    eventKeydown(option) {
+      console.log('keydown form');
+      console.log(option);
+      if (option.event.key == 'Enter') {
+        let nextElement = this.nextElement(option.event.target.closest('.el-field'));
+        if (nextElement) nextElement.focus();
+      }
+    },
+    nextElement(currentElement) {
+      if (currentElement.className.indexOf('form-action') != -1) return null;
+      if (currentElement.parentElement.nextElementSibling) {
+        let parentNextElement = currentElement.parentElement.nextElementSibling.querySelector('.el-field > .el-field__item');
+        if (parentNextElement.querySelector('input'))
+          return parentNextElement.querySelector('input').focus();
+        if (parentNextElement.querySelector('textarea'))
+        return parentNextElement.querySelector('textarea').focus();
+      }
+      this.nextElement(currentElement.parentElement);
+    },
+
     eventNextElement() {},
     eventKeydownAccept(event) {
       switch(event.key) {

@@ -21,22 +21,22 @@
           <v-col cols="3">
             <el-field-choice :inputProperties="fieldForm.organization_type"
                              v-model="fieldFormValue.organization_type"
-                             @next-element="eventNextElement"></el-field-choice>
+                             @event-keydown="eventKeydown"></el-field-choice>
           </v-col>
           <v-col cols="3">
             <el-field-choice :inputProperties="fieldForm.institution_type" 
                              v-model="fieldFormValue.institution_type"
-                             @next-element="eventNextElement"></el-field-choice>
+                             @event-keydown="eventKeydown"></el-field-choice>
           </v-col>
           <v-col cols="3">
             <el-field-number :inputProperties="fieldForm.institution_code" 
                              v-model="fieldFormValue.institution_code"
-                             @next-element="eventNextElement"></el-field-number>
+                             @event-keydown="eventKeydown"></el-field-number>
           </v-col>
           <v-col cols="3">
             <el-field-choice :inputProperties="fieldForm.industry_typing" 
                              v-model="fieldFormValue.industry_typing"
-                             @next-element="eventNextElement"></el-field-choice>
+                             @event-keydown="eventKeydown"></el-field-choice>
           </v-col>
         </v-row>
         <v-row dense>
@@ -60,21 +60,21 @@
           <v-col cols="4">
             <el-field-choice :inputProperties="fieldForm.budget_level"
                              v-model="fieldFormValue.budget_level"
-                             @next-element="eventNextElement"></el-field-choice>
+                             @event-keydown="eventKeydown"></el-field-choice>
           </v-col>
         </v-row>
         <v-row dense>
           <v-col cols="12">
             <el-field-choice :inputProperties="fieldForm.egrul_status" 
                              v-model="fieldFormValue.egrul_status"
-                             @next-element="eventNextElement"></el-field-choice>
+                             @event-keydown="eventKeydown"></el-field-choice>
           </v-col>
         </v-row>
         <v-row dense>
           <v-col cols="12">
             <el-field-choice :inputProperties="fieldForm.rubpnubp_status" 
                              v-model="fieldFormValue.rubpnubp_status"
-                             @next-element="eventNextElement"></el-field-choice>
+                             @event-keydown="eventKeydown"></el-field-choice>
           </v-col>
         </v-row>
         <v-row dense>
