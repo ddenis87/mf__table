@@ -132,6 +132,8 @@ export default {
   CLEAR_DATA(state, option) {
     state[option.tableName][option.guid].countDataTotal = -1;
     state[option.tableName][option.guid].listData = [];
+    state[option.tableName][option.guid].linkPageNext = null;
+    state[option.tableName][option.guid].linkPagePrevious = null;
   },
   CLEAR_DATA_GROUP_LEGEND(state, option) {
     state[option.tableName][option.guid].listDataGroup = [];
