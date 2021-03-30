@@ -2,7 +2,7 @@ import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory.vue';
 import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber.vue';
 import ElFieldString from '@/components/Elements/ElFields/ElFieldString.vue';
 import ElFieldStringArea from '@/components/Elements/ElFields/ElFieldStringArea.vue';
-import ElFieldDate from '@/components/Elements/ElField/ElFieldDate.vue';
+import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate.vue';
 import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice.vue';
 import ElFieldDialog from '@/components/Elements/ElField/ElFieldDialog.vue';
 import ElBtn from '@/components/Elements/ElBtn/ElBtn.vue';
@@ -58,8 +58,8 @@ export const TheTableForm = {
       console.log('keydown form');
       console.log(option);
       if (option.event.key == 'Enter') {
-        let nextElement = this.nextElement(option.event.target.closest('.el-field'));
-        if (nextElement) nextElement.focus();
+        this.nextElement(option.event.target.closest('.el-field'));
+        // if (nextElement) nextElement.focus();
       }
     },
     nextElement(currentElement) {

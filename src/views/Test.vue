@@ -2,6 +2,11 @@
   <div class="test">
     <v-form class="form-action" ref="formAction">
       <v-container fluid>
+        <v-row dense>
+          <v-col cols="3">
+            <el-field-date v-model="f0" @event-keydown="eventKeydown"></el-field-date>
+          </v-col>
+        </v-row>
         <v-row class="form__row" dense>
           <v-col class="form__col" cols="3">
             <el-field-choice data-tab="3"
@@ -39,13 +44,20 @@
           </v-col>
         </v-row>
         <v-row dense>
-          <v-col cols="6">
-            <el-field-string-area data-tab="5" v-model="f6" @event-keydown="eventKeydown"></el-field-string-area>
+          <v-col class="form__col" cols="3">
+            <el-field-number data-tab="2" v-model="f7" @event-keydown="eventKeydown"></el-field-number>
           </v-col>
         </v-row>
         <v-row dense>
-          <v-col class="form__col" cols="3">
-            <el-field-number data-tab="2" v-model="f7" @event-keydown="eventKeydown"></el-field-number>
+          <v-col cols="12">
+            <el-field-dialog :inputProperties="{'related_model_name': 'organization' }"
+                             v-model="f8"
+                             @event-keydown="eventKeydown"></el-field-dialog>
+          </v-col>
+        </v-row>
+        <v-row dense>
+          <v-col cols="6">
+            <el-field-string data-tab="5" v-model="f9" @event-keydown="eventKeydown"></el-field-string>
           </v-col>
         </v-row>
       </v-container>
@@ -59,6 +71,8 @@ import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory';
 import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice';
 import ElFieldStringArea from '@/components/Elements/ElFields/ElFieldStringArea';
 import ElFieldString from '@/components/Elements/ElFields/ElFieldString';
+import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate';
+import ElFieldDialog from '@/components/Elements/ElFields/ElFieldDialog';
 export default {
   name: 'Test',
   components: {
@@ -67,9 +81,12 @@ export default {
     ElFieldHistory,
     ElFieldStringArea,
     ElFieldString,
+    ElFieldDate,
+    ElFieldDialog,
   },
   data() {
     return {
+      f0: null,
       f1: 2,
       f2: '',
       f3: '',
@@ -77,6 +94,8 @@ export default {
       f5: '',
       f6: '21',
       f7: '',
+      f8: '',
+      f9: '',
     }
   },
   methods: {
@@ -85,7 +104,7 @@ export default {
       console.log(option);
       if (option.event.key == 'Enter') {
         let nextElement = this.nextElement(option.event.target.closest('.el-field'));
-        if (nextElement) nextElement.focus();
+        // if (nextElement) nextElement.focus();
       }
     },
     nextElement(currentElement) {
