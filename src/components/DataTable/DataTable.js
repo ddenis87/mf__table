@@ -49,9 +49,9 @@ export const DataTable = {
         this.isShowDialogEmpty = true;
       }
       // if (this.countDataTotal < 50) {
-      //   if (this.getApiNext())
+      //   if (this.getLinkPageNext())
       //     this.requestData({next: true});
-        // if (this.getApiPrevious()) {
+        // if (this.getLinkPagePrevious()) {
         //   console.log('previous load');
           // this.requestData({previous: true});
       //   }
@@ -97,8 +97,8 @@ export const DataTable = {
     });
   },
   methods: {
-    getApiNext() { return this.$store.getters['DataTable/GET_LINK_PAGE_NEXT'](this.optionGetter); },
-    getApiPrevious() { return this.$store.getters['DataTable/GET_LINK_PAGE_PREVIOUS'](this.optionGetter); },
+    getLinkPageNext() { return this.$store.getters['DataTable/GET_LINK_PAGE_NEXT'](this.optionGetter); },
+    getLinkPagePrevious() { return this.$store.getters['DataTable/GET_LINK_PAGE_PREVIOUS'](this.optionGetter); },
     // getDataCount() { return this.$store.getters['DataTable/GET_DATA'](this.optionGetter); },
     getCountDataTotal() { return this.$store.getters['DataTable/GET_COUNT_DATA_TOTAL'](this.optionGetter); },
     async requestData(option) {
@@ -193,7 +193,7 @@ export const DataTable = {
         this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', {
           tableName: this.tableName,
           guid: this.guid,
-          defaultFilters: { 'search': null, 'is_deleted': false, }
+          defaultFilters: { 'search': null, 'is_deleted': false, 'parent__isnull': (this.propsTable.isHierarchy) ? true : null }
         });
       }
       this.isShowDialogEmpty = false;

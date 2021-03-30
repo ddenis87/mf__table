@@ -19,7 +19,7 @@ export const DataTableLazyLoad = {
       let bootAnchorPreviousEdge = this.parentElement.querySelector(`.${this.guid}__boot-anchor-previous`).getBoundingClientRect().top + 10;
       if (bootAnchorPreviousEdge > this.parentElementEdgeTop) {
         // console.log('preload');
-        if(this.getApiPrevious()) {
+        if(this.getLinkPagePrevious()) {
           this.isBlock = false;
           this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
           this.requestDataPrevious();
@@ -27,7 +27,7 @@ export const DataTableLazyLoad = {
       }
       if (bootAnchorEdge < this.parentElementEdge) {
         // console.log('load next');
-        if (this.getApiNext()) {
+        if (this.getLinkPageNext()) {
           this.isBlock = false;
           this.parentElement.removeEventListener('scroll', this.eventScrollPagination);
           this.requestData({next: true});
