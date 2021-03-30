@@ -79,18 +79,17 @@ export const TheTableForm = {
       this.nextElement(currentElement.parentElement);
     },
 
-    eventNextElement() {},
-    eventKeydownAccept(event) {
-      switch(event.key) {
-        case 'Enter': {this.eventClickActionAccept(); break;}
-        case 'Tab': {
-          console.log('end form tab');
-          console.log(event.target.closest('.table-form').querySelector('.tabspace-start input'));
-          let eventClick = new Event('click');
-          event.target.closest('.table-form').querySelector('.tabspace-start input').focus();
-          break;
-        }
-      }
+    eventAcceptKeydown(event) {
+      // switch(event.key) {
+      //   case 'Enter': {this.eventClickActionAccept(); break;}
+      //   case 'Tab': {
+      //     console.log('end form tab');
+      //     console.log(event.target.closest('.table-form').querySelector('.tabspace-start input'));
+      //     let eventClick = new Event('click');
+      //     event.target.closest('.table-form').querySelector('.tabspace-start input').focus();
+      //     break;
+      //   }
+      // }
     },
 
     // ACTIONS

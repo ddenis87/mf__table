@@ -1,5 +1,5 @@
 <template>
-  <div class="table-form">
+  <div class="form-element">
     <v-form class="form-action" ref="formAction">
       <v-container fluid>
         <v-row dense>
@@ -10,9 +10,9 @@
                            v-model="fieldFormValue.registry_date"
                            @event-keydown="eventKeydown"></el-field-date>
           </v-col>
-          <!-- <v-col cols="3" ></v-col> -->
           <v-col cols="3" >
-            <el-field-history input-custom-label="История" :tabindex="(fieldFormValue.id) ? '' : '-1'"
+            <el-field-history input-custom-label="История" 
+                              :tabindex="(fieldFormValue.id) ? '' : '-1'"
                               related-model-name="actualdesc"
                               dimension="related"
                               :dimensionValue="fieldFormValue.id"
@@ -101,7 +101,7 @@
         <el-btn @click="eventClickActionCancel">Отменить</el-btn>
         <el-btn class="tabspace-end" 
                    @click="eventClickActionAccept"
-                   @keydown="eventKeydownAccept">Записать</el-btn>
+                   @keydown="eventAcceptKeydown">Записать</el-btn>
       </v-card-actions>
     </v-form>
   </div>

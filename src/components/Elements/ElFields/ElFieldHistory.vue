@@ -7,6 +7,7 @@
                   v-model="fieldValue"
                   @keydown.stop.enter="eventKeydownEnter"
                   @blur="eventBlurField">
+      <div class="el-field__anchor" tabindex="-1"></div>
       <template v-slot:append>
         <el-btn-icon-small icon="mdi-history" @click="openDialog">Открыть историю изменений</el-btn-icon-small>
       </template>

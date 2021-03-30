@@ -1,6 +1,6 @@
 <template>
-<div class="table-form">
-  <v-form ref="formAction">
+<div class="form-element">
+  <v-form class="form-action" ref="formAction">
     <v-container fluid>
       <v-row dense>
         <v-col cols="12"><el-field-string :input-properties="fieldForm.head_name"
@@ -14,12 +14,12 @@
                                           @event-keydown="eventKeydown"></el-field-number></v-col>
       </v-row>
     </v-container>
-    <v-card-actions>
+    <v-card-actions class="form-action__control">
       <v-spacer></v-spacer>
       <el-btn @click="eventClickActionCancel">Отменить</el-btn>
-      <el-btn class="tabspace-end" 
+      <el-btn 
                  @click="eventClickActionAccept"
-                 @keydown="eventKeydownAccept">Записать</el-btn>
+                 @keydown="eventKeydown">Записать</el-btn>
     </v-card-actions>
   </v-form>
 </div>
