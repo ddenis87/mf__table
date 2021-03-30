@@ -16,10 +16,9 @@
     </v-container>
     <v-card-actions class="form-action__control">
       <v-spacer></v-spacer>
-      <el-btn @click="eventClickActionCancel">Отменить</el-btn>
-      <el-btn 
-                 @click="eventClickActionAccept"
-                 @keydown="eventKeydown">Записать</el-btn>
+      <el-btn @click="eventFormCancel">Отменить</el-btn>
+      <el-btn @click="eventFormAccept"
+              @keydown="eventAcceptKeydown">Записать</el-btn>
     </v-card-actions>
   </v-form>
 </div>

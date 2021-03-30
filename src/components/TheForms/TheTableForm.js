@@ -65,42 +65,44 @@ export const TheTableForm = {
     nextElement(currentElement) {
       if (currentElement.className.indexOf('form-action') != -1) return null;
       if (currentElement.parentElement.nextElementSibling) {
-        let nextElement = currentElement.parentElement.nextElementSibling.querySelector('.el-field > .el-field__item');
-        if (nextElement.parentElement.getAttribute('tabindex') == -1) {
-          this.nextElement(nextElement.parentElement);
-          return;
+        let nextElement = currentElement.parentElement.nextElementSibling;
+        if (nextElement.querySelector('.el-field > .el-field__item')) {
+          nextElement = nextElement.querySelector('.el-field > .el-field__item');
+          if (nextElement.parentElement.getAttribute('tabindex') == -1) {
+            this.nextElement(nextElement.parentElement);
+            return;
+          }
+          if (nextElement.querySelector('input'))
+            return nextElement.querySelector('input').focus();
+          if (nextElement.querySelector('textarea'))
+            return nextElement.querySelector('textarea').focus();
         }
-        console.log(nextElement.parentElement.getAttribute('tabindex'));
-        if (nextElement.querySelector('input'))
-          return nextElement.querySelector('input').focus();
-        if (nextElement.querySelector('textarea'))
-          return nextElement.querySelector('textarea').focus();
+        if (nextElement.className.indexOf('form-action__control')) {
+          nextElement.lastElementChild.querySelector('button').focus();
+        }
       }
       this.nextElement(currentElement.parentElement);
     },
 
     eventAcceptKeydown(event) {
-      // switch(event.key) {
-      //   case 'Enter': {this.eventClickActionAccept(); break;}
-      //   case 'Tab': {
-      //     console.log('end form tab');
-      //     console.log(event.target.closest('.table-form').querySelector('.tabspace-start input'));
-      //     let eventClick = new Event('click');
-      //     event.target.closest('.table-form').querySelector('.tabspace-start input').focus();
-      //     break;
-      //   }
-      // }
+      if (event.key == 'Tab') {
+        event.preventDefault();
+        let startForm = event.target.closest('.form-action').firstElementChild.firstElementChild.firstElementChild.querySelector('.el-field > .el-field__item');
+        if (startForm.querySelector('input')) { startForm.querySelector('input').focus(); return; }
+        if (startForm.querySelector('textarea')) { startForm.querySelector('textarea').focus(); return; }
+      }
+      this.eventFormAccept();
     },
 
     // ACTIONS
     assingObject(base, added) {
       return Object.assign(base, added);
     },
-    eventClickActionCancel() {
+    eventFormCancel() {
       this.$emit('event-action-cancel');
       this.$refs.formAction.reset();
     },
-    async eventClickActionAccept() {
+    async eventFormAccept() {
       if (!this.fieldFormValueValidation()) return;
       // console.log(this.fieldFormValue);
       // let sendFormData = new FormData();

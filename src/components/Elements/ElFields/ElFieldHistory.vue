@@ -133,6 +133,9 @@ export default {
 
 <style lang="scss">
 @import './ElField.scss';
+.el-field-history {
+  outline: none;
+}
 .history-table {
   position: relative;
   display: grid;

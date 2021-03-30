@@ -4,8 +4,7 @@
       <v-container fluid>
         <v-row dense>
           <v-col cols="3" >
-            <el-field-date class="tabspace-start"
-                           :input-properties="fieldForm.registry_date"
+            <el-field-date :input-properties="fieldForm.registry_date"
                            :is-autofocus="true"
                            v-model="fieldFormValue.registry_date"
                            @event-keydown="eventKeydown"></el-field-date>
@@ -96,12 +95,11 @@
           </v-col>
         </v-row> <!---->
       </v-container>
-      <v-card-actions>
+      <v-card-actions class="form-action__control">
         <v-spacer></v-spacer>
-        <el-btn @click="eventClickActionCancel">Отменить</el-btn>
-        <el-btn class="tabspace-end" 
-                   @click="eventClickActionAccept"
-                   @keydown="eventAcceptKeydown">Записать</el-btn>
+        <el-btn @click="eventFormCancel">Отменить</el-btn>
+        <el-btn @click="eventFormAccept"
+                @keydown="eventAcceptKeydown">Записать</el-btn>
       </v-card-actions>
     </v-form>
   </div>
