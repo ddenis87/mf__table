@@ -2,7 +2,7 @@
   <div class="tables-page">
     <div class="tables-page__header">
       <v-toolbar height="50" flat>
-       <v-toolbar-title>{{ tableDiscription || 'Загрузка...' }}</v-toolbar-title>
+       <v-toolbar-title>{{ tableDiscription || titleLoading }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-card min-width="380" max-height="34" flat v-if="tableDiscription">
           <el-field-search :is-label="true"
@@ -43,9 +43,14 @@ export default {
       tableName: this.$route.query.tableName,
       guid: null,
       freeSearchValue: '',
+      titleLoading: 'Загрузка',
+      titleLoadingInterval: null,
     }
   },
   computed: {
+    processLoading() {
+
+    },
     optionTable() { return { tableName: this.tableName, guid: this.guid } },
 
     tableDiscription() { return this.$store.getters['DataTable/GET_DESCRIPTION'](this.optionTable) },
@@ -61,6 +66,15 @@ export default {
       if (this.eventFilterExtendedReset)
         this.freeSearchValue = '';
     }
+  },
+  mounted() {
+    this.titleLoadingInterval = setInterval(() => {
+      this.titleLoading += '.';
+      if (this.tableDiscription) {
+        clearInterval(this.titleLoadingInterval);
+        this.titleLoading = this.tableDiscription;
+      }
+    }, 300);
   },
   methods: {
     freeSearch(option) {

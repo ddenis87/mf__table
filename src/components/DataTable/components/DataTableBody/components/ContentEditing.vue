@@ -10,7 +10,10 @@
                :is-hide-label="true"
                :is-selected="true"
                :is-btn-clear="false"
-               @keydown="eventKeydown"
+
+               :is-autofocus="true"
+               @event-keydown="eventKeydown"
+               @keydown="eventKeydowno"
                @keydown-enter="editingAccepted"
                @keydown-tab="editingAccepted"
                @keydown-esc="editingCanceled"
@@ -63,6 +66,9 @@ export default {
   },
   methods: {
     eventKeydown(option) {
+      console.log(option);
+    },
+    eventKeydowno(option) {
       // console.log(option);
       switch(option.key) {
         case 'Escape': {

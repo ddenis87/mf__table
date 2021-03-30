@@ -41,3 +41,7 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import './ElField.scss';
+</style>
