@@ -1,5 +1,8 @@
 <template>
-  <div class="el-field">
+  <div class="el-field el-field-choice"
+       :class="{'el-field_single-line': isSingleLine, 
+                'el-field_hide-message': isHideMessage,
+                'el-field_hide-underline': isHideUnderline}">
     <div class="el-field__anchor" tabindex="-1"></div>
     <v-autocomplete class="el-field__item"
                     v-bind="propsField"
@@ -10,15 +13,13 @@
                     @click.stop
                     @change="changeValue"
                     @keydown.stop.enter="eventKeydownEnter"
-                    
-                    @blur="blurInput"
-                    ></v-autocomplete>
+                    @blur="blurInput"></v-autocomplete>
   </div>
 </template>
 
 <script>
 import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldProps.js';
+import { ElFieldProps } from './ElFieldsProps.js';
 export default {
   name: 'ElFieldChoice',
   mixins: [
@@ -28,16 +29,21 @@ export default {
   data() {
     return {
       isChange: false,
-      isKey: '',
     }
   },
   methods: {
     changeValue() {
-      console.log('change');
       this.isChange = true;
+      this.emitInputValue();
     },
     
     eventKeydownEnter(event) {
+      if (this.fieldValue) {
+        setTimeout(() => { this.emitKeydown(event); }, 100);
+        let newEvent = new Event('click');
+        event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
+        return;
+      }
       if (this.checkRequiredField(event)) return;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);

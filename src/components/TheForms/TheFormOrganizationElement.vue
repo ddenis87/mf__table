@@ -1,6 +1,6 @@
 <template>
   <div class="table-form">
-    <v-form ref="formAction">
+    <v-form class="form-action" ref="formAction">
       <v-container fluid>
         <v-row dense>
           <v-col cols="3" >
@@ -43,19 +43,19 @@
           <v-col cols="12">
             <el-field-string-area :input-properties="fieldForm.title"
                                   v-model="fieldFormValue.title"
-                                  @next-element="eventNextElement"></el-field-string-area>
+                                  @event-keydown="eventKeydown"></el-field-string-area>
           </v-col>
         </v-row>
         <v-row dense>
           <v-col cols="4">
             <el-field-string :inputProperties="fieldForm.inn" 
                              v-model="fieldFormValue.inn"
-                             @next-element="eventNextElement"></el-field-string>
+                             @event-keydown="eventKeydown"></el-field-string>
           </v-col>
           <v-col cols="4">
             <el-field-string :inputProperties="fieldForm.kpp" 
                              v-model="fieldFormValue.kpp"
-                             @next-element="eventNextElement"></el-field-string>
+                             @event-keydown="eventKeydown"></el-field-string>
           </v-col>
           <v-col cols="4">
             <el-field-choice :inputProperties="fieldForm.budget_level"

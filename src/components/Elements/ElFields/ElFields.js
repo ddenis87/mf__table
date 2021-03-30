@@ -17,6 +17,7 @@ export const ElField = {
     fieldItems() { return this.inputProperties.choices; },
     fieldLabel() { return (!this.isHideLabel) ? (this.inputCustomLabel) ? this.inputCustomLabel : this.inputProperties.label : null; },
     fieldRequired() { return (this.inputProperties.required && !this.isRequiredOff) ? [this.rules.required] : [] },
+    fieldMaxLength() { return ('max_length' in this.inputProperties) ? this.inputProperties['max_length'] : Infinity; },
   },
   watch: {
     inputValue() { this.fieldValue = this.inputValue; },

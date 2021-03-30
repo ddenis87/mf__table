@@ -1,7 +1,7 @@
 import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory.vue';
 import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber.vue';
-import ElFieldString from '@/components/Elements/ElField/ElFieldString.vue';
-import ElFieldStringArea from '@/components/Elements/ElField/ElFieldStringArea.vue';
+import ElFieldString from '@/components/Elements/ElFields/ElFieldString.vue';
+import ElFieldStringArea from '@/components/Elements/ElFields/ElFieldStringArea.vue';
 import ElFieldDate from '@/components/Elements/ElField/ElFieldDate.vue';
 import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice.vue';
 import ElFieldDialog from '@/components/Elements/ElField/ElFieldDialog.vue';
@@ -69,7 +69,7 @@ export const TheTableForm = {
         if (parentNextElement.querySelector('input'))
           return parentNextElement.querySelector('input').focus();
         if (parentNextElement.querySelector('textarea'))
-        return parentNextElement.querySelector('textarea').focus();
+          return parentNextElement.querySelector('textarea').focus();
       }
       this.nextElement(currentElement.parentElement);
     },

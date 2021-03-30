@@ -1,15 +1,16 @@
 <template>
-  <div class="el-field el-field-number"
+  <div class="el-field el-field-string"
        :class="{'el-field_single-line': isSingleLine, 
                 'el-field_hide-message': isHideMessage,
                 'el-field_hide-underline': isHideUnderline}">
-    <div class="el-field__anchor" tabindex="-2"></div>
+    <div class="el-field__anchor" tabindex="-1"></div>
     <v-text-field class="el-field__item"
-                  type="number"
                   v-bind="propsField"
+                  :maxLength="fieldMaxLength"
                   v-model="fieldValue"
                   @keydown.stop.enter="eventKeydownEnter"
-                  @blur="blurInput"></v-text-field>
+                  @blur="blurInput">
+    </v-text-field>
   </div>
 </template>
 
@@ -18,7 +19,7 @@ import { ElField } from './ElFields.js';
 import { ElFieldProps } from './ElFieldsProps.js';
 
 export default {
-  name: 'ElFieldNumber',
+  name: 'ElFieldString',
   mixins: [
     ElField,
     ElFieldProps,
@@ -36,15 +37,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import './ElField.scss';
-::v-deep {
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    display: none;
-    -webkit-appearance: none;
-    margin: 0;
-  }
-}
-</style>

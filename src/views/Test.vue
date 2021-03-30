@@ -33,14 +33,21 @@
             <el-field-number data-tab="3" v-model="f4" @event-keydown="eventKeydown"></el-field-number>
           </v-col>
         </v-row>
-        <!-- <v-row dense>
-          <v-col cols="3">
-            <el-field-history data-tab="4" v-model="f3" @event-keydown="eventKeydown" @clear-value="eventClearValue" @event-blur="eventBlur"></el-field-history>
+        <v-row dense>
+          <v-col cols="6">
+            <el-field-string data-tab="5" v-model="f5" @event-keydown="eventKeydown"></el-field-string>
           </v-col>
-          <v-col cols="3">
-            <el-field-number data-tab="5" v-model="f3" @event-keydown="eventKeydown" @clear-value="eventClearValue" @event-blur="eventBlur"></el-field-number>
+        </v-row>
+        <v-row dense>
+          <v-col cols="6">
+            <el-field-string-area data-tab="5" v-model="f6" @event-keydown="eventKeydown"></el-field-string-area>
           </v-col>
-        </v-row> -->
+        </v-row>
+        <v-row dense>
+          <v-col class="form__col" cols="3">
+            <el-field-number data-tab="2" v-model="f7" @event-keydown="eventKeydown"></el-field-number>
+          </v-col>
+        </v-row>
       </v-container>
     </v-form>
   </div>
@@ -50,12 +57,16 @@
 import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber';
 import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory';
 import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice';
+import ElFieldStringArea from '@/components/Elements/ElFields/ElFieldStringArea';
+import ElFieldString from '@/components/Elements/ElFields/ElFieldString';
 export default {
   name: 'Test',
   components: {
     ElFieldNumber,
     ElFieldChoice,
     ElFieldHistory,
+    ElFieldStringArea,
+    ElFieldString,
   },
   data() {
     return {
@@ -63,6 +74,9 @@ export default {
       f2: '',
       f3: '',
       f4: '21',
+      f5: '',
+      f6: '21',
+      f7: '',
     }
   },
   methods: {
@@ -76,8 +90,14 @@ export default {
     },
     nextElement(currentElement) {
       if (currentElement.className.indexOf('form-action') != -1) return null;
-      if (currentElement.parentElement.nextElementSibling)
-        return currentElement.parentElement.nextElementSibling.querySelector('.el-field > .el-field__item').querySelector('input').focus();
+      if (currentElement.parentElement.nextElementSibling) {
+        let parentNextElement = currentElement.parentElement.nextElementSibling.querySelector('.el-field > .el-field__item');
+        if (parentNextElement.querySelector('input'))
+          return parentNextElement.querySelector('input').focus();
+        if (parentNextElement.querySelector('textarea')) {
+          return parentNextElement.querySelector('textarea').focus();
+        }
+      }
       this.nextElement(currentElement.parentElement);
     },
     eventClearValue() {
