@@ -5,16 +5,18 @@
         <v-row dense>
           <v-col cols="3" >
             <el-field-date class="tabspace-start"
-                           :input-properties="fieldForm.registry_date" 
+                           :input-properties="fieldForm.registry_date"
+                           :is-autofocus="true"
                            v-model="fieldFormValue.registry_date"
-                           @next-element="eventNextElement"></el-field-date>
+                           @event-keydown="eventKeydown"></el-field-date>
           </v-col>
           <!-- <v-col cols="3" ></v-col> -->
           <v-col cols="3" >
-            <el-field-history input-custom-label="История"
+            <el-field-history input-custom-label="История" :tabindex="(fieldFormValue.id) ? '' : '-1'"
                               related-model-name="actualdesc"
                               dimension="related"
-                              :dimensionValue="fieldFormValue.id"></el-field-history>
+                              :dimensionValue="fieldFormValue.id"
+                              @event-keydown="eventKeydown"></el-field-history>
           </v-col>
         </v-row>
          <v-row dense>
@@ -81,7 +83,7 @@
           <v-col cols="12">
             <el-field-dialog :inputProperties="assingObject(fieldForm.bk, {})"
                              v-model="fieldFormValue.bk"
-                             @next-element="eventNextElement"></el-field-dialog>
+                             @event-keydown="eventKeydown"></el-field-dialog>
           </v-col>
         </v-row>
         <v-row dense>
@@ -90,7 +92,7 @@
                              :filters="{ 'is_group': true }"
                              customLabel="Группа"
                              v-model="fieldFormValue.parent"
-                             @next-element="eventNextElement"></el-field-dialog>
+                             @event-keydown="eventKeydown"></el-field-dialog>
           </v-col>
         </v-row> <!---->
       </v-container>

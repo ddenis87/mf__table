@@ -4,7 +4,7 @@ import ElFieldString from '@/components/Elements/ElFields/ElFieldString.vue';
 import ElFieldStringArea from '@/components/Elements/ElFields/ElFieldStringArea.vue';
 import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate.vue';
 import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice.vue';
-import ElFieldDialog from '@/components/Elements/ElField/ElFieldDialog.vue';
+import ElFieldDialog from '@/components/Elements/ElFields/ElFieldDialog.vue';
 import ElBtn from '@/components/Elements/ElBtn/ElBtn.vue';
 
 export const TheTableForm = {
@@ -65,11 +65,16 @@ export const TheTableForm = {
     nextElement(currentElement) {
       if (currentElement.className.indexOf('form-action') != -1) return null;
       if (currentElement.parentElement.nextElementSibling) {
-        let parentNextElement = currentElement.parentElement.nextElementSibling.querySelector('.el-field > .el-field__item');
-        if (parentNextElement.querySelector('input'))
-          return parentNextElement.querySelector('input').focus();
-        if (parentNextElement.querySelector('textarea'))
-          return parentNextElement.querySelector('textarea').focus();
+        let nextElement = currentElement.parentElement.nextElementSibling.querySelector('.el-field > .el-field__item');
+        if (nextElement.parentElement.getAttribute('tabindex') == -1) {
+          this.nextElement(nextElement.parentElement);
+          return;
+        }
+        console.log(nextElement.parentElement.getAttribute('tabindex'));
+        if (nextElement.querySelector('input'))
+          return nextElement.querySelector('input').focus();
+        if (nextElement.querySelector('textarea'))
+          return nextElement.querySelector('textarea').focus();
       }
       this.nextElement(currentElement.parentElement);
     },

@@ -8,6 +8,7 @@
                   v-bind="propsField"
                   :maxLength="fieldMaxLength"
                   v-model="fieldValue"
+                  @input="eventInput"
                   @keydown.stop.enter="eventKeydownEnter"
                   @blur="blurInput">
     </v-text-field>
@@ -25,6 +26,9 @@ export default {
     ElFieldProps,
   ],
   methods: {
+    eventInput() {
+      this.emitInputValue();
+    },
     eventKeydownEnter(event) {
       if (this.checkRequiredField(event)) return;
       let newEvent = new Event('click');

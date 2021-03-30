@@ -1,21 +1,12 @@
 <template>
   <div class="el-field el-field-history">
     <v-text-field class="el-field__item"
-                  :dense="isDense" :loading="isLoadingData"
-                  :single-line="isSingleLine"
-                  :solo="isHideUnderline"
-                  :flat="isHideUnderline"
-                  :hide-details="isHideMessage"
+                  v-bind="propsField"
+                  :loading="isLoadingData"
                   :disabled="(dimensionValue) ? false : true"
-                  :clearable="isBtnClear"
-                  :label="fieldLabel"
-                  :rules="fieldRequired"
                   v-model="fieldValue"
-                  @keydown.tab="eventKeydownTab"
-                  @keydown.enter="eventKeydownEnter"
-                  @keydown.esc="eventKeydownEsc"
-                  @click:clear="eventClear"
-                  @blur="eventBlur">
+                  @keydown.stop.enter="eventKeydownEnter"
+                  @blur="eventBlurField">
       <template v-slot:append>
         <el-btn-icon-small icon="mdi-history" @click="openDialog">Открыть историю изменений</el-btn-icon-small>
       </template>
@@ -50,12 +41,15 @@ import DialogModal from '@/components/Dialogs/DialogModal.vue';
 import DataTableControl from '@/components/DataTableControls/DataTableControl.vue';
 
 
-import { ElField } from './ElField.js';
+import { ElField } from './ElFields.js';
+import { ElFieldProps } from './ElFieldsProps.js';
 import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
+
 export default {
   name: 'ElFieldHistory',
   mixins: [
     ElField,
+    ElFieldProps,
     DataTableControl_DataTable,
   ],
   components: {
@@ -125,7 +119,13 @@ export default {
           }
           this.isLoadingData = false;
         })
-    }
+    },
+
+    eventKeydownEnter(event) {
+      this.emitKeydown(event);
+    },
+
+    eventBlurField() {},
   }
 }
 </script>

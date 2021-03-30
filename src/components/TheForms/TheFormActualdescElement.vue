@@ -5,14 +5,17 @@
         <v-row dense>
           <v-col cols="3" >
             <el-field-date class="tabspace-start"
-                           :input-properties="fieldForm.start_date" 
-                           v-model="fieldFormValue.start_date"></el-field-date>
+                           :input-properties="fieldForm.start_date"
+                           :is-autofocus="true"
+                           v-model="fieldFormValue.start_date"
+                           @event-keydown="eventKeydown"></el-field-date>
           </v-col>
         </v-row>
         <v-row dense>
           <v-col cols="12" >
             <el-field-string :inputProperties="fieldForm.some_desc" 
-                             v-model="fieldFormValue.some_desc"></el-field-string>
+                             v-model="fieldFormValue.some_desc"
+                             @event-keydown="eventKeydown"></el-field-string>
           </v-col>
         </v-row>
         <!-- <v-row dense>

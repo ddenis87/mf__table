@@ -10,6 +10,7 @@
                 v-bind="propsField"
                 :maxLength="fieldMaxLength"
                 v-model="fieldValue"
+                @input="eventInput"
                 @keydown.stop.enter="eventKeydownEnter"
                 @blur="blurInput">
     </v-textarea>
@@ -26,6 +27,9 @@ export default {
     ElFieldProps,
   ],
   methods: {
+    eventInput() {
+      this.emitInputValue();
+    },
     eventKeydownEnter(event) {
       console.log('enter');
       event.preventDefault();

@@ -4,41 +4,44 @@
       <v-container fluid>
         <v-row dense>
           <v-col cols="3" >
-            <el-field-date :input-properties="fieldForm.registry_date" 
+            <el-field-date :input-properties="fieldForm.registry_date"
+                           :is-autofocus="true"
                            v-model="fieldFormValue.registry_date"
-                           @next-element="eventNextElement"></el-field-date>
+                           @event-keydown="eventKeydown"></el-field-date>
           </v-col>
           <v-col cols="3" >
             <el-field-history input-custom-label="История"
+                              :tabindex="(fieldFormValue.id) ? '' : '-1'"
                               related-model-name="actualdesc"
                               dimension="related"
-                              :dimensionValue="fieldFormValue.id"></el-field-history>
+                              :dimensionValue="fieldFormValue.id"
+                              @event-keydown="eventKeydown"></el-field-history>
           </v-col>
         </v-row>
         <v-row dense>
           <v-col cols="3">
               <el-field-number :inputProperties="fieldForm.institution_code" 
                                v-model="fieldFormValue.institution_code"
-                               @next-element="eventNextElement"></el-field-number>
+                               @event-keydown="eventKeydown"></el-field-number>
           </v-col>
           <v-col cols="3">
             <el-field-choice :inputProperties="fieldForm.budget_level"
                              v-model="fieldFormValue.budget_level"
-                             @next-element="eventNextElement"></el-field-choice>
+                             @event-keydown="eventKeydown"></el-field-choice>
           </v-col>
         </v-row>
         <v-row dense>
           <v-col cols="12">
             <el-field-string-area :input-properties="fieldForm.title"
                                   v-model="fieldFormValue.title"
-                                  @next-element="eventNextElement"></el-field-string-area>
+                                  @event-keydown="eventKeydown"></el-field-string-area>
           </v-col>
         </v-row>
         <v-row dense>
           <v-col cols="12">
             <el-field-dialog :inputProperties="assingObject(fieldForm.bk, {related_model_view: '{head_code} - {head_name}'})"
                              v-model="fieldFormValue.bk"
-                             @next-element="eventNextElement"></el-field-dialog>
+                             @event-keydown="eventKeydown"></el-field-dialog>
           </v-col>
         </v-row>
         <v-row dense>
@@ -46,7 +49,7 @@
             <el-field-dialog :inputProperties="assingObject(fieldForm.parent, {related_model_view: '{title} - {id}'})"
                              :filters="{ 'is_group': true }"
                              v-model="fieldFormValue.parent"
-                             @next-element="eventNextElement"></el-field-dialog>
+                             @event-keydown="eventKeydown"></el-field-dialog>
           </v-col>
         </v-row>
       </v-container>

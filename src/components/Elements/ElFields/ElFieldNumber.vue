@@ -8,6 +8,7 @@
                   type="number"
                   v-bind="propsField"
                   v-model="fieldValue"
+                  @input="eventInput"
                   @keydown.stop.enter="eventKeydownEnter"
                   @blur="blurInput"></v-text-field>
   </div>
@@ -24,6 +25,9 @@ export default {
     ElFieldProps,
   ],
   methods: {
+    eventInput() {
+      this.emitInputValue();
+    },
     eventKeydownEnter(event) {
       if (this.checkRequiredField(event)) return;
       let newEvent = new Event('click');

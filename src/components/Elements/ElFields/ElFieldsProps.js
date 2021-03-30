@@ -11,7 +11,7 @@ export const ElFieldProps = {
     isBtnClear: { type: Boolean, default: true },
     
     isSelected: { type: Boolean, defalt: false },
-
+    isAutofocus: { type: Boolean, defalt: false },
     inputValue: null,
     inputProperties: { type: Object, default:() => { return { label: '', required: false, type: 'string' } } },
     inputCustomLabel: { type: String, default: null }
@@ -30,6 +30,7 @@ export const ElFieldProps = {
         clearable: this.isBtnClear,
         label: this.fieldLabel,
         rules: this.fieldRequired,
+        autofocus: this.isAutofocus,
       }
     },
   },
