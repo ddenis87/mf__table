@@ -23,8 +23,8 @@ class DataTableSpace {
   listDataGroup = [];
   activeElement = null;
 
-  apiNext = null;
-  apiPrevious = null;
+  linkPageNext = null;
+  linkPagePrevious = null;
   
   filters = { // сменить название
     'page_size': '',
@@ -123,11 +123,11 @@ export default {
   },
   SET_DATA_OPTIONS(state, option) {
     state[option.tableName][option.guid].countDataTotal = option.data.count;
-    state[option.tableName][option.guid].apiNext = option.data.next
+    state[option.tableName][option.guid].linkPageNext = option.data.next
   },
   SET_DATA_OPTIONS_PRELOAD(state, option) {
     state[option.tableName][option.guid].countDataTotal = option.data.count;
-    state[option.tableName][option.guid].apiPrevious = option.data.previous;
+    state[option.tableName][option.guid].linkPagePrevious = option.data.previous;
   },
   CLEAR_DATA(state, option) {
     state[option.tableName][option.guid].countDataTotal = -1;

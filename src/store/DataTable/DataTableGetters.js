@@ -77,8 +77,8 @@ export default {
       default: return addressApi;
     }
   },
-  GET_ADDRESS_API_NEXT:(state) => (option) => { return state[option.tableName][option.guid].apiNext; },
-  GET_ADDRESS_API_PREVIOUS:(state) => (option) => { return state[option.tableName][option.guid].apiPrevious; },
+  GET_LINK_PAGE_NEXT:(state) => (option) => { return state[option.tableName][option.guid].linkPageNext; },
+  GET_LINK_PAGE_PREVIOUS:(state) => (option) => { return state[option.tableName][option.guid].linkPagePrevious; },
 
   GET_FILTER_API:(state) => (option) => {
     let filters = state[option.tableName][option.guid].filters;

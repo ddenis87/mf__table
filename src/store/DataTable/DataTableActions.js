@@ -206,7 +206,7 @@ export default {
   },
 
   REQUEST_DATA_PREVIOUS(state, option) {
-    let addressApi = state.getters.GET_ADDRESS_API_PREVIOUS(option);
+    let addressApi = state.getters.GET_LINK_PAGE_PREVIOUS(option);
     let sendOption = { // Заменить на option
       tableName: option.tableName,
       guid: option.guid,
@@ -332,7 +332,7 @@ export default {
     let filterApi = state.getters.GET_FILTER_API(option);
     let filterExtended = state.getters.GET_FILTER_EXTENDED(option);
     let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName) + filterApi + filterExtended;
-    if ('next' in option) { addressApi = state.getters.GET_ADDRESS_API_NEXT(option); }
+    if ('next' in option) { addressApi = state.getters.GET_LINK_PAGE_NEXT(option); }
     // else { state.commit('CLEAR_DATA', option); };
     if ('id' in option) addressApi += `&page_by_id=${option.id}`;
 

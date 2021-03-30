@@ -97,8 +97,8 @@ export const DataTable = {
     });
   },
   methods: {
-    getApiNext() { return this.$store.getters['DataTable/GET_ADDRESS_API_NEXT'](this.optionGetter); },
-    getApiPrevious() { return this.$store.getters['DataTable/GET_ADDRESS_API_PREVIOUS'](this.optionGetter); },
+    getApiNext() { return this.$store.getters['DataTable/GET_LINK_PAGE_NEXT'](this.optionGetter); },
+    getApiPrevious() { return this.$store.getters['DataTable/GET_LINK_PAGE_PREVIOUS'](this.optionGetter); },
     // getDataCount() { return this.$store.getters['DataTable/GET_DATA'](this.optionGetter); },
     getCountDataTotal() { return this.$store.getters['DataTable/GET_COUNT_DATA_TOTAL'](this.optionGetter); },
     async requestData(option) {
