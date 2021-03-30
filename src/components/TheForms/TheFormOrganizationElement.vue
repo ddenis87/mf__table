@@ -10,6 +10,11 @@
                            @event-keydown="eventKeydown"></el-field-date>
           </v-col>
           <v-col cols="3" >
+            <el-field-date-time :input-properties="fieldForm.last_visited"
+                           v-model="fieldFormValue.last_visited"
+                           @event-keydown="eventKeydown"></el-field-date-time>
+          </v-col>
+          <v-col cols="3" >
             <el-field-history input-custom-label="История" 
                               :tabindex="(fieldFormValue.id) ? '' : '-1'"
                               related-model-name="actualdesc"
@@ -120,6 +125,7 @@ export default {
         id: null,
         title: '',
         registry_date: '',
+        last_visited: '',
         institution_code: '',
         inn: '',
         kpp: '',
@@ -139,6 +145,7 @@ export default {
       this.fieldFormValue = {
         title: '',
         registry_date: null,
+        last_visited: null,
         institution_code: '',
         inn: '',
         kpp: '',

@@ -3,6 +3,7 @@ import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber.vue';
 import ElFieldString from '@/components/Elements/ElFields/ElFieldString.vue';
 import ElFieldStringArea from '@/components/Elements/ElFields/ElFieldStringArea.vue';
 import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate.vue';
+import ElFieldDateTime from '@/components/Elements/ElFields/ElFieldDateTime.vue';
 import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice.vue';
 import ElFieldDialog from '@/components/Elements/ElFields/ElFieldDialog.vue';
 import ElBtn from '@/components/Elements/ElBtn/ElBtn.vue';
@@ -14,6 +15,7 @@ export const TheTableForm = {
     ElFieldString,
     ElFieldStringArea,
     ElFieldDate,
+    ElFieldDateTime,
     ElFieldChoice,
     ElFieldDialog,
     ElBtn,
