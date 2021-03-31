@@ -13,7 +13,7 @@ export const ElFieldProps = {
     isSelected: { type: Boolean, defalt: false },
     isAutofocus: { type: Boolean, defalt: false },
     inputValue: null,
-    inputProperties: { type: Object, default:() => { return { label: '', required: false, type: 'string' } } },
+    inputProperties: { type: Object, default() { return { label: '', required: true, type: 'string' } } },
     inputCustomLabel: { type: String, default: null }
   },
   computed: {

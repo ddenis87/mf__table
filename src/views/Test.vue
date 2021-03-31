@@ -3,6 +3,11 @@
     <v-form class="form-action" ref="formAction">
       <v-container fluid>
         <v-row dense>
+          <v-col class="form__col" cols="3">
+            <el-field field-type="date"></el-field>
+          </v-col>
+        </v-row>
+        <!-- <v-row dense>
           <v-col cols="3">
             <el-field-date v-model="f0" @event-keydown="eventKeydown"></el-field-date>
           </v-col>
@@ -59,13 +64,15 @@
           <v-col cols="6">
             <el-field-string data-tab="5" v-model="f9" @event-keydown="eventKeydown"></el-field-string>
           </v-col>
-        </v-row>
+        </v-row> -->
       </v-container>
     </v-form>
   </div>
 </template>
 
 <script>
+import ElField from '@/components/Elements/ElFields/ElField.vue';
+
 import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber';
 import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory';
 import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice';
@@ -83,6 +90,7 @@ export default {
     ElFieldString,
     ElFieldDate,
     ElFieldDialog,
+    ElField,
   },
   data() {
     return {

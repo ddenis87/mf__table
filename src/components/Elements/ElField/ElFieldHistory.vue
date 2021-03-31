@@ -49,7 +49,7 @@
 
 <script>
 import DialogModal from '@/components/Dialogs/DialogModal.vue';
-import DataTableControl from '@/components/DataTableControl/DataTableControl.vue';
+import DataTableControl from '@/components/DataTableControls/DataTableControl.vue';
 
 
 import { ElField } from './ElField.js';
