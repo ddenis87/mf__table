@@ -42,8 +42,8 @@ import DialogModal from '@/components/Dialogs/DialogModal.vue';
 import DataTableControl from '@/components/DataTableControls/DataTableControl.vue';
 
 
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
 
 export default {

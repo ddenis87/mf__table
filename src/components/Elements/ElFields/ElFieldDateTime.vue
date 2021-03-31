@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 
 export default {
   name: 'ElFieldDateTime',

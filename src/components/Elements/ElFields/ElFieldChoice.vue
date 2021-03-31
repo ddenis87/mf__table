@@ -12,14 +12,16 @@
                     v-model="fieldValue"
                     @click.stop
                     @change="changeValue"
-                    @keydown.stop.enter="eventKeydownEnter"
-                    @blur="blurInput"></v-autocomplete>
+                    @keydown.stop.enter="eventKeydown"
+                    @keydown.stop.tab="eventKeydown"
+                    @keydown.stop.escape="eventKeydown"
+                    @blur="blurField"></v-autocomplete>
   </div>
 </template>
 
 <script>
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 export default {
   name: 'ElFieldChoice',
   mixins: [

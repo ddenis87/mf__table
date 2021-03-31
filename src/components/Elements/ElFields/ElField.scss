@@ -17,11 +17,16 @@
   
 }
 
-.el-field_hide-underline {
-  .v-text-field.v-text-field--solo .v-input__control {
-    min-height: 24px;
-  }
-}
+// .el-field_hide-underline {
+//   .v-text-field.v-text-field--solo .v-input__control {
+//     min-height: 24px;
+//   }
+//   .v-text-field__details {
+//     display: none;
+//   }
+// }
+
+
 
 ::v-deep {
   .v-input__control {

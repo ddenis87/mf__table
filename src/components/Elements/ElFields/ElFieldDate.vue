@@ -9,9 +9,12 @@
                   v-model="fieldValue"
                   v-mask="fieldMask"
                   @input="eventInputValue"
-                  @keydown.stop.enter="eventKeydownEnter"
+                  @keydown.stop.enter="eventKeydown"
+                  @keydown.stop.tab="eventKeydown"
+                  @keydown.stop.escape="eventKeydown"
                   
-                  @click:clear="eventClearValue">
+                  @click:clear="eventClearValue"
+                  @blur="blurField">
       <template v-slot:append>
         <el-btn-icon-small  icon="mdi-calendar-range" no-tooltip @keydown="eventOpenDialog" @click="eventOpenDialog"></el-btn-icon-small>
       </template>
@@ -43,8 +46,8 @@
 </template>
 
 <script>
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 
 export default {
   name: 'ElFieldDate',
@@ -135,7 +138,7 @@ export default {
       }
       this.emitInputValue(newDateTime);
     },
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
       if (this.inputProperties.required && !this.isRequiredOff)
         if (this.fieldValue.length != 10) return;
       if (!this.fieldValue || this.fieldValue.length == 0) {
@@ -146,6 +149,7 @@ export default {
         // }
         this.emitInputValue(null);
         this.emitKeydown(event);
+        this.isEmit = false;
         // this.emitKeyEnter(sendOption);
         // this.$emit('next-element', {event: event});
         return;
@@ -168,10 +172,10 @@ export default {
       //   value: newDateTime,
       //   event: event,
       // }
-      this.isEmit = true;
       this.isDialogShow = false;
       this.emitInputValue(newDateTime);
       this.emitKeydown(event);
+      this.isEmit = false;
       // this.emitKeyEnter(sendOption);
       // this.$emit('next-element', {event: event});
     },
@@ -227,20 +231,21 @@ export default {
       },10);
     },
 
-    eventBlurField(event) {
-      // if (event.relatedTarget)
-      //   if (event.relatedTarget.closest(`.el-field-date__date-time`)) {
-      //     event.preventDefault();
-      //     event.relatedTarget.closest(`.el-field-date__date-time`).focus();
-      //     this.fieldElementDOM = event.target;
-      //     return;
-      //   } else {
-      //     this.emitBlurField({value: this.fieldValue.split('.').reverse().join('-'), key: 'Enter', shift: false, ev: 'blur'});
-      //   }
-      // if (!this.isEmit) {
-      //   this.isDialogShow = false;
-      //   this.emitKeyEsc();
-      // }
+    blurField(event) {
+      if (event.relatedTarget)
+        if (event.relatedTarget.closest(`.el-field-date__date-time`)) {
+          event.preventDefault();
+          event.relatedTarget.closest(`.el-field-date__date-time`).focus();
+          this.fieldElementDOM = event.target;
+          return;
+        } else {
+          // this.emitBlurField({value: this.fieldValue.split('.').reverse().join('-'), key: 'Enter', shift: false, ev: 'blur'});
+          this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''})
+        }
+      if (this.isEmit) {
+        this.isDialogShow = false;
+        this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''})
+      }
     },
 
     emitKeydown(event) { this.$emit('event-keydown', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''}); },

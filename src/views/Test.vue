@@ -4,7 +4,10 @@
       <v-container fluid>
         <v-row dense>
           <v-col class="form__col" cols="3">
-            <el-field field-type="date"></el-field>
+            <el-field-wrapper field-type="date" :is-dense="true"
+                      :is-hide-label="true"
+                      :is-hide-underline="true"
+                      :is-autofocus="true"></el-field-wrapper>
           </v-col>
         </v-row>
         <!-- <v-row dense>
@@ -71,7 +74,7 @@
 </template>
 
 <script>
-import ElField from '@/components/Elements/ElFields/ElField.vue';
+import ElFieldWrapper from '@/components/Elements/ElFields/ElFieldWrapper.vue';
 
 import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber';
 import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory';
@@ -90,7 +93,7 @@ export default {
     ElFieldString,
     ElFieldDate,
     ElFieldDialog,
-    ElField,
+    ElFieldWrapper,
   },
   data() {
     return {

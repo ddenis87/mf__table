@@ -2,11 +2,13 @@ import Vue from 'vue';
 import vuetify from '@/plugins/vuetify';
 import store from '@/store';
 import ContentEditing from '../components/ContentEditing.vue';
+import FormEditField from '../components/FormEditField.vue';
 
 export const DataTableBodyEvents = {
   data() {
     return {
       isTooltipTimer: null,
+      formEditField: null,
     }
   },
   methods: {
@@ -21,9 +23,9 @@ export const DataTableBodyEvents = {
     },
     
     // EVENT TOGGLE EDITING COLUMN
-    eventColumnDblclick(event, itemRow, columnProperties, columnValue) {
+    eventColumnDblclick(event, element, fieldOption, fieldValue) {
       // console.log(itemRow);
-      if (!this.checkForEditable(event, columnProperties)) {    // checkForEditable - in mixin Editing
+      if (!this.checkForEditable(event, fieldOption)) {    // checkForEditable - in mixin Editing
         if (this.isModeAdding) {
           // console.log(event.target.nextElementSibling);
           let nextEditableElement = event.target.nextElementSibling;
@@ -39,10 +41,42 @@ export const DataTableBodyEvents = {
       }
       this.switchDecorationToEdit(event);  // switchDecorationToEdit - in mixin Editing
       if (event.target.closest('.body-column').querySelector('.box-editing-default')) {
-        let target = event.target.closest('.body-column').querySelector('.box-editing-default');
-        this.mountEditingComponent(target, itemRow, columnProperties, columnValue);  // mountEditingComponent - in mixin Editing
+        let targetInsert = event.target.closest('.body-column').querySelector('.box-editing-default');
+        
+        this.mountFormEditField({
+          targetInsert,
+          fieldOption,
+          fieldValue,
+          element,
+        });
+          // this.mountEditingComponent(target, targetInsert, fieldOption, fieldValue);  // mountEditingComponent - in mixin Editing
+
+
       }
     },
+
+    mountFormEditField(option) {
+      let propertiesComponent = {
+        tableName: this.tableName,
+        guid: this.guid,
+      };
+      let propertiesField = {
+        fieldOption: option.fieldOption,
+        fieldValue: option.fieldValue,
+      };
+      let subClassVue = Vue.extend(FormEditField);
+      this.formEditField = new subClassVue({
+        vuetify,
+        store,
+        propsData: {
+          propertiesComponent,
+          propertiesField,
+          element: option.element,
+        }
+      }).$mount();
+      option.targetInsert.prepend(this.formEditField.$el);
+    },
+
     mountEditingComponent(target, itemRow, columnProperties, columnValue) {
       let editingComponentProperties = {
         tableName: this.tableName,
@@ -79,6 +113,9 @@ export const DataTableBodyEvents = {
       editableElement.querySelector('.box-editing').classList.remove('display-none');
     },
     editingCanceled() {
+      // console.log('delete comp edidting');
+      // Vue.delete(this.formEditField);
+      this.formEditField = null
       let editableElement = document.querySelector('.body-column_editing');
       editableElement.classList.remove('body-column_focus');
       editableElement.parentElement.classList.remove('body-row_focus');

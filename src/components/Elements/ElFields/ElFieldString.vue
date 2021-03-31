@@ -9,15 +9,17 @@
                   :maxLength="fieldMaxLength"
                   v-model="fieldValue"
                   @input="eventInput"
-                  @keydown.stop.enter="eventKeydownEnter"
-                  @blur="blurInput">
+                  @keydown.stop.enter="eventKeydown"
+                  @keydown.stop.tab="eventKeydown"
+                  @keydown.stop.escape="eventKeydown"
+                  @blur="blurField">
     </v-text-field>
   </div>
 </template>
 
 <script>
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 
 export default {
   name: 'ElFieldString',
@@ -29,15 +31,14 @@ export default {
     eventInput() {
       this.emitInputValue();
     },
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
       if (this.checkRequiredField(event)) return;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
       this.emitInputValue();
       this.emitKeydown(event);
+      this.isEmit = false;
     },
-
-    blurInput(event) {},
   }
 }
 </script>
