@@ -46,16 +46,58 @@ export default {
       let editableField = document.querySelector('.body-column_editing');
       let newEvent = new CustomEvent('editing-canceled')
       editableField.dispatchEvent(newEvent);
-      if (document.querySelector('.form-edit-field')) document.querySelector('.form-edit-field').remove();
+      this.removeFormEditField();
     },
+    
     editingAccept(option) {
       console.log(option);
       console.log(this.propertiesField);
-      let bFormData = this.buildForm(option);
-
-      for (let key of Object.keys(this.element)) {
-        console.log(bFormData.get(key));
+      if (this.$store.getters['DataTable/GET_ADDING_MODE'](this.propertiesComponent).index != null) {  // if ADDING_MODE
+        if (option.event.type == 'blur') {
+          this.editingCanceled();
+        } else {
+          this.saveElementInStore(option);
+        }
+        return;
       }
+      console.log('editingAccept');
+      this.saveFieldElementInStor(option.value);
+
+      let bFormData = this.buildForm(option);
+      let sendOption = {
+        ...this.propertiesComponent,
+        id: this.element['id'],
+        fieldName: this.fieldOption.value,
+        value: option.value,
+        formData: bFormData,
+      };
+      this.$store.dispatch('DataTable/UPDATE_ELEMENT_FIELD', sendOption);
+      let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: 'Enter', keyShift: option.event.shift } });
+      let editableElement = document.querySelector('.body-column_editing');
+      editableElement.dispatchEvent(eventEditingAccepted);
+      
+      this.removeFormEditField();
+    },
+
+    saveElementInStore(option) {
+      console.log('saveElementInStore');
+      this.saveFieldElementInStor(option.value);
+      let editableElement = document.querySelector('.body-column_editing');
+      let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: 'Tab', keyShift: option.event.shift } });
+      editableElement.dispatchEvent(eventEditingAccepted);
+      
+      this.removeFormEditField();
+    },
+
+    saveFieldElementInStor(value) {
+      let sendOption = {
+        ...this.propertiesComponent,
+        id: this.element['id'],
+        fieldName: this.fieldOption.value,
+        value: value
+      };
+      console.log(sendOption);
+      this.$store.dispatch('DataTable/ADDING_NEW_ELEMEN_INLINE_FIELD', sendOption);
     },
 
     computedValueField(value) {
@@ -73,13 +115,18 @@ export default {
 
     buildForm(option) {
       let newFormData = new FormData();
-      let keyValue = null;
       this.fieldsElement.forEach(element => {
-        keyValue = Object.entries(element);
-        newFormData.set(keyValue[0], keyValue[1]);
+        if (element.value != '') 
+          newFormData.set(element.key, element.value);
       });
       newFormData.set(this.fieldOption.value, option.value);
       return newFormData;
+    },
+
+    removeFormEditField() {
+      if (document.querySelector('.form-edit-field')) {
+        document.querySelector('.form-edit-field').remove();
+      }
     },
   }
 }
