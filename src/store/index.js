@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import Login from './Login.js';
 import DataTable from './DataTable/DataTable.js';
 import AccessControl from './AccessControl.js';
+import Workbook from './Workbook.js';
 
 Vue.use(Vuex)
 
@@ -22,5 +23,6 @@ export default new Vuex.Store({
     Login,
     DataTable,
     AccessControl,
+    Workbook,
   }
 })
