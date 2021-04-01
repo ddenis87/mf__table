@@ -5,7 +5,8 @@ module.exports = {
   },
   'extends': [
     'plugin:vue/essential',
-    'eslint:recommended'
+    'eslint:recommended',
+    // '@vue/airbnb'
   ],
   parserOptions: {
     parser: 'babel-eslint'
@@ -15,6 +16,15 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
   },
   overrides: [
+    {
+      files: [
+        '**/__tests__/*.{j,t}s?(x)',
+        '**/tests/unit/**/*.spec.{j,t}s?(x)'
+      ],
+      env: {
+        jest: true
+      }
+    },
     {
       files: [
         '**/__tests__/*.{j,t}s?(x)',
