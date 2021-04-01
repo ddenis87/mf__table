@@ -30,7 +30,7 @@ export default {
     eventInput() {
       this.emitInputValue();
     },
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
       if (this.checkRequiredField(event)) return;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);

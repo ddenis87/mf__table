@@ -61,19 +61,21 @@ export default {
         return;
       }
       console.log('editingAccept');
-      this.saveFieldElementInStor(option.value);
+      this.saveElementFieldInStore(option.value);
 
       let bFormData = this.buildForm(option);
       let sendOption = {
         ...this.propertiesComponent,
         id: this.element['id'],
         fieldName: this.fieldOption.value,
-        value: option.value,
+        value: this.computedValueField(option.value),
         formData: bFormData,
       };
       this.$store.dispatch('DataTable/UPDATE_ELEMENT_FIELD', sendOption);
-      let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: 'Enter', keyShift: option.event.shift } });
+      let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: (option.event.type == 'blur') ? 'Enter' : option.event.key, keyShift: option.event.shiftKey } });
+      
       let editableElement = document.querySelector('.body-column_editing');
+      console.log(editableElement);
       editableElement.dispatchEvent(eventEditingAccepted);
       
       this.removeFormEditField();
@@ -81,7 +83,7 @@ export default {
 
     saveElementInStore(option) {
       console.log('saveElementInStore');
-      this.saveFieldElementInStor(option.value);
+      this.saveElementFieldInStore(option.value);
       let editableElement = document.querySelector('.body-column_editing');
       let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: 'Tab', keyShift: option.event.shift } });
       editableElement.dispatchEvent(eventEditingAccepted);
@@ -89,12 +91,12 @@ export default {
       this.removeFormEditField();
     },
 
-    saveFieldElementInStor(value) {
+    saveElementFieldInStore(value) {
       let sendOption = {
         ...this.propertiesComponent,
         id: this.element['id'],
         fieldName: this.fieldOption.value,
-        value: value
+        value: value,
       };
       console.log(sendOption);
       this.$store.dispatch('DataTable/ADDING_NEW_ELEMEN_INLINE_FIELD', sendOption);
@@ -119,7 +121,7 @@ export default {
         if (element.value != '') 
           newFormData.set(element.key, element.value);
       });
-      newFormData.set(this.fieldOption.value, option.value);
+      newFormData.set(this.fieldOption.value, this.computedValueField(option.value));
       return newFormData;
     },
 

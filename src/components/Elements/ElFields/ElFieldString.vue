@@ -12,6 +12,7 @@
                   @keydown.stop.enter="eventKeydown"
                   @keydown.stop.tab="eventKeydown"
                   @keydown.stop.escape="eventKeydown"
+                  @keydown.stop
                   @blur="blurField">
     </v-text-field>
   </div>

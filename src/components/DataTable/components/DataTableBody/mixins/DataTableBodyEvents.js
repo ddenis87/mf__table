@@ -137,8 +137,13 @@ export const DataTableBodyEvents = {
           this.switchDecorationToDisplay();
           event.target.classList.remove('body-column_focus');
           if (!nextEditableElement) {
+            event.preventDefault();
             // this.editingAcceptedNewElement(event);
-            this.$emit('adding-new-element');
+            if (this.$store.getters['DataTable/GET_ADDING_MODE']({
+              tableName: this.tableName,
+              guid: this.guid,
+            }).index != null)
+              this.$emit('adding-new-element');
             return;
           }
           setTimeout(() => {
@@ -190,7 +195,7 @@ export const DataTableBodyEvents = {
     },
     
     async eventColumnKeydown(event, itemRow, itemColumn, columnValue) {
-      // console.log('event column keydown');
+      console.log(event);
       if (event.code.includes('Arrow') || event.code == 'Tab') {
         event.preventDefault();
         if ((event.code == 'ArrowRight' && event.target.nextElementSibling) || (event.code =='Tab' && event.shiftKey == false && event.target.nextElementSibling)) { event.target.nextElementSibling.focus(); return; }

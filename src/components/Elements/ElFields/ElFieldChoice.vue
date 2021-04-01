@@ -12,6 +12,7 @@
                     v-model="fieldValue"
                     @click.stop
                     @change="changeValue"
+                    @keydown.stop
                     @keydown.stop.enter="eventKeydown"
                     @keydown.stop.tab="eventKeydown"
                     @keydown.stop.escape="eventKeydown"
@@ -39,16 +40,20 @@ export default {
       this.emitInputValue();
     },
     
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
       if (this.fieldValue) {
-        setTimeout(() => { this.emitKeydown(event); }, 100);
+        this.isEmit = false;
+        setTimeout(() => { this.emitKeydown(event);  }, 100);
         let newEvent = new Event('click');
+        console.log('element');
         event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
         return;
       }
       if (this.checkRequiredField(event)) return;
+      this.isEmit = false;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
+      
       setTimeout(() => {
         if (this.isChange == true) {
           this.isChange = false;
@@ -56,13 +61,14 @@ export default {
         } else {
           this.emitInputValue();
           this.emitKeydown(event); // this.$emit('event-keydown', {event: event, value: this.fieldValue});
+          
         }
       }, 100);
     },
 
-    blurInput(event) {
+    // blurInput(event) {
 
-    },
+    // },
   },
 }
 </script>

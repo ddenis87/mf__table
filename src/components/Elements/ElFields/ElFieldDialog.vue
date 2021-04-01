@@ -20,8 +20,11 @@
                     @click:clear="eventClearValue"
                     @input="eventInputValue"
                     @change="eventChangeValue"
-                    @keydown.stop.enter="eventKeydownEnter"
-                    @blur="eventBlurField">
+                    @keydown.stop
+                    @keydown.stop.enter="eventKeydown"
+                    @keydown.stop.tab="eventKeydown"
+                    @keydown.stop.escape="eventKeydown"
+                    @blur="blurField">
     </v-autocomplete>
     <dialog-full-page :is-dialog-name="dialogTableName" 
                       :is-dialog-show="isDialogShow" 
@@ -135,14 +138,16 @@ export default {
 
     eventInputValue() { this.emitInputValue(); },
 
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
       if (this.fieldValue) {
+        this.isEmit = false;
         setTimeout(() => { this.emitKeydown(event); }, 100);
         let newEvent = new Event('click');
         event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
         return;
       }
       if (this.checkRequiredField(event)) return;
+      this.isEmit = false;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
       setTimeout(() => {
@@ -175,9 +180,9 @@ export default {
       this.isDialogShow = false;
     },
 
-    eventBlurField() {
-      if (!this.isDialogShow  && !this.isEmit) {
-        this.emitBlurField();
+    blurField(event) {
+      if (!this.isDialogShow  && this.isEmit) {
+        this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue : ''}); // this.emitBlurField();
       }
     },
   },
