@@ -11,7 +11,7 @@ class DataTableSpace {
     this.filters['is_deleted'] = isDeleted;
 
     this.propsTable = Object.assign(this.propsTable, propsTable) ;
-  };
+  }
 
   apiLoading = false;
   propsTable = {

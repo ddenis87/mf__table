@@ -202,7 +202,7 @@ export const DataTableControlActions = {
       let bFormData = new FormData();
       for (let key of Object.keys(sendOption.values)) {
         bFormData.set(`${key}`, `${sendOption.values[key]}`);
-      };
+      }
       sendOption.formData = bFormData;
       delete sendOption.values;
       sendOption.previous = true;

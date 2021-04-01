@@ -48,9 +48,9 @@ export default {
     }
   },
   computed: {
-    processLoading() {
+    // processLoading() {
 
-    },
+    // },
     optionTable() { return { tableName: this.tableName, guid: this.guid } },
 
     tableDiscription() { return this.$store.getters['DataTable/GET_DESCRIPTION'](this.optionTable) },

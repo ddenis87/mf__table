@@ -64,8 +64,8 @@ export default {
       console.log('valid');
       this.$store.commit('Login/SET_USER_NAME_PASSWORD', this.userData);
       await this.$store.dispatch(`Login/GET_USER_TOKEN_ACCESS`, this.userData)
-        .then(res => this.$router.push('/Home'))
-        .catch(err => {
+        .then(() => this.$router.push('/Home'))
+        .catch(() => {
           this.isError = true;
           this.$refs.FormLogin.reset();
           setTimeout(() => this.isError = false, 3000);

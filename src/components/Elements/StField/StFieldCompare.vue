@@ -63,9 +63,6 @@ export default {
     
   },
   computed: {
-    fieldValueDefault() {
-      switch('') {}
-    },
     fieldLabel() { if (this.isLabel) return this.inputProperties.label; return; },
     fieldList() {
       return (this.inputProperties) ? this.fieldListMap(this.inputProperties.type) : [];

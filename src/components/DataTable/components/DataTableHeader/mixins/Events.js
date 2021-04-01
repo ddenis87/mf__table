@@ -40,7 +40,7 @@ export const Events = {
         this.isSortingCurrentField = targetColumn.getAttribute('data-key');
         this.isSortingOrderAsc = true;
         targetColumn.querySelector('.header-column__sort').classList.add('header-column__sort_active_asc');
-      };
+      }
       let sendOption = {
         ordering: this.isSortingOrderAsc,
         key: targetColumn.getAttribute('data-key'),

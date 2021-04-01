@@ -93,6 +93,7 @@ export default {
             case 'date': return () => import('@/components/Elements/ElField/ElFieldRange/ElFieldRangeDate.vue');
             case 'datetime': return () => import('@/components/Elements/ElField/ElFieldRange/ElFieldRangeDateTime.vue');
           }
+          break;
         }
         default: {
           this.isDisabledData = false;

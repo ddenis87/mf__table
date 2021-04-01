@@ -148,7 +148,7 @@ export const DataTable = {
 
           bFormData.set(`${key}`, `${newCurrentValue}`);
         }
-      };
+      }
       console.log(sendOption);
       sendOption.formData = bFormData;
       sendOption.previous = true;

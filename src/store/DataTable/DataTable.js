@@ -14,7 +14,7 @@ class DataTable {
   listData = [];  // МАССИВ ДАННЫХ  !!!!!
 
   extra_actions = {};
-};
+}
 
 export default {
   namespaced: true,

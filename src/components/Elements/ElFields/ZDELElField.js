@@ -50,7 +50,7 @@ export const ElField = {
       case 'datetime': inputElement = document.querySelector(`.content-editing .v-text-field__slot input`); break;
       case 'choice': 
       case 'field': inputElement = document.querySelector(`.content-editing .v-select__slot input`); break;
-    };
+    }
     if (!this.isSelected) return;
     setTimeout(() => {
       inputElement.select();

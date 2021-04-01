@@ -152,10 +152,10 @@ export default {
     computedTooltipShift() {
       let calcTooltipShift = { left: -7, top: -3, };
       // if (this.propsTable.typeRow == 'fixed' && this.propsTable.typeColumn == 'fixed') { calcTooltipShift.left = -1; calcTooltipShift.top = -2; return calcTooltipShift};
-      if (this.propsTable.typeRow == 'fixed' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift};
-      if (this.propsTable.typeRow == 'auto' && this.propsTable.typeColumn == 'fixed') { calcTooltipShift.left = 3; calcTooltipShift.top = -3; return calcTooltipShift};
-      if (this.propsTable.typeRow == 'dense' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift};
-      if (this.propsTable.typeRow == 'auto' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift};
+      if (this.propsTable.typeRow == 'fixed' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift}
+      if (this.propsTable.typeRow == 'auto' && this.propsTable.typeColumn == 'fixed') { calcTooltipShift.left = 3; calcTooltipShift.top = -3; return calcTooltipShift}
+      if (this.propsTable.typeRow == 'dense' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -7; calcTooltipShift.top = -3; return calcTooltipShift}
+      if (this.propsTable.typeRow == 'auto' && this.propsTable.typeColumn == 'dense') { calcTooltipShift.left = -1; calcTooltipShift.top = -3; return calcTooltipShift}
       return calcTooltipShift;
     },
   },

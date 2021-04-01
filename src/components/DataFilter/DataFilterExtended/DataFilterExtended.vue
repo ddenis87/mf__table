@@ -81,7 +81,7 @@ export default {
       }
       
     },
-    eventKeydown(event) {
+    eventKeydown() {
       // if (event.key == 'Enter') this.nextElement(event.target);
       // console.log(event);
       // console.log(document.activeElement);

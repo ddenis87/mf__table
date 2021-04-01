@@ -73,23 +73,23 @@
 <script>
 import ElField from '@/components/Elements/ElFields/ElField.vue';
 
-import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber';
-import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory';
-import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice';
-import ElFieldStringArea from '@/components/Elements/ElFields/ElFieldStringArea';
-import ElFieldString from '@/components/Elements/ElFields/ElFieldString';
-import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate';
-import ElFieldDialog from '@/components/Elements/ElFields/ElFieldDialog';
+// import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber';
+// import ElFieldHistory from '@/components/Elements/ElFields/ElFieldHistory';
+// import ElFieldChoice from '@/components/Elements/ElFields/ElFieldChoice';
+// import ElFieldStringArea from '@/components/Elements/ElFields/ElFieldStringArea';
+// import ElFieldString from '@/components/Elements/ElFields/ElFieldString';
+// import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate';
+// import ElFieldDialog from '@/components/Elements/ElFields/ElFieldDialog';
 export default {
   name: 'Test',
   components: {
-    ElFieldNumber,
-    ElFieldChoice,
-    ElFieldHistory,
-    ElFieldStringArea,
-    ElFieldString,
-    ElFieldDate,
-    ElFieldDialog,
+    // ElFieldNumber,
+    // ElFieldChoice,
+    // ElFieldHistory,
+    // ElFieldStringArea,
+    // ElFieldString,
+    // ElFieldDate,
+    // ElFieldDialog,
     ElField,
   },
   data() {
@@ -111,7 +111,7 @@ export default {
       console.log('keydown form');
       console.log(option);
       if (option.event.key == 'Enter') {
-        let nextElement = this.nextElement(option.event.target.closest('.el-field'));
+        // let nextElement = this.nextElement(option.event.target.closest('.el-field'));
         // if (nextElement) nextElement.focus();
       }
     },

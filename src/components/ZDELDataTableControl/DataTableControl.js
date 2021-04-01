@@ -162,7 +162,7 @@ export const DataTableControl = {
       for (let key of Object.keys(sendOption.values)) {
         // if (sendOption.values[key])
           bFormData.set(`${key}`, `${sendOption.values[key]}`);
-      };
+      }
       sendOption.formData = bFormData;
       delete sendOption.values;
       sendOption.previous = true;
