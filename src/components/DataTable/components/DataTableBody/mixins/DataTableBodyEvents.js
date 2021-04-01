@@ -130,20 +130,21 @@ export const DataTableBodyEvents = {
           break;
         }
         case 'Tab': {
-          let nextEditableElement = null;
+          let nextEditableElement = null; 
           if (event.detail.keyShift) nextEditableElement = event.target.previousElementSibling;
           else nextEditableElement = event.target.nextElementSibling;
           // console.log(nextEditableElement);
           this.switchDecorationToDisplay();
           event.target.classList.remove('body-column_focus');
           if (!nextEditableElement) {
-            event.preventDefault();
             // this.editingAcceptedNewElement(event);
             if (this.$store.getters['DataTable/GET_ADDING_MODE']({
               tableName: this.tableName,
               guid: this.guid,
-            }).index != null)
+            }).index != null) {
               this.$emit('adding-new-element');
+            }
+            
             return;
           }
           setTimeout(() => {
