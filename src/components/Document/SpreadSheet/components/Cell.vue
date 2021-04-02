@@ -1,6 +1,6 @@
 <template>
   <td class="cell" :style="cellProperties.style" :colspan="cellProperties.colspan" :rowspan="cellProperties.rowspan">
-    <slot>{{ cellProperties.value }}</slot>
+    {{ cellProperties.value }}
   </td>
 </template>
 
@@ -8,7 +8,7 @@
 export default {
   name: 'Cell',
   props: {
-    // cellProperties: { type: Object, default:() => { return {style: {}, value: '' } } },
+    cellProperties: { type: Object, default:() => { return {style: {}, value: '' } } },
 
     collspan: { type: Number, default: 0 },  //  ???
     rowspan: { type: Number, default: 0 },  //  ???
@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     cellStyle() {
-      let cellStyle = {};
+      // let cellStyle = {};
       return {};
     },
   },
@@ -41,8 +41,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.cell {
-  border-bottom: thin solid grey;
-  border-left: thin solid grey;
-}
+
 </style>
