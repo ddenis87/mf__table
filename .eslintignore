@@ -1,4 +1,10 @@
 #Invalid
 /src/tests
 /src/store
-/src/components
+# /src/components
+/src/components/Elements
+/src/components/DataTableSingle
+/src/components/DataTableLazy
+/src/components/DataTable
+/src/components/DataHistory
+/src/components/DataFilter

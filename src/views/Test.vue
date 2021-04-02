@@ -20,3 +20,11 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.test {
+  height: calc(100vh - 64px);
+  padding: 5px;
+  // border: thin solid orange;
+}
+</style>
