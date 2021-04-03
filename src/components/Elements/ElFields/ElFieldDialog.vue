@@ -114,7 +114,7 @@ export default {
           setTimeout(() => {
             this.fieldElementDOM.focus();
             this.fieldElementDOM.select();
-          }, 10);
+          }, 100);
         });
       // console.log(option);
       
@@ -141,6 +141,9 @@ export default {
         setTimeout(() => { this.emitKeydown(event); }, 100);
         let newEvent = new Event('click');
         event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
+        setTimeout(() => {
+          event.target.focus();
+        }, 100)
         return;
       }
       if (this.checkRequiredField(event)) return;
@@ -178,8 +181,12 @@ export default {
     },
 
     blurField(event) {
-      if (!this.isDialogShow  && this.isEmit) {
-        this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue : ''}); // this.emitBlurField();
+      if (!this.isDialogShow) {
+        if (this.isEmit) {
+          this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue : ''}); // this.emitBlurField();
+        } else {
+          this.isEmit = true;
+        }
       }
     },
   },

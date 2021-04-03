@@ -1,6 +1,6 @@
 export const ElFieldProps = {
   props: {
-    inUse: { type: String, default: 'form' },
+    inUse: { type: String, default: 'table' },
     isDense: { type: Boolean, default: true },
     isSingleLine: { type: Boolean, default: false, },  // show or hide label
     isRequiredOff: { type: Boolean, default: false },  // 

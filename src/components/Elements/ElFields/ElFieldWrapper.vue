@@ -17,9 +17,11 @@ export default {
     prop: 'fieldValue',
   },
   props: {
+    inUse: { type: String, default: 'table' },
     isDense: { type: Boolean, default: false },
     isHideLabel: { type: Boolean, dafault: false },
     isHideUnderline: { type: Boolean, dafault: false },
+    isRequiredOff: { type: Boolean, dafault: true },
     isSelected: { type: Boolean, defalt: false },
     isAutofocus: { type: Boolean, defalt: false },
     isBtnClear: { type: Boolean, default: false },
@@ -39,9 +41,11 @@ export default {
     },
     fieldPropertiesView() {
       return {
+        'in-use': this.inUse,
         'is-dense': this.isDense,
         'is-hide-label': this.isHideLabel,
         'is-hide-underline': this.isHideUnderline,
+        'is-required-off': true,
         'is-selected': this.isSelected,
         'autofocus': this.isAutofocus,
         'is-btn-clear': this.isBtnClear,
@@ -63,15 +67,14 @@ export default {
       return fieldName + fieldType;
     },
     eventKeydown(option) {
-      option.event.preventDefault();
       switch(option.event.key) {
-        case 'Escape': { this.$emit('event-keydown-escape', option); break; }
-        case 'Enter': { this.$emit('event-keydown-enter', option); break; }
-        case 'Tab': { this.$emit('event-keydown-tab', option); break; }
+        case 'Escape': { this.$emit('event-keydown-escape', {...option, fieldKey: this.fieldOption.value}); break; }
+        case 'Enter': { this.$emit('event-keydown-enter', {...option, fieldKey: this.fieldOption.value}); break; }
+        case 'Tab': { this.$emit('event-keydown-tab', {...option, fieldKey: this.fieldOption.value}); break; }
       }
     },
     eventBlur(option) {
-      this.$emit('event-blur', option);
+      this.$emit('event-blur', {...option, fieldKey: this.fieldOption.value});
     }
   },
 }

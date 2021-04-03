@@ -2,17 +2,17 @@
   <div class="form-edit-field"
        :class="{'form-edit-field_required': this.fieldOption.required}">
     <el-field-wrapper :is-dense="true"
-                            :is-hide-label="true"
-                            :is-hide-underline="true"
-                            :is-selected="true"
-                            :is-autofocus="true"
-                            :field-type="fieldType"
-                            :field-option="fieldOption"
-                            v-model="fieldValue"
-                            @event-keydown-escape="editingCanceled"
-                            @event-keydown-enter="editingAccept"
-                            @event-keydown-tab="editingAccept"
-                            @event-blur="editingAccept"></el-field-wrapper>
+                      :is-hide-label="true"
+                      :is-hide-underline="true"
+                      :is-selected="true"
+                      :is-autofocus="true"
+                      :field-type="fieldType"
+                      :field-option="fieldOption"
+                      v-model="fieldValue"
+                      @event-keydown-escape="editingCanceled"
+                      @event-keydown-enter="editingAccept"
+                      @event-keydown-tab="editingAccept"
+                      @event-blur="editingAccept"></el-field-wrapper>
   </div>
 </template>
 
@@ -52,14 +52,14 @@ export default {
     editingAccept(option) {
       console.log(option);
       console.log(this.propertiesField);
-      if (this.$store.getters['DataTable/GET_ADDING_MODE'](this.propertiesComponent).index != null) {  // if ADDING_MODE
-        if (option.event.type == 'blur') {
-          this.editingCanceled();
-        } else {
-          this.saveElementInStore(option);
-        }
-        return;
-      }
+      // if (this.$store.getters['DataTable/GET_ADDING_MODE'](this.propertiesComponent).index != null) {  // if ADDING_MODE
+      //   if (option.event.type == 'blur') {
+      //     this.editingCanceled();
+      //   } else {
+      //     this.saveElementInStore(option);
+      //   }
+      //   return;
+      // }
       console.log('editingAccept');
       this.saveElementFieldInStore(option.value);
 
@@ -81,15 +81,15 @@ export default {
       this.removeFormEditField();
     },
 
-    saveElementInStore(option) {
-      console.log('saveElementInStore');
-      this.saveElementFieldInStore(option.value);
-      let editableElement = document.querySelector('.body-column_editing');
-      let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: 'Tab', keyShift: option.event.shift } });
-      editableElement.dispatchEvent(eventEditingAccepted);
+    // saveElementInStore(option) {
+    //   console.log('saveElementInStore');
+    //   this.saveElementFieldInStore(option.value);
+    //   let editableElement = document.querySelector('.body-column_editing');
+    //   let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: 'Tab', keyShift: option.event.shift } });
+    //   editableElement.dispatchEvent(eventEditingAccepted);
       
-      this.removeFormEditField();
-    },
+    //   this.removeFormEditField();
+    // },
 
     saveElementFieldInStore(value) {
       let sendOption = {

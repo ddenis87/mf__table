@@ -70,6 +70,7 @@ export const ElField = {
     blurField(event) {
       if (this.isEmit)
         this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue : ''});
+      else this.isEmit = true;
     }
   }
 }

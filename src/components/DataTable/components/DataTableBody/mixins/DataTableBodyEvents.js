@@ -3,13 +3,20 @@ import vuetify from '@/plugins/vuetify';
 import store from '@/store';
 import ContentEditing from '../components/ContentEditing.vue';
 import FormEditField from '../components/FormEditField.vue';
+import FormEditElement from '../components/FormEditElement.vue';
 
 export const DataTableBodyEvents = {
   data() {
     return {
       isTooltipTimer: null,
       formEditField: null,
+      formEditElement: null,
     }
+  },
+  computed: {
+    getAddingMode() {
+      return (this.$store.getters['DataTable/GET_ADDING_MODE']({ tableName: this.tableName, guid: this.guid }).index) ? true : false;
+    },
   },
   methods: {
     // EVENT EXPANSION ROW
@@ -77,19 +84,44 @@ export const DataTableBodyEvents = {
       option.targetInsert.prepend(this.formEditField.$el);
     },
 
-    mountEditingComponent(target, itemRow, columnProperties, columnValue) {
-      let editingComponentProperties = {
+    mountFormEditElement(option) {
+      let propertiesComponent = {
         tableName: this.tableName,
         guid: this.guid,
-        itemRow,
-        columnProperties,
-        columnValue,
       };
-      // console.log(editingComponentProperties);
-      let editingComponentVue = Vue.extend(ContentEditing);
-      let editingComponent = new editingComponentVue({ vuetify, store, propsData: { properties: editingComponentProperties }}).$mount();
-      target.prepend(editingComponent.$el);
+      // let propertiesField = {
+      //   fieldOption: option.fieldOption,
+      //   fieldValue: option.fieldValue,
+      // };
+      let subClassVue = Vue.extend(FormEditElement);
+      this.formEditElement = new subClassVue({
+        vuetify,
+        store,
+        propsData: {
+          propertiesComponent,
+          itemsHeader: this.itemsHeader,
+          styleForm: this.template,
+          typeRow: this.typeRow,
+          // propertiesField,
+          // element: option.element,
+        }
+      }).$mount();
+      option.targetInsert.after(this.formEditElement.$el);
     },
+
+    // mountEditingComponent(target, itemRow, columnProperties, columnValue) {
+    //   let editingComponentProperties = {
+    //     tableName: this.tableName,
+    //     guid: this.guid,
+    //     itemRow,
+    //     columnProperties,
+    //     columnValue,
+    //   };
+    //   // console.log(editingComponentProperties);
+    //   let editingComponentVue = Vue.extend(ContentEditing);
+    //   let editingComponent = new editingComponentVue({ vuetify, store, propsData: { properties: editingComponentProperties }}).$mount();
+    //   target.prepend(editingComponent.$el);
+    // },
     checkForEditable(event, columnProperties) {
       if (!this.isEditable) { return false; } // if table properties editable set in false // ??? emit rowProperties
       if (columnProperties['read_only']) { return false; } // field not can edit (at API)
@@ -143,6 +175,9 @@ export const DataTableBodyEvents = {
               guid: this.guid,
             }).index != null) {
               this.$emit('adding-new-element');
+            } else {
+              event.target.closest('.body-row').classList.remove('body-row_hover');
+              event.target.closest('.body-row').classList.remove('body-row_focus');
             }
             
             return;
@@ -168,7 +203,7 @@ export const DataTableBodyEvents = {
             this.$emit('show-tooltip', Object.assign(parent, {text: event.target.closest('.body-column').getAttribute('data-overflow-text')}));
           }
         }, 1100);
-      if (!this.isColumnFocus && !this.isColumnEditing && !this.isRowFocus)
+      if (!this.isColumnFocus && !this.isColumnEditing && !this.isRowFocus && !this.getAddingMode)
         event.target.closest('.body-row')?.classList.add('body-row_hover');
       
     },
@@ -196,7 +231,7 @@ export const DataTableBodyEvents = {
     },
     
     async eventColumnKeydown(event, itemRow, itemColumn, columnValue) {
-      console.log(event);
+      // console.log(event);
       if (event.code.includes('Arrow') || event.code == 'Tab') {
         event.preventDefault();
         if ((event.code == 'ArrowRight' && event.target.nextElementSibling) || (event.code =='Tab' && event.shiftKey == false && event.target.nextElementSibling)) { event.target.nextElementSibling.focus(); return; }
@@ -218,22 +253,32 @@ export const DataTableBodyEvents = {
         this.eventColumnDblclick(event, itemRow, itemColumn, columnValue); // ПЕРЕКЛЮЧАЕМСЯ В РЕЖИМ РЕДАКТИРОВАНИЯ
       }
       if (event.code == 'Insert') {
-        if (!this.isAddingInline) return;
-        await this.$store.dispatch('DataTable/ADDING_NEW_ELEMEN_INLINE', {
-          tableName: this.tableName,
-          guid: this.guid,
-          id: ('id' in itemRow) ? itemRow.id : -1,
-        })
-          .then(() => {
-            // let isGroup = this.$store.getters['DataTable/GET_DATA_GROUP_LEVEL']({ tableName: this.tableName, guid: this.guid });
-            let index = this.$store.getters['DataTable/GET_ADDING_MODE']({ tableName: this.tableName, guid: this.guid }).index;
-            // console.log(index);
-            // console.log(document.querySelectorAll(`.${this.guid} .body .body-row`)[index]);
-            let addingElement = document.querySelectorAll(`.${this.guid} .body .body-row`)[index].querySelectorAll('.body-column')[0];
-            let eventDblClick = new Event('dblclick', {bubbles: false});
-            addingElement.focus();
-            addingElement.dispatchEvent(eventDblClick);
-          });
+        console.log(event.target.closest('.body-row'));
+        let addingElement = event.target.closest('.body-row');
+        this.mountFormEditElement({targetInsert: addingElement});
+        // if (!this.isAddingInline) return;
+        // await this.$store.dispatch('DataTable/ADDING_NEW_ELEMEN_INLINE', {
+        //   tableName: this.tableName,
+        //   guid: this.guid,
+        //   id: ('id' in itemRow) ? itemRow.id : -1,
+        // })
+        //   .then(() => {
+        //     // -----------------------------------------------------------
+        //     // let index = this.$store.getters['DataTable/GET_ADDING_MODE']({ tableName: this.tableName, guid: this.guid }).index;
+        //     let addingElement = document.querySelectorAll(`.${this.guid} .body .body-row`)[index];
+        //     addingElement.style = {};
+        //     addingElement.innerHTML = '';
+        //     this.mountFormEditElement({targetInsert: addingElement});
+        //     // console.log(addingElement);
+        //     // -----------------------------------------------------------
+
+        //     // -----------------------------------------------------------
+        //     // let index = this.$store.getters['DataTable/GET_ADDING_MODE']({ tableName: this.tableName, guid: this.guid }).index;
+        //     // let addingElement = document.querySelectorAll(`.${this.guid} .body .body-row`)[index].querySelectorAll('.body-column')[0];
+        //     // let eventDblClick = new Event('dblclick', {bubbles: false});
+        //     // addingElement.focus();
+        //     // addingElement.dispatchEvent(eventDblClick);
+        //   });
       }
     },
 

@@ -162,6 +162,10 @@ export default {
   methods: {
     showTooltip(parent) {
       // console.log(parent);
+      if (this.$store.getters['DataTable/GET_ADDING_MODE']({
+        tableName: this.tableName,
+        guid: this.guid,
+      }).index) return;
       this.propertiesTooltip = {
         top: (!parent.top) ? -300 : parent.top + this.computedTooltipShift.top,
         left: parent.left + this.computedTooltipShift.left,
