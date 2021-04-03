@@ -1,18 +1,24 @@
 <template>
-  <div class="form-edit-field"
-       :class="{'form-edit-field_required': this.fieldOption.required}">
-    <el-field-wrapper :is-dense="true"
-                      :is-hide-label="true"
-                      :is-hide-underline="true"
-                      :is-selected="true"
-                      :is-autofocus="true"
-                      :field-type="fieldType"
-                      :field-option="fieldOption"
-                      v-model="fieldValue"
-                      @event-keydown-escape="editingCanceled"
-                      @event-keydown-enter="editingAccept"
-                      @event-keydown-tab="editingAccept"
-                      @event-blur="editingAccept"></el-field-wrapper>
+  <div class="form-edit-field">
+    <div class="element" :class="`element_${typeRow}`">
+      <el-field-wrapper class="element__item"
+                        :is-dense="true"
+                        :is-hide-label="true"
+                        :is-hide-underline="true"
+                        :is-selected="true"
+                        :is-autofocus="true"
+                        :field-type="fieldType"
+                        :field-option="fieldOption"
+                        v-model="fieldValue"
+                        @event-keydown-escape="editingCanceled"
+                        @event-keydown-enter="editingAccept"
+                        @event-keydown-tab="editingAccept"
+                        @event-blur="editingAccept"></el-field-wrapper>
+    </div>
+    <div class="element line-required">
+      <div class="line-required"
+           :class="`line-required_${this.fieldOption.required}`"></div>
+    </div>
   </div>
 </template>
 
@@ -28,6 +34,7 @@ export default {
     propertiesComponent: { type: Object, default: () => { return { tableName: '', guid: '' }}},
     propertiesField: { type: Object, default: () => { return { fieldOption: Object, fieldValue: null }}},
     element: null,
+    typeRow: { type: String, default: 'fixed' },
   },
   computed: {
     fieldType() { return this.propertiesField.fieldOption.type; },
@@ -50,17 +57,6 @@ export default {
     },
     
     editingAccept(option) {
-      console.log(option);
-      console.log(this.propertiesField);
-      // if (this.$store.getters['DataTable/GET_ADDING_MODE'](this.propertiesComponent).index != null) {  // if ADDING_MODE
-      //   if (option.event.type == 'blur') {
-      //     this.editingCanceled();
-      //   } else {
-      //     this.saveElementInStore(option);
-      //   }
-      //   return;
-      // }
-      console.log('editingAccept');
       this.saveElementFieldInStore(option.value);
 
       let bFormData = this.buildForm(option);
@@ -80,16 +76,6 @@ export default {
       
       this.removeFormEditField();
     },
-
-    // saveElementInStore(option) {
-    //   console.log('saveElementInStore');
-    //   this.saveElementFieldInStore(option.value);
-    //   let editableElement = document.querySelector('.body-column_editing');
-    //   let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: 'Tab', keyShift: option.event.shift } });
-    //   editableElement.dispatchEvent(eventEditingAccepted);
-      
-    //   this.removeFormEditField();
-    // },
 
     saveElementFieldInStore(value) {
       let sendOption = {
@@ -136,9 +122,29 @@ export default {
 
 <style lang="scss" scoped>
 .form-edit-field {
-  margin-top: -17px;
-  &_required {
-    border-bottom: thin dashed red;
+  padding-top: 2px;
+  background-color: white;
+  border-bottom: thin solid rgba(0, 0, 0, 0.12);
+  .element {
+    overflow: hidden;
+    
+    &_fixed { height: calc(41px - 6px); }
+    &_dense { height: 22px; }
+    &_auto { height: auto; }
+    &__item {
+      margin-top: -19px;
+    }
+  }
+  .line-required {
+    height: 3px;
+    &_false {
+      margin: 0px 2px;
+      background-color: rgba(21,101,192, .3);
+    }
+    &_true {
+      margin: 0px 2px;
+      background-color: rgba(255, 0, 0,.6);
+    }
   }
 }
 </style>

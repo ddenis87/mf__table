@@ -90,13 +90,13 @@ export default {
           option.event.target.focus();
           if (this.checkRequiredElementFields()) {
             // send server
-            console.log('send server');
+            // console.log('send server');
             this.editingAccepted();
-            console.log(this.fieldsElement);
+            // console.log(this.fieldsElement);
           } else {
             option.event.target.focus();
             // show error
-            console.log('error');
+            // console.log('error');
             this.isShowError = true;
             setTimeout(() => this.isShowError = false, 5000);
           }
@@ -113,13 +113,13 @@ export default {
         if (!option.event.relatedTarget.closest('.form-edit-element')) {
           if (this.checkRequiredElementFields()) {
             // send server
-            console.log('send server');
+            // console.log('send server');
             this.editingAccepted();
             console.log(this.fieldsElement);
           } else {
-            option.event.target.focus();
+            setTimeout(() => option.event.target.focus(), 300);
             // show error
-            console.log('error');
+            // console.log(option.event);
             this.isShowError = true;
             setTimeout(() => this.isShowError = false, 5000);
           }
@@ -140,8 +140,10 @@ export default {
         .then((id) => {
           let addingElement = document.querySelectorAll(`.${this.propertiesComponent.guid} .body [data-rowId="${id}"]`)[0];
           let eventClick = new Event('click', {bubbles: false});
-          addingElement.focus();
-          addingElement.dispatchEvent(eventClick);
+          setTimeout(() => {
+            addingElement.focus();
+            addingElement.dispatchEvent(eventClick);
+          }, 1000);
         })
         .catch(() => this.addingModeOff())
         .finally(() => {
@@ -234,6 +236,7 @@ export default {
 .form-edit-element {
   padding-top: 2px;
   background-color: white;
+  border-bottom: thin solid rgba(0, 0, 0, 0.12);
   &_padding-group {
     padding-left: 40px;
   }
@@ -257,7 +260,7 @@ export default {
     }
     &_true {
       margin: 0px 2px;
-      background-color: rgba(198, 40, 40,.3);
+      background-color: rgba(255, 0, 0,.6);
     }
   }
   

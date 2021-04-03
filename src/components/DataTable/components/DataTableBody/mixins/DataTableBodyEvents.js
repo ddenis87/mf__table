@@ -15,7 +15,7 @@ export const DataTableBodyEvents = {
   },
   computed: {
     getAddingMode() {
-      return (this.$store.getters['DataTable/GET_ADDING_MODE']({ tableName: this.tableName, guid: this.guid }).index) ? true : false;
+      return (this.$store.getters['DataTable/GET_MARK_MODE_ADDING']({ tableName: this.tableName, guid: this.guid })) ? true : false;
     },
     getEventAdding() {
       return this.$store.getters['DataTable/GET_MARK_EVENTS_ADDING']({ tableName: this.tableName, guid: this.guid });
@@ -50,6 +50,7 @@ export const DataTableBodyEvents = {
     
     // EVENT TOGGLE EDITING COLUMN
     eventColumnDblclick(event, element, fieldOption, fieldValue) {
+      if (this.getAddingMode) { event.preventDefault(); return; }
       // console.log(itemRow);
       if (!this.checkForEditable(event, fieldOption)) {    // checkForEditable - in mixin Editing
         if (this.isModeAdding) {
@@ -98,6 +99,7 @@ export const DataTableBodyEvents = {
           propertiesComponent,
           propertiesField,
           element: option.element,
+          typeRow: this.typeRow,
         }
       }).$mount();
       option.targetInsert.prepend(this.formEditField.$el);
@@ -215,6 +217,7 @@ export const DataTableBodyEvents = {
 
     // EVENTS MOUSE
     eventMouseOver(event) {
+      if (this.getAddingMode) { event.preventDefault(); return; }
       if (!this.isColumnEditing && this.typeRow != 'auto')
         this.isTooltipTimer = setTimeout(() => {
           if (event.target.closest('.body-column > .box-display')) {
@@ -238,6 +241,7 @@ export const DataTableBodyEvents = {
     // EVENTS KEYBOARD
     eventRowKeydown(event, itemRow) { // НАВИГАЦИЯ ПРИ ЗАБЛОКИРОВАННОЙ ТАБЛИЦЕ НА РЕДАКТИРОВАНИЕ (НАВИГАЦИЯ ПО СТРОКАМ)
       console.log('event row keydown');
+      if (this.getAddingMode) { event.preventDefault(); return; }
       if (event.code.includes('Arrow') || event.code == 'Tab') {
         event.preventDefault();
         if ((event.code == 'ArrowDown' && event.target.nextElementSibling) || (event.code =='Tab' && event.shiftKey == false)) { event.target.nextElementSibling.focus(); }
@@ -245,12 +249,14 @@ export const DataTableBodyEvents = {
       }
     },
     eventRowDblclick(event, itemRow) {
+      if (this.getAddingMode) { event.preventDefault(); return; }
       let newItemRow = Object.assign({}, itemRow);
       if ('text' in newItemRow) delete newItemRow.text;
       this.$emit('event-row-selected', event, newItemRow);
     },
     
     async eventColumnKeydown(event, itemRow, itemColumn, columnValue) {
+      if (this.getAddingMode) { event.preventDefault(); return; }
       // console.log(event);
       if (event.code.includes('Arrow') || event.code == 'Tab') {
         event.preventDefault();
@@ -304,12 +310,14 @@ export const DataTableBodyEvents = {
 
     // EVENT FOCUS/SELECT/BLUR ROW
     eventRowFocus(event, itemRow) {
+      if (this.getAddingMode) { event.preventDefault(); return; }
       this.isRowFocus = true;
       event.target.classList.remove('body-row_hover');
       event.target.classList.add('body-row_focus');
       this.$emit('event-row-focused', event, itemRow);
     },
     eventRowBlur(event) {
+      // if (this.getAddingMode) { event.preventDefault(); return; }
       this.isRowFocus = false;
       event.target.classList.remove('body-row_focus');
       // this.emitBlurBody(event);
@@ -318,6 +326,7 @@ export const DataTableBodyEvents = {
     // EVENT FOCUS/BLUR COLUMN
     eventColumnFocus(event, itemRow) {
       this.$emit('hide-tooltip'); // hide tooltip
+      if (this.getAddingMode) { event.preventDefault(); return; }
       // this.isTooltipShow = false; 
       this.isColumnFocus = true;
       event.target.parentElement.classList.remove('body-row_hover');
@@ -326,6 +335,7 @@ export const DataTableBodyEvents = {
       this.$emit('event-row-focused', event, itemRow);
     },
     eventColumnBlur(event) {  // work if not editable
+      // if (this.getAddingMode) { event.preventDefault(); return; }
       if (!this.isColumnEditing) {
         this.isColumnFocus = false;
         event.target.parentElement.classList.remove('body-row_focus');
