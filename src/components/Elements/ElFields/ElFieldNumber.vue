@@ -7,13 +7,18 @@
     <v-text-field class="el-field__item"
                   type="number"
                   v-bind="propsField"
+                  :loading="(inUse == null && inputProperties.required)"
                   v-model="fieldValue"
                   @input="eventInput"
                   @keydown.stop.enter="eventKeydown"
                   @keydown.stop.tab="eventKeydown"
                   @keydown.stop.escape="eventKeydown"
                   @keydown.stop
-                  @blur="blurField"></v-text-field>
+                  @blur="blurField">
+      <template v-slot:progress>
+        <div v-if="(inUse == null && inputProperties.required)" class="el-field__item_required"></div>
+      </template>
+    </v-text-field>
   </div>
 </template>
 

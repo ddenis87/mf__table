@@ -22,7 +22,8 @@
            class="line-required"
            :class="`line-required_${item.required}`"></div>
     </div>
-    <v-snackbar v-model="isShowError" color="red darken-1">{{ 'Не заполнены все обязательные поля' }}</v-snackbar>
+    <v-snackbar content-class="snack" v-model="isShowError"
+                color="red darken-3">{{ 'Не заполнены все обязательные поля' }}</v-snackbar>
   </div>
 </template>
 
@@ -98,7 +99,7 @@ export default {
             // show error
             // console.log('error');
             this.isShowError = true;
-            setTimeout(() => this.isShowError = false, 5000);
+            // setTimeout(() => this.isShowError = false, 5000);
           }
         }
       }
@@ -121,7 +122,7 @@ export default {
             // show error
             // console.log(option.event);
             this.isShowError = true;
-            setTimeout(() => this.isShowError = false, 5000);
+            // setTimeout(() => this.isShowError = false, 5000);
           }
         }
       }
@@ -263,6 +264,6 @@ export default {
       background-color: rgba(255, 0, 0,.6);
     }
   }
-  
+  // .snack  -- in App
 }
 </style>

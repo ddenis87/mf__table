@@ -6,6 +6,7 @@
     <div class="el-field__anchor" tabindex="-1"></div>
     <v-text-field class="el-field__item"
                   v-bind="propsField"
+                  :loading="(inUse == null && inputProperties.required)"
                   v-model="fieldValue"
                   v-mask="fieldMask"
                   @input="eventInputValue"
@@ -15,6 +16,9 @@
                   @keydown.stop.escape="eventKeydown"
                   @keydown.stop
                   @blur="blurField">
+      <template v-slot:progress>
+        <div v-if="(inUse == null && inputProperties.required)" class="el-field__item_required"></div>
+      </template>
       <template v-slot:append>
         <el-btn-icon-small  icon="mdi-calendar-range" no-tooltip @keydown="eventOpenDialog" @click="eventOpenDialog"></el-btn-icon-small>
       </template>

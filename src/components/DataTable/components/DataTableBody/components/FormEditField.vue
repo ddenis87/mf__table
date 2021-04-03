@@ -71,7 +71,7 @@ export default {
       let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: (option.event.type == 'blur') ? 'Enter' : option.event.key, keyShift: option.event.shiftKey } });
       
       let editableElement = document.querySelector('.body-column_editing');
-      console.log(editableElement);
+      // console.log(editableElement);
       if (document.querySelector('.body-column_editing')) document.querySelector('.body-column_editing').dispatchEvent(eventEditingAccepted);
       
       this.removeFormEditField();
@@ -84,7 +84,7 @@ export default {
         fieldName: this.fieldOption.value,
         value: value,
       };
-      console.log(sendOption);
+      // console.log(sendOption);
       this.$store.dispatch('DataTable/ADDING_NEW_ELEMEN_INLINE_FIELD', sendOption);
     },
 

@@ -7,6 +7,7 @@
     <v-autocomplete class="el-field__item"
                     v-bind="propsField"
                     :items="fieldItems"
+                    :loading="(inUse == null && inputProperties.required)"
                     :item-text="'display_name'"
                     :item-value="'value'"
                     v-model="fieldValue"
@@ -16,7 +17,11 @@
                     @keydown.stop.tab="eventKeydown"
                     @keydown.stop.escape="eventKeydown"
                     @keydown.stop
-                    @blur="blurField"></v-autocomplete>
+                    @blur="blurField">
+        <template v-slot:progress>
+          <div v-if="(inUse == null && inputProperties.required)" class="el-field__item_required"></div>
+        </template>
+      </v-autocomplete>
   </div>
 </template>
 
@@ -77,13 +82,4 @@ export default {
 
 <style lang="scss" scoped>
 @import './ElField.scss';
-// .el-field {
-//   &__anchor {
-//     width: 100%;
-//     height: 0px;
-//     outline: no;
-//     // border: thin solid grey;
-
-//   }
-// }
 </style>

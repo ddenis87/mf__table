@@ -8,11 +8,15 @@
                 rows="3"
                 auto-grow
                 v-bind="propsField"
+                :loading="(inUse == null && inputProperties.required)"
                 :maxLength="fieldMaxLength"
                 v-model="fieldValue"
                 @input="eventInput"
                 @keydown.stop.enter="eventKeydownEnter"
                 @blur="blurInput">
+      <template v-slot:progress>
+        <div v-if="(inUse == null && inputProperties.required)" class="el-field__item_required"></div>
+      </template>
     </v-textarea>
   </div>
 </template>

@@ -45,7 +45,7 @@ export default {
         'is-dense': this.isDense,
         'is-hide-label': this.isHideLabel,
         'is-hide-underline': this.isHideUnderline,
-        'is-required-off': true,
+        'is-required-off': this.isRequiredOff,
         'is-selected': this.isSelected,
         'autofocus': this.isAutofocus,
         'is-btn-clear': this.isBtnClear,

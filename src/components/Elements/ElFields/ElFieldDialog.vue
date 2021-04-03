@@ -7,6 +7,7 @@
     <v-autocomplete class="el-field__item"
                     append-icon="mdi-dots-horizontal"
                     v-bind="propsField"
+                    :loading="(inUse == null && inputProperties.required)"
                     :items="fieldList"
                     :item-text="fieldListText"
                     :item-value="'id'"
@@ -21,6 +22,9 @@
                     @keydown.stop.escape="eventKeydown"
                     @keydown.stop
                     @blur="blurField">
+      <template v-slot:progress>
+        <div v-if="(inUse == null && inputProperties.required)" class="el-field__item_required"></div>
+      </template>
     </v-autocomplete>
     <dialog-full-page :is-dialog-name="dialogTableName" 
                       :is-dialog-show="isDialogShow" 
