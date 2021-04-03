@@ -17,6 +17,25 @@ export const DataTableBodyEvents = {
     getAddingMode() {
       return (this.$store.getters['DataTable/GET_ADDING_MODE']({ tableName: this.tableName, guid: this.guid }).index) ? true : false;
     },
+    getEventAdding() {
+      return this.$store.getters['DataTable/GET_MARK_EVENTS_ADDING']({ tableName: this.tableName, guid: this.guid });
+    }
+  },
+  watch: {
+    getEventAdding() {
+      if (this.getEventAdding) {
+        let activeElement = this.$store.getters[`DataTable/GET_ACTIVE_ELEMENT`]({
+          tableName: this.tableName,
+          guid: this.guid,
+        });
+        let targetInsert;
+        if (activeElement) targetInsert = document.querySelector(`.${this.guid} .body [data-rowid="${activeElement.id}"]`);
+        // else targetInsert = document.querySelectorAll(`.${this.guid} .body .body-row`)[0];
+        this.mountFormEditElement({targetInsert: targetInsert})
+        // console.log(targetInsert);
+        // console.log('ADDING');
+      }
+    },
   },
   methods: {
     // EVENT EXPANSION ROW
@@ -102,6 +121,7 @@ export const DataTableBodyEvents = {
           itemsHeader: this.itemsHeader,
           styleForm: this.template,
           typeRow: this.typeRow,
+          isHierarchyMode: this.isHierarchyMode,
           // propertiesField,
           // element: option.element,
         }
@@ -253,7 +273,7 @@ export const DataTableBodyEvents = {
         this.eventColumnDblclick(event, itemRow, itemColumn, columnValue); // ПЕРЕКЛЮЧАЕМСЯ В РЕЖИМ РЕДАКТИРОВАНИЯ
       }
       if (event.code == 'Insert') {
-        console.log(event.target.closest('.body-row'));
+        // console.log(event.target.closest('.body-row'));
         let addingElement = event.target.closest('.body-row');
         this.mountFormEditElement({targetInsert: addingElement});
         // if (!this.isAddingInline) return;

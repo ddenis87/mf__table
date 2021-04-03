@@ -1,5 +1,5 @@
 <template>
-  <div class="form-edit-element" ref="FormEditElement">
+  <div class="form-edit-element" :class="{'form-edit-element_padding-group' : isHierarchyMode}" ref="FormEditElement">
     <div class="element" :class="`element_${typeRow}`" :style="styleForm">
       <el-field-wrapper v-for="(item, index) in itemsHeader"
                         :key="index"
@@ -22,6 +22,7 @@
            class="line-required"
            :class="`line-required_${item.required}`"></div>
     </div>
+    <v-snackbar v-model="isShowError" color="red darken-1">{{ 'Не заполнены все обязательные поля' }}</v-snackbar>
   </div>
 </template>
 
@@ -37,20 +38,37 @@ export default {
     itemsHeader: null,
     styleForm: Object,
     typeRow: { type: String, default: 'fixed' },
+    isHierarchyMode: {type: Boolean, default: false},
   },
   data() {
     return {
       fieldsElement: {},
+      isShowError: false,
     }
   },
+  computed: {
+    getListGroup() {
+      return this.$store.getters['DataTable/GET_DATA_GROUP']({
+        tableName: this.propertiesComponent.tableName,
+        guid: this.propertiesComponent.guid,
+      });
+    },
+  },
   mounted() {
-    console.log(this.propertiesComponent);
-    console.log(this.itemsHeader);
+    // console.log(this.propertiesComponent);
+    // console.log(this.itemsHeader);
     console.log(this.styleForm);
     setTimeout(() => {
       this.$refs.FormEditElement.querySelectorAll('.el-field > .el-field__item')[0].querySelector('input').focus();
-    }, 300);
-    
+    }, 400);
+    this.$store.commit('DataTable/MARK_MODE_ADDING', {
+      tableName: this.propertiesComponent.tableName,
+      guid: this.propertiesComponent.guid,
+      status: true,
+    });
+  },
+  beforeDestroy() {
+    console.log('destroy');
   },
   methods: {
     eventKeydown(option) {
@@ -79,6 +97,8 @@ export default {
             option.event.target.focus();
             // show error
             console.log('error');
+            this.isShowError = true;
+            setTimeout(() => this.isShowError = false, 5000);
           }
         }
       }
@@ -100,11 +120,11 @@ export default {
             option.event.target.focus();
             // show error
             console.log('error');
+            this.isShowError = true;
+            setTimeout(() => this.isShowError = false, 5000);
           }
         }
       }
-      
-      // console.log(option);
     },
     async editingAccepted() {
       
@@ -122,19 +142,41 @@ export default {
           let eventClick = new Event('click', {bubbles: false});
           addingElement.focus();
           addingElement.dispatchEvent(eventClick);
-        });
+        })
+        .catch(() => this.addingModeOff())
+        .finally(() => {
+          this.addingModeOff();
+        })
     },
 
     editingCanceled() {
+      this.addingModeOff();
       document.querySelector('.form-edit-element').remove();
     },
     
+    addingModeOff() {
+      this.$store.commit('DataTable/MARK_MODE_ADDING', {
+        tableName: this.propertiesComponent.tableName,
+        guid: this.propertiesComponent.guid,
+        status: null,
+      });
+      this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', {
+        tableName: this.propertiesComponent.tableName,
+        guid: this.propertiesComponent.guid,
+        value: null,
+      });
+    },
+
     buildForm() {
       let newFormData = new FormData();
       for (let keyValue of Object.entries(this.fieldsElement)) {
         let element = {key: keyValue[0], value: keyValue[1]};
         if (element.value != '') 
           newFormData.set(element.key, this.computedValueField(element.value));
+      }
+      if (this.getListGroup.length) {
+        let valueGroup = this.computedValueField(this.getListGroup[this.getListGroup.length - 1]);
+        newFormData.set('parent', valueGroup);
       }
       return newFormData;
     },
@@ -153,7 +195,6 @@ export default {
     },
 
     checkRequiredElementFields() {
-      // console.log(this.itemsHeader);
       for (let key of Object.keys(this.itemsHeader)) {
         let field = this.itemsHeader[key];
         if (field.required) {
@@ -182,9 +223,6 @@ export default {
           if (nextElement.querySelector('textarea'))
             return nextElement.querySelector('textarea').focus();
         }
-        // if (nextElement.className.indexOf('form-action__control')) {
-        //   nextElement.lastElementChild.querySelector('button').focus();
-        // }
       }
       this.nextElement(currentElement.parentElement);
     },
@@ -196,9 +234,11 @@ export default {
 .form-edit-element {
   padding-top: 2px;
   background-color: white;
+  &_padding-group {
+    padding-left: 40px;
+  }
   .element {
     display: grid;
-    // border: thin solid grey;
     overflow: hidden;
     
     &_fixed { grid-template-rows: calc(43px - 6px); }
@@ -207,9 +247,6 @@ export default {
     &__item {
       margin-top: -19px;
       padding: 2px;
-      // border-right: thin solid grey;
-      // &:last-child { border-right: 0px; }
-      // background-color: rgba(0,0,255,.2);
     }
   }
   .line-required {

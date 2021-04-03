@@ -4,10 +4,11 @@
       <v-container fluid>
         <v-row dense>
           <v-col class="form__col" cols="3">
-            <el-field-wrapper field-type="date" :is-dense="true"
+            <form-edit-element></form-edit-element>
+            <!-- <el-field-wrapper field-type="date" :is-dense="true"
                       :is-hide-label="true"
                       :is-hide-underline="true"
-                      :is-autofocus="true"></el-field-wrapper>
+                      :is-autofocus="true"></el-field-wrapper> -->
           </v-col>
         </v-row>
         <!-- <v-row dense>
@@ -74,6 +75,8 @@
 </template>
 
 <script>
+import FormEditElement from '@/components/DataTable/components/DataTableBody/components/FormEditElement.vue';
+
 import ElFieldWrapper from '@/components/Elements/ElFields/ElFieldWrapper.vue';
 
 import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber';
@@ -86,6 +89,8 @@ import ElFieldDialog from '@/components/Elements/ElFields/ElFieldDialog';
 export default {
   name: 'Test',
   components: {
+    FormEditElement,
+
     ElFieldNumber,
     ElFieldChoice,
     ElFieldHistory,
@@ -93,7 +98,7 @@ export default {
     ElFieldString,
     ElFieldDate,
     ElFieldDialog,
-    ElFieldWrapper,
+    ElFieldWrapper
   },
   data() {
     return {

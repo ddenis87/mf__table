@@ -76,7 +76,7 @@ export default {
       
       let editableElement = document.querySelector('.body-column_editing');
       console.log(editableElement);
-      editableElement.dispatchEvent(eventEditingAccepted);
+      if (document.querySelector('.body-column_editing')) document.querySelector('.body-column_editing').dispatchEvent(eventEditingAccepted);
       
       this.removeFormEditField();
     },

@@ -141,9 +141,9 @@ export default {
         setTimeout(() => { this.emitKeydown(event); }, 100);
         let newEvent = new Event('click');
         event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
-        setTimeout(() => {
+        if (this.inUse == 'table') setTimeout(() => {
           event.target.focus();
-        }, 100)
+        }, 50)
         return;
       }
       if (this.checkRequiredField(event)) return;

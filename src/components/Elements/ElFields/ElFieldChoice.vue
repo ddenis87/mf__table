@@ -42,12 +42,12 @@ export default {
     
     eventKeydown(event) {
       if (this.inUse == 'table') { event.preventDefault(); }
-      console.log(this.fieldValue);
+      // console.log(this.fieldValue);
       if (this.fieldValue) {
         this.isEmit = false;
         setTimeout(() => { this.emitKeydown(event);  }, 100);
         let newEvent = new Event('click');
-        console.log('element');
+        // console.log('element');
         event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
         return;
       }
