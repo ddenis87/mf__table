@@ -9,8 +9,12 @@
                   v-model="fieldValue"
                   v-mask="fieldMask"
                   @input="eventInputValue"
-                  @keydown.stop.enter="eventKeydownEnter"
-                  @click:clear="eventClearValue">
+                  @click:clear="eventClearValue"
+                  @keydown.stop.enter="eventKeydown"
+                  @keydown.stop.tab="eventKeydown"
+                  @keydown.stop.escape="eventKeydown"
+                  @keydown.stop
+                  @blur="blurField">
       <template v-slot:append>
         <el-btn-icon-small  icon="mdi-calendar-range" no-tooltip @keydown="eventOpenDialog" @click="eventOpenDialog"></el-btn-icon-small>
       </template>
@@ -92,7 +96,7 @@ export default {
     },
     eventClickOutsideMenu() { this.emitBlurField(); },
 
-    eventSelectDate(event) {
+    eventSelectDate() {
       let newTime = '';
       if (this.fieldValueTime != null) {
         newTime = (this.fieldValueTime.length != 5) ? '00:00' : this.fieldValueTime;
@@ -150,19 +154,14 @@ export default {
       }
       this.emitInputValue(newDateTime);
     },
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
       if (this.inputProperties.required && !this.isRequiredOff)
         if (this.fieldValue.length != 16) return;
       if (!this.fieldValue || this.fieldValue.length == 0) {
-        // let sendOption = {
-        //   key: event.key,
-        //   value: null,
-        //   event: event,
-        // }
         this.emitInputValue(null);
         this.emitKeydown(event);
-        // this.emitKeyEnter(sendOption);
-        // this.$emit('next-element', {event: event});
+        this.isEmit = false;
         return;
       }
       let newDateTime = this.fieldValue.split(' ')[0].split('.').reverse().join('-') + 'T' + this.fieldValue.split(' ')[1];
@@ -178,57 +177,11 @@ export default {
         this.fieldValue = '';
         return;
       }
-      // let sendOption = {
-      //   key: event.key,
-      //   value: newDateTime,
-      //   event: event,
-      // }
-      this.isEmit = true;
       this.isDialogShow = false;
       this.emitInputValue(newDateTime);
       this.emitKeydown(event);
-      // this.emitKeyEnter(sendOption);
-      // this.$emit('next-element', {event: event});
+      this.isEmit = false;
     },
-    
-    // eventKeyTab(event) {
-    //   if (this.inputProperties.required && !this.isRequiredOff)
-    //     if (this.fieldValue.length != 16) return;
-    //   if (!this.fieldValue || this.fieldValue.length == 0) {
-    //     let sendOption = {
-    //       key: event.key,
-    //       shift: event.shiftKey,
-    //       value: null,
-    //       event: event,
-    //     }
-    //     this.emitInputValue(null);
-    //     this.emitKeyEnter(sendOption);
-    //     return;
-    //   }
-    //   let newDateTime = this.fieldValue.split(' ')[0].split('.').reverse().join('-') + 'T' + this.fieldValue.split(' ')[1];
-    //   if (new Date(newDateTime) == 'Invalid Date') {
-    //     this.fieldValue = '';
-    //     return;
-    //   }
-    //   let newDate = new Date(newDateTime);
-    //   newDate = `${newDate.getFullYear()}-` + 
-    //             `${(+newDate.getMonth() < 9) ? '0' + (+newDate.getMonth() + 1) : +newDate.getMonth() + 1}-` + 
-    //             `${(+newDate.getDate() < 10) ? '0' + newDate.getDate() : newDate.getDate()}`;
-    //   if (newDate.split('-').reverse().join('.') != this.fieldValue.split(' ')[0]) {
-    //     this.fieldValue = '';
-    //     return;
-    //   }
-    //   let sendOption = {
-    //     key: event.key,
-    //     shift: event.shiftKey,
-    //     value: newDateTime,
-    //     event: event,
-    //   }
-    //   this.isEmit = true;
-    //   this.isDialogShow = false;
-    //   this.emitInputValue(newDateTime);
-    //   this.emitKeyTab(sendOption);
-    // },
 
     eventClearValue() {
       this.fieldValue = null;
@@ -239,25 +192,26 @@ export default {
         this.fieldValueDate = null;
         this.fieldValueTime = null;
         this.emitInputValue(null);
-        // this.emitClearValue();
       },10);
     },
 
     eventBlurField(event) {
-      // if (event.relatedTarget)
-      //   if (event.relatedTarget.closest(`.el-field-date-time__date-time`)) { 
-      //     event.relatedTarget.closest(`.el-field-date-time__date-time`).focus();
-      //     this.fieldElementDOM = event.target;
-      //     return;
-      //   }
-      // if (!this.isEmit) {
-      //   this.isDialogShow = false;
-      //   this.emitKeyEsc();
-      // }
+      if (event.relatedTarget)
+        if (event.relatedTarget.closest(`.el-field-date__date-time`)) {
+          event.preventDefault();
+          event.relatedTarget.closest(`.el-field-date__date-time`).focus();
+          this.fieldElementDOM = event.target;
+          return;
+        } else {
+          this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''})
+        }
+      if (this.isEmit) {
+        this.isDialogShow = false;
+        this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''})
+      }
     },
 
     emitKeydown(event) { this.$emit('event-keydown', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''}); },
-    // emitInputValue(value) { this.$emit('input-value', value); },
   },
 }
 </script>

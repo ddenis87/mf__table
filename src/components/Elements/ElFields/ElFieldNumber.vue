@@ -12,6 +12,7 @@
                   @keydown.stop.enter="eventKeydown"
                   @keydown.stop.tab="eventKeydown"
                   @keydown.stop.escape="eventKeydown"
+                  @keydown.stop
                   @blur="blurField"></v-text-field>
   </div>
 </template>
@@ -31,6 +32,7 @@ export default {
       this.emitInputValue();
     },
     eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
       if (this.checkRequiredField(event)) return;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);

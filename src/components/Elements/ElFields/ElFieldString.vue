@@ -33,6 +33,7 @@ export default {
       this.emitInputValue();
     },
     eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
       if (this.checkRequiredField(event)) return;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);

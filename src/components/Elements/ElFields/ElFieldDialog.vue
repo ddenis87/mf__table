@@ -5,25 +5,21 @@
                 'el-field_hide-underline': isHideUnderline}">
     <div class="el-field__anchor" tabindex="-1"></div>
     <v-autocomplete class="el-field__item"
-                    
-                    
                     append-icon="mdi-dots-horizontal"
-
                     v-bind="propsField"
                     :items="fieldList"
                     :item-text="fieldListText"
                     :item-value="'id'"
-                    
                     v-model="fieldValue"
                     @click.stop
                     @click:append="eventOpenDialog"
                     @click:clear="eventClearValue"
                     @input="eventInputValue"
                     @change="eventChangeValue"
-                    @keydown.stop
                     @keydown.stop.enter="eventKeydown"
                     @keydown.stop.tab="eventKeydown"
                     @keydown.stop.escape="eventKeydown"
+                    @keydown.stop
                     @blur="blurField">
     </v-autocomplete>
     <dialog-full-page :is-dialog-name="dialogTableName" 
@@ -139,6 +135,7 @@ export default {
     eventInputValue() { this.emitInputValue(); },
 
     eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
       if (this.fieldValue) {
         this.isEmit = false;
         setTimeout(() => { this.emitKeydown(event); }, 100);

@@ -12,10 +12,10 @@
                     v-model="fieldValue"
                     @click.stop
                     @change="changeValue"
-                    @keydown.stop
                     @keydown.stop.enter="eventKeydown"
                     @keydown.stop.tab="eventKeydown"
                     @keydown.stop.escape="eventKeydown"
+                    @keydown.stop
                     @blur="blurField"></v-autocomplete>
   </div>
 </template>
@@ -41,6 +41,8 @@ export default {
     },
     
     eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
+      console.log(this.fieldValue);
       if (this.fieldValue) {
         this.isEmit = false;
         setTimeout(() => { this.emitKeydown(event);  }, 100);

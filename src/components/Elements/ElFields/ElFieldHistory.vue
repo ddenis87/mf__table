@@ -62,7 +62,7 @@ export default {
     isBtnClear: { type: Boolean, default: false },
     // idElement: { type: Number, default: null },
     relatedModelName: { type: String, default: null },
-
+    isRequiredOff: { type: Boolean, default: true },
     // isEditable: { type: Boolean, default: false },
     dimension: { type: String, default: '' },
     dimensionValue: null, // { type: String, default: '' },
