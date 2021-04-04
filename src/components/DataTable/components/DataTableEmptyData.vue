@@ -3,7 +3,7 @@
                 :is-dialog-show="isShow"
                 @close-dialog="closeDialogModal('cancel')">
     <v-card>
-      <v-card-text>По заданным условиям записи отсутствуют, отключить или сбросить фильтры?</v-card-text>
+      <v-card-text>По заданным условиям записи отсутствуют, отключить фильтры?</v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <el-btn @click="closeDialogModal('cancel')">Отменить</el-btn>

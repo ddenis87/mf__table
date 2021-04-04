@@ -145,6 +145,10 @@ export const DataTableControlActions = {
            snackBar.status = false;
          })
          .finally(() => {
+           this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', {
+             tableName: this.tableName,
+             guid: this.guid,
+           });
            this.$emit('event-mark-deleted', snackBar);
          })
     },
@@ -167,6 +171,10 @@ export const DataTableControlActions = {
            snackBar.status = false;
          })
          .finally(() => {
+           this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', {
+             tableName: this.tableName,
+             guid: this.guid,
+           });
            this.$emit('event-mark-deleted', snackBar);
          })
     },

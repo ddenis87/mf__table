@@ -5,7 +5,7 @@
                  @click="addingElement">Добавить элемент</el-btn-icon>
     <el-btn-icon v-if="propsTable.isAddingInline"
                  icon="mdi-table-row-plus-after" 
-                 :disabled="!activeElement"
+                 
                  @click="addingElementInline">Добавить строку</el-btn-icon>
     <el-btn-icon v-if="propsTable.isHierarchy && propsTable.isAdding"
                  icon="mdi-folder-plus-outline"

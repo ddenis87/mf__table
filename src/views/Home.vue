@@ -49,14 +49,6 @@ export default {
     border-radius: 5px;
   }
 }
-@media screen and (max-width: 450px) {
-  .home {
-    padding-top: 36px;
-    &-title {
-      font-size: 1em;
-    }
-  }
-}
 @media screen and (max-width: 850px) {
   .home {
     padding-top: 36px;
@@ -65,4 +57,13 @@ export default {
     }
   }
 }
+@media screen and (max-width: 400px) {
+  .home {
+    padding-top: 36px;
+    &-title {
+      font-size: 1em;
+    }
+  }
+}
+
 </style>

@@ -29,11 +29,13 @@ export const DataTableBodyEvents = {
           guid: this.guid,
         });
         let targetInsert;
-        if (activeElement) targetInsert = document.querySelector(`.${this.guid} .body [data-rowid="${activeElement.id}"]`);
-        // else targetInsert = document.querySelectorAll(`.${this.guid} .body .body-row`)[0];
-        this.mountFormEditElement({targetInsert: targetInsert})
+        if (activeElement) {
+          targetInsert = document.querySelector(`.${this.guid} .body [data-rowid="${activeElement.id}"]`);
+        } else {
+          targetInsert = null;
+        }
         // console.log(targetInsert);
-        // console.log('ADDING');
+        this.mountFormEditElement({targetInsert: targetInsert})
       }
     },
   },
@@ -110,10 +112,6 @@ export const DataTableBodyEvents = {
         tableName: this.tableName,
         guid: this.guid,
       };
-      // let propertiesField = {
-      //   fieldOption: option.fieldOption,
-      //   fieldValue: option.fieldValue,
-      // };
       let subClassVue = Vue.extend(FormEditElement);
       this.formEditElement = new subClassVue({
         vuetify,
@@ -124,26 +122,16 @@ export const DataTableBodyEvents = {
           styleForm: this.template,
           typeRow: this.typeRow,
           isHierarchyMode: this.isHierarchyMode,
-          // propertiesField,
-          // element: option.element,
         }
       }).$mount();
-      option.targetInsert.after(this.formEditElement.$el);
+      if (option.targetInsert) {
+        option.targetInsert.after(this.formEditElement.$el);
+      } else {
+        document.querySelector(`.${this.guid} .body`).prepend(this.formEditElement.$el);
+
+      }
     },
 
-    // mountEditingComponent(target, itemRow, columnProperties, columnValue) {
-    //   let editingComponentProperties = {
-    //     tableName: this.tableName,
-    //     guid: this.guid,
-    //     itemRow,
-    //     columnProperties,
-    //     columnValue,
-    //   };
-    //   // console.log(editingComponentProperties);
-    //   let editingComponentVue = Vue.extend(ContentEditing);
-    //   let editingComponent = new editingComponentVue({ vuetify, store, propsData: { properties: editingComponentProperties }}).$mount();
-    //   target.prepend(editingComponent.$el);
-    // },
     checkForEditable(event, columnProperties) {
       if (!this.isEditable) { return false; } // if table properties editable set in false // ??? emit rowProperties
       if (columnProperties['read_only']) { return false; } // field not can edit (at API)
