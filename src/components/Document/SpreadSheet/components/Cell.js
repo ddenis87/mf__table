@@ -1,15 +1,4 @@
-<template>
-  <td class="cell"
-      :style="style"
-      :colspan="cellProperties.colspan"
-      :rowspan="cellProperties.rowspan">
-    {{ cellProperties.value }}
-  </td>
-</template>
-
-<script>
-export default {
-  name: 'Cell',
+export const Cell = {
   props: {
     cellProperties: {
       type: Object,
@@ -39,31 +28,4 @@ export default {
     borderLeft: { type: String, default: '' },
     backgroundColor: { type: String, default: '' },
   },
-  computed: {
-    style() {
-      return {
-        'font-family': this.fontFamily,
-        'font-size': this.fontSize,
-        'font-weight': this.fontWeight,
-        'font-style': this.fontStyle,
-        'text-decoration': this.textDecoration,
-        'text-transform': this.textTransform,
-        color: this.color,
-
-        'text-align': this.textAlign,
-        'vertical-align': this.verticalAlign,
-
-        'border-top': this.borderTop,
-        'border-right': this.borderRight,
-        'border-bottom': this.borderBottom,
-        'border-left': this.borderLeft,
-        'background-color': this.backgroundColor,
-      };
-    },
-  },
-};
-</script>
-
-<style lang="scss" scoped>
-
-</style>
+}

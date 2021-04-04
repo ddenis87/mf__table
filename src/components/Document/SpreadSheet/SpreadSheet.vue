@@ -6,12 +6,13 @@
           <th class="head-column head-column__title"></th>
           <th v-for="j in 25"
               :key="`head-column-${j}`"
-              class="head-column">{{ getTitleForNumberColumn(j) }}</th>
+              class="head-column"
+              :style="columnStyle(getTitleForNumberColumn(j))">{{ getTitleForNumberColumn(j) }}</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr v-for="i in 25"
+        <tr v-for="i in 50"
             :key="`body-row-${i}`"
             class="body-row">
           <td class="body-column body-column__title">{{ i }}</td>
@@ -19,12 +20,11 @@
                 :key="`body-column-${j}`"
                 class="body-column"
                 :cell-properties="cellProperties(`${getTitleForNumberColumn(j)}${i}`)"
-                :cell-style="cellStyle(`${getTitleForNumberColumn(j)}${i}`)"></cell>
+                v-bind="cellStyle(`${getTitleForNumberColumn(j)}${i}`)"></cell>
         </tr>
       </tbody>
     </table>
   </div>
-
 </template>
 
 <script>
@@ -36,6 +36,31 @@ export default {
     Cell,
   },
   props: {
+    columns: {
+      type: Array,
+      default() {
+        return {
+          name: String,
+          style: { type: [String, Array], default: '' },
+        };
+      },
+    },
+    columnsStyles: {
+      type: Array,
+      default() {
+        return {
+          name: String,
+          value: {
+            type: Object,
+            default() {
+              return {
+                minWidth: String,
+              };
+            },
+          },
+        };
+      },
+    },
     cells: {
       type: Array,
       default() {
@@ -57,30 +82,6 @@ export default {
         };
       },
     },
-    // Boolean, можно ли выбирать
-    // styles: [
-    //   {
-    //     collspan: { type: Number, default: 0 }, //  ???
-    //     rowspan: { type: Number, default: 0 }, //  ???
-
-    //     fontFamily: { type: String, default: '' },
-    //     fontSize: { type: String, default: '' },
-    //     fontWeight: { type: String, default: '' }, //  normal, lighter, bold, bolder
-    //     fontStyle: { type: String, default: '' }, //  normal, italic, oblique
-    //     textDecoration: { type: String, default: '' }, // underline, overline, line-through
-    //     textTransform: { type: String, default: '' }, // uppercase, lowercase, capitalize
-    //     color: { type: String, default: '' },
-    //     textAlign: { type: String, default: '' },
-    //     verticalAlign: { type: String, default: '' },
-
-    //     borderTop: { type: String, default: '' },
-    //     borderBottom: { type: String, default: '' },
-    //     borderLeft: { type: String, default: '' },
-    //     borderRight: { type: String, default: '' },
-
-    //     backgroundColor: { type: String, default: '' },
-    //   },
-    // ],
   },
   data() {
     return {
@@ -90,26 +91,70 @@ export default {
   },
 
   methods: {
+    columnStyle(columnName) {
+      const columnStyle = {};
+      const columnStyleList = this.columns.find((item) => item.name === columnName.toLowerCase())?.style;
+      if (!columnStyleList) return columnStyle;
+      if (typeof (columnStyleList) === 'string') {
+        return this.columnsStyles.find((item) => item.name === columnStyleList).value;
+      }
+      columnStyleList.forEach((element) => {
+        const style = this.columnsStyles.find((item) => item.name === element);
+        if (style) {
+          Object.assign(columnStyle, style.value);
+        }
+      });
+      console.log(columnStyle);
+      return columnStyle;
+    },
     cellProperties(cellName) {
       const cellsProperties = this.cells.find((item) => item.name === cellName.toLowerCase());
-      return cellsProperties || {};
+      if (!cellsProperties) return {};
+
+      if (Object.keys(cellsProperties).includes('spanColRow')) {
+        if (typeof (cellsProperties.spanColRow) === 'number') {
+          cellsProperties.colspan = cellsProperties.spanColRow;
+          cellsProperties.rowspan = cellsProperties.spanColRow;
+        } else {
+          cellsProperties.colspan = cellsProperties.spanColRow[0] || 1;
+          cellsProperties.rowspan = cellsProperties.spanColRow[1] || 1;
+        }
+      }
+      return cellsProperties;
     },
     cellStyle(cellName) {
-      const cellStyle = [];
+      const cellStyle = {};
       const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
       if (!cellStyleList) return cellStyle;
       if (typeof (cellStyleList) === 'string') {
-        return [this.cellsStyles.find((item) => item.name === cellStyleList).value];
+        return this.cellsStyles.find((item) => item.name === cellStyleList).value;
       }
       cellStyleList.forEach((element) => {
-        if (this.cellsStyles.find((item) => item.name === element)) {
-          cellStyle.push(this.cellsStyles.find((item) => item.name === element).value);
+        const style = this.cellsStyles.find((item) => item.name === element);
+        if (style) {
+          Object.assign(cellStyle, style.value);
         }
       });
       console.log(cellStyle);
       return cellStyle;
     },
-
+    // cellStyle(cellName) {
+    //   const cellStyle = [];
+    //   const cellStyleList = this.cells.find((item) => {
+    //     item.name === cellName.toLowerCase()
+    //   })?.style;
+    //   if (!cellStyleList) return cellStyle;
+    //   if (typeof (cellStyleList) === 'string') {
+    //     return [this.cellsStyles.find((item) => item.name === cellStyleList).value];
+    //   }
+    //   cellStyleList.forEach((element) => {
+    //     if (this.cellsStyles.find((item) => item.name === element)) {
+    //       cellStyle.push(this.cellsStyles.find((item) => item.name === element).value);
+    //     }
+    //   });
+    //   console.log(cellStyle);
+    //   return cellStyle;
+    // },
     selectedCell(event) {
       if (this.currentSelectedCell === event.target) return;
       if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('body-column__selected');
@@ -174,7 +219,6 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
       position: sticky;
       top: 0px;
       .head-row {
-
         height: 24px;
         font-size: 0.75em;
         background-color: rgba(0, 0, 0, 0.1);
