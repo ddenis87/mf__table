@@ -20,7 +20,7 @@
         </v-row>
         <v-row dense>
           <v-col cols="3">
-              <el-field-number :inputProperties="fieldForm.institution_code" 
+              <el-field-number :inputProperties="fieldForm.institution_code"
                                v-model="fieldFormValue.institution_code"
                                @event-keydown="eventKeydown"></el-field-number>
           </v-col>
@@ -65,6 +65,7 @@
 
 <script>
 import { TheTableForm } from './TheTableForm.js';
+
 export default {
   name: 'TheFormOrganizationGroup',
   mixins: [
@@ -82,7 +83,7 @@ export default {
         bk: null,
         parent: null,
       },
-    }
+    };
   },
   methods: {
     fieldFormValueClear() {
@@ -97,5 +98,5 @@ export default {
       };
     },
   },
-}
+};
 </script>

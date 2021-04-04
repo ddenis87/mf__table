@@ -5,7 +5,7 @@
              color="blue darken-3">
     <v-toolbar-items>
       <v-list class="app-bar-nav"
-              nav 
+              nav
               dark color="blue darken-3"
               height="40">
         <v-list-item-group>
@@ -33,14 +33,14 @@
         </v-list-item-group>
       </v-list>
     </v-toolbar-items>
-    
+
   </v-toolbar>
 </template>
 
 <script>
 export default {
   name: 'AppBarNav',
-}
+};
 </script>
 
 <style lang="scss" scoped>

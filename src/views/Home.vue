@@ -18,9 +18,9 @@ export default {
   methods: {
     getStarted() {
       this.$router.push('/TablesPage?tableName=organization');
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

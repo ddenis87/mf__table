@@ -7,8 +7,8 @@
         <v-card-actions class="form-logout__action">
           <v-spacer></v-spacer>
           <v-btn dark
-                 color="blue darken-3" 
-                 height="30" 
+                 color="blue darken-3"
+                 height="30"
                  @click="goLogin">Войти
           </v-btn>
         </v-card-actions>
@@ -19,6 +19,7 @@
 
 <script>
 import DialogToolbar from '@/components/Dialogs/DialogToolbar.vue';
+
 export default {
   name: 'Logout',
   components: {
@@ -29,7 +30,7 @@ export default {
       this.$router.push('/');
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

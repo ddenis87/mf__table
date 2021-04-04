@@ -15,16 +15,17 @@
 <script>
 import AppBar from '@/components/App/AppBar.vue';
 import AppBarNav from '@/components/App/AppBarNav.vue';
+
 export default {
   name: 'LayoutMain',
   components: {
     AppBar,
-    AppBarNav
+    AppBarNav,
   },
   created() {
     if (localStorage.getItem('Token') == null) this.$router.push('/Login');
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -57,5 +58,5 @@ export default {
     // border: thin solid red;
   }
 }
-  
+
 </style>

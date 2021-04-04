@@ -8,3 +8,9 @@
 /src/components/DataTable
 /src/components/DataHistory
 /src/components/DataFilter
+/src/components/DataTableControls
+/src/components/ZDELDataTableControl
+/src/componentsInteraction
+/src/components/TheForms
+/src/components/TheTable
+/src/views

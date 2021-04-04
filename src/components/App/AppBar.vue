@@ -14,17 +14,18 @@
 
 <script>
 import ProfileUser from '@/components/Profile/ProfileUser.vue';
+
 export default {
   name: 'AppBar',
   components: {
-    ProfileUser
+    ProfileUser,
   },
   methods: {
     routeHome() {
       this.$router.push('/');
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

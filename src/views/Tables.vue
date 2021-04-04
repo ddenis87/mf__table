@@ -18,7 +18,7 @@
       </v-col>
     </v-row>
   </v-container>
-  
+
 </template>
 
 <script>
@@ -28,18 +28,16 @@ export default {
     return {
       selectedTable: null,
       listTable: [
-        {value: 'Организации', path: 'TableOrganization', tableName: 'organization'},
-        {value: 'Главные распорядители', path: 'TableBudgetclassification', tableName: 'budgetclassification'},
+        { value: 'Организации', path: 'TableOrganization', tableName: 'organization' },
+        { value: 'Главные распорядители', path: 'TableBudgetclassification', tableName: 'budgetclassification' },
         // {value: 'Actual descs', path: 'TableActualdesc', tableName: 'actualdesc'},
       ],
-    }
+    };
   },
   watch: {
     selectedTable() {
-      if (this.selectedTable)
-        this.$router.push({path: '/TablesPage', query: { tableName: this.selectedTable.tableName }});
-      
+      if (this.selectedTable) { this.$router.push({ path: '/TablesPage', query: { tableName: this.selectedTable.tableName } }); }
     },
   },
-}
+};
 </script>

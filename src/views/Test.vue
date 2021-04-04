@@ -1,6 +1,6 @@
 <template>
   <div class="test">
-    <spread-sheet></spread-sheet>
+    <spread-sheet :cells="cells" :cells-styles="cellsStyles"></spread-sheet>
   </div>
 </template>
 
@@ -14,11 +14,39 @@ export default {
   },
   data() {
     return {
-    }
+      cells: [
+        {
+          name: 'g4',
+          value: 'Cell testing',
+          style: ['c0', 'c1'],
+        },
+        {
+          name: 'b6',
+          value: 'Cell testing',
+          style: 'c1',
+        },
+      ],
+      cellsStyles: [
+        {
+          name: 'c0',
+          value: {
+            'background-color': 'orange',
+            color: 'white',
+            'qwe-er': 2
+          }
+        },
+        {
+          name: 'c1',
+          value: {
+            color: 'green',
+          }
+        },
+      ],
+    };
   },
   methods: {
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>

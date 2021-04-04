@@ -4,90 +4,116 @@
       <thead>
         <tr class="head-row">
           <th class="head-column head-column__title"></th>
-          <th v-for="j in 50"
+          <th v-for="j in 25"
               :key="`head-column-${j}`"
               class="head-column">{{ getTitleForNumberColumn(j) }}</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr v-for="i in 50"
+        <tr v-for="i in 25"
             :key="`body-row-${i}`"
             class="body-row">
           <td class="body-column body-column__title">{{ i }}</td>
-          <cell v-for="j in 50"
+          <cell v-for="j in 25"
                 :key="`body-column-${j}`"
                 class="body-column"
-                :cellProperties="cellProperties(`cell_${i}_${j}`)"
-                :data-cell-name="`cell_${i}_${j}`"></cell>
+                :cell-properties="cellProperties(`${getTitleForNumberColumn(j)}${i}`)"
+                :cell-style="cellStyle(`${getTitleForNumberColumn(j)}${i}`)"></cell>
         </tr>
       </tbody>
     </table>
   </div>
-  
+
 </template>
 
 <script>
 import Cell from './components/Cell.vue';
+
 export default {
   name: 'SpreadSheet',
   components: {
     Cell,
   },
   props: {
+    cells: {
+      type: Array,
+      default() {
+        return {
+          name: String,
+          spanColRow: { type: [Number, Array], default: 1 },
+          value: { type: [String, Number, Boolean, Array, Object, Date, Function], default: '' },
+          style: { type: [String, Array], default: '' },
+          protected: { type: Boolean, default: false },
+        };
+      },
+    },
+    cellsStyles: {
+      type: Array,
+      default() {
+        return {
+          name: { type: String, default: '' },
+          value: { type: Object, default() { return { }; } },
+        };
+      },
+    },
     // Boolean, можно ли выбирать
+    // styles: [
+    //   {
+    //     collspan: { type: Number, default: 0 }, //  ???
+    //     rowspan: { type: Number, default: 0 }, //  ???
+
+    //     fontFamily: { type: String, default: '' },
+    //     fontSize: { type: String, default: '' },
+    //     fontWeight: { type: String, default: '' }, //  normal, lighter, bold, bolder
+    //     fontStyle: { type: String, default: '' }, //  normal, italic, oblique
+    //     textDecoration: { type: String, default: '' }, // underline, overline, line-through
+    //     textTransform: { type: String, default: '' }, // uppercase, lowercase, capitalize
+    //     color: { type: String, default: '' },
+    //     textAlign: { type: String, default: '' },
+    //     verticalAlign: { type: String, default: '' },
+
+    //     borderTop: { type: String, default: '' },
+    //     borderBottom: { type: String, default: '' },
+    //     borderLeft: { type: String, default: '' },
+    //     borderRight: { type: String, default: '' },
+
+    //     backgroundColor: { type: String, default: '' },
+    //   },
+    // ],
   },
   data() {
     return {
       currentSelectedCell: null,
-      setChar: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
-      dataJson: {
-        cell_4_7: {  // имя А1
-          // защита ечейки
-          value: 'Cell testing', // значение на определенного типа
-          style: { // попробовать в класс стиля
-            'background-color': 'grey',
-            'color': 'white',
-          }
-        },
-        cell_10_13: {
-          colspan: '2',
-          rowspan: '1',
-          
-          value: '21-03-2021',
-          style: {
-            'color': 'green',
-          }
-        },
-        cell_6_3: {
-          colspan: '1',
-          rowspan: '3',
-          value: 'Cell.. testing.. union... row.....',
-          style: {
-            'color': 'grey',
-          }
-        },
-      }
-    }
+      setChar: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+    };
   },
- 
+
   methods: {
     cellProperties(cellName) {
-      if (Object.keys(this.dataJson).includes(cellName)) return this.dataJson[cellName];
-      return {};
-    },
-
-    cellValue(cellName) {
-      if (Object.keys(this.dataJson).includes(cellName)) return this.dataJson[cellName].value;
+      const cellsProperties = this.cells.find((item) => item.name === cellName.toLowerCase());
+      return cellsProperties || {};
     },
     cellStyle(cellName) {
-      if (Object.keys(this.dataJson).includes(cellName)) return this.dataJson[cellName].style;
-      return {};
+      const cellStyle = [];
+      const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
+      if (!cellStyleList) return cellStyle;
+      if (typeof (cellStyleList) === 'string') {
+        return [this.cellsStyles.find((item) => item.name === cellStyleList).value];
+      }
+      cellStyleList.forEach((element) => {
+        if (this.cellsStyles.find((item) => item.name === element)) {
+          cellStyle.push(this.cellsStyles.find((item) => item.name === element).value);
+        }
+      });
+      console.log(cellStyle);
+      return cellStyle;
     },
+
     selectedCell(event) {
-      if (this.currentSelectedCell == event.target) return;
+      if (this.currentSelectedCell === event.target) return;
       if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('body-column__selected');
-      event.target.classList.add('body-column__selected')
+      event.target.classList.add('body-column__selected');
       this.currentSelectedCell = event.target;
     },
     selectedCellStart() {
@@ -100,11 +126,11 @@ export default {
     getTitleForNumberColumn(number) {
       if (number > 702) return 'Infinity';
       if (number <= this.setChar.length) return this.setChar[number - 1];
-      if ((number % this.setChar.length) == 0) return `${this.setChar[((number - this.setChar.length) / this.setChar.length) - 1]}${this.setChar[this.setChar.length - 1]}`;
+      if ((number % this.setChar.length) === 0) return `${this.setChar[((number - this.setChar.length) / this.setChar.length) - 1]}${this.setChar[this.setChar.length - 1]}`;
       return `${this.setChar[(Math.floor(number / this.setChar.length)) - 1]}${this.setChar[(number % this.setChar.length) - 1]}`;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -115,7 +141,10 @@ $scrollThumbBorderRadius: 3px;
 $scrollThumbBackgroundColor: rgba(0,0,0,0.2);
 
 $borderRadius: 0px 0px 4px 4px;
-$boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2), 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+$boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
+            0 2px 1px -1px rgba(0,0,0,.2),
+            0 1px 1px 0 rgba(0,0,0,.14),
+            0 1px 3px 0 rgba(0,0,0,.12);
 
 .spread-sheet {
   position: relative;
@@ -139,13 +168,13 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2), 0 2px 1px -1px rgba(0,0,0,.2), 0 1px
     border-collapse: collapse;
     table-layout: fixed;
     font-family: Arial, Helvetica, sans-serif;
-    
+
     font-size: 16px;
     thead {
       position: sticky;
       top: 0px;
       .head-row {
-        
+
         height: 24px;
         font-size: 0.75em;
         background-color: rgba(0, 0, 0, 0.1);
@@ -160,10 +189,10 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2), 0 2px 1px -1px rgba(0,0,0,.2), 0 1px
         }
       }
     }
-    
+
     tbody {
       .body-row {
-        height: 32px;
+        height: 24px;
         box-sizing: border-box;
         .body-column {
           position: relative;
@@ -185,22 +214,17 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2), 0 2px 1px -1px rgba(0,0,0,.2), 0 1px
             content: '';
             position: absolute;
             top: 0px;
-            right: 0px; 
-            bottom: 0px;    
+            right: 0px;
+            bottom: 0px;
             left: 0px;
             border: 2px solid #1a73e8;
-
-            // border: 2px solid #1a73e8;
-            // border-top: 2px solid #1a73e8;
-            // border-left: 2px solid #1a73e8;
             box-shadow: 0 2px 6px 2px rgb(60 64 67 / 15%);
           }
         }
       }
     }
-    
+
   }
-  
 
 }
 </style>

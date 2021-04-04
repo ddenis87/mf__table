@@ -15,7 +15,7 @@ export default {
     return {
       disAddingInline: null,
       disEditableInline: false,
-           
+
       disExpansion: null,
       disHierarchy: null,
       disMultiline: null,
@@ -24,11 +24,11 @@ export default {
       optionTable: {
         tableName: 'actualdesc',
         templateUno: [
-          {value: 'start_date', width: [210, 210] },
-          {value: 'some_desc', width: [200, ], },
+          { value: 'start_date', width: [210, 210] },
+          { value: 'some_desc', width: [200] },
         ],
       },
-    }
+    };
   },
-}
+};
 </script>

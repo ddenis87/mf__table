@@ -31,9 +31,9 @@ export const TheTableForm = {
   computed: {
     fieldForm() {
       if (!this.guid) return null;
-      let fieldForm = this.$store.getters[`DataTable/GET_LIST_OPTIONS`]({tableName: this.tableName});
+      const fieldForm = this.$store.getters['DataTable/GET_LIST_OPTIONS']({ tableName: this.tableName });
       if (this.focusedElement != null) {
-        for (let key of Object.keys(fieldForm)) {
+        for (const key of Object.keys(fieldForm)) {
           this.fieldFormValue[key] = this.focusedElement[key];
         }
       }
@@ -42,14 +42,14 @@ export const TheTableForm = {
   },
   mounted() {
     if (this.focusedElement == null) {
-      let filtersStor = this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid});
-      Object.keys(this.fieldFormValue).forEach(key => {
+      const filtersStor = this.$store.getters['DataTable/GET_FILTERS']({ tableName: this.tableName, guid: this.guid });
+      Object.keys(this.fieldFormValue).forEach((key) => {
         if (key in filtersStor) this.fieldFormValue[key] = filtersStor[key];
-      })
+      });
     }
     if (this.focusedElement == null && this.filtersForm) {
       // console.log('fill filters');
-      Object.keys(this.filtersForm).forEach(key => {
+      Object.keys(this.filtersForm).forEach((key) => {
         this.fieldFormValue[key] = this.filtersForm[key];
       });
     }
@@ -74,10 +74,8 @@ export const TheTableForm = {
             this.nextElement(nextElement.parentElement);
             return;
           }
-          if (nextElement.querySelector('input'))
-            return nextElement.querySelector('input').focus();
-          if (nextElement.querySelector('textarea'))
-            return nextElement.querySelector('textarea').focus();
+          if (nextElement.querySelector('input')) { return nextElement.querySelector('input').focus(); }
+          if (nextElement.querySelector('textarea')) { return nextElement.querySelector('textarea').focus(); }
         }
         if (nextElement.className.indexOf('form-action__control')) {
           nextElement.lastElementChild.querySelector('button').focus();
@@ -89,7 +87,7 @@ export const TheTableForm = {
     eventAcceptKeydown(event) {
       if (event.key == 'Tab') {
         event.preventDefault();
-        let startForm = event.target.closest('.form-action').firstElementChild.firstElementChild.firstElementChild.querySelector('.el-field > .el-field__item');
+        const startForm = event.target.closest('.form-action').firstElementChild.firstElementChild.firstElementChild.querySelector('.el-field > .el-field__item');
         if (startForm.querySelector('input')) { startForm.querySelector('input').focus(); return; }
         if (startForm.querySelector('textarea')) { startForm.querySelector('textarea').focus(); return; }
       }
@@ -133,19 +131,19 @@ export const TheTableForm = {
       //     })
       // }
       // this.$emit('event-accept');
-      let option = {values: {}};
-      
+      const option = { values: {} };
+
       option.actionName = (this.focusedElement) ? 'editing' : 'adding';
-      let newFieldFormValue = {};
-      for (let item of Object.entries(this.fieldFormValue)) {
+      const newFieldFormValue = {};
+      for (const item of Object.entries(this.fieldFormValue)) {
         // console.log(item[0], ' - ', item[1]);
         if (item[1] == undefined || item[1] == null) {
           newFieldFormValue[item[0]] = '';
         } else { newFieldFormValue[item[0]] = item[1]; }
       }
       Object.assign(option.values, newFieldFormValue);
-      for (let key of Object.keys(option.values)) {
-        if (typeof(option.values[key]) == 'object' && option.values[key] != null) {
+      for (const key of Object.keys(option.values)) {
+        if (typeof (option.values[key]) === 'object' && option.values[key] != null) {
           if ('id' in option.values[key]) option.values[key] = option.values[key].id;
           else option.values[key] = option.values[key].value;
         }
@@ -162,10 +160,10 @@ export const TheTableForm = {
         }, 3000);
         return false;
       }
-      for (let key of Object.keys(this.fieldFormValue)) {
+      for (const key of Object.keys(this.fieldFormValue)) {
         if (this.fieldForm[key].required == true && (this.fieldFormValue[key] == '' || this.fieldFormValue[key] == null)) return false;
       }
       return true;
-    }
+    },
   },
-}
+};

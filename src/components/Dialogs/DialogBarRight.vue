@@ -11,6 +11,7 @@
 
 <script>
 import DialogToolbar from './DialogToolbar.vue';
+
 export default {
   name: 'DialogBarRight',
   components: {
@@ -25,16 +26,16 @@ export default {
   data() {
     return {
       isOpen: false,
-    }
+    };
   },
   computed: {
     dialogName() {
-      return (this.tableName) ? this.isDialogName + ' - ' + this.$store.getters[`DataTable/GET_DESCRIPTION`](this.tableName) : this.isDialogName;
+      return (this.tableName) ? `${this.isDialogName} - ${this.$store.getters['DataTable/GET_DESCRIPTION'](this.tableName)}` : this.isDialogName;
     },
   },
   watch: {
     isDialogShow() { this.isOpen = this.isDialogShow; },
     isOpen() { if (!this.isOpen) this.$emit('close-dialog'); },
   },
-}
+};
 </script>

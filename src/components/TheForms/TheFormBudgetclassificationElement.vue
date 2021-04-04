@@ -9,7 +9,7 @@
                                           @event-keydown="eventKeydown"></el-field-string></v-col>
       </v-row>
       <v-row dense>
-        <v-col cols="2"><el-field-number :input-properties="fieldForm.head_code" 
+        <v-col cols="2"><el-field-number :input-properties="fieldForm.head_code"
                                           v-model="fieldFormValue.head_code"
                                           @event-keydown="eventKeydown"></el-field-number></v-col>
       </v-row>
@@ -40,15 +40,15 @@ export default {
         head_name: '',
         head_code: '',
       },
-    }
+    };
   },
   methods: {
     fieldFormValueClear() {
       this.fieldFormValue = {
         head_name: '',
         head_code: '',
-      }
+      };
     },
   },
-}
+};
 </script>

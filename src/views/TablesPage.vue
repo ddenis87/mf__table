@@ -8,7 +8,7 @@
           <el-field-search :is-label="true"
                            :input-properties="{label: 'Найти в таблице'}"
                            v-model="freeSearchValue"
-                           @keydown-enter="freeSearch" 
+                           @keydown-enter="freeSearch"
                            @clear-value="clearValueFreeSearch"></el-field-search>
         </v-card><!--  -->
       </v-toolbar>
@@ -17,7 +17,7 @@
       <data-table-control v-bind="propertiesControl"></data-table-control>
     </div>
     <div class="tables-page__body">
-      <component class="table" 
+      <component class="table"
                  :is="componentTable"
                  @component-mounted="mountedTable"></component>
     </div>
@@ -29,6 +29,7 @@ import DataTableControl from '@/components/DataTableControls/DataTableControl.vu
 import ElFieldSearch from '@/components/Elements/ElField/ElFieldSearch.vue';
 
 import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
+
 export default {
   name: 'TablesPage',
   components: {
@@ -45,27 +46,25 @@ export default {
       freeSearchValue: '',
       titleLoading: 'Загрузка',
       titleLoadingInterval: null,
-    }
+    };
   },
   computed: {
     // processLoading() {
 
     // },
-    optionTable() { return { tableName: this.tableName, guid: this.guid } },
+    optionTable() { return { tableName: this.tableName, guid: this.guid }; },
 
-    tableDiscription() { return this.$store.getters['DataTable/GET_DESCRIPTION'](this.optionTable) },
+    tableDiscription() { return this.$store.getters['DataTable/GET_DESCRIPTION'](this.optionTable); },
 
     eventFilterExtendedReset() {
-      if (this.$store.getters['DataTable/GET_MARK_EVENTS_FILTER_EXTENDE_RESET'](this.optionTable))
-        return true;
+      if (this.$store.getters['DataTable/GET_MARK_EVENTS_FILTER_EXTENDE_RESET'](this.optionTable)) { return true; }
       return null;
     },
   },
   watch: {
     eventFilterExtendedReset() {
-      if (this.eventFilterExtendedReset)
-        this.freeSearchValue = '';
-    }
+      if (this.eventFilterExtendedReset) { this.freeSearchValue = ''; }
+    },
   },
   mounted() {
     this.titleLoadingInterval = setInterval(() => {
@@ -78,14 +77,14 @@ export default {
   },
   methods: {
     freeSearch(option) {
-      this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', Object.assign({ defaultFilters: { 'search': option.value } }, this.optionTable));
+      this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', { defaultFilters: { search: option.value }, ...this.optionTable });
     },
     clearValueFreeSearch() {
-      let isHierarchy = this.$store.getters['DataTable/GET_PROP_TABLE_VALUE'](Object.assign({ key: 'isHierarchy' }, this.optionTable));
-      this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', Object.assign({ defaultFilters: { 'search': null, 'ordering': (isHierarchy) ? '-is_group' : null } }, this.optionTable));
+      const isHierarchy = this.$store.getters['DataTable/GET_PROP_TABLE_VALUE']({ key: 'isHierarchy', ...this.optionTable });
+      this.$store.dispatch('DataTable/SET_FILTER_DEFAULT', { defaultFilters: { search: null, ordering: (isHierarchy) ? '-is_group' : null }, ...this.optionTable });
     },
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>

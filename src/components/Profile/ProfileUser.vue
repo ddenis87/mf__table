@@ -25,7 +25,7 @@ export default {
       this.$router.push('/Logout');
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

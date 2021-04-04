@@ -3,7 +3,7 @@
     <!-- <div class="app__bar">
       <app-bar></app-bar>
     </div>
-    
+
     <div class="app__bar-nav">
       <app-bar-nav></app-bar-nav>
     </div>
@@ -14,7 +14,7 @@
     <component :is="layout">
       <router-view/>
     </component>
-    
+
   </v-app>
 </template>
 
@@ -22,6 +22,7 @@
 
 import LayoutEmpty from '@/layout/LayoutEmpty.vue';
 import LayoutMain from '@/layout/LayoutMain.vue';
+
 export default {
   name: 'App',
   components: {
@@ -29,7 +30,7 @@ export default {
     LayoutMain,
   },
   computed: {
-    layout() { return 'Layout' + (this.$route.meta.layout || 'Main') },
+    layout() { return `Layout${this.$route.meta.layout || 'Main'}`; },
   },
 };
 </script>
@@ -53,7 +54,7 @@ html, body {
   border-radius: 4px;
   font-size: .875rem;
   line-height: 1.5;
-  
+
   &-control {
     background-color: rgba(0, 0, 0, .87);
     color: rgba(255, 255, 255, 1);
