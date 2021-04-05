@@ -3,10 +3,21 @@ export default {
     const stylesDomElement = document.createElement('style');
     stylesDomElement.setAttribute('type', 'text/css');
     let style = '';
+
     this.styles.forEach((element) => {
-      style += ` .${element.name} ${JSON.stringify(element.list).replace('/\','/g', ';').replace('"', '')}`;
+      const styleKebabCase = {};
+      Object.entries(element.list).forEach((item) => {
+        const [styleName, styleValue] = [...item];
+        styleKebabCase[styleName.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)] = styleValue;
+      });
+      style += ` .spread-sheet .table .body-row .${element.name} ${this.formatedStyleString(styleKebabCase)}`;
     });
-    console.log(style);
-    document.querySelector('head').prepend(stylesDomElement);
+    stylesDomElement.innerHTML = `${style}`;
+    document.querySelector('head').append(stylesDomElement);
+  },
+  methods: {
+    formatedStyleString(object) {
+      return JSON.stringify(object).replace(/,/g, ';').replace(/"/g, '').replace(/}/g, ';}');
+    },
   },
 };

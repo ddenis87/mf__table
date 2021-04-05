@@ -18,7 +18,10 @@
           <td class="body-column body-column__title">{{ i }}</td>
           <td v-for="j in 25"
               :key="`body-column-${j}`"
-              class="body-column" :style="cellStyle(`${getTitleForNumberColumn(j).toLowerCase()}${i}`)">
+              class="body-column"
+              :class="`${cellProperties(`${getTitleForNumberColumn(j).toLowerCase()}${i}`).style}`"
+              >
+
             {{ cellProperties(`${getTitleForNumberColumn(j).toLowerCase()}${i}`).value }}
           </td>
         </tr>
@@ -48,15 +51,15 @@ export default {
     };
   },
   methods: {
-    // columnStyle(columnNumber) {
-    //   const columnName = this.getTitleForNumberColumn(columnNumber).toLowerCase();
-    //   return this.columns.find((item) => item.name === columnName)?.style || {};
-    // },
-    // cellProperties(cellName) {
-    //   const cellProperties = this.cells.find((item) => item.name === cellName);
-    //   if (!cellProperties) return {};
-    //   return cellProperties;
-    // },
+    columnStyle(columnNumber) {
+      const columnName = this.getTitleForNumberColumn(columnNumber).toLowerCase();
+      return this.columns.find((item) => item.name === columnName)?.style || {};
+    },
+    cellProperties(cellName) {
+      const cellProperties = this.cells.find((item) => item.name === cellName);
+      if (!cellProperties) return {};
+      return cellProperties;
+    },
     // cellStyle(cellName) {
     //   const cellStyle = {};
     //   const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
@@ -150,7 +153,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 $scrollWidth: 8px;
 $scrollHeight: 8px;
 $scrollBorderRadius: 4px;
@@ -205,7 +208,7 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
       }
     }
 
-    tbody {
+    // tbody {
       .body-row {
         height: 24px;
         box-sizing: border-box;
@@ -238,9 +241,7 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
           }
         }
       }
-    }
-
+    // }
   }
-
 }
 </style>
