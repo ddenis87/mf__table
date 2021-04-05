@@ -3,7 +3,7 @@
     <spread-sheet :columns="columns"
                   
                   :cells="cells"
-                  :cells-styles="cellsStyles"></spread-sheet>
+                  :styles="cellsStyles"></spread-sheet>
   </div>
 </template>
 

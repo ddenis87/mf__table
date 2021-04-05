@@ -29,11 +29,13 @@
 
 <script>
 import SpreadSheetProps from './SpreadSheetProps';
+import SpreadSheetComputed from './SpreadSheetComputed';
 
 export default {
   name: 'SpreadSheet',
   mixins: [
     SpreadSheetProps,
+    SpreadSheetComputed,
   ],
   data() {
     return {
@@ -46,21 +48,21 @@ export default {
     };
   },
   methods: {
-    columnStyle(columnNumber) {
-      const columnName = this.getTitleForNumberColumn(columnNumber).toLowerCase();
-      return this.columns.find((item) => item.name === columnName)?.style || {};
-    },
-    cellProperties(cellName) {
-      const cellProperties = this.cells.find((item) => item.name === cellName);
-      if (!cellProperties) return {};
-      return cellProperties;
-    },
-    cellStyle(cellName) {
-      const cellStyle = {};
-      const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
-      if (!cellStyleList) return cellStyle;
-      return this.cellsStyles.find((item) => item.name === cellStyleList)?.list;
-    },
+    // columnStyle(columnNumber) {
+    //   const columnName = this.getTitleForNumberColumn(columnNumber).toLowerCase();
+    //   return this.columns.find((item) => item.name === columnName)?.style || {};
+    // },
+    // cellProperties(cellName) {
+    //   const cellProperties = this.cells.find((item) => item.name === cellName);
+    //   if (!cellProperties) return {};
+    //   return cellProperties;
+    // },
+    // cellStyle(cellName) {
+    //   const cellStyle = {};
+    //   const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
+    //   if (!cellStyleList) return cellStyle;
+    //   return this.cellsStyles.find((item) => item.name === cellStyleList)?.list;
+    // },
     // columnStyle(columnName) {
     //   const columnStyle = {};
     //   const columnStyleList = this.columns.find((item) => item.name === columnName.toLowerCase())?.style;
