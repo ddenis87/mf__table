@@ -7,20 +7,20 @@
           <th v-for="j in 25"
               :key="`head-column-${j}`"
               class="head-column"
-              :style="columnStyle(getTitleForNumberColumn(j))">{{ getTitleForNumberColumn(j) }}</th>
+              :style="columnStyle(j)">{{ getTitleForNumberColumn(j) }}</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr v-for="i in 50"
+        <tr v-for="i in 60"
             :key="`body-row-${i}`"
             class="body-row">
           <td class="body-column body-column__title">{{ i }}</td>
-          <cell v-for="j in 25"
-                :key="`body-column-${j}`"
-                class="body-column"
-                :cell-properties="cellProperties(`${getTitleForNumberColumn(j)}${i}`)"
-                v-bind="cellStyle(`${getTitleForNumberColumn(j)}${i}`)"></cell>
+          <td v-for="j in 25"
+              :key="`body-column-${j}`"
+              class="body-column" :style="cellStyle(`${getTitleForNumberColumn(j).toLowerCase()}${i}`)">
+            {{ cellProperties(`${getTitleForNumberColumn(j).toLowerCase()}${i}`).value }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -28,116 +28,86 @@
 </template>
 
 <script>
-import Cell from './components/Cell.vue';
+import SpreadSheetProps from './SpreadSheetProps';
 
 export default {
   name: 'SpreadSheet',
-  components: {
-    Cell,
-  },
-  props: {
-    columns: {
-      type: Array,
-      default() {
-        return {
-          name: String,
-          style: { type: [String, Array], default: '' },
-        };
-      },
-    },
-    columnsStyles: {
-      type: Array,
-      default() {
-        return {
-          name: String,
-          value: {
-            type: Object,
-            default() {
-              return {
-                minWidth: String,
-              };
-            },
-          },
-        };
-      },
-    },
-    cells: {
-      type: Array,
-      default() {
-        return {
-          name: String,
-          spanColRow: { type: [Number, Array], default: 1 },
-          value: { type: [String, Number, Boolean, Array, Object, Date, Function], default: '' },
-          style: { type: [String, Array], default: '' },
-          protected: { type: Boolean, default: false },
-        };
-      },
-    },
-    cellsStyles: {
-      type: Array,
-      default() {
-        return {
-          name: { type: String, default: '' },
-          value: { type: Object, default() { return { }; } },
-        };
-      },
-    },
-  },
+  mixins: [
+    SpreadSheetProps,
+  ],
   data() {
     return {
       currentSelectedCell: null,
       setChar: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+
+      styleClass: {
+        fontSize: '16px',
+      },
     };
   },
-
   methods: {
-    columnStyle(columnName) {
-      const columnStyle = {};
-      const columnStyleList = this.columns.find((item) => item.name === columnName.toLowerCase())?.style;
-      if (!columnStyleList) return columnStyle;
-      if (typeof (columnStyleList) === 'string') {
-        return this.columnsStyles.find((item) => item.name === columnStyleList).value;
-      }
-      columnStyleList.forEach((element) => {
-        const style = this.columnsStyles.find((item) => item.name === element);
-        if (style) {
-          Object.assign(columnStyle, style.value);
-        }
-      });
-      console.log(columnStyle);
-      return columnStyle;
+    columnStyle(columnNumber) {
+      const columnName = this.getTitleForNumberColumn(columnNumber).toLowerCase();
+      return this.columns.find((item) => item.name === columnName)?.style || {};
     },
     cellProperties(cellName) {
-      const cellsProperties = this.cells.find((item) => item.name === cellName.toLowerCase());
-      if (!cellsProperties) return {};
-
-      if (Object.keys(cellsProperties).includes('spanColRow')) {
-        if (typeof (cellsProperties.spanColRow) === 'number') {
-          cellsProperties.colspan = cellsProperties.spanColRow;
-          cellsProperties.rowspan = cellsProperties.spanColRow;
-        } else {
-          cellsProperties.colspan = cellsProperties.spanColRow[0] || 1;
-          cellsProperties.rowspan = cellsProperties.spanColRow[1] || 1;
-        }
-      }
-      return cellsProperties;
+      const cellProperties = this.cells.find((item) => item.name === cellName);
+      if (!cellProperties) return {};
+      return cellProperties;
     },
     cellStyle(cellName) {
       const cellStyle = {};
       const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
       if (!cellStyleList) return cellStyle;
-      if (typeof (cellStyleList) === 'string') {
-        return this.cellsStyles.find((item) => item.name === cellStyleList).value;
-      }
-      cellStyleList.forEach((element) => {
-        const style = this.cellsStyles.find((item) => item.name === element);
-        if (style) {
-          Object.assign(cellStyle, style.value);
-        }
-      });
-      console.log(cellStyle);
-      return cellStyle;
+      return this.cellsStyles.find((item) => item.name === cellStyleList)?.list;
     },
+    // columnStyle(columnName) {
+    //   const columnStyle = {};
+    //   const columnStyleList = this.columns.find((item) => item.name === columnName.toLowerCase())?.style;
+    //   if (!columnStyleList) return columnStyle;
+    //   if (typeof (columnStyleList) === 'string') {
+    //     return this.columnsStyles.find((item) => item.name === columnStyleList).value;
+    //   }
+    //   columnStyleList.forEach((element) => {
+    //     const style = this.columnsStyles.find((item) => item.name === element);
+    //     if (style) {
+    //       Object.assign(columnStyle, style.value);
+    //     }
+    //   });
+    //   console.log(columnStyle);
+    //   return columnStyle;
+    // },
+    // cellProperties(cellName) {
+    //   const cellsProperties = this.cells.find((item) => item.name === cellName.toLowerCase());
+    //   if (!cellsProperties) return {};
+
+    //   if (Object.keys(cellsProperties).includes('spanColRow')) {
+    //     if (typeof (cellsProperties.spanColRow) === 'number') {
+    //       cellsProperties.colspan = cellsProperties.spanColRow;
+    //       cellsProperties.rowspan = cellsProperties.spanColRow;
+    //     } else {
+    //       cellsProperties.colspan = cellsProperties.spanColRow[0] || 1;
+    //       cellsProperties.rowspan = cellsProperties.spanColRow[1] || 1;
+    //     }
+    //   }
+    //   return cellsProperties;
+    // },
+    // cellStyle(cellName) {
+    //   const cellStyle = {};
+    //   const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
+    //   if (!cellStyleList) return cellStyle;
+    //   if (typeof (cellStyleList) === 'string') {
+    //     return this.cellsStyles.find((item) => item.name === cellStyleList).value;
+    //   }
+    //   cellStyleList.forEach((element) => {
+    //     const style = this.cellsStyles.find((item) => item.name === element);
+    //     if (style) {
+    //       Object.assign(cellStyle, style.value);
+    //     }
+    //   });
+    //   // console.log(cellStyle);
+    //   return cellStyle;
+    // },
     // cellStyle(cellName) {
     //   const cellStyle = [];
     //   const cellStyleList = this.cells.find((item) => {
@@ -209,7 +179,6 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
   }
 
   .table {
-    position: relative;
     border-collapse: collapse;
     table-layout: fixed;
     font-family: Arial, Helvetica, sans-serif;
@@ -245,6 +214,7 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
           border-bottom: thin solid grey;
           border-left: thin solid grey;
           box-sizing: border-box;
+          overflow: hidden;
           &__title {
             border-bottom: thin solid grey;
             border-left: thin solid grey;

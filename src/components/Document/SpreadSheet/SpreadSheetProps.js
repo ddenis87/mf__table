@@ -4,7 +4,7 @@ export default {
       type: Object,
       default() {
         return {
-          style: {
+          styleDefault: {
             type: Object,
             default() {
               return {
@@ -22,14 +22,7 @@ export default {
       default() {
         return {
           name: String,
-          style: {
-            type: Object,
-            default() {
-              return {
-                maxWidth: String,
-              };
-            },
-          },
+          width: Number,
         };
       },
     },
@@ -41,12 +34,13 @@ export default {
           name: String,
           spanColRow: { type: [Number, Array], default: 1 },
           value: { type: [String, Number, Boolean, Array, Object, Date, Function], default: '' },
-          class: { type: String, default: '' },
+          style: { type: String, default: '' },
           protected: { type: Boolean, default: false },
         };
       },
     },
-    cellsStyles: { // стили ячеек
+
+    styles: { // стили
       type: Array,
       default() {
         return {
@@ -66,11 +60,12 @@ export default {
                 textAlign: { type: String, default: '' },
                 verticalAlign: { type: String, default: '' },
 
+                backgroundColor: { type: String, default: '' },
+
                 borderTop: { type: String, default: '' },
                 borderRight: { type: String, default: '' },
                 borderBottom: { type: String, default: '' },
                 borderLeft: { type: String, default: '' },
-                backgroundColor: { type: String, default: '' },
               };
             },
           },

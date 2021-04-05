@@ -1,4 +1,4 @@
-export const Cell = {
+export default {
   props: {
     cellProperties: {
       type: Object,
@@ -28,4 +28,4 @@ export const Cell = {
     borderLeft: { type: String, default: '' },
     backgroundColor: { type: String, default: '' },
   },
-}
+};
