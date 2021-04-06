@@ -7,7 +7,7 @@
           <th v-for="j in countColumn"
               :key="`head-column-${j}`"
               class="head-column"
-              :style="columnWidth(getTitleForNumberColumn(j))">{{ getTitleForNumberColumn(j).toUpperCase() }}</th>
+              :style="columnWidth(getcolumnsTitle(j))">{{ getcolumnsTitle(j).toUpperCase() }}</th>
         </tr>
       </thead>
 
@@ -17,15 +17,17 @@
             class="body-row"
             :style="rowHeight(i)">
           <td class="body-column body-column__title">{{ i }}</td>
-          <td v-for="j in countColumn"
-              :key="`body-column-${j}`"
-              :colspan="cellProperties(`${titleForNumberColumn[j]}${i}`).colspan"
-              :rowspan="cellProperties(`${titleForNumberColumn[j]}${i}`).rowspan"
-              class="body-column"
-              :class="(cellsMap[`${titleForNumberColumn[j]}${i}`]) ?
-                cellsMap[`${titleForNumberColumn[j]}${i}`].style : ''">
-            {{ (cellsMap[`${titleForNumberColumn[j]}${i}`]) ? cellsMap[`${titleForNumberColumn[j]}${i}`].value : '' }}
-          </td>
+          <template v-for="j in countColumn">
+            <td v-if="!executeCells.includes(`${columnsTitle[j]}${i}`)"
+                :key="`body-column-${i}${j}`"
+                :colspan="cellProperties(`${columnsTitle[j]}${i}`).colspan"
+                :rowspan="cellProperties(`${columnsTitle[j]}${i}`).rowspan"
+                class="body-column"
+                :class="(cellsMap[`${columnsTitle[j]}${i}`]) ?
+                  cellsMap[`${columnsTitle[j]}${i}`].style : ''">
+              {{ (cellsMap[`${columnsTitle[j]}${i}`]) ? cellsMap[`${columnsTitle[j]}${i}`].value : '' }}
+            </td>
+          </template>
         </tr>
       </tbody>
     </table>
@@ -46,16 +48,14 @@ export default {
     return {
       currentSelectedCell: null,
       setChar: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-      titleForNumberColumn: {},
+      columnsTitle: {}, // {1: a, 2: b, ..., 24: aa}
+      executeCells: [],
     };
   },
   computed: {
     cellsMap() {
       const cellMap = {};
-      this.cells.forEach((element) => {
-        cellMap[element.name] = element;
-      });
-      console.log(cellMap);
+      this.cells.forEach((element) => { cellMap[element.name] = element; });
       return cellMap;
     },
   },
@@ -88,20 +88,20 @@ export default {
       // console.log(event.target);
     },
 
-    getTitleForNumberColumn(number) {
+    getcolumnsTitle(number) {
       if (number > 702) return 'Infinity';
       if (number <= this.setChar.length) {
         const title = this.setChar[number - 1];
-        this.titleForNumberColumn[number] = title;
+        this.columnsTitle[number] = title;
         return title;
       }
       if ((number % this.setChar.length) === 0) {
         const title = `${this.setChar[((number - this.setChar.length) / this.setChar.length) - 1]}${this.setChar[this.setChar.length - 1]}`;
-        this.titleForNumberColumn[number] = title;
+        this.columnsTitle[number] = title;
         return title;
       }
       const title = `${this.setChar[(Math.floor(number / this.setChar.length)) - 1]}${this.setChar[(number % this.setChar.length) - 1]}`;
-      this.titleForNumberColumn[number] = title;
+      this.columnsTitle[number] = title;
       return title;
     },
   },

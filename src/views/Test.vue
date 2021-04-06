@@ -7,8 +7,8 @@
       <div class="item">
         <v-text-field label="Строки" v-model="countRow"></v-text-field>
       </div>
-      <div class="item">
-        <v-btn dense @click="commitSpace">Commit</v-btn>
+      <div class="item item_btn">
+        <v-btn small @click="commitSpace">Commit</v-btn>
       </div>
     </div>
     <div class="test-table">
@@ -156,6 +156,9 @@ export default {
     .item {
       width: 100px;
       padding-right: 20px;
+      &_btn {
+        align-self: center;
+      }
     }
     // border: thin solid green;
   }

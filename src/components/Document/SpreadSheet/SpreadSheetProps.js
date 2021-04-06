@@ -23,10 +23,12 @@ export default {
     columns: {
       type: Array,
       default() {
-        return {
-          name: String,
-          width: Number,
-        };
+        return [
+          {
+            name: String,
+            width: Number,
+          },
+        ];
       },
     },
 
@@ -43,13 +45,15 @@ export default {
     cells: { // ячейки
       type: Array,
       default() {
-        return {
-          name: String,
-          value: { type: [String, Number, Boolean, Array, Object, Date, Function], default: '' },
-          spanColRow: { type: [Number, Array], default: 1 },
-          style: { type: String, default: '' },
-          protected: { type: Boolean, default: false },
-        };
+        return [
+          {
+            name: String,
+            value: { type: [String, Number, Boolean, Array, Object, Date, Function], default: '' },
+            spanColRow: { type: [Number, Array], default: 1 },
+            style: { type: String, default: '' },
+            protected: { type: Boolean, default: false },
+          },
+        ];
       },
     },
 
