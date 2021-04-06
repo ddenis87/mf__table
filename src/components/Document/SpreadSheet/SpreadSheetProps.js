@@ -1,5 +1,8 @@
 export default {
   props: {
+    countColumn: { type: Number, default: 25 },
+    countRow: { type: Number, default: 100 },
+
     spreadSheet: {
       type: Object,
       default() {
@@ -27,13 +30,23 @@ export default {
       },
     },
 
+    rows: {
+      type: Array,
+      default() {
+        return {
+          name: String,
+          height: Number,
+        };
+      },
+    },
+
     cells: { // ячейки
       type: Array,
       default() {
         return {
           name: String,
-          spanColRow: { type: [Number, Array], default: 1 },
           value: { type: [String, Number, Boolean, Array, Object, Date, Function], default: '' },
+          spanColRow: { type: [Number, Array], default: 1 },
           style: { type: String, default: '' },
           protected: { type: Boolean, default: false },
         };

@@ -1,9 +1,28 @@
 <template>
   <div class="test">
-    <spread-sheet :columns="columns"
-                  
-                  :cells="cells"
-                  :styles="cellsStyles"></spread-sheet>
+    <div class="test-control-top">
+      <div class="item">
+        <v-text-field label="Столбцы" v-model="countColumn"></v-text-field>
+      </div>
+      <div class="item">
+        <v-text-field label="Строки" v-model="countRow"></v-text-field>
+      </div>
+      <div class="item">
+        <v-btn dense @click="commitSpace">Commit</v-btn>
+      </div>
+    </div>
+    <div class="test-table">
+      <spread-sheet :columns="columns"
+                    :rows="rows"
+                    :cells="cells"
+                    :styles="styles"
+                    
+                    :countColumn="sheetSpace.column"
+                    :countRow="sheetSpace.row"></spread-sheet>
+    </div>
+    <div class="test-control-right">
+      123
+    </div>
   </div>
 </template>
 
@@ -17,24 +36,39 @@ export default {
   },
   data() {
     return {
+      countColumn: 25,
+      countRow: 100,
+      sheetSpace: {
+        column: 25,
+        row: 100,
+      },
+
       columns: [
-        { name: 'a', style: { 'min-width': '50px', }, },
-        { name: 'b', style: { 'min-width': '20px', 'max-width': '20px', 'width': '20px' }, },
-        { name: 'c', style: { 'min-width': '20px', }, },
-        { name: 'd', style: { 'min-width': '250px', }, },
-        { name: 'e', style: { 'min-width': '20px', }, },
+        { name: 'a', width: 100 },
+        { name: 'b', width: 20 },
+        { name: 'c', width: 20 },
+        { name: 'D', width: 250 },
+        { name: 'e', width: 100 },
+      ],
+
+      rows: [
+        { name: 5, height: 40 },
+        { name: 6, height: 30 },
+        { name: 7, height: 30 },
+        { name: 8, height: 80 },
       ],
       
       cells: [
-        { name: 'd3', spanColRow: [2, 2], value: 'Test form for display', style: 'c0', },
+        { name: 'd3', value: 'Test form for display', spanColRow: [2, 2], style: 'c0', },
         { name: 'c3', value: 'Cell testing size', style: 'c3', },
-        { name: 'b2', value: 'Cell testing', style: 'c1', },
-        { name: 'a12', value: 'Cell testing', style: 'c2', },
-        { name: 'b10', spanColRow: [2, ], value: 'Testing join', style: 'c4', },
-        { name: 'd5', spanColRow: [1, 4], value: 'Testing join upper width 250px', style: 'c5', },
+        { name: 'b2', value: 'Testing color', style: 'c1', },
+        { name: 'a12', value: 'Testing font-weight', style: 'c2', },
+        { name: 'b10', value: 'Testing join column', spanColRow: [2, ], style: 'c4', },
+        { name: 'D5', value: 'Testing upper', spanColRow: [1, 4], style: 'c5', },
+        { name: 'd8', value: 'Testing heigth join row and col (wrong?)', style: 'c6', spanColRow: [2, 2] },
       ],
 
-      cellsStyles: [
+      styles: [
         {
           name: 'c0',
           list: {
@@ -74,14 +108,31 @@ export default {
         {
           name: 'c5',
           list: {
-            textTransform: 'uppercase'
+            textTransform: 'uppercase',
+            borderTop: '2px solid black',
+            borderBottom: '2px solid black',
+            borderLeft: '2px solid black',
+            borderRight: '2px solid black',
+          }
+        },
+        {
+          name: 'c6',
+          list: {
+            textTransform: 'uppercase',
+            borderTop: '2px solid black',
+            borderBottom: '2px dashed red',
+            borderLeft: '2px solid black',
+            borderRight: '2px solid black',
           }
         },
       ],
     };
   },
   methods: {
-    test() {
+    commitSpace() {
+      this.sheetSpace.column = +this.countColumn;
+      this.sheetSpace.row = +this.countRow;
+      console.log(this.sheetSpace);
     },
   },
 };
@@ -89,8 +140,34 @@ export default {
 
 <style lang="scss" scoped>
 .test {
-  height: calc(100vh - 64px);
-  padding: 5px;
-  // border: thin solid orange;
+  display: grid;
+  grid-template-areas: "control-top control-top" "table control-right";
+  grid-template-rows: 60px 1fr;
+  grid-template-columns: 100% 300px;
+  max-width: 100%;
+
+  border: thin solid red;
+  &-control-top {
+    grid-area: control-top;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 5px;
+    .item {
+      width: 100px;
+      padding-right: 20px;
+    }
+    // border: thin solid green;
+  }
+  &-table {
+    grid-area: table;
+    padding: 5px;
+    width: calc(100vw - 300px);
+    height: calc(100vh - 126px);
+  }
+  &-control-right {
+    grid-area: control-right;
+    border: thin solid peru;
+  }
 }
 </style>

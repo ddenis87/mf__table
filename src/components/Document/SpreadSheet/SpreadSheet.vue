@@ -4,25 +4,27 @@
       <thead>
         <tr class="head-row">
           <th class="head-column head-column__title"></th>
-          <th v-for="j in 25"
+          <th v-for="j in countColumn"
               :key="`head-column-${j}`"
               class="head-column"
-              :style="columnStyle(j)">{{ getTitleForNumberColumn(j) }}</th>
+              :style="columnWidth(getTitleForNumberColumn(j))">{{ getTitleForNumberColumn(j).toUpperCase() }}</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr v-for="i in 60"
+        <tr v-for="i in countRow"
             :key="`body-row-${i}`"
-            class="body-row">
+            class="body-row"
+            :style="rowHeight(i)">
           <td class="body-column body-column__title">{{ i }}</td>
-          <td v-for="j in 25"
+          <td v-for="j in countColumn"
               :key="`body-column-${j}`"
+              :colspan="cellProperties(`${titleForNumberColumn[j]}${i}`).colspan"
+              :rowspan="cellProperties(`${titleForNumberColumn[j]}${i}`).rowspan"
               class="body-column"
-              :class="`${cellProperties(`${getTitleForNumberColumn(j).toLowerCase()}${i}`).style}`"
-              >
-
-            {{ cellProperties(`${getTitleForNumberColumn(j).toLowerCase()}${i}`).value }}
+              :class="(cellsMap[`${titleForNumberColumn[j]}${i}`]) ?
+                cellsMap[`${titleForNumberColumn[j]}${i}`].style : ''">
+            {{ (cellsMap[`${titleForNumberColumn[j]}${i}`]) ? cellsMap[`${titleForNumberColumn[j]}${i}`].value : '' }}
           </td>
         </tr>
       </tbody>
@@ -43,93 +45,36 @@ export default {
   data() {
     return {
       currentSelectedCell: null,
-      setChar: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-
-      styleClass: {
-        fontSize: '16px',
-      },
+      setChar: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      titleForNumberColumn: {},
     };
   },
-  methods: {
-    columnStyle(columnNumber) {
-      const columnName = this.getTitleForNumberColumn(columnNumber).toLowerCase();
-      return this.columns.find((item) => item.name === columnName)?.style || {};
+  computed: {
+    cellsMap() {
+      const cellMap = {};
+      this.cells.forEach((element) => {
+        cellMap[element.name] = element;
+      });
+      console.log(cellMap);
+      return cellMap;
     },
+  },
+  methods: {
     cellProperties(cellName) {
-      const cellProperties = this.cells.find((item) => item.name === cellName);
-      if (!cellProperties) return {};
+      const cellProperties = this.cells.find((item) => item.name.toLowerCase() === cellName);
+      if (!cellProperties) return '';
+      if (Object.keys(cellProperties).includes('spanColRow')) {
+        if (typeof (cellProperties.spanColRow) === 'number') {
+          cellProperties.colspan = cellProperties.spanColRow;
+          cellProperties.rowspan = cellProperties.spanColRow;
+        } else {
+          cellProperties.colspan = cellProperties.spanColRow[0] || 1;
+          cellProperties.rowspan = cellProperties.spanColRow[1] || 1;
+        }
+      }
       return cellProperties;
     },
-    // cellStyle(cellName) {
-    //   const cellStyle = {};
-    //   const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
-    //   if (!cellStyleList) return cellStyle;
-    //   return this.cellsStyles.find((item) => item.name === cellStyleList)?.list;
-    // },
-    // columnStyle(columnName) {
-    //   const columnStyle = {};
-    //   const columnStyleList = this.columns.find((item) => item.name === columnName.toLowerCase())?.style;
-    //   if (!columnStyleList) return columnStyle;
-    //   if (typeof (columnStyleList) === 'string') {
-    //     return this.columnsStyles.find((item) => item.name === columnStyleList).value;
-    //   }
-    //   columnStyleList.forEach((element) => {
-    //     const style = this.columnsStyles.find((item) => item.name === element);
-    //     if (style) {
-    //       Object.assign(columnStyle, style.value);
-    //     }
-    //   });
-    //   console.log(columnStyle);
-    //   return columnStyle;
-    // },
-    // cellProperties(cellName) {
-    //   const cellsProperties = this.cells.find((item) => item.name === cellName.toLowerCase());
-    //   if (!cellsProperties) return {};
 
-    //   if (Object.keys(cellsProperties).includes('spanColRow')) {
-    //     if (typeof (cellsProperties.spanColRow) === 'number') {
-    //       cellsProperties.colspan = cellsProperties.spanColRow;
-    //       cellsProperties.rowspan = cellsProperties.spanColRow;
-    //     } else {
-    //       cellsProperties.colspan = cellsProperties.spanColRow[0] || 1;
-    //       cellsProperties.rowspan = cellsProperties.spanColRow[1] || 1;
-    //     }
-    //   }
-    //   return cellsProperties;
-    // },
-    // cellStyle(cellName) {
-    //   const cellStyle = {};
-    //   const cellStyleList = this.cells.find((item) => item.name === cellName.toLowerCase())?.style;
-    //   if (!cellStyleList) return cellStyle;
-    //   if (typeof (cellStyleList) === 'string') {
-    //     return this.cellsStyles.find((item) => item.name === cellStyleList).value;
-    //   }
-    //   cellStyleList.forEach((element) => {
-    //     const style = this.cellsStyles.find((item) => item.name === element);
-    //     if (style) {
-    //       Object.assign(cellStyle, style.value);
-    //     }
-    //   });
-    //   // console.log(cellStyle);
-    //   return cellStyle;
-    // },
-    // cellStyle(cellName) {
-    //   const cellStyle = [];
-    //   const cellStyleList = this.cells.find((item) => {
-    //     item.name === cellName.toLowerCase()
-    //   })?.style;
-    //   if (!cellStyleList) return cellStyle;
-    //   if (typeof (cellStyleList) === 'string') {
-    //     return [this.cellsStyles.find((item) => item.name === cellStyleList).value];
-    //   }
-    //   cellStyleList.forEach((element) => {
-    //     if (this.cellsStyles.find((item) => item.name === element)) {
-    //       cellStyle.push(this.cellsStyles.find((item) => item.name === element).value);
-    //     }
-    //   });
-    //   console.log(cellStyle);
-    //   return cellStyle;
-    // },
     selectedCell(event) {
       if (this.currentSelectedCell === event.target) return;
       if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('body-column__selected');
@@ -145,9 +90,19 @@ export default {
 
     getTitleForNumberColumn(number) {
       if (number > 702) return 'Infinity';
-      if (number <= this.setChar.length) return this.setChar[number - 1];
-      if ((number % this.setChar.length) === 0) return `${this.setChar[((number - this.setChar.length) / this.setChar.length) - 1]}${this.setChar[this.setChar.length - 1]}`;
-      return `${this.setChar[(Math.floor(number / this.setChar.length)) - 1]}${this.setChar[(number % this.setChar.length) - 1]}`;
+      if (number <= this.setChar.length) {
+        const title = this.setChar[number - 1];
+        this.titleForNumberColumn[number] = title;
+        return title;
+      }
+      if ((number % this.setChar.length) === 0) {
+        const title = `${this.setChar[((number - this.setChar.length) / this.setChar.length) - 1]}${this.setChar[this.setChar.length - 1]}`;
+        this.titleForNumberColumn[number] = title;
+        return title;
+      }
+      const title = `${this.setChar[(Math.floor(number / this.setChar.length)) - 1]}${this.setChar[(number % this.setChar.length) - 1]}`;
+      this.titleForNumberColumn[number] = title;
+      return title;
     },
   },
 };
@@ -160,7 +115,7 @@ $scrollBorderRadius: 4px;
 $scrollThumbBorderRadius: 3px;
 $scrollThumbBackgroundColor: rgba(0,0,0,0.2);
 
-$borderRadius: 0px 0px 4px 4px;
+$borderRadius: 0px 4px 4px 4px;
 $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
             0 2px 1px -1px rgba(0,0,0,.2),
             0 1px 1px 0 rgba(0,0,0,.14),
@@ -184,31 +139,42 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
   }
 
   .table {
+    position: relative;
     border-collapse: collapse;
     table-layout: fixed;
     font-family: Arial, Helvetica, sans-serif;
 
     font-size: 16px;
     thead {
-      position: sticky;
-      top: 0px;
       .head-row {
         height: 24px;
         font-size: 0.75em;
-        background-color: rgba(0, 0, 0, 0.1);
         color: rgba(0, 0, 0, 0.5);
         .head-column {
+          position: sticky;
+          top: 0px;
           padding: 2px;
           min-width: 94px;
-          border: thin solid grey;
+          border-left: thin solid grey;
+          box-shadow: inset 0 1px 0 grey, inset 0 -1px 0 grey;
+          background-color: #dadce0;
+          z-index: 100;
           &__title {
+            position: sticky;
+            top: 0px;
+            left: 0px;
+            box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
             min-width: 60px;
+            max-width: 60px;
+            width: 60px;
+            z-index: 200;
           }
         }
       }
     }
 
-    // tbody {
+    tbody {
+      position: relative;
       .body-row {
         height: 24px;
         box-sizing: border-box;
@@ -221,13 +187,16 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
           box-sizing: border-box;
           overflow: hidden;
           &__title {
-            border-bottom: thin solid grey;
-            border-left: thin solid grey;
+            position: sticky;
+            left: 0px;
+            border-left: 0px;
+            box-shadow: inset 1px 0px 0 grey, 1px 0px 0 grey;
             text-align: center;
             font-size: 0.75em;
             font-weight: bold;
-            background-color: rgba(0, 0, 0, 0.1);
+            background-color: #dadce0;
             color: rgba(0, 0, 0, 0.5);
+            z-index: 150;
           }
           &__selected::after {
             content: '';
@@ -237,11 +206,10 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
             bottom: 0px;
             left: 0px;
             border: 2px solid #1a73e8;
-            box-shadow: 0 2px 6px 2px rgb(60 64 67 / 15%);
           }
         }
       }
-    // }
+    }
   }
 }
 </style>
