@@ -4,6 +4,7 @@
       <thead>
         <tr class="head-row">
           <th class="head-column head-column__title"></th>
+          <th v-show="isGroup" class="head-column head-column__group"></th>
           <th v-for="j in countColumn"
               :key="`head-column-${j}`"
               class="head-column"
@@ -17,8 +18,9 @@
             class="body-row"
             :style="getRowHeight(i)">
           <td class="body-column body-column__title">{{ i }}</td>
+          <th v-show="isGroup" class="body-column body-column__group"></th>
           <template v-for="j in countColumn">
-            <td v-if="(!executeCells.has(`${columnsTitle[j]}${i}`))"
+            <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
                 :key="`body-column-${i}-${j}`"
                 class="body-column"
                 :colspan="getColspan(`${columnsTitle[j]}${i}`)"
@@ -45,10 +47,11 @@ export default {
   ],
   data() {
     return {
+      isGroup: false,
       currentSelectedCell: null,
       setChar: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       columnsTitle: {}, // {1: a, 2: b, ..., 24: aa}
-      executeCells: new Set(),
+      excludedCells: new Set(),
     };
   },
   computed: {
@@ -71,13 +74,11 @@ export default {
     // addingExecuteCell(count) {
     // },
     getRowspan(cellName) {
-      if (!this.cells[cellName]) return 1;
-      if (!this.cells[cellName].rowspan) return 1;
+      if (!this.cells[cellName] || !this.cells[cellName].rowspan) return 1;
       return this.cells[cellName].rowspan;
     },
     getColspan(cellName) {
-      if (!this.cells[cellName]) return 1;
-      if (!this.cells[cellName].colspan) return 1;
+      if (!this.cells[cellName] || !this.cells[cellName].colspan) return 1;
       return this.cells[cellName].colspan;
     },
     getCellStyle(cellName) {
@@ -89,25 +90,27 @@ export default {
       if (!this.cells[cellName]) return '';
       if (Object.keys(this.cells[cellName]).includes('colspan')) {
         for (let i = 1; i < this.cells[cellName].colspan; i += 1) {
-          console.log(`${this.columnsTitle[column + i]}${row}`);
-          this.executeCells.add(`${this.columnsTitle[column + i]}${row}`);
+          this.excludedCells.add(`${this.columnsTitle[column + i]}${row}`);
         }
       }
       if (Object.keys(this.cells[cellName]).includes('rowspan')) {
         for (let i = 1; i < this.cells[cellName].rowspan; i += 1) {
-          this.executeCells.add(`${this.columnsTitle[column]}${row + i}`);
+          this.excludedCells.add(`${this.columnsTitle[column]}${row + i}`);
           if (Object.keys(this.cells[cellName]).includes('colspan')) {
             for (let j = 1; j < this.cells[cellName].colspan; j += 1) {
-              this.executeCells.add(`${this.columnsTitle[column + j]}${row + i}`);
+              this.excludedCells.add(`${this.columnsTitle[column + j]}${row + i}`);
             }
           }
         }
       }
-      console.log(this.executeCells);
+      // console.log(this.excludedCells);
       return this.cells[cellName].value;
     },
     getRowHeight(rowNumber) {
-      if (this.rows[rowNumber]) return { height: `${this.rows[rowNumber].height}px` };
+      if (this.rows[rowNumber]) {
+
+        return { height: `${this.rows[rowNumber].height}px` } || {};
+      };
       return {};
     },
     getColumnWidth(columnNumber) {
