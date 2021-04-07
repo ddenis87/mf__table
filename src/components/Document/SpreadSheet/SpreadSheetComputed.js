@@ -4,16 +4,18 @@ export default {
     // this.setColumnWidth();
   },
   methods: {
-    columnWidth(name) {
-      const columnWidth = this.columns.find((item) => item.name.toLowerCase() === name)?.width;
-      if (columnWidth) return { 'min-width': `${columnWidth}px`, 'max-width': `${columnWidth}px`, width: `${columnWidth}px` };
-      return '';
-    },
-    rowHeight(name) {
-      const rowHeight = this.rows.find((item) => item.name === name)?.height;
-      if (rowHeight) return `height: ${rowHeight}px`;
-      return '';
-    },
+    // columnWidth(name) {
+    //   const columnWidth = this.columns.find((item) => item.name.toLowerCase() === name)?.width;
+    //   if (columnWidth) return {
+    //   'min-width': `${columnWidth}px`, 'max-width': `${columnWidth}px`, width: `${columnWidth}px`
+    //  };
+    //   return '';
+    // },
+    // rowHeight(name) {
+    //   const rowHeight = this.rows.find((item) => item.name === name)?.height;
+    //   if (rowHeight) return `height: ${rowHeight}px`;
+    //   return '';
+    // },
     addingStylesInHead() {
       const styleDomElement = document.createElement('style');
       styleDomElement.setAttribute('type', 'text/css');

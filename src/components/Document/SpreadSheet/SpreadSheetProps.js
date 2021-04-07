@@ -21,39 +21,31 @@ export default {
     },
 
     columns: {
-      type: Array,
-      default() {
-        return [
-          {
-            name: String,
-            width: Number,
-          },
-        ];
-      },
+      type: Object,
     },
 
     rows: {
-      type: Array,
-      default() {
-        return {
-          name: String,
-          height: Number,
-        };
-      },
+      type: Object,
     },
 
+    // cells: { // ячейки
+    //   type: Array,
+    //   default() {
+    //     return [
+    //       {
+    //         name: String,
+    //         value: { type: [String, Number, Boolean, Array, Object, Date, Function], default: '' },
+    //         spanColRow: { type: [Number, Array], default: 1 },
+    //         style: { type: String, default: '' },
+    //         protected: { type: Boolean, default: false },
+    //       },
+    //     ];
+    //   },
+    // },
     cells: { // ячейки
-      type: Array,
+      type: Object,
       default() {
-        return [
-          {
-            name: String,
-            value: { type: [String, Number, Boolean, Array, Object, Date, Function], default: '' },
-            spanColRow: { type: [Number, Array], default: 1 },
-            style: { type: String, default: '' },
-            protected: { type: Boolean, default: false },
-          },
-        ];
+        return {};
       },
     },
 
