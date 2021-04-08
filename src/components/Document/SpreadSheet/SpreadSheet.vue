@@ -1,5 +1,5 @@
 <template>
-  <div class="spread-sheet">
+  <div class="spread-sheet" ref="SpreadSheet">
     <table class="table" @click="selectedCell">
       <thead>
         <tr class="head-row">
@@ -20,7 +20,7 @@
               class="body-row"
               :style="getRowHeight(i)">
             <td v-show="isGroup" class="body-column body-column__group">
-              <row-btn-icon v-show="isGroupElement(i)">mdi-plus-box-outline</row-btn-icon>
+              <row-btn-icon v-show="isGroupElement(i)" :data-row-group-number="i">mdi-plus-box-outline</row-btn-icon>
             </td>
             <td class="body-column body-column__title"
                 :class="{'body-column__title_group': isGroup}">{{ i }}</td>
@@ -40,7 +40,7 @@
             <tr v-for="k in isGroupElement(i) - 1"
                 :key="`body-row-group-${k}`"
                 class="body-row body-row-group body-row-group_hidden"
-                >
+                :data-group-row="i">
               <td v-show="isGroup" class="body-column body-column__group">
                 <!-- <row-btn-icon v-show="isGroupElement(i + k)">mdi-plus-box-outline</row-btn-icon> -->
               </td>
@@ -191,10 +191,30 @@ export default {
       return title;
     },
     selectedCell(event) {
+      if (event.target.closest('button')) {
+        this.toggleGroup(event.target.closest('button'));
+        return;
+      }
       if (this.currentSelectedCell === event.target) return;
       if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('body-column__selected');
       event.target.classList.add('body-column__selected');
       this.currentSelectedCell = event.target;
+    },
+    toggleGroup(btnGroupElement) {
+      console.log(btnGroupElement.querySelector('i'));
+      const btnGroupImg = btnGroupElement.querySelector('i');
+      if (btnGroupImg.classList.contains('mdi-plus-box-outline')) {
+        btnGroupImg.classList.remove('mdi-plus-box-outline');
+        btnGroupImg.classList.add('mdi-minus-box-outline');
+      } else {
+        btnGroupImg.classList.remove('mdi-minus-box-outline');
+        btnGroupImg.classList.add('mdi-plus-box-outline');
+      }
+      const rowNumber = btnGroupElement.getAttribute('data-row-group-number');
+      const elementsGroup = document.querySelectorAll(`[data-group-row="${rowNumber}"]`);
+      elementsGroup.forEach((element) => {
+        element.classList.toggle('body-row-group_hidden');
+      });
     },
   },
 };
@@ -285,6 +305,7 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
         &-group {
           &_hidden {
             display: none;
+            // visibility: hidden;
           }
         }
         .body-column {
