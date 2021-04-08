@@ -29,7 +29,7 @@
                  :disabled="!activeElement"
                  icon="mdi-delete"
                  @click="deletingElement">{{ 'Удалить' }}</el-btn-icon>
-
+    <el-btn-icon icon="mdi-refresh" @click="refreshTable">{{ 'Обновить' }}</el-btn-icon>
     <dialog-full-page :is-dialog-name="buildActionTitle"
                       :is-dialog-show="isShowDialog" 
                       @close-dialog="closeDialog">

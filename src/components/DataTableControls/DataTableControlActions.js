@@ -202,7 +202,19 @@ export const DataTableControlActions = {
         defaultFilters: filterParams,
       });
     },
-
+    refreshTable() {
+      let filterParams = {
+        is_deleted: false,
+        parent: null,
+        parent__isnull: (this.propsTable.isHierarchy) ? true : null,
+        ordering: (this.propsTable.isHierarchy) ? `-is_group` : null, 
+      };
+      this.$store.dispatch('DataTable/RESET_TABLE', {
+        tableName: this.tableName,
+        guid: this.guid,
+        defaultFilters: filterParams,
+      })
+    },
     async eventActionAccept(option) {
       let sendOption = {
         tableName: this.tableName,
