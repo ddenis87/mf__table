@@ -61,9 +61,21 @@ export default {
         row: 100,
       },
       columnsJSON: '{"a":{"width":120},"b":{"width":20},"c":{"width":20},"d":{"width":250},"e":{"width":100}}',
-      rowsJSON: '{"5":{"height":40},"6":{"height":30},"7":{"height":30},"8":{"height":80}, "14": {"rowGroup": "3"}}',
-      cellsJSON: '{"b2":{"value":"Testing color","style":"c1"},"c3":{"value":"Cell testing size","style":"c3"},"d3":{"value":"Test form for display","colspan":2,"rowspan":2,"style":"c0"},"d5":{"value":"Testing upper","rowspan":4,"style":"c5"},"e8":{"value":"Testing lowercase","colspan":2,"rowspan":2,"style":"c6"},"b10":{"value":"Testing join column","colspan":4,"style":"c4"},"a12":{"value":"Testing font-weight","style":"c2"}}',
-      stylesJSON: '[{"name":"c0","list":{"backgroundColor":"orange","color":"white","fontFamily":"Area","fontSize":"0.7em"}},{"name":"c1","list":{"color":"green"}},{"name":"c2","list":{"color":"rgba(240, 0, 0)","fontWeight":"bold"}},{"name":"c3","list":{"borderLeft":"2px solid black","borderRight":"2px solid black"}},{"name":"c4","list":{"borderTop":"2px solid black","borderBottom":"2px solid black"}},{"name":"c5","list":{"textTransform":"uppercase","borderTop":"2px solid black","borderBottom":"2px solid black","borderLeft":"2px solid black","borderRight":"2px solid black"}},{"name":"c6","list":{"textTransform":"lowercase","borderTop":"2px solid black","borderBottom":"2px dashed red","borderLeft":"2px solid black","borderRight":"2px solid black"}}]',
+      rowsJSON: '{"5":{"height":40},"6":{"height":30},"7":{"height":30},"8":{"height":80}, "14": {"rowGroup": "4"}}',
+      cellsJSON: `{
+        "b2":{"value":"Testing color","style":"c1"},
+        "c3":{"value":"Cell testing size","style":"c3"},
+        "d3":{"value":"Test form for display","colspan":2,"rowspan":2,"style":"c0"},
+        "d5":{"value":"Testing upper","rowspan":4,"style":"c5"},
+        "e8":{"value":"Testing lowercase","colspan":2,"rowspan":2,"style":"c6"},
+        "b10":{"value":"Testing join column","colspan":4,"style":"c4"},
+        "a12":{"value":"Testing font-weight","style":"c1"},
+        "a14":{"value":"Title group","colspan":3,"style":"c2"},
+        "d15":{"value":"Test group"},
+        "c16":{"value":"Test group"},
+        "g17":{"value":"Test group"}
+      }`,
+      stylesJSON: `[{"name":"c0","list":{"backgroundColor":"orange","color":"white","fontFamily":"Area","fontSize":"0.7em"}},{"name":"c1","list":{"color":"green"}},{"name":"c2","list":{"color":"rgba(240, 0, 0)","fontWeight":"bold"}},{"name":"c3","list":{"borderLeft":"2px solid black","borderRight":"2px solid black"}},{"name":"c4","list":{"borderTop":"2px solid black","borderBottom":"2px solid black"}},{"name":"c5","list":{"textTransform":"uppercase","borderTop":"2px solid black","borderBottom":"2px solid black","borderLeft":"2px solid black","borderRight":"2px solid black"}},{"name":"c6","list":{"textTransform":"lowercase","borderTop":"2px solid black","borderBottom":"2px dashed red","borderLeft":"2px solid black","borderRight":"2px solid black"}}]`,
       // columns: {
       //   'a': { width: 120 },
       //   'b': { width: 20 },
@@ -109,8 +121,8 @@ export default {
         {
           name: 'c2',
           list: {
-            color: 'rgba(240, 0, 0)',
             fontWeight: 'bold',
+            fontSize: '1em'
           }
         },
         {

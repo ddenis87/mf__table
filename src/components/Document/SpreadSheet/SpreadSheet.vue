@@ -3,8 +3,9 @@
     <table class="table" @click="selectedCell">
       <thead>
         <tr class="head-row">
-          <th class="head-column head-column__title"></th>
           <th v-show="isGroup" class="head-column head-column__group"></th>
+          <th class="head-column head-column__title"
+              :class="{'head-column__title_group': isGroup}"></th>
           <th v-for="j in countColumn"
               :key="`head-column-${j}`"
               class="head-column"
@@ -13,12 +14,63 @@
       </thead>
 
       <tbody>
+        <template v-for="i in countRow">
+          <tr v-if="(!excludedRows.has(`${i}`))"
+              :key="`body-row-${i}`"
+              class="body-row"
+              :style="getRowHeight(i)">
+            <td v-show="isGroup" class="body-column body-column__group">
+              <row-btn-icon v-show="isGroupElement(i)">mdi-plus-box-outline</row-btn-icon>
+            </td>
+            <td class="body-column body-column__title"
+                :class="{'body-column__title_group': isGroup}">{{ i }}</td>
+            <template v-for="j in countColumn">
+              <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
+                  :key="`body-column-${i}-${j}`"
+                  class="body-column"
+                  :colspan="getColspan(`${columnsTitle[j]}${i}`)"
+                  :rowspan="getRowspan(`${columnsTitle[j]}${i}`)"
+                  :class="getCellStyle(`${columnsTitle[j]}${i}`)">
+                {{ getCellValue(i, j) }}
+              </td>
+            </template>
+          </tr>
+          <!-- rows group -->
+          <template v-if="isGroupElement(i)">
+            <tr v-for="k in isGroupElement(i) - 1"
+                :key="`body-row-group-${k}`"
+                class="body-row body-row-group body-row-group_hidden"
+                >
+              <td v-show="isGroup" class="body-column body-column__group">
+                <!-- <row-btn-icon v-show="isGroupElement(i + k)">mdi-plus-box-outline</row-btn-icon> -->
+              </td>
+              <td class="body-column body-column__title"
+                  :class="{'body-column__title_group': isGroup}">{{ i + k }}</td>
+              <template v-for="l in countColumn">
+                <td v-if="(!excludedCells.has(`${columnsTitle[l]}${i + k}`))"
+                    :key="`body-column-${i + k}-${l}`"
+                    class="body-column"
+                    :colspan="getColspan(`${columnsTitle[l]}${i + k}`)"
+                    :rowspan="getRowspan(`${columnsTitle[l]}${i + k}`)"
+                    :class="getCellStyle(`${columnsTitle[l]}${i + k}`)">
+                  {{ getCellValue(i + k, l) }}
+                </td>
+              </template>
+            </tr>
+          </template>
+        </template>
+      </tbody>
+      <!-- no group -->
+      <!-- <tbody>
         <tr v-for="i in countRow"
             :key="`body-row-${i}`"
             class="body-row"
             :style="getRowHeight(i)">
-          <td class="body-column body-column__title">{{ i }}</td>
-          <th v-show="isGroup" class="body-column body-column__group"></th>
+          <td v-show="isGroup" class="body-column body-column__group">
+            <row-btn-icon v-show="isGroupElement(i)">mdi-plus-box-outline</row-btn-icon>
+          </td>
+          <td class="body-column body-column__title"
+              :class="{'body-column__title_group': isGroup}">{{ i }}</td>
           <template v-for="j in countColumn">
             <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
                 :key="`body-column-${i}-${j}`"
@@ -30,7 +82,7 @@
             </td>
           </template>
         </tr>
-      </tbody>
+      </tbody> -->
     </table>
   </div>
 </template>
@@ -38,6 +90,7 @@
 <script>
 import SpreadSheetProps from './SpreadSheetProps';
 import SpreadSheetComputed from './SpreadSheetComputed';
+import RowBtnIcon from './components/RowBtnIcon.vue';
 
 export default {
   name: 'SpreadSheet',
@@ -45,6 +98,9 @@ export default {
     SpreadSheetProps,
     SpreadSheetComputed,
   ],
+  components: {
+    RowBtnIcon,
+  },
   data() {
     return {
       isGroup: false,
@@ -52,27 +108,14 @@ export default {
       setChar: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       columnsTitle: {}, // {1: a, 2: b, ..., 24: aa}
       excludedCells: new Set(),
+      excludedRows: new Set(),
     };
   },
-  computed: {
-  },
   methods: {
-    // cellProperties(cellName) {
-    //   const cellProperties = this.cells.find((item) => item.name.toLowerCase() === cellName);
-    //   if (!cellProperties) return '';
-    //   if (Object.keys(cellProperties).includes('spanColRow')) {
-    //     if (typeof (cellProperties.spanColRow) === 'number') {
-    //       cellProperties.colspan = cellProperties.spanColRow;
-    //       cellProperties.rowspan = cellProperties.spanColRow;
-    //     } else {
-    //       cellProperties.colspan = cellProperties.spanColRow[0] || 1;
-    //       cellProperties.rowspan = cellProperties.spanColRow[1] || 1;
-    //     }
-    //   }
-    //   return cellProperties;
-    // },
-    // addingExecuteCell(count) {
-    // },
+    isGroupElement(rowNumber) { // insert element "+"
+      if (this.rows[rowNumber] && this.rows[rowNumber].rowGroup) return +this.rows[rowNumber].rowGroup;
+      return false;
+    },
     getRowspan(cellName) {
       if (!this.cells[cellName] || !this.cells[cellName].rowspan) return 1;
       return this.cells[cellName].rowspan;
@@ -107,10 +150,18 @@ export default {
       return this.cells[cellName].value;
     },
     getRowHeight(rowNumber) {
+      const rowProps = {};
       if (this.rows[rowNumber]) {
-
-        return { height: `${this.rows[rowNumber].height}px` } || {};
-      };
+        if (this.rows[rowNumber].rowGroup) {
+          this.isGroup = true;
+          for (let i = 1; i < this.rows[rowNumber].rowGroup; i += 1) {
+            this.excludedRows.add(`${rowNumber + i}`);
+          }
+          console.log(this.excludedRows);
+          rowProps.rowGroup = +this.rows[rowNumber].rowGroup;
+        }
+        return { height: `${this.rows[rowNumber].height}px`, ...rowProps } || {};
+      }
       return {};
     },
     getColumnWidth(columnNumber) {
@@ -209,6 +260,18 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
             max-width: 60px;
             width: 60px;
             z-index: 200;
+            &_group {
+              left: 25px;
+            }
+          }
+          &__group {
+            position: sticky;
+            left: 0px;
+            min-width: 25px;
+            max-width: 25px;
+            width: 25px;
+            box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
+            z-index: 210;
           }
         }
       }
@@ -219,6 +282,11 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
       .body-row {
         height: 24px;
         box-sizing: border-box;
+        &-group {
+          &_hidden {
+            display: none;
+          }
+        }
         .body-column {
           position: relative;
           padding: 2px 3px;
@@ -241,6 +309,18 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
             background-color: #dadce0;
             color: rgba(0, 0, 0, 0.5);
             z-index: 150;
+            &_group {
+              left: 25px;
+            }
+          }
+          &__group {
+            position: sticky;
+            left: 0px;
+            border-bottom: 0px;
+            background-color: #dadce0;
+            box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
+            z-index: 160;
+
           }
           &__selected::after {
             content: '';
