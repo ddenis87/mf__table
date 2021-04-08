@@ -12,7 +12,7 @@
               :style="getColumnWidth(j)">{{ getColumnTitle(j).toUpperCase() }}</th>
         </tr>
       </thead>
-
+      <!-- Variant 3 -->
       <tbody>
         <template v-for="i in countRow">
           <tr v-if="(!excludedRows.has(`${i}`))"
@@ -35,14 +35,63 @@
               </td>
             </template>
           </tr>
-          <!-- rows group -->
+
+          <tr v-if="(excludedRows.has(`${i}`))"
+              :key="`body-row-${i}`"
+              class="body-row body-row-group body-row-group_hidden"
+              :data-group-row="getRowParent(i)"
+              :style="getRowHeight(i)">
+            <td v-show="isGroup" class="body-column body-column__group">
+              <row-btn-icon v-show="isGroupElement(i)" :data-row-group-number="i">mdi-plus-box-outline</row-btn-icon>
+            </td>
+            <td class="body-column body-column__title"
+                :class="{'body-column__title_group': isGroup}">{{ i }}</td>
+            <template v-for="j in countColumn">
+              <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
+                  :key="`body-column-${i}-${j}`"
+                  class="body-column"
+                  :colspan="getColspan(`${columnsTitle[j]}${i}`)"
+                  :rowspan="getRowspan(`${columnsTitle[j]}${i}`)"
+                  :class="getCellStyle(`${columnsTitle[j]}${i}`)">
+                {{ getCellValue(i, j) }}
+              </td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
+
+      <!-- Variant 2 -->
+      <!-- <tbody>
+        <template v-for="i in countRow">
+          <tr v-if="(!excludedRows.has(`${i}`))"
+              :key="`body-row-${i}`"
+              class="body-row"
+              :style="getRowHeight(i)">
+            <td v-show="isGroup" class="body-column body-column__group">
+              <row-btn-icon v-show="isGroupElement(i)" :data-row-group-number="i">mdi-plus-box-outline</row-btn-icon>
+            </td>
+            <td class="body-column body-column__title"
+                :class="{'body-column__title_group': isGroup}">{{ i }}</td>
+            <template v-for="j in countColumn">
+              <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
+                  :key="`body-column-${i}-${j}`"
+                  class="body-column"
+                  :colspan="getColspan(`${columnsTitle[j]}${i}`)"
+                  :rowspan="getRowspan(`${columnsTitle[j]}${i}`)"
+                  :class="getCellStyle(`${columnsTitle[j]}${i}`)">
+                {{ getCellValue(i, j) }}
+              </td>
+            </template>
+          </tr>
+
           <template v-if="isGroupElement(i)">
             <tr v-for="k in isGroupElement(i) - 1"
-                :key="`body-row-group-${k}`"
+                :key="`body-row-group-${i + k}`"
                 class="body-row body-row-group body-row-group_hidden"
                 :data-group-row="i">
               <td v-show="isGroup" class="body-column body-column__group">
-                <!-- <row-btn-icon v-show="isGroupElement(i + k)">mdi-plus-box-outline</row-btn-icon> -->
+                <v-divider vertical></v-divider>
+                <row-btn-icon v-show="isGroupElement(i + k)">mdi-plus-box-outline</row-btn-icon>
               </td>
               <td class="body-column body-column__title"
                   :class="{'body-column__title_group': isGroup}">{{ i + k }}</td>
@@ -59,7 +108,7 @@
             </tr>
           </template>
         </template>
-      </tbody>
+      </tbody> -->
       <!-- no group -->
       <!-- <tbody>
         <tr v-for="i in countRow"
@@ -91,6 +140,7 @@
 import SpreadSheetProps from './SpreadSheetProps';
 import SpreadSheetComputed from './SpreadSheetComputed';
 import RowBtnIcon from './components/RowBtnIcon.vue';
+// import SpreadSheetBodyRow from './components/SpreadSheetBodyRow.vue';
 
 export default {
   name: 'SpreadSheet',
@@ -100,6 +150,7 @@ export default {
   ],
   components: {
     RowBtnIcon,
+    // SpreadSheetBodyRow,
   },
   data() {
     return {
@@ -112,6 +163,9 @@ export default {
     };
   },
   methods: {
+    getRowParent(rowNumber) {
+      return this.rows[rowNumber].parent;
+    },
     isGroupElement(rowNumber) { // insert element "+"
       if (this.rows[rowNumber] && this.rows[rowNumber].rowGroup) return +this.rows[rowNumber].rowGroup;
       return false;

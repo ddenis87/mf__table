@@ -61,7 +61,39 @@ export default {
         row: 100,
       },
       columnsJSON: '{"a":{"width":120},"b":{"width":20},"c":{"width":20},"d":{"width":250},"e":{"width":100}}',
-      rowsJSON: '{"5":{"height":40},"6":{"height":30},"7":{"height":30},"8":{"height":80}, "14": {"rowGroup": "4"}, "21": {"rowGroup": "2"}}',
+      // rowsJSON: '{"5":{"height":40},"6":{"height":30},"7":{"height":30},"8":{"height":80}, "14": {"rowGroup": "10"}, "19": {"rowGroup": "3"}, "27": {"rowGroup": "2"}}',
+      
+      //  Variant 2
+      // rowsJSON: `{
+      //   "5":{"height":40},
+      //   "6":{"height":30},
+      //   "7":{"height":30},
+      //   "8":{"height":80},
+      //   "14": {"rowGroup": "10"},
+      //   "19": {"rowGroup": "3"},
+      //   "27": {"rowGroup": "2"}
+      // }`,
+
+      //  Variant 3
+      rowsJSON: `{
+        "5":{"height":40},
+        "6":{"height":30},
+        "7":{"height":30},
+        "8":{"height":80},
+        "14": {"rowGroup": "10"},
+        "15": {"parent": "14"},
+        "16": {"parent": "14"},
+        "17": {"parent": "14"},
+        "18": {"parent": "14"},
+        "19": {"rowGroup": "3", "parent": "14"},
+        "20": {"parent": "19"},
+        "21": {"parent": "19"},
+        "22": {"parent": "14"},
+        "23": {"parent": "14"},
+        "27": {"rowGroup": "2"},
+        "28": {"parent": "27"}
+      }`,
+      
       cellsJSON: `{
         "b2":{"value":"Testing color","style":"c1"},
         "c3":{"value":"Cell testing size","style":"c3"},
@@ -85,8 +117,12 @@ export default {
         "e17":{"value":"","style":"c8"},
         "f17":{"value":"","style":"c8"},
         "g17":{"value":"Test group","style":"c8 c10"},
-        "a21":{"value":"Еще одна группа","colspan":5,"style":"c1"},
-        "a22":{"value":"Строка группы вся оранжевая","colspan":5,"style":"c11 c1"}
+        "a19":{"value":"Заголовок вложенной группы","colspan":5,"style":"c1"},
+        "a20":{"value":"Строка вложенной группы","colspan":5,"style":"c1"},
+        "a21":{"value":"Строка вложенной группы","colspan":5,"style":"c1"},
+        "a23":{"value":"Последняя строка группы","colspan":5,"style":"c1"},
+        "a27":{"value":"Еще одна группа","colspan":5,"style":"c1"},
+        "a28":{"value":"Строка группы вся оранжевая","colspan":5,"style":"c11 c1"}
       }`,
       stylesJSON: `[
         {"name":"c0","list":{"backgroundColor":"orange","color":"white","fontFamily":"Area","fontSize":"0.7em"}},
