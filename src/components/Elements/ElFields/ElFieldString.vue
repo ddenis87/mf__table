@@ -6,7 +6,7 @@
     <div class="el-field__anchor" tabindex="-1"></div>
     <v-text-field class="el-field__item"
                   v-bind="propsField"
-                  :loading="(inUse == null && inputProperties.required)"
+                  :loading="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))"
                   :maxLength="fieldMaxLength"
                   v-model="fieldValue"
                   @input="eventInput"
@@ -16,7 +16,7 @@
                   @keydown.stop
                   @blur="blurField">
       <template v-slot:progress>
-        <div v-if="(inUse == null && inputProperties.required)" class="el-field__item_required"></div>
+        <div v-if="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))" class="el-field__item_required"></div>
       </template>
     </v-text-field>
   </div>

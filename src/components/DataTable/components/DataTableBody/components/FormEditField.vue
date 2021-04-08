@@ -15,10 +15,10 @@
                         @event-keydown-tab="editingAccept"
                         @event-blur="editingAccept"></el-field-wrapper>
     </div>
-    <div class="element line-required">
+    <!-- <div class="element line-required">
       <div class="line-required"
            :class="`line-required_${this.fieldOption.required}`"></div>
-    </div>
+    </div> -->
   </div>
 </template>
 

@@ -16,12 +16,12 @@
                         @event-keydown-tab="eventKeydown"
                         @event-blur="eventBlur"></el-field-wrapper>
     </div>
-    <div class="element line-required" :style="styleForm">
+    <!-- <div class="element line-required" :style="styleForm">
       <div v-for="(item, index) in itemsHeader"
            :key="index"
            class="line-required"
            :class="`line-required_${item.required}`"></div>
-    </div>
+    </div> -->
     <v-snackbar content-class="snack" v-model="isShowError"
                 color="red darken-3">{{ 'Не заполнены все обязательные поля' }}</v-snackbar>
   </div>

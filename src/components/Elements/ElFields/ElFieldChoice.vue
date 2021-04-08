@@ -7,7 +7,7 @@
     <v-autocomplete class="el-field__item"
                     v-bind="propsField"
                     :items="fieldItems"
-                    :loading="(inUse == null && inputProperties.required)"
+                    :loading="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))"
                     :item-text="'display_name'"
                     :item-value="'value'"
                     v-model="fieldValue"
@@ -19,7 +19,7 @@
                     @keydown.stop
                     @blur="blurField">
         <template v-slot:progress>
-          <div v-if="(inUse == null && inputProperties.required)" class="el-field__item_required"></div>
+          <div v-if="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))" class="el-field__item_required"></div>
         </template>
       </v-autocomplete>
   </div>

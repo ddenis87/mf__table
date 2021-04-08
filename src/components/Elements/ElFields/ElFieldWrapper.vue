@@ -1,11 +1,14 @@
 <template>
-  <div class="el-field-wrapper">
+  <div class="el-field-wrapper"
+       :class="{'el-field-wrapper__required': (fieldOption.required && (value == null || value == ''))}">
     <component :is="importField"
                v-model="value"
                v-bind="fieldPropertiesView"
                :input-properties="fieldOption"
                @event-keydown="eventKeydown"
                @event-blur="eventBlur"></component>
+    <!-- <div class="el-field-wrapper__required"
+         :class="{'el-field-wrapper__required_true': (fieldOption.required && (value == null || value == ''))}"></div> -->
   </div>
 </template>
 
@@ -81,5 +84,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.el-field-wrapper {
+  overflow: hidden;
+  margin: 0 3px;
+  border-bottom: 2px solid rgba(21, 101, 192, .3);
+  &__required {
+    border-bottom: 3px solid rgba(255, 0, 0,.6);
+  }
+}
 </style>
