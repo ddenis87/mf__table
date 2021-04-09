@@ -3,9 +3,12 @@
     <table class="table" @click="selectedCell">
       <thead>
         <tr class="head-row">
-          <th v-show="isGroup" class="head-column head-column__group"></th>
+          <th v-show="isGroup"
+              class="head-column head-column__group"
+              ></th>
           <th class="head-column head-column__title"
-              :class="{'head-column__title_group': isGroup}"></th>
+              :class="{'head-column__title_group': isGroup}"
+              :style="shiftCellTitle"></th>
           <th v-for="j in countColumn"
               :key="`head-column-${j}`"
               class="head-column"
@@ -20,10 +23,17 @@
               class="body-row"
               :style="getRowHeight(i)">
             <td v-show="isGroup" class="body-column body-column__group">
-              <row-btn-icon v-show="isGroupElement(i)" :data-row-group-number="i">mdi-plus-box-outline</row-btn-icon>
+              <group-element :level="getLevelRow(i)"
+                             :is-group="(isGroupElement(i)) ? true : false"
+                             :row-number="i"
+                             :row-group-count="isGroupElement(i)"></group-element>
+              <!-- <row-btn-icon v-show="isGroupElement(i)"
+                            :data-row-group-number="i"
+                            :data-row-group="isGroupElement(i)">mdi-plus-box-outline</row-btn-icon> -->
             </td>
             <td class="body-column body-column__title"
-                :class="{'body-column__title_group': isGroup}">{{ i }}</td>
+                :class="{'body-column__title_group': isGroup}"
+                :style="shiftCellTitle">{{ i }}</td>
             <template v-for="j in countColumn">
               <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
                   :key="`body-column-${i}-${j}`"
@@ -42,10 +52,17 @@
               :data-group-row="getRowParent(i)"
               :style="getRowHeight(i)">
             <td v-show="isGroup" class="body-column body-column__group">
-              <row-btn-icon v-show="isGroupElement(i)" :data-row-group-number="i">mdi-plus-box-outline</row-btn-icon>
+              <group-element :level="getLevelRow(i)"
+                             :is-group="(isGroupElement(i)) ? true : false"
+                             :row-number="i"
+                             :row-group-count="isGroupElement(i)"></group-element>
+              <!-- <row-btn-icon v-show="isGroupElement(i)"
+                            :data-row-group-number="i"
+                            :data-row-group="isGroupElement(i)">mdi-plus-box-outline</row-btn-icon> -->
             </td>
             <td class="body-column body-column__title"
-                :class="{'body-column__title_group': isGroup}">{{ i }}</td>
+                :class="{'body-column__title_group': isGroup}"
+                :style="shiftCellTitle">{{ i }}</td>
             <template v-for="j in countColumn">
               <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
                   :key="`body-column-${i}-${j}`"
@@ -139,8 +156,9 @@
 <script>
 import SpreadSheetProps from './SpreadSheetProps';
 import SpreadSheetComputed from './SpreadSheetComputed';
-import RowBtnIcon from './components/RowBtnIcon.vue';
-// import SpreadSheetBodyRow from './components/SpreadSheetBodyRow.vue';
+
+import GroupElement from './components/GroupElement.vue';
+// import RowBtnIcon from './components/RowBtnIcon.vue';
 
 export default {
   name: 'SpreadSheet',
@@ -149,12 +167,14 @@ export default {
     SpreadSheetComputed,
   ],
   components: {
-    RowBtnIcon,
+    GroupElement,
+    // RowBtnIcon,
     // SpreadSheetBodyRow,
   },
   data() {
     return {
       isGroup: false,
+      openGroup: new Map(),
       currentSelectedCell: null,
       setChar: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       columnsTitle: {}, // {1: a, 2: b, ..., 24: aa}
@@ -162,7 +182,27 @@ export default {
       excludedRows: new Set(),
     };
   },
+  computed: {
+    shiftCellTitle() {
+      return { left: '25px' };
+    },
+  },
   methods: {
+    getLevelRow(rowNumber) {
+      if (!this.rows[rowNumber] || !this.rows[rowNumber].parent) return 1;
+      // console.log('go level');
+      let level = 1;
+      let condition = true;
+      let currentParent = this.rows[rowNumber].parent;
+      while (condition) {
+        if (this.rows[currentParent].parent) {
+          level += 1;
+          currentParent = this.rows[currentParent].parent;
+        } else condition = false;
+      }
+      // console.log(level);
+      return level;
+    },
     getRowParent(rowNumber) {
       return this.rows[rowNumber].parent;
     },
@@ -200,7 +240,6 @@ export default {
           }
         }
       }
-      // console.log(this.excludedCells);
       return this.cells[cellName].value;
     },
     getRowHeight(rowNumber) {
@@ -211,7 +250,7 @@ export default {
           for (let i = 1; i < this.rows[rowNumber].rowGroup; i += 1) {
             this.excludedRows.add(`${rowNumber + i}`);
           }
-          console.log(this.excludedRows);
+          // console.log(this.excludedRows);
           rowProps.rowGroup = +this.rows[rowNumber].rowGroup;
         }
         return { height: `${this.rows[rowNumber].height}px`, ...rowProps } || {};
@@ -255,20 +294,33 @@ export default {
       this.currentSelectedCell = event.target;
     },
     toggleGroup(btnGroupElement) {
-      console.log(btnGroupElement.querySelector('i'));
       const btnGroupImg = btnGroupElement.querySelector('i');
+      const rowNumber = btnGroupElement.getAttribute('data-row-group-number');
       if (btnGroupImg.classList.contains('mdi-plus-box-outline')) {
         btnGroupImg.classList.remove('mdi-plus-box-outline');
         btnGroupImg.classList.add('mdi-minus-box-outline');
+
+        const elementsGroup = document.querySelectorAll(`[data-group-row="${rowNumber}"]`);
+        elementsGroup.forEach((element) => {
+          element.classList.remove('body-row-group_hidden');
+        });
+        this.openGroup.set(rowNumber, this.getLevelRow(rowNumber));
       } else {
         btnGroupImg.classList.remove('mdi-minus-box-outline');
         btnGroupImg.classList.add('mdi-plus-box-outline');
+
+        let currentRow = btnGroupElement.closest('.body-row');
+        for (let i = 0; i < btnGroupElement.getAttribute('data-row-group') - 1; i += 1) {
+          currentRow = currentRow.nextElementSibling;
+          if (currentRow.querySelector('button')) {
+            currentRow.querySelector('button i').classList.remove('mdi-minus-box-outline');
+            currentRow.querySelector('button i').classList.add('mdi-plus-box-outline');
+          }
+          currentRow.classList.add('body-row-group_hidden');
+          this.openGroup.delete(rowNumber);
+        }
       }
-      const rowNumber = btnGroupElement.getAttribute('data-row-group-number');
-      const elementsGroup = document.querySelectorAll(`[data-group-row="${rowNumber}"]`);
-      elementsGroup.forEach((element) => {
-        element.classList.toggle('body-row-group_hidden');
-      });
+      console.log(this.openGroup);
     },
   },
 };
@@ -334,9 +386,9 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
             max-width: 60px;
             width: 60px;
             z-index: 200;
-            &_group {
-              left: 25px;
-            }
+            // &_group {
+            //   left: 25px;
+            // }
           }
           &__group {
             position: sticky;
@@ -384,9 +436,9 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
             background-color: #dadce0;
             color: rgba(0, 0, 0, 0.5);
             z-index: 150;
-            &_group {
-              left: 25px;
-            }
+            // &_group {
+            //   left: 25px;
+            // }
           }
           &__group {
             position: sticky;
