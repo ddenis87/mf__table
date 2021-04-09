@@ -8,8 +8,9 @@
         </tr>
       </thead> -->
 
-      <!-- <spread-sheet-head :count-column="countColumn"
-                         :columns="columns"></spread-sheet-head> -->
+      <spread-sheet-head-row-group :count-column="countColumn"
+                                   :columns="columns"
+                                   :is-rows-group="isGroup"></spread-sheet-head-row-group>
       <thead>
         <tr class="head-row">
           <th v-show="isGroup"
@@ -160,7 +161,7 @@
 import SpreadSheetProps from './SpreadSheetProps';
 import SpreadSheetComputed from './SpreadSheetComputed';
 
-// import SpreadSheetHead from './components/SpreadSheetHead.vue';
+import SpreadSheetHeadRowGroup from './components/SpreadSheetHeadRowGroup.vue';
 import SpreadSheetRow from './SpreadSheetRow';
 import SpreadSheetColumn from './SpreadSheetColumn';
 
@@ -177,7 +178,7 @@ export default {
   ],
   components: {
     GroupElement,
-    // SpreadSheetHead,
+    SpreadSheetHeadRowGroup,
     // RowBtnIcon,
     // SpreadSheetBodyRow,
   },

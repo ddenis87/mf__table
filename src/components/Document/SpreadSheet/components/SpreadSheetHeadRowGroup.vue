@@ -5,11 +5,16 @@
           class="head-column head-column__group"
           ></th>
       <th class="head-column head-column__title"
-          ></th>
+          :class="{'head-column__title_group': isRowsGroup}"></th>
       <th v-for="j in countColumn"
           :key="`head-column-${j}`"
           class="head-column"
-          :style="getColumnWidth(j)">{{ getColumnTitle(j).toUpperCase() }}</th>
+          :style="getColumnWidth(j)">
+        <group-element :level="getLevelRow(i)"
+                       :is-group="(isGroupElement(i)) ? true : false"
+                       :row-number="i"
+                       :row-group-count="isGroupElement(i)"></group-element>
+      </th>
     </tr>
   </thead>
 </template>
@@ -17,7 +22,7 @@
 <script>
 
 export default {
-  name: 'SpreadSheetHead',
+  name: 'SpreadSheetHeadRowGroup',
   props: {
     countColumn: { type: Number, default: 1 },
     columns: { type: Object },
@@ -70,7 +75,7 @@ thead {
       top: 0px;
       padding: 2px;
       min-width: 94px;
-      border-left: thin solid grey;
+      // border-left: thin solid grey;
       box-shadow: inset 0 1px 0 grey, inset 0 -1px 0 grey, 1px 0 0 grey;
       background-color: #dadce0;
       z-index: 100;

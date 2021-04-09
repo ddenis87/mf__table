@@ -35,7 +35,7 @@ export default {
     getRowParent(rowNumber) {
       return this.rows[rowNumber].parent;
     },
-    getRowHeight(rowNumber) {
+    getRowHeight(rowNumber) { // разбить на 2 функции
       const rowProps = {};
       if (this.rows[rowNumber]) {
         if (this.rows[rowNumber].rowGroup) {
