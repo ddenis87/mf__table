@@ -92,7 +92,7 @@ export default {
   display: grid;
   grid-template-areas: "tables-page__header" "tables-page__control" "tables-page__body";
   grid-template-columns: 1fr;
-  grid-template-rows: 42px 44px 1fr;
+  grid-template-rows: 42px 48px 1fr;
   width: 100%;
   height: 100%;
 
@@ -110,7 +110,7 @@ export default {
     padding: 5px;
     grid-area: tables-page__body;
     width: 100vw;
-    height: calc(100vh - 152px);
+    height: calc(100vh - 156px);
     z-index: 10;
     .table {
       z-index: 9;

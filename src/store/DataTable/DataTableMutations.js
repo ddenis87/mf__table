@@ -44,6 +44,7 @@ class DataTableSpace {
   markersEvents = {
     filterExtendedReset: null,
     filterExtendedOff: null,
+    eventAdding: null,
     modeAdding: null,
     modeEditing: null,
   };
@@ -231,5 +232,13 @@ export default {
   MARK_EVENT_FILTER_EXTENDED_OFF(state, option) {
     state[option.tableName][option.guid].markersEvents.filterExtendedOff = true;
     setTimeout(() => state[option.tableName][option.guid].markersEvents.filterExtendedOff = null,1000);
+  },
+  MARK_EVENT_ADDING(state, option) {
+    state[option.tableName][option.guid].markersEvents.eventAdding = option.status;
+    setTimeout(() => state[option.tableName][option.guid].markersEvents.eventAdding = null,1000);
+  },
+  MARK_MODE_ADDING(state, option) {
+    state[option.tableName][option.guid].markersEvents.modeAdding = option.status;
+    // setTimeout(() => state[option.tableName][option.guid].markersEvents.eventAdding = null,1000);
   },
 }

@@ -27,10 +27,11 @@ export const DataTableControl = {
         tableName: this.tableName,
         guid: this.guid,
       });
-      let statusAdding = (this.$store.getters['DataTable/GET_ADDING_MODE']({
+      let statusAdding = (this.$store.getters['DataTable/GET_MARK_MODE_ADDING']({
         tableName: this.tableName,
         guid: this.guid,
-      }).index != null) ? true : false;
+      }) != null) ? true : false;
+      
       return (statusLoading || statusAdding) ? true : false;
     },
     propsTable() {

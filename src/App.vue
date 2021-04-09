@@ -64,4 +64,10 @@ html, body {
     background-color: rgba(255, 255, 255, 1);
   }
 }
+.snack {
+    display: flex;
+    justify-content: center;
+    // text-align: center;
+    // font-size: 1.2em;
+  }
 </style>

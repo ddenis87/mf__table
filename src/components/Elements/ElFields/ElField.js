@@ -2,13 +2,14 @@ import ElBtnIconSmall from '@/components/Elements/ElBtn/ElBtnIconSmall.vue';
 import ElBtn from '@/components/Elements/ElBtn/ElBtn.vue';
 
 export const ElField = {
-  model: {
-    prop: 'inputValue',
-    event: 'input-value',
-  },
+  
   components: {
     ElBtnIconSmall,
     ElBtn,
+  },
+  model: {
+    prop: 'inputValue',
+    event: 'input-value',
   },
   data() {
     return {
@@ -17,7 +18,6 @@ export const ElField = {
       rules: {
         required(value) { return !!value || false; },
       },
-
     }
   },
   computed: {
@@ -28,6 +28,23 @@ export const ElField = {
   },
   watch: {
     inputValue() { this.fieldValue = this.inputValue; },
+  },
+  mounted() {
+    let inputElement = null;
+    switch (this.inputProperties.type) {
+      case 'string':
+      case 'integer': 
+      case 'date':
+      case 'datetime': inputElement = document.querySelector(`.el-field-wrapper .v-text-field__slot input`); break;
+      case 'choice': 
+      case 'field': inputElement = document.querySelector(`.el-field-wrapper .v-select__slot input`); break;
+    };
+    if (!this.isSelected) return;
+    setTimeout(() => {
+      // inputElement.setSelectionRange(0, 0);
+      inputElement.select();
+      inputElement.focus();
+    }, 50);
   },
   methods: {
     eventClearValue() {
@@ -49,5 +66,11 @@ export const ElField = {
       }
       return false;
     },
+
+    blurField(event) {
+      if (this.isEmit)
+        this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue : ''});
+      else this.isEmit = true;
+    }
   }
 }

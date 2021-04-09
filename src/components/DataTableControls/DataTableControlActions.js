@@ -69,26 +69,32 @@ export const DataTableControlActions = {
     },
     
     async addingElementInline() {
-      await this.$store.dispatch('DataTable/ADDING_NEW_ELEMEN_INLINE', {
+      // console.log('adding element')
+      this.$store.commit('DataTable/MARK_EVENT_ADDING', {
         tableName: this.tableName,
         guid: this.guid,
-        id: (this.activeElement) ? this.activeElement.id : -1,
-      })
-        .then(() => {
-          let index = this.$store.getters['DataTable/GET_ADDING_MODE']({
-            tableName: this.tableName,
-            guid: this.guid,
-          }).index;
-          let addingElement = document.querySelectorAll(`.${this.guid} .body .body-row`)[index].querySelectorAll('.body-column')[0];
-          let eventDblClick = new Event('dblclick', {bubbles: false});
-          addingElement.focus();
-          addingElement.dispatchEvent(eventDblClick);
+        status: true,
+      });
+      // await this.$store.dispatch('DataTable/ADDING_NEW_ELEMEN_INLINE', {
+      //   tableName: this.tableName,
+      //   guid: this.guid,
+      //   id: (this.activeElement) ? this.activeElement.id : -1,
+      // })
+      //   .then(() => {
+      //     let index = this.$store.getters['DataTable/GET_ADDING_MODE']({
+      //       tableName: this.tableName,
+      //       guid: this.guid,
+      //     }).index;
+      //     let addingElement = document.querySelectorAll(`.${this.guid} .body .body-row`)[index].querySelectorAll('.body-column')[0];
+      //     let eventDblClick = new Event('dblclick', {bubbles: false});
+      //     addingElement.focus();
+      //     addingElement.dispatchEvent(eventDblClick);
 
-          this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', {
-            tableName: this.tableName,
-            guid: this.guid,
-          });
-        });
+      //     this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', {
+      //       tableName: this.tableName,
+      //       guid: this.guid,
+      //     });
+      //   });
     },
 
     addingGroup() {
@@ -139,6 +145,10 @@ export const DataTableControlActions = {
            snackBar.status = false;
          })
          .finally(() => {
+           this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', {
+             tableName: this.tableName,
+             guid: this.guid,
+           });
            this.$emit('event-mark-deleted', snackBar);
          })
     },
@@ -161,6 +171,10 @@ export const DataTableControlActions = {
            snackBar.status = false;
          })
          .finally(() => {
+           this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', {
+             tableName: this.tableName,
+             guid: this.guid,
+           });
            this.$emit('event-mark-deleted', snackBar);
          })
     },
@@ -188,7 +202,19 @@ export const DataTableControlActions = {
         defaultFilters: filterParams,
       });
     },
-
+    refreshTable() {
+      let filterParams = {
+        is_deleted: false,
+        parent: null,
+        parent__isnull: (this.propsTable.isHierarchy) ? true : null,
+        ordering: (this.propsTable.isHierarchy) ? `-is_group` : null, 
+      };
+      this.$store.dispatch('DataTable/RESET_TABLE', {
+        tableName: this.tableName,
+        guid: this.guid,
+        defaultFilters: filterParams,
+      })
+    },
     async eventActionAccept(option) {
       let sendOption = {
         tableName: this.tableName,

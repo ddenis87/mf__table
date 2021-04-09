@@ -42,10 +42,11 @@ export const TheTableForm = {
   },
   mounted() {
     if (this.focusedElement == null) {
-      const filtersStor = this.$store.getters['DataTable/GET_FILTERS']({ tableName: this.tableName, guid: this.guid });
-      Object.keys(this.fieldFormValue).forEach((key) => {
-        if (key in filtersStor) this.fieldFormValue[key] = filtersStor[key];
-      });
+      let filtersStor = this.$store.getters[`DataTable/GET_FILTERS`]({tableName: this.tableName, guid: this.guid});
+      Object.keys(this.fieldFormValue).forEach(key => {
+        if (!this.fieldFormValue[key])
+          if (key in filtersStor) this.fieldFormValue[key] = filtersStor[key];
+      })
     }
     if (this.focusedElement == null && this.filtersForm) {
       // console.log('fill filters');
@@ -134,9 +135,9 @@ export const TheTableForm = {
       const option = { values: {} };
 
       option.actionName = (this.focusedElement) ? 'editing' : 'adding';
-      const newFieldFormValue = {};
-      for (const item of Object.entries(this.fieldFormValue)) {
-        // console.log(item[0], ' - ', item[1]);
+      let newFieldFormValue = {};
+      for (let item of Object.entries(this.fieldFormValue)) {
+        console.log(item[0], ' - ', item[1]);
         if (item[1] == undefined || item[1] == null) {
           newFieldFormValue[item[0]] = '';
         } else { newFieldFormValue[item[0]] = item[1]; }

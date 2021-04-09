@@ -6,12 +6,19 @@
     <div class="el-field__anchor" tabindex="-1"></div>
     <v-text-field class="el-field__item"
                   v-bind="propsField"
+                  :loading="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))"
                   v-model="fieldValue"
                   v-mask="fieldMask"
                   @input="eventInputValue"
-                  @keydown.stop.enter="eventKeydownEnter"
-                  
-                  @click:clear="eventClearValue">
+                  @click:clear="eventClearValue"
+                  @keydown.stop.enter="eventKeydown"
+                  @keydown.stop.tab="eventKeydown"
+                  @keydown.stop.escape="eventKeydown"
+                  @keydown.stop
+                  @blur="blurField">
+      <template v-slot:progress>
+        <div v-if="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))" class="el-field__item_required"></div>
+      </template>
       <template v-slot:append>
         <el-btn-icon-small  icon="mdi-calendar-range" no-tooltip @keydown="eventOpenDialog" @click="eventOpenDialog"></el-btn-icon-small>
       </template>
@@ -43,8 +50,8 @@
 </template>
 
 <script>
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 
 export default {
   name: 'ElFieldDate',
@@ -87,7 +94,7 @@ export default {
     },
     eventClickOutsideMenu() { this.emitBlurField(); },
 
-    eventSelectDate(event) {
+    eventSelectDate() {
       let newDate = '';
       if (this.fieldValueDate == null) {
         newDate = new Date();
@@ -135,19 +142,14 @@ export default {
       }
       this.emitInputValue(newDateTime);
     },
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
       if (this.inputProperties.required && !this.isRequiredOff)
         if (this.fieldValue.length != 10) return;
       if (!this.fieldValue || this.fieldValue.length == 0) {
-        // let sendOption = {
-        //   key: event.key,
-        //   value: null,
-        //   event: event,
-        // }
         this.emitInputValue(null);
         this.emitKeydown(event);
-        // this.emitKeyEnter(sendOption);
-        // this.$emit('next-element', {event: event});
+        this.isEmit = false;
         return;
       }
       let newDateTime = this.fieldValue.split('.').reverse().join('-');
@@ -163,58 +165,11 @@ export default {
         this.fieldValue = '';
         return;
       }
-      // let sendOption = {
-      //   key: event.key,
-      //   value: newDateTime,
-      //   event: event,
-      // }
-      this.isEmit = true;
       this.isDialogShow = false;
       this.emitInputValue(newDateTime);
       this.emitKeydown(event);
-      // this.emitKeyEnter(sendOption);
-      // this.$emit('next-element', {event: event});
+      this.isEmit = false;
     },
-    
-    // eventKeyTab(event) {
-    //   if (this.inputProperties.required && !this.isRequiredOff)
-    //     if (this.fieldValue.length != 10) return;
-    //   if (!this.fieldValue || this.fieldValue.length == 0) {
-    //     let sendOption = {
-    //       key: event.key,
-    //       shift: event.shiftKey,
-    //       value: null,
-    //       event: event,
-    //     }
-    //     this.emitInputValue(null);
-    //     this.emitKeyEnter(sendOption);
-    //     return;
-    //   }
-    //   let newDateTime = this.fieldValue.split('.').reverse().join('-');
-    //   if (new Date(newDateTime) == 'Invalid Date') {
-    //     this.fieldValue = '';
-    //     return;
-    //   }
-    //   let newDate = new Date(newDateTime);
-    //   newDate = `${newDate.getFullYear()}-` + 
-    //             `${(+newDate.getMonth() < 9) ? '0' + (+newDate.getMonth() + 1) : +newDate.getMonth() + 1}-` + 
-    //             `${(+newDate.getDate() < 10) ? '0' + newDate.getDate() : newDate.getDate()}`;
-    //   if (newDate.split('-').reverse().join('.') != this.fieldValue) {
-    //     this.fieldValue = '';
-    //     return;
-    //   }
-    //   let sendOption = {
-    //     key: event.key,
-    //     shift: event.shiftKey,
-    //     value: newDateTime,
-    //     event: event,
-    //   }
-    //   this.isEmit = true;
-    //   this.isDialogShow = false;
-    //   this.emitInputValue(newDateTime);
-    //   this.emitKeyTab(sendOption);
-    // },
-
 
     eventClearValue() {
       this.fieldValue = null;
@@ -223,24 +178,29 @@ export default {
         this.fieldValue = null;
         this.fieldValueDate = null;
         this.emitInputValue(null);
-        // this.emitClearValue();
       },10);
     },
 
-    eventBlurField(event) {
-      // if (event.relatedTarget)
-      //   if (event.relatedTarget.closest(`.el-field-date__date-time`)) {
-      //     event.preventDefault();
-      //     event.relatedTarget.closest(`.el-field-date__date-time`).focus();
-      //     this.fieldElementDOM = event.target;
-      //     return;
-      //   } else {
-      //     this.emitBlurField({value: this.fieldValue.split('.').reverse().join('-'), key: 'Enter', shift: false, ev: 'blur'});
-      //   }
-      // if (!this.isEmit) {
-      //   this.isDialogShow = false;
-      //   this.emitKeyEsc();
-      // }
+    blurField(event) {
+      if (event.relatedTarget)
+        if (event.relatedTarget.closest(`.el-field-date__date-time`)) {
+          event.preventDefault();
+          event.relatedTarget.closest(`.el-field-date__date-time`).focus();
+          this.fieldElementDOM = event.target;
+          return;
+        } else {
+          if (this.isEmit)
+            this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''})
+          else
+            this.isEmit = true;
+          return;
+        }
+      if (this.isEmit) {
+        this.isDialogShow = false;
+        this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''})
+      } else {
+        this.isEmit = true;
+      }
     },
 
     emitKeydown(event) { this.$emit('event-keydown', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''}); },

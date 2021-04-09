@@ -53,7 +53,13 @@ export default {
     }
   },
   // ---------------------------------------------------------------------------
-
+  RESET_TABLE(state, option) {
+    state.commit('SET_FILTER_DEFAULT', option);
+    state.commit('CLEAR_DATA', option);
+    state.commit('CLEAR_DATA_GROUP_LEGEND', option);
+    state.commit('SET_FILTER_EXTENDED', {value: null, ...option});
+    state.dispatch('REQUEST_DATA', option);
+  },
   // ----FILTERS----------------------------------------------------------------
   // ----УСТАНОВКА ФИЛЬТРОВ ПО УМОЛЧАНИЮ----------------------------------------
   SET_FILTER_DEFAULT(state, option) {

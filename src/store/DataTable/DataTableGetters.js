@@ -124,7 +124,12 @@ export default {
     if (!option.guid) return null;
     return state[option.tableName][option.guid].markersEvents.filterExtendedOff;
   },
-
+  GET_MARK_EVENTS_ADDING:(state) => (option) => {
+    return state[option.tableName][option.guid].markersEvents.eventAdding;
+  },
+  GET_MARK_MODE_ADDING:(state) => (option) => {
+    return state[option.tableName][option.guid].markersEvents.modeAdding;
+  },
 
   // HISTORY DATA -------------------------------------------------------
   // ------------ -------------------------------------------------------

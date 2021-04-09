@@ -42,8 +42,8 @@ import DialogModal from '@/components/Dialogs/DialogModal.vue';
 import DataTableControl from '@/components/DataTableControls/DataTableControl.vue';
 
 
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
 
 export default {
@@ -62,7 +62,7 @@ export default {
     isBtnClear: { type: Boolean, default: false },
     // idElement: { type: Number, default: null },
     relatedModelName: { type: String, default: null },
-
+    isRequiredOff: { type: Boolean, default: true },
     // isEditable: { type: Boolean, default: false },
     dimension: { type: String, default: '' },
     dimensionValue: null, // { type: String, default: '' },

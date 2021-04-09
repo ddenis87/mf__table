@@ -11,7 +11,7 @@
                                  @next-element="nextElement"></data-filter-extended-item>
     </div>
     <div class="data-filter-extended__action">
-      <!-- <el-btn @click="resetFilter">Очистить</el-btn> -->
+      <el-btn @click="resetFilter">Сбросить все</el-btn>
       <el-btn class="tabspace-end" @click="acceptFilter" @keydown.stop="eventKeydownAcceptFilter">Применить</el-btn>
     </div>
   </div>
@@ -111,12 +111,15 @@ export default {
       this.$emit('accept');
     },
     resetFilter() {
+      this.$store.dispatch('DataTable/MARK_EVENT_FILTER_EXTENDED_RESET', { tableName: this.tableName, guid: this.guid });
+
       let sendOption = {
         tableName: this.tableName,
         guid: this.guid,
         value: null,
       };
       this.$store.dispatch('DataTable/SET_FILTER_EXTENDED', sendOption);
+      this.$emit('accept');
     },
   }
 }

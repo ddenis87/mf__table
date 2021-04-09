@@ -6,13 +6,15 @@
       <v-overlay :value="isDisabledControl" opacity="0.5" z-index="999" color="white" :absolute="true"></v-overlay>
 
       <!-- ACTIONS -->
-      <data-table-control-actions :table-name="tableName"
+      <data-table-control-actions class="toolbar-group"
+                                  :table-name="tableName"
                                   :guid="guid"
                                   :props-table="propsTable"
                                   :filters-form="filtersForm"></data-table-control-actions>
       <v-spacer></v-spacer>
       <!-- VIEWS -->
-      <data-table-control-views :table-name="tableName"
+      <data-table-control-views class="toolbar-group"
+                                :table-name="tableName"
                                 :guid="guid"
                                 :props-table="propsTable"></data-table-control-views>
       
@@ -50,5 +52,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.data-table-control {
+  .toolbar {
+    overflow: hidden;
+    overflow-x: scroll;
+    &::-webkit-scrollbar {
+      width: 2px;
+      height: 4px;
+      border-radius: 4px;
+      &-thumb {
+        border-radius: 3px;
+        background-color: rgba(0,0,0,0.2);
+      }
+    }
 
+    &-group {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+  }
+}
 </style>

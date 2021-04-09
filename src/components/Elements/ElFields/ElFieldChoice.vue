@@ -7,19 +7,27 @@
     <v-autocomplete class="el-field__item"
                     v-bind="propsField"
                     :items="fieldItems"
+                    :loading="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))"
                     :item-text="'display_name'"
                     :item-value="'value'"
                     v-model="fieldValue"
                     @click.stop
                     @change="changeValue"
-                    @keydown.stop.enter="eventKeydownEnter"
-                    @blur="blurInput"></v-autocomplete>
+                    @keydown.stop.enter="eventKeydown"
+                    @keydown.stop.tab="eventKeydown"
+                    @keydown.stop.escape="eventKeydown"
+                    @keydown.stop
+                    @blur="blurField">
+        <template v-slot:progress>
+          <div v-if="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))" class="el-field__item_required"></div>
+        </template>
+      </v-autocomplete>
   </div>
 </template>
 
 <script>
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 export default {
   name: 'ElFieldChoice',
   mixins: [
@@ -37,16 +45,22 @@ export default {
       this.emitInputValue();
     },
     
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
+      // console.log(this.fieldValue);
       if (this.fieldValue) {
-        setTimeout(() => { this.emitKeydown(event); }, 100);
+        this.isEmit = false;
+        setTimeout(() => { this.emitKeydown(event);  }, 100);
         let newEvent = new Event('click');
+        // console.log('element');
         event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
         return;
       }
       if (this.checkRequiredField(event)) return;
+      this.isEmit = false;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
+      
       setTimeout(() => {
         if (this.isChange == true) {
           this.isChange = false;
@@ -54,26 +68,18 @@ export default {
         } else {
           this.emitInputValue();
           this.emitKeydown(event); // this.$emit('event-keydown', {event: event, value: this.fieldValue});
+          
         }
       }, 100);
     },
 
-    blurInput(event) {
+    // blurInput(event) {
 
-    },
+    // },
   },
 }
 </script>
 
 <style lang="scss" scoped>
 @import './ElField.scss';
-// .el-field {
-//   &__anchor {
-//     width: 100%;
-//     height: 0px;
-//     outline: no;
-//     // border: thin solid grey;
-
-//   }
-// }
 </style>

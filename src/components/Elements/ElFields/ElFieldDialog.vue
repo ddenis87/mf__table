@@ -5,23 +5,26 @@
                 'el-field_hide-underline': isHideUnderline}">
     <div class="el-field__anchor" tabindex="-1"></div>
     <v-autocomplete class="el-field__item"
-                    
-                    
                     append-icon="mdi-dots-horizontal"
-
                     v-bind="propsField"
+                    :loading="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))"
                     :items="fieldList"
                     :item-text="fieldListText"
                     :item-value="'id'"
-                    
                     v-model="fieldValue"
                     @click.stop
                     @click:append="eventOpenDialog"
                     @click:clear="eventClearValue"
                     @input="eventInputValue"
                     @change="eventChangeValue"
-                    @keydown.stop.enter="eventKeydownEnter"
-                    @blur="eventBlurField">
+                    @keydown.stop.enter="eventKeydown"
+                    @keydown.stop.tab="eventKeydown"
+                    @keydown.stop.escape="eventKeydown"
+                    @keydown.stop
+                    @blur="blurField">
+      <template v-slot:progress>
+        <div v-if="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))" class="el-field__item_required"></div>
+      </template>
     </v-autocomplete>
     <dialog-full-page :is-dialog-name="dialogTableName" 
                       :is-dialog-show="isDialogShow" 
@@ -35,8 +38,8 @@
 </template>
 
 <script>
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 
 import DialogFullPage from '@/components/Dialogs/DialogFullPage.vue';
 export default {
@@ -115,7 +118,7 @@ export default {
           setTimeout(() => {
             this.fieldElementDOM.focus();
             this.fieldElementDOM.select();
-          }, 10);
+          }, 100);
         });
       // console.log(option);
       
@@ -135,14 +138,20 @@ export default {
 
     eventInputValue() { this.emitInputValue(); },
 
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
       if (this.fieldValue) {
+        this.isEmit = false;
         setTimeout(() => { this.emitKeydown(event); }, 100);
         let newEvent = new Event('click');
         event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
+        if (this.inUse == 'table') setTimeout(() => {
+          event.target.focus();
+        }, 50)
         return;
       }
       if (this.checkRequiredField(event)) return;
+      this.isEmit = false;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
       setTimeout(() => {
@@ -175,9 +184,13 @@ export default {
       this.isDialogShow = false;
     },
 
-    eventBlurField() {
-      if (!this.isDialogShow  && !this.isEmit) {
-        this.emitBlurField();
+    blurField(event) {
+      if (!this.isDialogShow) {
+        if (this.isEmit) {
+          this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue : ''}); // this.emitBlurField();
+        } else {
+          this.isEmit = true;
+        }
       }
     },
   },

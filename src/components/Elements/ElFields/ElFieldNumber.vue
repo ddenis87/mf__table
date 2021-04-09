@@ -3,20 +3,28 @@
        :class="{'el-field_single-line': isSingleLine, 
                 'el-field_hide-message': isHideMessage,
                 'el-field_hide-underline': isHideUnderline}">
-    <div class="el-field__anchor" tabindex="-2"></div>
+    <div class="el-field__anchor" tabindex="-1"></div>
     <v-text-field class="el-field__item"
                   type="number"
                   v-bind="propsField"
+                  :loading="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))"
                   v-model="fieldValue"
                   @input="eventInput"
-                  @keydown.stop.enter="eventKeydownEnter"
-                  @blur="blurInput"></v-text-field>
+                  @keydown.stop.enter="eventKeydown"
+                  @keydown.stop.tab="eventKeydown"
+                  @keydown.stop.escape="eventKeydown"
+                  @keydown.stop
+                  @blur="blurField">
+      <template v-slot:progress>
+        <div v-if="(inUse == null && inputProperties.required && (fieldValue == null || fieldValue == ''))" class="el-field__item_required"></div>
+      </template>
+    </v-text-field>
   </div>
 </template>
 
 <script>
-import { ElField } from './ElFields.js';
-import { ElFieldProps } from './ElFieldsProps.js';
+import { ElField } from './ElField.js';
+import { ElFieldProps } from './ElFieldProps.js';
 
 export default {
   name: 'ElFieldNumber',
@@ -28,15 +36,15 @@ export default {
     eventInput() {
       this.emitInputValue();
     },
-    eventKeydownEnter(event) {
+    eventKeydown(event) {
+      if (this.inUse == 'table') { event.preventDefault(); }
       if (this.checkRequiredField(event)) return;
       let newEvent = new Event('click');
       event.target.closest('.el-field').firstChild.dispatchEvent(newEvent);
       this.emitInputValue();
       this.emitKeydown(event);
+      this.isEmit = false;
     },
-
-    blurInput(event) {},
   }
 }
 </script>

@@ -5,6 +5,7 @@
                  @click="addingElement">Добавить элемент</el-btn-icon>
     <el-btn-icon v-if="propsTable.isAddingInline"
                  icon="mdi-table-row-plus-after" 
+                 
                  @click="addingElementInline">Добавить строку</el-btn-icon>
     <el-btn-icon v-if="propsTable.isHierarchy && propsTable.isAdding"
                  icon="mdi-folder-plus-outline"
@@ -28,7 +29,7 @@
                  :disabled="!activeElement"
                  icon="mdi-delete"
                  @click="deletingElement">{{ 'Удалить' }}</el-btn-icon>
-
+    <el-btn-icon icon="mdi-refresh" @click="refreshTable">{{ 'Обновить' }}</el-btn-icon>
     <dialog-full-page :is-dialog-name="buildActionTitle"
                       :is-dialog-show="isShowDialog" 
                       @close-dialog="closeDialog">

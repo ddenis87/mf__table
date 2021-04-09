@@ -35,12 +35,12 @@ export default {
     computedOverflow() {
       let overflow = document.querySelector(`.${this.guid}-data-overflow`);
       let overflowBlock = document.querySelector(`.${this.guid}-data-overflow-block`);
-      if (overflow.getBoundingClientRect().height + 10 < overflowBlock.getBoundingClientRect().height) {
+      if (overflow.getBoundingClientRect().height + 12 < overflowBlock.getBoundingClientRect().height) {
         this.$emit('is-show');
         return;
       }
       let overflowLine = document.querySelector(`.${this.guid}-data-overflow-line`);
-      if (overflow.getBoundingClientRect().width + 4 < overflowLine.getBoundingClientRect().width) {
+      if (overflow.getBoundingClientRect().width + 16 < overflowLine.getBoundingClientRect().width) {
         this.$emit('is-show');
         return;
       }
