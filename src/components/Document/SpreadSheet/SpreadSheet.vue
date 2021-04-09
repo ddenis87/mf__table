@@ -1,6 +1,15 @@
 <template>
   <div class="spread-sheet" ref="SpreadSheet">
     <table class="table" @click="selectedCell">
+      <!-- <colgroup></colgroup>
+      <thead>
+        <tr>
+          <th>1</th>
+        </tr>
+      </thead> -->
+
+      <!-- <spread-sheet-head :count-column="countColumn"
+                         :columns="columns"></spread-sheet-head> -->
       <thead>
         <tr class="head-row">
           <th v-show="isGroup"
@@ -27,9 +36,6 @@
                              :is-group="(isGroupElement(i)) ? true : false"
                              :row-number="i"
                              :row-group-count="isGroupElement(i)"></group-element>
-              <!-- <row-btn-icon v-show="isGroupElement(i)"
-                            :data-row-group-number="i"
-                            :data-row-group="isGroupElement(i)">mdi-plus-box-outline</row-btn-icon> -->
             </td>
             <td class="body-column body-column__title"
                 :class="{'body-column__title_group': isGroup}"
@@ -56,9 +62,6 @@
                              :is-group="(isGroupElement(i)) ? true : false"
                              :row-number="i"
                              :row-group-count="isGroupElement(i)"></group-element>
-              <!-- <row-btn-icon v-show="isGroupElement(i)"
-                            :data-row-group-number="i"
-                            :data-row-group="isGroupElement(i)">mdi-plus-box-outline</row-btn-icon> -->
             </td>
             <td class="body-column body-column__title"
                 :class="{'body-column__title_group': isGroup}"
@@ -157,7 +160,11 @@
 import SpreadSheetProps from './SpreadSheetProps';
 import SpreadSheetComputed from './SpreadSheetComputed';
 
-import GroupElement from './components/GroupElement.vue';
+// import SpreadSheetHead from './components/SpreadSheetHead.vue';
+import SpreadSheetRow from './SpreadSheetRow';
+import SpreadSheetColumn from './SpreadSheetColumn';
+
+import GroupElement from './GroupElement.vue';
 // import RowBtnIcon from './components/RowBtnIcon.vue';
 
 export default {
@@ -165,9 +172,12 @@ export default {
   mixins: [
     SpreadSheetProps,
     SpreadSheetComputed,
+    SpreadSheetRow,
+    SpreadSheetColumn,
   ],
   components: {
     GroupElement,
+    // SpreadSheetHead,
     // RowBtnIcon,
     // SpreadSheetBodyRow,
   },
@@ -182,42 +192,7 @@ export default {
       excludedRows: new Set(),
     };
   },
-  computed: {
-    shiftCellTitle() {
-      return { left: '25px' };
-    },
-  },
   methods: {
-    getLevelRow(rowNumber) {
-      if (!this.rows[rowNumber] || !this.rows[rowNumber].parent) return 1;
-      // console.log('go level');
-      let level = 1;
-      let condition = true;
-      let currentParent = this.rows[rowNumber].parent;
-      while (condition) {
-        if (this.rows[currentParent].parent) {
-          level += 1;
-          currentParent = this.rows[currentParent].parent;
-        } else condition = false;
-      }
-      // console.log(level);
-      return level;
-    },
-    getRowParent(rowNumber) {
-      return this.rows[rowNumber].parent;
-    },
-    isGroupElement(rowNumber) { // insert element "+"
-      if (this.rows[rowNumber] && this.rows[rowNumber].rowGroup) return +this.rows[rowNumber].rowGroup;
-      return false;
-    },
-    getRowspan(cellName) {
-      if (!this.cells[cellName] || !this.cells[cellName].rowspan) return 1;
-      return this.cells[cellName].rowspan;
-    },
-    getColspan(cellName) {
-      if (!this.cells[cellName] || !this.cells[cellName].colspan) return 1;
-      return this.cells[cellName].colspan;
-    },
     getCellStyle(cellName) {
       if (!this.cells[cellName] || !this.cells[cellName].style) return {};
       return this.cells[cellName].style;
@@ -242,21 +217,7 @@ export default {
       }
       return this.cells[cellName].value;
     },
-    getRowHeight(rowNumber) {
-      const rowProps = {};
-      if (this.rows[rowNumber]) {
-        if (this.rows[rowNumber].rowGroup) {
-          this.isGroup = true;
-          for (let i = 1; i < this.rows[rowNumber].rowGroup; i += 1) {
-            this.excludedRows.add(`${rowNumber + i}`);
-          }
-          // console.log(this.excludedRows);
-          rowProps.rowGroup = +this.rows[rowNumber].rowGroup;
-        }
-        return { height: `${this.rows[rowNumber].height}px`, ...rowProps } || {};
-      }
-      return {};
-    },
+
     getColumnWidth(columnNumber) {
       const name = this.getColumnTitle(columnNumber);
       if (this.columns[name]) {
@@ -292,35 +253,6 @@ export default {
       if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('body-column__selected');
       event.target.classList.add('body-column__selected');
       this.currentSelectedCell = event.target;
-    },
-    toggleGroup(btnGroupElement) {
-      const btnGroupImg = btnGroupElement.querySelector('i');
-      const rowNumber = btnGroupElement.getAttribute('data-row-group-number');
-      if (btnGroupImg.classList.contains('mdi-plus-box-outline')) {
-        btnGroupImg.classList.remove('mdi-plus-box-outline');
-        btnGroupImg.classList.add('mdi-minus-box-outline');
-
-        const elementsGroup = document.querySelectorAll(`[data-group-row="${rowNumber}"]`);
-        elementsGroup.forEach((element) => {
-          element.classList.remove('body-row-group_hidden');
-        });
-        this.openGroup.set(rowNumber, this.getLevelRow(rowNumber));
-      } else {
-        btnGroupImg.classList.remove('mdi-minus-box-outline');
-        btnGroupImg.classList.add('mdi-plus-box-outline');
-
-        let currentRow = btnGroupElement.closest('.body-row');
-        for (let i = 0; i < btnGroupElement.getAttribute('data-row-group') - 1; i += 1) {
-          currentRow = currentRow.nextElementSibling;
-          if (currentRow.querySelector('button')) {
-            currentRow.querySelector('button i').classList.remove('mdi-minus-box-outline');
-            currentRow.querySelector('button i').classList.add('mdi-plus-box-outline');
-          }
-          currentRow.classList.add('body-row-group_hidden');
-          this.openGroup.delete(rowNumber);
-        }
-      }
-      console.log(this.openGroup);
     },
   },
 };

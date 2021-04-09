@@ -60,7 +60,16 @@ export default {
         column: 25,
         row: 100,
       },
-      columnsJSON: '{"a":{"width":120},"b":{"width":20},"c":{"width":20},"d":{"width":250},"e":{"width":100}}',
+      columnsJSON: `{
+        "a":{"width":120},
+        "b":{"width":20},
+        "c":{"width":20},
+        "d":{"width":250},
+        "e":{"width":100},
+        "h":{"columnGroup":"3"},
+        "i":{"parent":"h"},
+        "j":{"parent":"h"}
+      }`,
       // rowsJSON: '{"5":{"height":40},"6":{"height":30},"7":{"height":30},"8":{"height":80}, "14": {"rowGroup": "10"}, "19": {"rowGroup": "3"}, "27": {"rowGroup": "2"}}',
       
       //  Variant 2
