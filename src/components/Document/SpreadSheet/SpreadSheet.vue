@@ -1,158 +1,19 @@
 <template>
   <div class="spread-sheet" ref="SpreadSheet">
-    <table class="table" @click="selectedCell">
-      <!-- <colgroup></colgroup>
-      <thead>
-        <tr>
-          <th>1</th>
-        </tr>
-      </thead> -->
+    <table class="table" @click="eventClickTable">
+      <spread-sheet-head :is-rows-group="isRowsGroup"
+                         :column-count="columnCount"
+                         :columns="columns"
+                         
+                         :shift-title="shiftTitle"></spread-sheet-head>
+      <spread-sheet-body :row-count="rowCount"
+                         :rows="rows"
+                         :column-count="columnCount"
+                         :columns="columns"
+                         :cells="cells"
 
-      <spread-sheet-head-row-group :count-column="countColumn"
-                                   :columns="columns"
-                                   :is-rows-group="isGroup"></spread-sheet-head-row-group>
-      <thead>
-        <tr class="head-row">
-          <th v-show="isGroup"
-              class="head-column head-column__group"
-              ></th>
-          <th class="head-column head-column__title"
-              :class="{'head-column__title_group': isGroup}"
-              :style="shiftCellTitle"></th>
-          <th v-for="j in countColumn"
-              :key="`head-column-${j}`"
-              class="head-column"
-              :style="getColumnWidth(j)">{{ getColumnTitle(j).toUpperCase() }}</th>
-        </tr>
-      </thead>
-      <!-- Variant 3 -->
-      <tbody>
-        <template v-for="i in countRow">
-          <tr v-if="(!excludedRows.has(`${i}`))"
-              :key="`body-row-${i}`"
-              class="body-row"
-              :style="getRowHeight(i)">
-            <td v-show="isGroup" class="body-column body-column__group">
-              <group-element :level="getLevelRow(i)"
-                             :is-group="(isGroupElement(i)) ? true : false"
-                             :row-number="i"
-                             :row-group-count="isGroupElement(i)"></group-element>
-            </td>
-            <td class="body-column body-column__title"
-                :class="{'body-column__title_group': isGroup}"
-                :style="shiftCellTitle">{{ i }}</td>
-            <template v-for="j in countColumn">
-              <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
-                  :key="`body-column-${i}-${j}`"
-                  class="body-column"
-                  :colspan="getColspan(`${columnsTitle[j]}${i}`)"
-                  :rowspan="getRowspan(`${columnsTitle[j]}${i}`)"
-                  :class="getCellStyle(`${columnsTitle[j]}${i}`)">
-                {{ getCellValue(i, j) }}
-              </td>
-            </template>
-          </tr>
-
-          <tr v-if="(excludedRows.has(`${i}`))"
-              :key="`body-row-${i}`"
-              class="body-row body-row-group body-row-group_hidden"
-              :data-group-row="getRowParent(i)"
-              :style="getRowHeight(i)">
-            <td v-show="isGroup" class="body-column body-column__group">
-              <group-element :level="getLevelRow(i)"
-                             :is-group="(isGroupElement(i)) ? true : false"
-                             :row-number="i"
-                             :row-group-count="isGroupElement(i)"></group-element>
-            </td>
-            <td class="body-column body-column__title"
-                :class="{'body-column__title_group': isGroup}"
-                :style="shiftCellTitle">{{ i }}</td>
-            <template v-for="j in countColumn">
-              <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
-                  :key="`body-column-${i}-${j}`"
-                  class="body-column"
-                  :colspan="getColspan(`${columnsTitle[j]}${i}`)"
-                  :rowspan="getRowspan(`${columnsTitle[j]}${i}`)"
-                  :class="getCellStyle(`${columnsTitle[j]}${i}`)">
-                {{ getCellValue(i, j) }}
-              </td>
-            </template>
-          </tr>
-        </template>
-      </tbody>
-
-      <!-- Variant 2 -->
-      <!-- <tbody>
-        <template v-for="i in countRow">
-          <tr v-if="(!excludedRows.has(`${i}`))"
-              :key="`body-row-${i}`"
-              class="body-row"
-              :style="getRowHeight(i)">
-            <td v-show="isGroup" class="body-column body-column__group">
-              <row-btn-icon v-show="isGroupElement(i)" :data-row-group-number="i">mdi-plus-box-outline</row-btn-icon>
-            </td>
-            <td class="body-column body-column__title"
-                :class="{'body-column__title_group': isGroup}">{{ i }}</td>
-            <template v-for="j in countColumn">
-              <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
-                  :key="`body-column-${i}-${j}`"
-                  class="body-column"
-                  :colspan="getColspan(`${columnsTitle[j]}${i}`)"
-                  :rowspan="getRowspan(`${columnsTitle[j]}${i}`)"
-                  :class="getCellStyle(`${columnsTitle[j]}${i}`)">
-                {{ getCellValue(i, j) }}
-              </td>
-            </template>
-          </tr>
-
-          <template v-if="isGroupElement(i)">
-            <tr v-for="k in isGroupElement(i) - 1"
-                :key="`body-row-group-${i + k}`"
-                class="body-row body-row-group body-row-group_hidden"
-                :data-group-row="i">
-              <td v-show="isGroup" class="body-column body-column__group">
-                <v-divider vertical></v-divider>
-                <row-btn-icon v-show="isGroupElement(i + k)">mdi-plus-box-outline</row-btn-icon>
-              </td>
-              <td class="body-column body-column__title"
-                  :class="{'body-column__title_group': isGroup}">{{ i + k }}</td>
-              <template v-for="l in countColumn">
-                <td v-if="(!excludedCells.has(`${columnsTitle[l]}${i + k}`))"
-                    :key="`body-column-${i + k}-${l}`"
-                    class="body-column"
-                    :colspan="getColspan(`${columnsTitle[l]}${i + k}`)"
-                    :rowspan="getRowspan(`${columnsTitle[l]}${i + k}`)"
-                    :class="getCellStyle(`${columnsTitle[l]}${i + k}`)">
-                  {{ getCellValue(i + k, l) }}
-                </td>
-              </template>
-            </tr>
-          </template>
-        </template>
-      </tbody> -->
-      <!-- no group -->
-      <!-- <tbody>
-        <tr v-for="i in countRow"
-            :key="`body-row-${i}`"
-            class="body-row"
-            :style="getRowHeight(i)">
-          <td v-show="isGroup" class="body-column body-column__group">
-            <row-btn-icon v-show="isGroupElement(i)">mdi-plus-box-outline</row-btn-icon>
-          </td>
-          <td class="body-column body-column__title"
-              :class="{'body-column__title_group': isGroup}">{{ i }}</td>
-          <template v-for="j in countColumn">
-            <td v-if="(!excludedCells.has(`${columnsTitle[j]}${i}`))"
-                :key="`body-column-${i}-${j}`"
-                class="body-column"
-                :colspan="getColspan(`${columnsTitle[j]}${i}`)"
-                :rowspan="getRowspan(`${columnsTitle[j]}${i}`)"
-                :class="getCellStyle(`${columnsTitle[j]}${i}`)">
-              {{ getCellValue(i, j) }}
-            </td>
-          </template>
-        </tr>
-      </tbody> -->
+                         :shift-title="shiftTitle"
+                         :is-rows-group="isRowsGroup"></spread-sheet-body>
     </table>
   </div>
 </template>
@@ -160,99 +21,63 @@
 <script>
 import SpreadSheetProps from './SpreadSheetProps';
 import SpreadSheetComputed from './SpreadSheetComputed';
+import SpreaSheetRow from './SpreadSheetRow';
 
-import SpreadSheetHeadRowGroup from './components/SpreadSheetHeadRowGroup.vue';
-import SpreadSheetRow from './SpreadSheetRow';
-import SpreadSheetColumn from './SpreadSheetColumn';
-
-import GroupElement from './GroupElement.vue';
-// import RowBtnIcon from './components/RowBtnIcon.vue';
+import SpreadSheetHead from './components/SpreadSheetHead/SpreadSheetHead.vue';
+import SpreadSheetBody from './components/SpreadSheetBody/SpreadSheetBody.vue';
 
 export default {
   name: 'SpreadSheet',
   mixins: [
     SpreadSheetProps,
     SpreadSheetComputed,
-    SpreadSheetRow,
-    SpreadSheetColumn,
+    SpreaSheetRow,
   ],
   components: {
-    GroupElement,
-    SpreadSheetHeadRowGroup,
-    // RowBtnIcon,
-    // SpreadSheetBodyRow,
+    SpreadSheetHead,
+    SpreadSheetBody,
   },
   data() {
     return {
-      isGroup: false,
-      openGroup: new Map(),
-      currentSelectedCell: null,
-      setChar: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-      columnsTitle: {}, // {1: a, 2: b, ..., 24: aa}
-      excludedCells: new Set(),
-      excludedRows: new Set(),
     };
   },
   methods: {
-    getCellStyle(cellName) {
-      if (!this.cells[cellName] || !this.cells[cellName].style) return {};
-      return this.cells[cellName].style;
-    },
-    getCellValue(row, column) {
-      const cellName = `${this.columnsTitle[column]}${row}`;
-      if (!this.cells[cellName]) return '';
-      if (Object.keys(this.cells[cellName]).includes('colspan')) {
-        for (let i = 1; i < this.cells[cellName].colspan; i += 1) {
-          this.excludedCells.add(`${this.columnsTitle[column + i]}${row}`);
-        }
-      }
-      if (Object.keys(this.cells[cellName]).includes('rowspan')) {
-        for (let i = 1; i < this.cells[cellName].rowspan; i += 1) {
-          this.excludedCells.add(`${this.columnsTitle[column]}${row + i}`);
-          if (Object.keys(this.cells[cellName]).includes('colspan')) {
-            for (let j = 1; j < this.cells[cellName].colspan; j += 1) {
-              this.excludedCells.add(`${this.columnsTitle[column + j]}${row + i}`);
-            }
-          }
-        }
-      }
-      return this.cells[cellName].value;
-    },
-
-    getColumnWidth(columnNumber) {
-      const name = this.getColumnTitle(columnNumber);
-      if (this.columns[name]) {
-        return {
-          'max-width': `${this.columns[name].width}px`,
-          'min-width': `${this.columns[name].width}px`,
-        };
-      }
-      return {};
-    },
-    getColumnTitle(columnNumber) {
-      if (columnNumber > 702) return 'Infinity';
-      if (columnNumber <= this.setChar.length) {
-        const title = this.setChar[columnNumber - 1];
-        this.columnsTitle[columnNumber] = title;
-        return title;
-      }
-      if ((columnNumber % this.setChar.length) === 0) {
-        const title = `${this.setChar[((columnNumber - this.setChar.length) / this.setChar.length) - 1]}${this.setChar[this.setChar.length - 1]}`;
-        this.columnsTitle[columnNumber] = title;
-        return title;
-      }
-      const title = `${this.setChar[(Math.floor(columnNumber / this.setChar.length)) - 1]}${this.setChar[(columnNumber % this.setChar.length) - 1]}`;
-      this.columnsTitle[columnNumber] = title;
-      return title;
-    },
-    selectedCell(event) {
-      if (event.target.closest('button')) {
-        this.toggleGroup(event.target.closest('button'));
+    eventClickTable(evt) {
+      if (evt.target.closest('button') && evt.target.closest('button').hasAttribute('data-column-group-parent')) {
+        this.toggleColumnGroup(evt.target.closest('button'));
         return;
       }
+      if (evt.target.closest('button') && evt.target.closest('button').hasAttribute('data-row-group-parent')) {
+        this.toggleRowGroup(evt.target.closest('button'));
+        return;
+      }
+      this.selectedCell(evt);
+    },
+    toggleColumnGroup(evt) {
+      const columnGroupParent = evt.getAttribute('data-column-group-parent');
+      const columnGroupStatus = evt.getAttribute('data-column-group-status');
+      const columnsGroup = document.querySelectorAll(`[data-column-parent="${columnGroupParent}"]`);
+      const btnGroupImg = evt.querySelector('i');
+      if (columnGroupStatus === 'close') {
+        columnsGroup.forEach((element) => {
+          element.classList.remove('hidden');
+        });
+        evt.setAttribute('data-column-group-status', 'open');
+      } else {
+        columnsGroup.forEach((element) => {
+          element.classList.add('hidden');
+        });
+        evt.setAttribute('data-column-group-status', 'close');
+      }
+      btnGroupImg.classList.toggle('mdi-plus-box-outline');
+      btnGroupImg.classList.toggle('mdi-minus-box-outline');
+    },
+
+    selectedCell(event) {
+      // console.log(event);
       if (this.currentSelectedCell === event.target) return;
-      if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('body-column__selected');
-      event.target.classList.add('body-column__selected');
+      if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('body-row__column_selected');
+      event.target.classList.add('body-row__column_selected');
       this.currentSelectedCell = event.target;
     },
   },
@@ -296,104 +121,105 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
     font-family: Arial, Helvetica, sans-serif;
 
     font-size: 16px;
-    thead {
-      .head-row {
-        height: 24px;
-        font-size: 0.75em;
-        color: rgba(0, 0, 0, 0.5);
-        .head-column {
-          position: sticky;
-          top: 0px;
-          padding: 2px;
-          min-width: 94px;
-          border-left: thin solid grey;
-          box-shadow: inset 0 1px 0 grey, inset 0 -1px 0 grey, 1px 0 0 grey;
-          background-color: #dadce0;
-          z-index: 100;
-          &__title {
-            position: sticky;
-            top: 0px;
-            left: 0px;
-            box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
-            min-width: 60px;
-            max-width: 60px;
-            width: 60px;
-            z-index: 200;
-            // &_group {
-            //   left: 25px;
-            // }
-          }
-          &__group {
-            position: sticky;
-            left: 0px;
-            min-width: 25px;
-            max-width: 25px;
-            width: 25px;
-            box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
-            z-index: 210;
-          }
-        }
-      }
-    }
+    // thead {
+    //   .head-row {
+    //     height: 24px;
+    //     font-size: 0.75em;
+    //     color: rgba(0, 0, 0, 0.5);
+    //     .head-column {
+    //       position: sticky;
+    //       top: 0px;
+    //       padding: 2px;
+    //       min-width: 94px;
+    //       border-left: thin solid grey;
+    //       box-shadow: inset 0 1px 0 grey, inset 0 -1px 0 grey, 1px 0 0 grey;
+    //       background-color: #dadce0;
+    //       z-index: 100;
+    //       &__title {
+    //         position: sticky;
+    //         top: 0px;
+    //         left: 0px;
+    //         box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
+    //         min-width: 60px;
+    //         max-width: 60px;
+    //         width: 60px;
+    //         z-index: 200;
+    //         // &_group {
+    //         //   left: 25px;
+    //         // }
+    //       }
+    //       &__group {
+    //         position: sticky;
+    //         left: 0px;
+    //         min-width: 25px;
+    //         max-width: 25px;
+    //         width: 25px;
+    //         box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
+    //         z-index: 210;
+    //       }
+    //     }
+    //   }
+    // }
 
-    tbody {
-      position: relative;
-      .body-row {
-        height: 24px;
-        box-sizing: border-box;
-        &-group {
-          &_hidden {
-            display: none;
-            // visibility: hidden;
-          }
-        }
-        .body-column {
-          position: relative;
-          padding: 2px 3px;
-          font-size: 0.8em;
-          border-bottom: thin solid grey;
-          border-left: thin solid grey;
-          box-sizing: border-box;
-          overflow: hidden;
-          &:last-child {
-            border-right: thin solid grey;
-          }
-          &__title {
-            position: sticky;
-            left: 0px;
-            border-left: 0px;
-            box-shadow: inset 1px 0px 0 grey, 1px 0px 0 grey;
-            text-align: center;
-            font-size: 0.75em;
-            font-weight: bold;
-            background-color: #dadce0;
-            color: rgba(0, 0, 0, 0.5);
-            z-index: 150;
-            // &_group {
-            //   left: 25px;
-            // }
-          }
-          &__group {
-            position: sticky;
-            left: 0px;
-            border-bottom: 0px;
-            background-color: #dadce0;
-            box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
-            z-index: 160;
+    // tbody {
+    //   position: relative;
+      // .body-row {
+        // &__column {
+    //     height: 24px;
+    //     box-sizing: border-box;
+    //     &-group {
+    //       &_hidden {
+    //         display: none;
+    //         // visibility: hidden;
+    //       }
+    //     }
+    //     .body-column {
+    //       position: relative;
+    //       padding: 2px 3px;
+    //       font-size: 0.8em;
+    //       border-bottom: thin solid grey;
+    //       border-left: thin solid grey;
+    //       box-sizing: border-box;
+    //       overflow: hidden;
+    //       &:last-child {
+    //         border-right: thin solid grey;
+    //       }
+    //       &__title {
+    //         position: sticky;
+    //         left: 0px;
+    //         border-left: 0px;
+    //         box-shadow: inset 1px 0px 0 grey, 1px 0px 0 grey;
+    //         text-align: center;
+    //         font-size: 0.75em;
+    //         font-weight: bold;
+    //         background-color: #dadce0;
+    //         color: rgba(0, 0, 0, 0.5);
+    //         z-index: 150;
+    //         // &_group {
+    //         //   left: 25px;
+    //         // }
+    //       }
+    //       &__group {
+    //         position: sticky;
+    //         left: 0px;
+    //         border-bottom: 0px;
+    //         background-color: #dadce0;
+    //         box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
+    //         z-index: 160;
 
-          }
-          &__selected::after {
-            content: '';
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            bottom: 0px;
-            left: 0px;
-            border: 2px solid #1a73e8;
-          }
-        }
-      }
-    }
+    //       }
+          // &_selected::after {
+          //   content: '';
+          //   position: absolute;
+          //   top: 0px;
+          //   right: 0px;
+          //   bottom: 0px;
+          //   left: 0px;
+          //   border: 2px solid #1a73e8;
+          // }
+        // }
+      // }
+    // }
   }
 }
 </style>

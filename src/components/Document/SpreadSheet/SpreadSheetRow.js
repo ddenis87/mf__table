@@ -1,83 +1,58 @@
 export default {
+  data() {
+    return {
+      openRowGroup: new Map(),
+      rowGroupLevel: 1,
+    };
+  },
   computed: {
-    shiftCellTitle() {
-      return { left: '25px' };
+    shiftTitle() {
+      return { left: `${25 * this.rowGroupLevel}px` };
+    },
+    isRowsGroup() {
+      return !!Object.values(this.rows).find((item) => Object.keys(item).includes('rowGroup')) || false;
     },
   },
   methods: {
-    getLevelRow(rowNumber) {
-      if (!this.rows[rowNumber] || !this.rows[rowNumber].parent) return 1;
-      // console.log('go level');
-      let level = 1;
-      let condition = true;
-      let currentParent = this.rows[rowNumber].parent;
-      while (condition) {
-        if (this.rows[currentParent].parent) {
-          level += 1;
-          currentParent = this.rows[currentParent].parent;
-        } else condition = false;
-      }
-      // console.log(level);
-      return level;
-    },
-    isGroupElement(rowNumber) { // insert element "+"
-      if (this.rows[rowNumber] && this.rows[rowNumber].rowGroup) return +this.rows[rowNumber].rowGroup;
-      return false;
-    },
-    getRowspan(cellName) {
-      if (!this.cells[cellName] || !this.cells[cellName].rowspan) return 1;
-      return this.cells[cellName].rowspan;
-    },
-    getColspan(cellName) {
-      if (!this.cells[cellName] || !this.cells[cellName].colspan) return 1;
-      return this.cells[cellName].colspan;
-    },
-    getRowParent(rowNumber) {
-      return this.rows[rowNumber].parent;
-    },
-    getRowHeight(rowNumber) { // разбить на 2 функции
-      const rowProps = {};
-      if (this.rows[rowNumber]) {
-        if (this.rows[rowNumber].rowGroup) {
-          this.isGroup = true;
-          for (let i = 1; i < this.rows[rowNumber].rowGroup; i += 1) {
-            this.excludedRows.add(`${rowNumber + i}`);
-          }
-          // console.log(this.excludedRows);
-          rowProps.rowGroup = +this.rows[rowNumber].rowGroup;
-        }
-        return { height: `${this.rows[rowNumber].height}px`, ...rowProps } || {};
-      }
-      return {};
-    },
-    toggleGroup(btnGroupElement) {
-      const btnGroupImg = btnGroupElement.querySelector('i');
-      const rowNumber = btnGroupElement.getAttribute('data-row-group-number');
-      if (btnGroupImg.classList.contains('mdi-plus-box-outline')) {
-        btnGroupImg.classList.remove('mdi-plus-box-outline');
-        btnGroupImg.classList.add('mdi-minus-box-outline');
-
-        const elementsGroup = document.querySelectorAll(`[data-group-row="${rowNumber}"]`);
-        elementsGroup.forEach((element) => {
-          element.classList.remove('body-row-group_hidden');
+    toggleRowGroup(evt) {
+      const rowGroupParent = evt.getAttribute('data-row-group-parent');
+      const rowGroupStatus = evt.getAttribute('data-row-group-status');
+      const rowsGroup = document.querySelectorAll(`[data-row-parent="${rowGroupParent}"]`);
+      const btnGroupImg = evt.querySelector('i');
+      if (rowGroupStatus === 'close') {
+        rowsGroup.forEach((element) => {
+          element.classList.remove('hidden');
         });
-        this.openGroup.set(rowNumber, this.getLevelRow(rowNumber));
+        evt.setAttribute('data-row-group-status', 'open');
+        this.openRowGroup.set(rowGroupParent, this.getLevelRowGroup(rowGroupParent));
       } else {
-        btnGroupImg.classList.remove('mdi-minus-box-outline');
-        btnGroupImg.classList.add('mdi-plus-box-outline');
-
-        let currentRow = btnGroupElement.closest('.body-row');
-        for (let i = 0; i < btnGroupElement.getAttribute('data-row-group') - 1; i += 1) {
-          currentRow = currentRow.nextElementSibling;
-          if (currentRow.querySelector('button')) {
-            currentRow.querySelector('button i').classList.remove('mdi-minus-box-outline');
-            currentRow.querySelector('button i').classList.add('mdi-plus-box-outline');
-          }
-          currentRow.classList.add('body-row-group_hidden');
-          this.openGroup.delete(rowNumber);
-        }
+        rowsGroup.forEach((element) => {
+          element.classList.add('hidden');
+        });
+        evt.setAttribute('data-row-group-status', 'close');
+        this.openRowGroup.delete(rowGroupParent);
       }
-      console.log(this.openGroup);
+      btnGroupImg.classList.toggle('mdi-plus-box-outline');
+      btnGroupImg.classList.toggle('mdi-minus-box-outline');
+      
+      let shift = 0;
+      // console.log(this.openRowGroup.values());
+      this.openRowGroup.forEach((value) => {
+        if (value > shift) shift = value;
+      });
+      this.rowGroupLevel = shift + 1;
+    },
+    getLevelRowGroup(rowNumber) {
+      let level = 1;
+      let currentRow = rowNumber;
+      let condition = true;
+
+      while (condition) {
+        if (!this.rows[currentRow].parent) { condition = false; return level; }
+        level += 1;
+        currentRow = this.rows[currentRow].parent;
+      }
+      return level;
     },
   },
 };

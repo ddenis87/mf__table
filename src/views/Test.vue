@@ -20,8 +20,8 @@
                     :cells="cells"
                     :styles="styles"
                     
-                    :countColumn="sheetSpace.column"
-                    :countRow="sheetSpace.row"></spread-sheet>
+                    :columnCount="sheetSpace.column"
+                    :rowCount="sheetSpace.row"></spread-sheet>
     </div>
     <div class="test-control-right">
       
@@ -66,9 +66,13 @@ export default {
         "c":{"width":20},
         "d":{"width":250},
         "e":{"width":100},
-        "h":{"columnGroup":"3"},
+        "h":{"columnGroup":"6"},
         "i":{"parent":"h"},
-        "j":{"parent":"h"}
+        "j":{"parent":"h","columnGroup":"2"},
+        "k":{"parent":"j"},
+        "l":{"parent":"h"},
+        "m":{"parent":"h"},
+        "n":{"width":20}
       }`,
       // rowsJSON: '{"5":{"height":40},"6":{"height":30},"7":{"height":30},"8":{"height":80}, "14": {"rowGroup": "10"}, "19": {"rowGroup": "3"}, "27": {"rowGroup": "2"}}',
       
@@ -114,11 +118,13 @@ export default {
         "a14":{"value":"Title group","colspan":7,"style":"c2"},
         "a15":{"value":"","style":"c7 c9"},
         "g15":{"value":"","style":"c10"},
-        "g16":{"value":"","style":"c10"},
         "d15":{"value":"Test group"},
         "a16":{"value":"","style":"c9"},
         "c16":{"value":"Test group"},
         "d16":{"value":"Test group","colspan":2,"style":"c0 c11"},
+        "g16":{"value":"","style":"c10"},
+        "h16":{"value":"Разверни меня","style":"c1"},
+        "i16":{"value":"Hidden column","style":"c1"},
         "a17":{"value":"","style":"c8 c9"},
         "b17":{"value":"","style":"c8"},
         "c17":{"value":"","style":"c8"},
@@ -135,7 +141,7 @@ export default {
       }`,
       stylesJSON: `[
         {"name":"c0","list":{"backgroundColor":"orange","color":"white","fontFamily":"Area","fontSize":"0.7em"}},
-        {"name":"c1","list":{"color":"green"}},
+        {"name":"c1","list":{"color":"green","fontSize":"0.9em"}},
         {"name":"c2","list":{"color":"rgba(240, 0, 0)","fontWeight":"bold"}},
         {"name":"c3","list":{"borderLeft":"2px solid black","borderRight":"2px solid black"}},
         {"name":"c4","list":{"borderTop":"2px solid black","borderBottom":"2px solid black"}},
@@ -187,6 +193,7 @@ export default {
           name: 'c1',
           list: {
             color: 'green',
+            fontSize: '0.9em',
           }
         },
         {

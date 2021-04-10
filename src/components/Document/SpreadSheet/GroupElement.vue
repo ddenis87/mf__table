@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import RowBtnIcon from './components/RowBtnIcon.vue';
+import RowBtnIcon from './components/ZDRowBtnIcon.vue';
 
 export default {
   name: 'GroupElement',

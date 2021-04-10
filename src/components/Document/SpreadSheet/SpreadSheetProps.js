@@ -1,7 +1,7 @@
 export default {
   props: {
-    countColumn: { type: Number, default: 25 },
-    countRow: { type: Number, default: 100 },
+    columnCount: { type: Number, default: 25 },
+    rowCount: { type: Number, default: 100 },
 
     spreadSheet: {
       type: Object,
