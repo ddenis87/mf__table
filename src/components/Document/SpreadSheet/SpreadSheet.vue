@@ -1,18 +1,18 @@
 <template>
   <div class="spread-sheet" ref="SpreadSheet">
     <table class="table" @click="eventClickTable">
-      <spread-sheet-head :is-rows-group="isRowsGroup"
-                         :column-count="columnCount"
+      <spread-sheet-head :column-count="columnCount"
                          :columns="columns"
-                         
-                         :shift-title="shiftTitle"></spread-sheet-head>
+                         :shift-title-column="shiftTitleColumn"
+                         :shift-title-row="shiftTitleRow"
+                         :is-rows-group="isRowsGroup"></spread-sheet-head>
       <spread-sheet-body :row-count="rowCount"
                          :rows="rows"
                          :column-count="columnCount"
                          :columns="columns"
                          :cells="cells"
 
-                         :shift-title="shiftTitle"
+                         :shift-title-row="shiftTitleRow"
                          :is-rows-group="isRowsGroup"></spread-sheet-body>
     </table>
   </div>
@@ -39,7 +39,14 @@ export default {
   },
   data() {
     return {
+      openColumnGroup: new Map(),
+      columnGroupLevel: 1,
     };
+  },
+  computed: {
+    shiftTitleColumn() {
+      return { top: `${22 * this.columnGroupLevel}px` };
+    },
   },
   methods: {
     eventClickTable(evt) {
@@ -63,16 +70,36 @@ export default {
           element.classList.remove('hidden');
         });
         evt.setAttribute('data-column-group-status', 'open');
+        this.openColumnGroup.set(columnGroupParent, this.getLevelColumnGroup(columnGroupParent));
       } else {
         columnsGroup.forEach((element) => {
           element.classList.add('hidden');
         });
         evt.setAttribute('data-column-group-status', 'close');
+        this.openColumnGroup.delete(columnGroupParent);
       }
       btnGroupImg.classList.toggle('mdi-plus-box-outline');
       btnGroupImg.classList.toggle('mdi-minus-box-outline');
-    },
 
+      let shift = 0;
+      this.openColumnGroup.forEach((value) => {
+        if (value > shift) shift = value;
+      });
+      this.columnGroupLevel = shift + 1;
+      console.log(this.columnGroupLevel);
+    },
+    getLevelColumnGroup(columnNumber) {
+      let level = 1;
+      let currentColumn = columnNumber;
+      let condition = true;
+
+      while (condition) {
+        if (!this.columns[currentColumn].parent) { condition = false; return level; }
+        level += 1;
+        currentColumn = this.columns[currentColumn].parent;
+      }
+      return level;
+    },
     selectedCell(event) {
       // console.log(event);
       if (this.currentSelectedCell === event.target) return;

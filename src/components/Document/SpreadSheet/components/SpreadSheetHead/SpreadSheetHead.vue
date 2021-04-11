@@ -6,7 +6,7 @@
           class="head-row__column head-row__column-group-row"
           :style="styleColumnGroupRowGroup"></th>
       <th class="head-row__column head-row__column-group-title"
-          :style="shiftTitle"></th>
+          :style="shiftTitleRow"></th>
       <template v-for="i in columnCount">
         <th :key="`head-row__column-group-${i}`"
             class="head-row__column head-row__column-group"
@@ -56,38 +56,51 @@ export default {
     isRowsGroup: { type: Boolean, default: false },
     columnCount: { type: Number, default: 10 },
     columns: { type: Object },
-    rowGroupLevel: { type: Number, default: 0 },
+    // rowGroupLevel: { type: Number, default: 0 },
 
-    shiftTitle: { type: Object, default() { return { left: '0px' }; } },
+    shiftTitleColumn: { type: Object, default() { return { top: '0px' }; } },
+    shiftTitleRow: { type: Object, default() { return { left: '0px' }; } },
   },
   computed: {
     isColumnsGroup() {
       return Object.values(this.columns).find((item) => Object.keys(item).includes('columnGroup')) || false;
     },
     styleColumnTitleRowTitle() {
-      return { top: (this.isColumnsGroup) ? '22px' : '0px', ...this.shiftTitle };
+      return {
+        ...this.shiftTitleColumn,
+        // top: (this.isColumnsGroup) ? '22px' : '0px',
+        ...this.shiftTitleRow,
+      };
     },
     styleColumnGroupRowGroup() {
       return {
         top: '0px',
-        'max-width': this.shiftTitle.left,
-        'min-width': this.shiftTitle.left,
+        'max-width': this.shiftTitleRow.left,
+        'min-width': this.shiftTitleRow.left,
       };
     },
     styleColumnGroupRowTitle() {
       return {
-        top: (this.isColumnsGroup) ? '22px' : '0px',
-        'max-width': this.shiftTitle.left,
-        'min-width': this.shiftTitle.left,
+        ...this.shiftTitleColumn,
+        // top: (this.isColumnsGroup) ? '22px' : '0px',
+        'max-width': this.shiftTitleRow.left,
+        'min-width': this.shiftTitleRow.left,
       };
     },
   },
   methods: {
     getStyleColumnGroup(columnNumber) {
-      return { ...this.getWidthColumn(columnNumber) };
+      return {
+        height: this.shiftTitleColumn.top,
+        ...this.getWidthColumn(columnNumber),
+      };
     },
     getStyleColumn(columnNumber) {
-      return { top: (this.isColumnsGroup) ? '22px' : '0px', ...this.getWidthColumn(columnNumber) };
+      return {
+        ...this.shiftTitleColumn,
+        // top: (this.isColumnsGroup) ? '22px' : '0px',
+        ...this.getWidthColumn(columnNumber),
+      };
     },
     getWidthColumn(columnNumber) {
       const name = this.getColumnTitle(columnNumber);

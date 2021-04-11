@@ -6,7 +6,7 @@ export default {
     };
   },
   computed: {
-    shiftTitle() {
+    shiftTitleRow() {
       return { left: `${25 * this.rowGroupLevel}px` };
     },
     isRowsGroup() {
@@ -36,7 +36,6 @@ export default {
       btnGroupImg.classList.toggle('mdi-minus-box-outline');
       
       let shift = 0;
-      // console.log(this.openRowGroup.values());
       this.openRowGroup.forEach((value) => {
         if (value > shift) shift = value;
       });
