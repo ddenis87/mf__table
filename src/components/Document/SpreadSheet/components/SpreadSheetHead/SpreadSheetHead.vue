@@ -4,7 +4,7 @@
         class="head-row">
       <th v-if="isRowsGroup"
           class="head-row__column head-row__column-group-row"
-          :style="styleColumnGroupRow"></th>
+          :style="styleColumnGroupRowGroup"></th>
       <th class="head-row__column head-row__column-group-title"
           :style="shiftTitle"></th>
       <template v-for="i in columnCount">
@@ -23,9 +23,9 @@
     <tr class="head-row">
       <th v-if="isRowsGroup"
           class="head-row__column head-row__column-row"
-          :style="styleColumnGroupRow"></th>
+          :style="styleColumnGroupRowTitle"></th>
       <th class="head-row__column head-row__column-title"
-          :style="shiftTitle"></th>
+          :style="styleColumnTitleRowTitle"></th>
       <template v-for="i in columnCount">
         <th :key="`head-row__column-${i}`"
             class="head-row__column"
@@ -64,14 +64,22 @@ export default {
     isColumnsGroup() {
       return Object.values(this.columns).find((item) => Object.keys(item).includes('columnGroup')) || false;
     },
-    styleColumnGroupRow() {
+    styleColumnTitleRowTitle() {
+      return { top: (this.isColumnsGroup) ? '22px' : '0px', ...this.shiftTitle };
+    },
+    styleColumnGroupRowGroup() {
       return {
+        top: '0px',
         'max-width': this.shiftTitle.left,
         'min-width': this.shiftTitle.left,
       };
     },
-    styleColumnTitle() {
-      return { left: `${25 * this.rowGroupLevel * (this.isRowsGroup) ? 1 : 0}px` };
+    styleColumnGroupRowTitle() {
+      return {
+        top: (this.isColumnsGroup) ? '22px' : '0px',
+        'max-width': this.shiftTitle.left,
+        'min-width': this.shiftTitle.left,
+      };
     },
   },
   methods: {
@@ -79,12 +87,7 @@ export default {
       return { ...this.getWidthColumn(columnNumber) };
     },
     getStyleColumn(columnNumber) {
-      return { ...this.getWidthColumn(columnNumber) };
-      // if (columnNumber) return { top: '22px', ...this.getWidthColumn(columnNumber), ...this.styleColumnTitle };
-      // return { top: '22px', ...this.styleColumnTitle };
-    },
-    getShiftTitle() {
-
+      return { top: (this.isColumnsGroup) ? '22px' : '0px', ...this.getWidthColumn(columnNumber) };
     },
     getWidthColumn(columnNumber) {
       const name = this.getColumnTitle(columnNumber);
@@ -137,10 +140,12 @@ thead {
       }
     }
     &__column-group {
+      position: sticky;
       border-left: 0;
       box-shadow: inset 0px 1px 0 grey, inset 0 0px 0 grey, 1px 0 0 grey;
       z-index: 170;
       &-title {
+        top: 0px;
         left: 0px;
         min-width: 60px;
         max-width: 60px;
