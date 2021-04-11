@@ -5,13 +5,16 @@
         class="body-row"
         :class="{'hidden': excludedRow.has(`${i}`)}"
         :data-row-parent="(excludedRow.has(`${i}`) ? getRowParent(i) : '0')">
-      <td v-if="isRowsGroup"
+      <spread-sheet-body-cell-group :isRowsGroup="isRowsGroup"
+                                    :isRowGroup="isRowGroup(i)"
+                                    :row="i"></spread-sheet-body-cell-group>
+      <!-- <td v-if="isRowsGroup"
           class="body-row__column body-row__column-group"
           >
         <spread-sheet-btn-group v-if="isRowGroup(i)"
                                 :data-row-group-parent="i"
                                 data-row-group-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
-      </td>
+      </td> -->
       <td class="body-row__column body-row__column-title"
           :style="shiftTitleRow">{{ i }}</td>
 
@@ -33,12 +36,12 @@
 
 <script>
 import SpreadSheet from '../SpreadSheet';
-import SpreadSheetBtnGroup from '../SpreadSheetBtnGroup.vue';
+import SpreadSheetBodyCellGroup from './SpreadSheetBodyCellGroup.vue';
 
 export default {
   name: 'SpreadSheetBody',
   components: {
-    SpreadSheetBtnGroup,
+    SpreadSheetBodyCellGroup,
   },
   mixins: [
     SpreadSheet,
