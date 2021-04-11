@@ -3,11 +3,13 @@
     <table class="table" @click="eventClickTable">
       <spread-sheet-head :column-count="columnCount"
                          :columns="columns"
+                         :row-group-level="rowGroupLevel"
                          :shift-title-column="shiftTitleColumn"
                          :shift-title-row="shiftTitleRow"
                          :is-rows-group="isRowsGroup"></spread-sheet-head>
       <spread-sheet-body :row-count="rowCount"
                          :rows="rows"
+                         :row-group-level="rowGroupLevel"
                          :column-count="columnCount"
                          :columns="columns"
                          :cells="cells"

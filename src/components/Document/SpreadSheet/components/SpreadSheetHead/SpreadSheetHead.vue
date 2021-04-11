@@ -2,9 +2,13 @@
   <thead>
     <tr v-if="isColumnsGroup"
         class="head-row">
-      <th v-if="isRowsGroup"
-          class="head-row__column head-row__column-group-row"
-          :style="styleColumnGroupRowGroup"></th>
+      <template v-if="isRowsGroup">
+        <th v-for="i in rowGroupLevel"
+            :key="i"
+            class="head-row__column head-row__column-group-row"
+            :style="[styleColumnGroupRowGroup, { left: `${24 * (i - 1)}px` }]"></th>
+      </template>
+      
       <th class="head-row__column head-row__column-group-title"
           :style="shiftTitleRow"></th>
       <template v-for="i in columnCount">
@@ -21,9 +25,12 @@
 
     </tr>
     <tr class="head-row">
-      <th v-if="isRowsGroup"
-          class="head-row__column head-row__column-row"
-          :style="styleColumnGroupRowTitle"></th>
+      <template v-if="isRowsGroup">
+        <th v-for="i in rowGroupLevel"
+            :key="i"
+            class="head-row__column head-row__column-row"
+            :style="[styleColumnGroupRowTitle, { left: `${24 * (i - 1)}px` }]"></th>
+      </template>
       <th class="head-row__column head-row__column-title"
           :style="styleColumnTitleRowTitle"></th>
       <template v-for="i in columnCount">
@@ -56,7 +63,7 @@ export default {
     isRowsGroup: { type: Boolean, default: false },
     columnCount: { type: Number, default: 10 },
     columns: { type: Object },
-    // rowGroupLevel: { type: Number, default: 0 },
+    rowGroupLevel: { type: Number, default: 1 },
 
     shiftTitleColumn: { type: Object, default() { return { top: '0px' }; } },
     shiftTitleRow: { type: Object, default() { return { left: '0px' }; } },
@@ -75,16 +82,16 @@ export default {
     styleColumnGroupRowGroup() {
       return {
         top: '0px',
-        'max-width': this.shiftTitleRow.left,
-        'min-width': this.shiftTitleRow.left,
+        'max-width': '24px', // this.shiftTitleRow.left,
+        'min-width': '24px', // this.shiftTitleRow.left,
       };
     },
     styleColumnGroupRowTitle() {
       return {
         ...this.shiftTitleColumn,
         // top: (this.isColumnsGroup) ? '22px' : '0px',
-        'max-width': this.shiftTitleRow.left,
-        'min-width': this.shiftTitleRow.left,
+        'max-width': '24px', // this.shiftTitleRow.left,
+        'min-width': '24px', // this.shiftTitleRow.left,
       };
     },
   },

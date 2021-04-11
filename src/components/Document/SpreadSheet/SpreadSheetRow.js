@@ -7,7 +7,7 @@ export default {
   },
   computed: {
     shiftTitleRow() {
-      return { left: `${25 * this.rowGroupLevel}px` };
+      return { left: `${24 * this.rowGroupLevel}px` };
     },
     isRowsGroup() {
       return !!Object.values(this.rows).find((item) => Object.keys(item).includes('rowGroup')) || false;
@@ -26,9 +26,20 @@ export default {
         evt.setAttribute('data-row-group-status', 'open');
         this.openRowGroup.set(rowGroupParent, this.getLevelRowGroup(rowGroupParent));
       } else {
-        rowsGroup.forEach((element) => {
-          element.classList.add('hidden');
-        });
+        let currentRow = evt.closest('.body-row');
+        for (let i = 0; i < evt.closest('.body-row').getAttribute('data-row-count-group') - 1; i += 1) {
+          currentRow = currentRow.nextElementSibling;
+          if (currentRow.querySelector('button')) {
+            this.openRowGroup.delete(currentRow.querySelector('button').getAttribute('data-row-group-parent'));
+            currentRow.querySelector('button').setAttribute('data-row-group-status', 'close');
+            currentRow.querySelector('button i').classList.remove('mdi-minus-box-outline');
+            currentRow.querySelector('button i').classList.add('mdi-plus-box-outline');
+          }
+          currentRow.classList.add('hidden');
+        }
+        // rowsGroup.forEach((element) => {
+        //   element.classList.add('hidden');
+        // });
         evt.setAttribute('data-row-group-status', 'close');
         this.openRowGroup.delete(rowGroupParent);
       }

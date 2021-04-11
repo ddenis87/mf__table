@@ -4,10 +4,16 @@
         :key="`body-row-${i}`"
         class="body-row"
         :class="{'hidden': excludedRow.has(`${i}`)}"
-        :data-row-parent="(excludedRow.has(`${i}`) ? getRowParent(i) : '0')">
-      <spread-sheet-body-cell-group :isRowsGroup="isRowsGroup"
+        :data-row-parent="(excludedRow.has(`${i}`) ? getRowParent(i) : '0')"
+        :data-row-count-group="getRowCountGroup(i)">
+      <spread-sheet-body-cell-group v-for="j in rowGroupLevel"
+                                    :key="j"
+                                    :isRowsGroup="isRowsGroup"
                                     :isRowGroup="isRowGroup(i)"
-                                    :row="i"></spread-sheet-body-cell-group>
+                                    :row="i"
+                                    :rows="rows"
+                                    :current-level="rowGroupLevel"
+                                    :current-column="j"></spread-sheet-body-cell-group>
       <!-- <td v-if="isRowsGroup"
           class="body-row__column body-row__column-group"
           >
@@ -49,6 +55,7 @@ export default {
   props: {
     rowCount: { type: Number, default: 1 },
     rows: { type: Object },
+    rowGroupLevel: { type: Number, default: 1 },
     columnCount: { type: Number, default: 10 },
     columns: { type: Object },
     cells: { type: Object },
@@ -63,6 +70,18 @@ export default {
     };
   },
   methods: {
+    // getLevelRowGroup(rowNumber) {
+    //   let level = 1;
+    //   let currentRow = rowNumber;
+    //   let condition = true;
+
+    //   while (condition) {
+    //     if (!this.rows[currentRow]?.parent) { condition = false; return level; }
+    //     level += 1;
+    //     currentRow = this.rows[currentRow].parent;
+    //   }
+    //   return level;
+    // },
     getCellColspan(row, column) {
       const cellName = `${this.getColumnTitle(column)}${row}`;
       if (!this.cells[cellName] || !this.cells[cellName].colspan) return '';
@@ -95,6 +114,10 @@ export default {
       if (!this.cells[cellName] || !this.cells[cellName].style) return {};
       return this.cells[cellName].style;
     },
+    getRowCountGroup(rowNumber) {
+      if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return 0;
+      return this.rows[rowNumber].rowGroup;
+    },
     getRowParent(rowNumber) {
       return this.rows[rowNumber].parent;
     },
@@ -126,14 +149,21 @@ tbody {
       border-left: thin solid grey;
       border-bottom: thin solid grey;
       z-index: 50;
+      &:first-child {
+        border-left: thin solid grey;
+      }
       &-group {
         position: sticky;
         left: 0px;
         background-color: #dadce0;
+        border-left: 0;
         border-bottom: 0;
-        box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
+        // box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
         text-align: center;
         z-index: 60;
+        &:first-child {
+          box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
+        }
       }
       &-title {
         position: sticky;
