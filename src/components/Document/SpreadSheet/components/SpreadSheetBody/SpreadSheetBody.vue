@@ -12,15 +12,8 @@
                                     :isRowGroup="isRowGroup(i)"
                                     :row="i"
                                     :rows="rows"
-                                    :current-level="rowGroupLevel"
                                     :current-column="j"></spread-sheet-body-cell-group>
-      <!-- <td v-if="isRowsGroup"
-          class="body-row__column body-row__column-group"
-          >
-        <spread-sheet-btn-group v-if="isRowGroup(i)"
-                                :data-row-group-parent="i"
-                                data-row-group-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
-      </td> -->
+
       <td class="body-row__column body-row__column-title"
           :style="shiftTitleRow">{{ i }}</td>
 
@@ -70,18 +63,6 @@ export default {
     };
   },
   methods: {
-    // getLevelRowGroup(rowNumber) {
-    //   let level = 1;
-    //   let currentRow = rowNumber;
-    //   let condition = true;
-
-    //   while (condition) {
-    //     if (!this.rows[currentRow]?.parent) { condition = false; return level; }
-    //     level += 1;
-    //     currentRow = this.rows[currentRow].parent;
-    //   }
-    //   return level;
-    // },
     getCellColspan(row, column) {
       const cellName = `${this.getColumnTitle(column)}${row}`;
       if (!this.cells[cellName] || !this.cells[cellName].colspan) return '';
@@ -127,11 +108,6 @@ export default {
         this.excludedRow.add(`${rowNumber + i}`);
       }
       return true;
-    },
-    eventClickBody(evt) {
-      if (evt.target.closest('button') && evt.target.closest('button').hasAttribute('data-row-group-parent')) {
-        this.toggleRowGroup(evt.target.closest('button'));
-      }
     },
   },
 };

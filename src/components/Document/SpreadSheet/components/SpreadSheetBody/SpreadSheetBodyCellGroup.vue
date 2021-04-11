@@ -21,7 +21,6 @@ export default {
     isRowGroup: { type: Boolean, default: false },
     row: { type: Number },
     rows: { type: Object },
-    currentLevel: { type: Number, default: 1 },
     currentColumn: { type: Number, default: 1 },
   },
   computed: {
@@ -47,26 +46,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .body-row__column {
-//   position: relative;
-//   // border-left: thin solid grey;
-//   border-bottom: thin solid grey;
-//   z-index: 50;
-//   &-group {
-//     position: sticky;
-//     left: 0px;
-//     padding: 0px 3px;
-//     background-color: #dadce0;
-//     border-bottom: 0;
-//     box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
-//     text-align: left;
-//     z-index: 60;
-//   }
-//   .line {
-//     display: inline-flex;
-//     justify-content: center;
-//     width: 16px;
 
-//   }
-// }
 </style>
