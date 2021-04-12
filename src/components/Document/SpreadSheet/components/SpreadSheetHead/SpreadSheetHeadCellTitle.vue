@@ -1,6 +1,6 @@
 <template>
   <th class="head-column-title"
-      :style="shiftTitleLeft">{{ row }}</th>
+      :style="shiftTitleLeft">{{ }}</th>
 </template>
 
 <script>
@@ -14,7 +14,7 @@ export default {
     shiftTitleLeft() {
       return {
         left: `${24 * this.currentLevel}px`,
-        top: `${22 * (this.currentRow - 1)}px`,
+        top: `${24 * (this.currentRow - 1)}px`,
       };
     },
   },

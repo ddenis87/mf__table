@@ -68,7 +68,7 @@ export default {
     columns: { type: Object },
     rowGroupLevel: { type: Number, default: 1 },
 
-    shiftTitleColumn: { type: Object, default() { return { top: '0px' }; } },
+    shiftTitleColumn: { type: Number },
     shiftTitleRow: { type: Object, default() { return { left: '0px' }; } },
   },
   computed: {
@@ -107,7 +107,7 @@ export default {
     },
     getStyleColumn(columnNumber) {
       return {
-        ...this.shiftTitleColumn,
+        top: '24px',
         // top: (this.isColumnsGroup) ? '22px' : '0px',
         ...this.getWidthColumn(columnNumber),
       };
@@ -129,7 +129,7 @@ export default {
 
 thead {
   .head-row {
-    height: 22px;
+    height: 24px;
     font-size: 0.75em;
     color: rgba(0, 0, 0, 0.5);
     &__column {

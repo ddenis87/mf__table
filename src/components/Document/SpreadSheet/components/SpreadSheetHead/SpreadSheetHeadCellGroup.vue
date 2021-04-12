@@ -18,7 +18,7 @@ export default {
     shiftLeft() {
       return {
         left: `${24 * (this.currentLevel - 1)}px`,
-        top: `${22 * (this.currentRow - 1)}px`,
+        top: `${24 * (this.currentRow - 1)}px`,
       };
     },
   },

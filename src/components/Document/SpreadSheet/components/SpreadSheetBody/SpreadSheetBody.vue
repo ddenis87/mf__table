@@ -5,14 +5,13 @@
         class="body-row"
         :class="{'hidden': excludedRow.has(`${i}`)}"
         :data-row-parent="(excludedRow.has(`${i}`) ? getRowParent(i) : '0')"
-        :data-row-count-group="getRowCountGroup(i)"
-        >
+        :data-row-count-group="getRowCountGroup(i)">
       <spread-sheet-body-cell-group v-for="level in currentTableLevel"
                                     :key="level"
                                     :isRowGroup="isRowGroup(i, level)"
                                     :current-row="i"
                                     :current-level="level"></spread-sheet-body-cell-group>
- 
+
       <spread-sheet-body-cell-title :row="i"
                                     :current-table-level="currentTableLevel" ></spread-sheet-body-cell-title>
 

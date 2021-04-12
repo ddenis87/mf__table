@@ -5,7 +5,7 @@
                         :column-count="columnCount"
                          :columns="columns"
                          :row-group-level="rowGroupLevel"
-                         :shift-title-column="shiftTitleColumn"
+                         :shift-title-column="columnGroupLevel"
                          :shift-title-row="shiftTitleRow"
                          :is-rows-group="isRowsGroup"></spread-sheet-head>
       <spread-sheet-body :current-table-level="currentTableLevel"
@@ -53,14 +53,12 @@ export default {
         if (Object.values(this.rows).find((item) => Object.keys(item).includes('rowGroup'))) return 1;
         return 0;
       }
-      // console.log(this.openRowGroup.values().Math.max());
-      // return this.openRowGroup.values().Math.max();
       console.log(Math.max(Object.values(this.openRowGroup)));
       return Math.max(Object.values(this.openRowGroup));
     },
     
     shiftTitleColumn() {
-      return { top: `${22 * this.columnGroupLevel}px` };
+      return { top: `${24 * this.columnGroupLevel}px` };
     },
   },
   methods: {
@@ -80,20 +78,27 @@ export default {
       const groupStatus = evt.getAttribute('data-row-group-status');
       const rowsGroup = evt.closest('tbody').querySelectorAll(`[data-row-parent="${groupParent}"]`);
       const btnIcon = evt.querySelector('i');
-
       if (groupStatus === 'close') {
+        const countRowInGroup = evt.closest('.body-row').getAttribute('data-row-count-group') - 1;
+        let currentRow = evt.closest('.body-row');
+        // const currentLevel = this.currentTableLevel - 1;
         rowsGroup.forEach((element) => {
           element.classList.remove('hidden');
         });
-
+        setTimeout(() => {
+          for (let i = 0; i < countRowInGroup; i += 1) {
+            currentRow = currentRow.nextElementSibling;
+            // console.log(this.getLevelRow(groupParent));
+            currentRow.children[this.getLevelRow(groupParent) - 3].classList.add('column-group_child');
+          }
+        }, 300);
         btnIcon.classList.remove('mdi-plus-box-outline');
         btnIcon.classList.add('mdi-minus-box-outline');
         evt.setAttribute('data-row-group-status', 'open');
         if (Object.values(this.rows).filter((item) => item.parent === groupParent).find((item) => Object.keys(item).includes('rowGroup'))) {
-          // this.openRowGroup.set(groupParent, this.getLevelRow(groupParent) + 1);
           Vue.set(this.openRowGroup, groupParent, this.getLevelRow(groupParent));
-          // console.log(this.openRowGroup);
         }
+        this.addRowLine(evt);
       } else {
         const countRowInGroup = evt.closest('.body-row').getAttribute('data-row-count-group') - 1;
         let currentRow = evt.closest('.body-row');
@@ -113,7 +118,14 @@ export default {
         delete this.openRowGroup[groupParent];
       }
     },
-
+    addRowLine() {
+      // const count = evt.closest('.body-row').getAttribute('data-row-count-group');
+      // console.log(evt.closest('.column-group'));
+      // evt.closest('.column-group').setAttribute(
+      //   'rowspan',
+      //   evt.closest('.body-row').getAttribute('data-row-count-group')
+      // );
+    },
     getLevelRow(rowNumber) {
       let level = this.currentTableLevel + 1;
       let currentRow = rowNumber;

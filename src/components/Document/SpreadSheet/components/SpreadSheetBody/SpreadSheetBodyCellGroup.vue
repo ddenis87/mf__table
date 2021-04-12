@@ -1,6 +1,8 @@
 <template>
   <td class="column-group"
-      :class="{'column-group_first': (currentLevel === 1)}"
+      :class="{
+        'column-group_first': (currentLevel === 1),
+      }"
       :style="shiftLeft">
     <spread-sheet-btn-group v-if="isGroup"
                             :data-row-group-parent="currentRow"
@@ -45,6 +47,20 @@ export default {
   z-index: 300;
   &_first {
     box-shadow: 1px 0px 0px grey, inset 1px 0px 0px grey;
+  }
+  &_child {
+    // position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      border: 1px solid rgba(0, 0, 0, .3);
+      background-color: rgba(0, 0, 0, .3); // black;
+      width: 2px;
+      height: 100px;
+      left: 11px;
+      top: 0px;
+    }
+    // border-left: 2px solid blue;
   }
 }
 </style>
