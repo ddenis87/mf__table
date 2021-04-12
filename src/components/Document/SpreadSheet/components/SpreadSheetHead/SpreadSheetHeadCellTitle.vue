@@ -1,5 +1,6 @@
 <template>
   <th class="head-column-title"
+      :class="{'head-column-title_first-row': (currentRow === 1)}"
       :style="shiftTitleLeft">{{ }}</th>
 </template>
 
@@ -29,8 +30,11 @@ export default {
   padding: 2px;
   min-width: 60px;
   max-width: 60px;
-  box-shadow: inset 0px -1px 0px grey, 1px 0px 0px grey;;
+  box-shadow: inset 0px -1px 0px grey, 1px 0px 0px grey;
   background-color: #dadce0;
   z-index: 480;
+  &_first-row {
+    box-shadow: inset 0px -1px 0px grey, inset 0px 1px 0px grey, 1px 0px 0px grey;
+  }
 }
 </style>

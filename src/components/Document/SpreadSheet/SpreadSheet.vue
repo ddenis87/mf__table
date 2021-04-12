@@ -53,8 +53,7 @@ export default {
         if (Object.values(this.rows).find((item) => Object.keys(item).includes('rowGroup'))) return 1;
         return 0;
       }
-      console.log(Math.max(Object.values(this.openRowGroup)));
-      return Math.max(Object.values(this.openRowGroup));
+      return Math.max(...Object.values(this.openRowGroup));
     },
     
     shiftTitleColumn() {
@@ -86,19 +85,19 @@ export default {
           element.classList.remove('hidden');
         });
         setTimeout(() => {
-          for (let i = 0; i < countRowInGroup; i += 1) {
+          for (let i = 0; i < countRowInGroup - 1; i += 1) {
             currentRow = currentRow.nextElementSibling;
             // console.log(this.getLevelRow(groupParent));
-            currentRow.children[this.getLevelRow(groupParent) - 3].classList.add('column-group_child');
+            currentRow.children[this.getLevelRow(groupParent) - 1].classList.add('column-group_child');
           }
+          currentRow.nextElementSibling.children[this.getLevelRow(groupParent) - 1].classList.add('column-group_child-last');
         }, 300);
         btnIcon.classList.remove('mdi-plus-box-outline');
         btnIcon.classList.add('mdi-minus-box-outline');
         evt.setAttribute('data-row-group-status', 'open');
         if (Object.values(this.rows).filter((item) => item.parent === groupParent).find((item) => Object.keys(item).includes('rowGroup'))) {
-          Vue.set(this.openRowGroup, groupParent, this.getLevelRow(groupParent));
+          Vue.set(this.openRowGroup, groupParent, this.getLevelRow(groupParent) + 1);
         }
-        this.addRowLine(evt);
       } else {
         const countRowInGroup = evt.closest('.body-row').getAttribute('data-row-count-group') - 1;
         let currentRow = evt.closest('.body-row');
@@ -108,26 +107,24 @@ export default {
             currentRow.querySelector('button').setAttribute('data-row-group-status', 'close');
             currentRow.querySelector('button i').classList.remove('mdi-minus-box-outline');
             currentRow.querySelector('button i').classList.add('mdi-plus-box-outline');
+
+            const parentChild = currentRow.querySelector('button').getAttribute('data-row-group-parent');
+            this.openRowGroup[parentChild] = 0;
+            delete this.openRowGroup[parentChild];
           }
           currentRow.classList.add('hidden');
         }
         btnIcon.classList.add('mdi-plus-box-outline');
         btnIcon.classList.remove('mdi-minus-box-outline');
         evt.setAttribute('data-row-group-status', 'close');
+
         this.openRowGroup[groupParent] = 0;
         delete this.openRowGroup[groupParent];
       }
     },
-    addRowLine() {
-      // const count = evt.closest('.body-row').getAttribute('data-row-count-group');
-      // console.log(evt.closest('.column-group'));
-      // evt.closest('.column-group').setAttribute(
-      //   'rowspan',
-      //   evt.closest('.body-row').getAttribute('data-row-count-group')
-      // );
-    },
+
     getLevelRow(rowNumber) {
-      let level = this.currentTableLevel + 1;
+      let level = 1;
       let currentRow = rowNumber;
       let condition = true;
 
@@ -232,107 +229,7 @@ $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),
     border-collapse: collapse;
     table-layout: fixed;
     font-family: Arial, Helvetica, sans-serif;
-
     font-size: 16px;
-    // thead {
-    //   .head-row {
-    //     height: 24px;
-    //     font-size: 0.75em;
-    //     color: rgba(0, 0, 0, 0.5);
-    //     .head-column {
-    //       position: sticky;
-    //       top: 0px;
-    //       padding: 2px;
-    //       min-width: 94px;
-    //       border-left: thin solid grey;
-    //       box-shadow: inset 0 1px 0 grey, inset 0 -1px 0 grey, 1px 0 0 grey;
-    //       background-color: #dadce0;
-    //       z-index: 100;
-    //       &__title {
-    //         position: sticky;
-    //         top: 0px;
-    //         left: 0px;
-    //         box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
-    //         min-width: 60px;
-    //         max-width: 60px;
-    //         width: 60px;
-    //         z-index: 200;
-    //         // &_group {
-    //         //   left: 25px;
-    //         // }
-    //       }
-    //       &__group {
-    //         position: sticky;
-    //         left: 0px;
-    //         min-width: 25px;
-    //         max-width: 25px;
-    //         width: 25px;
-    //         box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
-    //         z-index: 210;
-    //       }
-    //     }
-    //   }
-    // }
-
-    // tbody {
-    //   position: relative;
-      // .body-row {
-        // &__column {
-    //     height: 24px;
-    //     box-sizing: border-box;
-    //     &-group {
-    //       &_hidden {
-    //         display: none;
-    //         // visibility: hidden;
-    //       }
-    //     }
-    //     .body-column {
-    //       position: relative;
-    //       padding: 2px 3px;
-    //       font-size: 0.8em;
-    //       border-bottom: thin solid grey;
-    //       border-left: thin solid grey;
-    //       box-sizing: border-box;
-    //       overflow: hidden;
-    //       &:last-child {
-    //         border-right: thin solid grey;
-    //       }
-    //       &__title {
-    //         position: sticky;
-    //         left: 0px;
-    //         border-left: 0px;
-    //         box-shadow: inset 1px 0px 0 grey, 1px 0px 0 grey;
-    //         text-align: center;
-    //         font-size: 0.75em;
-    //         font-weight: bold;
-    //         background-color: #dadce0;
-    //         color: rgba(0, 0, 0, 0.5);
-    //         z-index: 150;
-    //         // &_group {
-    //         //   left: 25px;
-    //         // }
-    //       }
-    //       &__group {
-    //         position: sticky;
-    //         left: 0px;
-    //         border-bottom: 0px;
-    //         background-color: #dadce0;
-    //         box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
-    //         z-index: 160;
-
-    //       }
-          // &_selected::after {
-          //   content: '';
-          //   position: absolute;
-          //   top: 0px;
-          //   right: 0px;
-          //   bottom: 0px;
-          //   left: 0px;
-          //   border: 2px solid #1a73e8;
-          // }
-        // }
-      // }
-    // }
   }
 }
 </style>

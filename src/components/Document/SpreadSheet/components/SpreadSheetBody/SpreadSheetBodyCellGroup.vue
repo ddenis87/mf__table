@@ -53,12 +53,27 @@ export default {
     &::before {
       content: '';
       position: absolute;
-      border: 1px solid rgba(0, 0, 0, .3);
-      background-color: rgba(0, 0, 0, .3); // black;
-      width: 2px;
+      border: 1px solid #3F3F3F; //rgba(0, 0, 0, .3);
+      background-color: #3F3F3F; //rgba(0, 0, 0, .3); // black;
+      width: 0px;
       height: 100px;
       left: 11px;
       top: 0px;
+    }
+    &-last {
+      &::before {
+        content: '';
+        position: absolute;
+        border: 0;
+        border-left: 2px solid #3F3F3F; //rgba(0, 0, 0, .3);
+        border-bottom: 2px solid #3F3F3F; //rgba(0, 0, 0, .3);
+        // background-color: rgba(0, 0, 0, .3); // black;
+        width: 8px;
+        height: 100%;
+        left: 11px;
+        // top: 0px;
+        bottom: 0px;
+      }
     }
     // border-left: 2px solid blue;
   }
