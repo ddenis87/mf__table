@@ -1,25 +1,27 @@
 <template>
   <div class="spread-sheet" ref="SpreadSheet">
     <table class="table" @click="eventClickTable">
-      <spread-sheet-head :column-count="columnCount"
+      <spread-sheet-head :current-table-level="currentTableLevel"
+                        :column-count="columnCount"
                          :columns="columns"
                          :row-group-level="rowGroupLevel"
                          :shift-title-column="shiftTitleColumn"
                          :shift-title-row="shiftTitleRow"
                          :is-rows-group="isRowsGroup"></spread-sheet-head>
-      <spread-sheet-body :row-count="rowCount"
+      <spread-sheet-body :current-table-level="currentTableLevel"
+                        :row-count="rowCount"
                          :rows="rows"
                          :column-count="columnCount"
                          :columns="columns"
                          :cells="cells"
                          :row-group-level="rowGroupLevel"
-                         :shift-title-row="shiftTitleRow"
                          :is-rows-group="isRowsGroup"></spread-sheet-body>
     </table>
   </div>
 </template>
 
 <script>
+import Vue from 'vue';
 import SpreadSheetProps from './SpreadSheetProps';
 import SpreadSheetComputed from './SpreadSheetComputed';
 import SpreaSheetRow from './SpreadSheetRow';
@@ -41,10 +43,22 @@ export default {
   data() {
     return {
       openColumnGroup: new Map(),
+      openRowGroup: {},
       columnGroupLevel: 1,
     };
   },
   computed: {
+    currentTableLevel() {
+      if (Object.keys(this.openRowGroup).length === 0) {
+        if (Object.values(this.rows).find((item) => Object.keys(item).includes('rowGroup'))) return 1;
+        return 0;
+      }
+      // console.log(this.openRowGroup.values().Math.max());
+      // return this.openRowGroup.values().Math.max();
+      console.log(Math.max(Object.values(this.openRowGroup)));
+      return Math.max(Object.values(this.openRowGroup));
+    },
+    
     shiftTitleColumn() {
       return { top: `${22 * this.columnGroupLevel}px` };
     },
@@ -61,6 +75,65 @@ export default {
       }
       this.selectedCell(evt);
     },
+    toggleRowGroup(evt) {
+      const groupParent = evt.getAttribute('data-row-group-parent');
+      const groupStatus = evt.getAttribute('data-row-group-status');
+      const rowsGroup = evt.closest('tbody').querySelectorAll(`[data-row-parent="${groupParent}"]`);
+      const btnIcon = evt.querySelector('i');
+
+      if (groupStatus === 'close') {
+        rowsGroup.forEach((element) => {
+          element.classList.remove('hidden');
+        });
+
+        btnIcon.classList.remove('mdi-plus-box-outline');
+        btnIcon.classList.add('mdi-minus-box-outline');
+        evt.setAttribute('data-row-group-status', 'open');
+        if (Object.values(this.rows).filter((item) => item.parent === groupParent).find((item) => Object.keys(item).includes('rowGroup'))) {
+          // this.openRowGroup.set(groupParent, this.getLevelRow(groupParent) + 1);
+          Vue.set(this.openRowGroup, groupParent, this.getLevelRow(groupParent));
+          // console.log(this.openRowGroup);
+        }
+      } else {
+        const countRowInGroup = evt.closest('.body-row').getAttribute('data-row-count-group') - 1;
+        let currentRow = evt.closest('.body-row');
+        for (let i = 0; i < countRowInGroup; i += 1) {
+          currentRow = currentRow.nextElementSibling;
+          if (currentRow.querySelector('button')) {
+            currentRow.querySelector('button').setAttribute('data-row-group-status', 'close');
+            currentRow.querySelector('button i').classList.remove('mdi-minus-box-outline');
+            currentRow.querySelector('button i').classList.add('mdi-plus-box-outline');
+          }
+          currentRow.classList.add('hidden');
+        }
+        btnIcon.classList.add('mdi-plus-box-outline');
+        btnIcon.classList.remove('mdi-minus-box-outline');
+        evt.setAttribute('data-row-group-status', 'close');
+        this.openRowGroup[groupParent] = 0;
+        delete this.openRowGroup[groupParent];
+      }
+    },
+
+    getLevelRow(rowNumber) {
+      let level = this.currentTableLevel + 1;
+      let currentRow = rowNumber;
+      let condition = true;
+
+      while (condition) {
+        if (!this.rows[currentRow].parent) { condition = false; return level; }
+        level += 1;
+        currentRow = this.rows[currentRow].parent;
+      }
+      return level;
+    },
+
+    closeRowGroup(evt, groupParent) {
+      const rowsGroup = evt.closest('tbody').querySelectorAll(`[data-row-parent="${groupParent}"]`);
+      rowsGroup.forEach((element) => {
+        element.classList.add('hidden');
+      });
+    },
+
     toggleColumnGroup(evt) {
       const columnGroupParent = evt.getAttribute('data-column-group-parent');
       const columnGroupStatus = evt.getAttribute('data-column-group-status');

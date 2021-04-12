@@ -5,17 +5,16 @@
         class="body-row"
         :class="{'hidden': excludedRow.has(`${i}`)}"
         :data-row-parent="(excludedRow.has(`${i}`) ? getRowParent(i) : '0')"
-        :data-row-count-group="getRowCountGroup(i)">
-      <spread-sheet-body-cell-group v-for="j in rowGroupLevel"
-                                    :key="j"
-                                    :isRowsGroup="isRowsGroup"
-                                    :isRowGroup="isRowGroup(i)"
-                                    :row="i"
-                                    :rows="rows"
-                                    :current-column="j"></spread-sheet-body-cell-group>
-
-      <td class="body-row__column body-row__column-title"
-          :style="shiftTitleRow">{{ i }}</td>
+        :data-row-count-group="getRowCountGroup(i)"
+        >
+      <spread-sheet-body-cell-group v-for="level in currentTableLevel"
+                                    :key="level"
+                                    :isRowGroup="isRowGroup(i, level)"
+                                    :current-row="i"
+                                    :current-level="level"></spread-sheet-body-cell-group>
+ 
+      <spread-sheet-body-cell-title :row="i"
+                                    :current-table-level="currentTableLevel" ></spread-sheet-body-cell-title>
 
       <template v-for="j in columnCount">
         <td v-if="(!excludedCells.has(`${getColumnTitle(j)}${i}`))"
@@ -28,7 +27,6 @@
           {{ getCellValue(i, j) }}
         </td>
       </template>
-      
     </tr>
   </tbody>
 </template>
@@ -36,16 +34,20 @@
 <script>
 import SpreadSheet from '../SpreadSheet';
 import SpreadSheetBodyCellGroup from './SpreadSheetBodyCellGroup.vue';
+import SpreadSheetBodyCellTitle from './SpreadSheetBodyCellTitle.vue';
 
 export default {
   name: 'SpreadSheetBody',
   components: {
     SpreadSheetBodyCellGroup,
+    SpreadSheetBodyCellTitle,
   },
   mixins: [
     SpreadSheet,
   ],
   props: {
+    currentTableLevel: { type: Number, default: 0 },
+
     rowCount: { type: Number, default: 1 },
     rows: { type: Object },
     rowGroupLevel: { type: Number, default: 1 },
@@ -53,7 +55,7 @@ export default {
     columns: { type: Object },
     cells: { type: Object },
 
-    shiftTitleRow: { type: Object, default() { return { left: '0px' }; } },
+    // shiftTitleRow: { type: Object, default() { return { left: '0px' }; } },
     isRowsGroup: { type: Boolean, default: false },
   },
   data() {
@@ -102,12 +104,31 @@ export default {
     getRowParent(rowNumber) {
       return this.rows[rowNumber].parent;
     },
-    isRowGroup(rowNumber) {
+    isRowGroup(rowNumber, level) {
       if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
       for (let i = 1; i < this.rows[rowNumber].rowGroup; i += 1) {
         this.excludedRow.add(`${rowNumber + i}`);
       }
-      return true;
+      return (level === this.getLevelRow(rowNumber));
+    },
+    // isRowGroup(rowNumber) {
+    //   if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
+    //   for (let i = 1; i < this.rows[rowNumber].rowGroup; i += 1) {
+    //     this.excludedRow.add(`${rowNumber + i}`);
+    //   }
+    //   return true;
+    // },
+    getLevelRow(rowNumber) {
+      let level = 1;
+      let currentRow = rowNumber;
+      let condition = true;
+
+      while (condition) {
+        if (!this.rows[currentRow]?.parent) { condition = false; return level; }
+        level += 1;
+        currentRow = this.rows[currentRow].parent;
+      }
+      return level;
     },
   },
 };
@@ -122,37 +143,17 @@ tbody {
     height: 24px;
     &__column {
       position: relative;
+      padding: 0px 3px;
       border-left: thin solid grey;
       border-bottom: thin solid grey;
       z-index: 50;
       &:first-child {
         border-left: thin solid grey;
       }
-      &-group {
-        position: sticky;
-        left: 0px;
-        background-color: #dadce0;
-        border-left: 0;
-        border-bottom: 0;
-        // box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
-        text-align: center;
-        z-index: 60;
-        &:first-child {
-          box-shadow: -1px 0px 0 grey, 0px 0px 0 grey;
-        }
+      &:last-child {
+        border-right: thin solid grey;
       }
-      &-title {
-        position: sticky;
-        left: 0px;
-        border-left: 0px;
-        box-shadow: inset 1px 0px 0 grey, 1px 0px 0 grey;
-        text-align: center;
-        font-size: 0.75em;
-        font-weight: bold;
-        background-color: #dadce0;
-        color: rgba(0, 0, 0, 0.5);
-        z-index: 70;
-      }
+
       &_selected::after {
         content: '';
         position: absolute;

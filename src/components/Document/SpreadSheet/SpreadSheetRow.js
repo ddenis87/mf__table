@@ -1,7 +1,7 @@
 export default {
   data() {
     return {
-      openRowGroup: new Map(),
+      // openRowGroup: new Map(),
       rowGroupLevel: 1,
     };
   },
@@ -14,44 +14,43 @@ export default {
     },
   },
   methods: {
-    toggleRowGroup(evt) {
-      const rowGroupParent = evt.getAttribute('data-row-group-parent');
-      const rowGroupStatus = evt.getAttribute('data-row-group-status');
-      const rowsGroup = document.querySelectorAll(`[data-row-parent="${rowGroupParent}"]`);
-      const btnGroupImg = evt.querySelector('i');
-      if (rowGroupStatus === 'close') {
-        rowsGroup.forEach((element) => {
-          element.classList.remove('hidden');
-        });
-        evt.setAttribute('data-row-group-status', 'open');
-        this.openRowGroup.set(rowGroupParent, this.getLevelRowGroup(rowGroupParent));
-      } else {
-        let currentRow = evt.closest('.body-row');
-        for (let i = 0; i < evt.closest('.body-row').getAttribute('data-row-count-group') - 1; i += 1) {
-          currentRow = currentRow.nextElementSibling;
-          if (currentRow.querySelector('button')) {
-            this.openRowGroup.delete(currentRow.querySelector('button').getAttribute('data-row-group-parent'));
-            currentRow.querySelector('button').setAttribute('data-row-group-status', 'close');
-            currentRow.querySelector('button i').classList.remove('mdi-minus-box-outline');
-            currentRow.querySelector('button i').classList.add('mdi-plus-box-outline');
-          }
-          currentRow.classList.add('hidden');
-        }
-        // rowsGroup.forEach((element) => {
-        //   element.classList.add('hidden');
-        // });
-        evt.setAttribute('data-row-group-status', 'close');
-        this.openRowGroup.delete(rowGroupParent);
-      }
-      btnGroupImg.classList.toggle('mdi-plus-box-outline');
-      btnGroupImg.classList.toggle('mdi-minus-box-outline');
-      
-      let shift = 0;
-      this.openRowGroup.forEach((value) => {
-        if (value > shift) shift = value;
-      });
-      this.rowGroupLevel = shift + 1;
-    },
+    // toggleRowGroup(evt) {
+    //   const rowGroupParent = evt.getAttribute('data-row-group-parent');
+    //   const rowGroupStatus = evt.getAttribute('data-row-group-status');
+    //   const rowsGroup = document.querySelectorAll(`[data-row-parent="${rowGroupParent}"]`);
+    //   const btnGroupImg = evt.querySelector('i');
+    //   if (rowGroupStatus === 'close') {
+    //     rowsGroup.forEach((element) => {
+    //       element.classList.remove('hidden');
+    //     });
+    //     evt.setAttribute('data-row-group-status', 'open');
+    //     this.openRowGroup.set(rowGroupParent, this.getLevelRowGroup(rowGroupParent));
+    //   } else {
+    //     let currentRow = evt.closest('.body-row');
+    //     for (let i = 0; i < evt.closest('.body-row').getAttribute('data-row-count-group') - 1; i += 1) {
+    //       currentRow = currentRow.nextElementSibling;
+    //       if (currentRow.querySelector('button')) {
+    //         this.openRowGroup.delete(currentRow.querySelector('button').getAttribute('data-row-group-parent'));
+    //         currentRow.querySelector('button').setAttribute('data-row-group-status', 'close');
+    //         currentRow.querySelector('button i').classList.remove('mdi-minus-box-outline');
+    //         currentRow.querySelector('button i').classList.add('mdi-plus-box-outline');
+    //       }
+    //       currentRow.classList.add('hidden');
+    //     }
+    //     // rowsGroup.forEach((element) => {
+    //     //   element.classList.add('hidden');
+    //     // });
+    //     evt.setAttribute('data-row-group-status', 'close');
+    //     this.openRowGroup.delete(rowGroupParent);
+    //   }
+    //   btnGroupImg.classList.toggle('mdi-plus-box-outline');
+    //   btnGroupImg.classList.toggle('mdi-minus-box-outline');
+    //   let shift = 0;
+    //   this.openRowGroup.forEach((value) => {
+    //     if (value > shift) shift = value;
+    //   });
+    //   this.rowGroupLevel = shift + 1;
+    // },
     getLevelRowGroup(rowNumber) {
       let level = 1;
       let currentRow = rowNumber;

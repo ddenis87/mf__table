@@ -2,18 +2,16 @@
   <thead>
     <tr v-if="isColumnsGroup"
         class="head-row">
-      <template v-if="isRowsGroup">
-        <th v-for="i in rowGroupLevel"
-            :key="i"
-            class="head-row__column head-row__column-group-row"
-            :style="[styleColumnGroupRowGroup, { left: `${24 * (i - 1)}px` }]"></th>
-      </template>
-      
-      <th class="head-row__column head-row__column-group-title"
-          :style="shiftTitleRow"></th>
+      <spread-sheet-head-cell-group v-for="level in currentTableLevel"
+                                    :key="level"
+                                    :current-level="level"
+                                    :current-row="1"></spread-sheet-head-cell-group>
+      <spread-sheet-head-cell-title :current-level="currentTableLevel"
+                                    :current-row="1"></spread-sheet-head-cell-title>
+
       <template v-for="i in columnCount">
         <th :key="`head-row__column-group-${i}`"
-            class="head-row__column head-row__column-group"
+            class="head-row__column-group"
             :class="{'hidden': excludedColumns.has(`${i}`)}"
             :style="getStyleColumnGroup(i)"
             :data-column-parent="(excludedColumns.has(`${i}`) ? getColumnParent(i) : '0')">
@@ -25,14 +23,13 @@
 
     </tr>
     <tr class="head-row">
-      <template v-if="isRowsGroup">
-        <th v-for="i in rowGroupLevel"
-            :key="i"
-            class="head-row__column head-row__column-row"
-            :style="[styleColumnGroupRowTitle, { left: `${24 * (i - 1)}px` }]"></th>
-      </template>
-      <th class="head-row__column head-row__column-title"
-          :style="styleColumnTitleRowTitle"></th>
+      <spread-sheet-head-cell-group v-for="level in currentTableLevel"
+                                    :key="level"
+                                    :current-level="level"
+                                    :current-row="2"></spread-sheet-head-cell-group>
+      <spread-sheet-head-cell-title :current-level="currentTableLevel"
+                                    :current-row="2"></spread-sheet-head-cell-title>
+
       <template v-for="i in columnCount">
         <th :key="`head-row__column-${i}`"
             class="head-row__column"
@@ -49,17 +46,23 @@
 <script>
 import SpreadSheet from '../SpreadSheet';
 
+import SpreadSheetHeadCellGroup from './SpreadSheetHeadCellGroup.vue';
+import SpreadSheetHeadCellTitle from './SpreadSheetHeadCellTitle.vue';
 import SpreadSheetBtnGroup from '../SpreadSheetBtnGroup.vue';
 
 export default {
   name: 'SpreadSheetHead',
   components: {
     SpreadSheetBtnGroup,
+    SpreadSheetHeadCellGroup,
+    SpreadSheetHeadCellTitle,
   },
   mixins: [
     SpreadSheet,
   ],
   props: {
+    currentTableLevel: { type: Number, default: 0 },
+
     isRowsGroup: { type: Boolean, default: false },
     columnCount: { type: Number, default: 10 },
     columns: { type: Object },
@@ -125,10 +128,6 @@ export default {
 @import '../../SpreadSheet.scss';
 
 thead {
-  position: sticky;
-  top: 0px;
-  font-size: $gFontSize;
-  z-index: 150;
   .head-row {
     height: 22px;
     font-size: 0.75em;
@@ -138,49 +137,17 @@ thead {
       top: 0px;
       padding: 2px;
       min-width: 94px;
-      border-left: thin solid grey;
-      box-shadow: inset 0px 1px 0 grey, inset 0 -1px 0 grey, 1px 0 0 grey;
+      box-shadow: inset 0px -1px 0px grey, inset 1px 0px 0px grey;
       background-color: #dadce0;
-      z-index: 160;
-      &-title {
-        left: 0px;
-        min-width: 60px;
-        max-width: 60px;
-        box-shadow: -1px 0px 0 grey, 1px 0px 0 grey, inset 0 1px 0 grey, inset 0 -1px 0 grey;
-        z-index: 170;
-      }
-      &-row {
-        left: 0px;
-        // border-right: 0;
-
-        min-width: 25px;
-        max-width: 25px;
-        box-shadow: -1px 0 0 grey, 1px 0 0 grey, inset 0px 1px 0 grey, inset -0px -1px 0 grey;
-        z-index: 175;
-      }
+      z-index: 280;
     }
     &__column-group {
       position: sticky;
-      border-left: 0;
-      box-shadow: inset 0px 1px 0 grey, inset 0 0px 0 grey, 1px 0 0 grey;
-      z-index: 170;
-      &-title {
-        top: 0px;
-        left: 0px;
-        min-width: 60px;
-        max-width: 60px;
-        border-left: thin solid grey;
-        box-shadow: -0px 0 0 grey, 1px 0 0 grey, inset 0 1px 0 grey, inset -0px 0px 0 grey;
-        z-index: 180;
-      }
-      &-row {
-        left: 0px;
-        min-width: 25px;
-        max-width: 25px;
-        // border-right: thin solid grey;
-        box-shadow: -1px 0 0 grey, 1px 0 0 grey, inset 0px 1px 0 grey, inset -0px -0px 0 grey;
-        z-index: 190;
-      }
+      top: 0px;
+      vertical-align: middle;
+      background-color: #dadce0;
+      box-shadow: inset 0px -1px 0px grey, inset 0px 1px 0px grey;
+      z-index: 300;
     }
     .hidden { display: none; }
   }
