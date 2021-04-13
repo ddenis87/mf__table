@@ -2,16 +2,16 @@ export default {
   data() {
     return {
       // openRowGroup: new Map(),
-      rowGroupLevel: 1,
+      // rowGroupLevel: 1,
     };
   },
   computed: {
-    shiftTitleRow() {
-      return { left: `${24 * this.rowGroupLevel}px` };
-    },
-    isRowsGroup() {
-      return !!Object.values(this.rows).find((item) => Object.keys(item).includes('rowGroup')) || false;
-    },
+    // shiftTitleRow() {
+    //   return { left: `${24 * this.rowGroupLevel}px` };
+    // },
+    // isRowsGroup() {
+    //   return !!Object.values(this.rows).find((item) => Object.keys(item).includes('rowGroup')) || false;
+    // },
   },
   methods: {
     // toggleRowGroup(evt) {
@@ -51,17 +51,17 @@ export default {
     //   });
     //   this.rowGroupLevel = shift + 1;
     // },
-    getLevelRowGroup(rowNumber) {
-      let level = 1;
-      let currentRow = rowNumber;
-      let condition = true;
+    // getLevelRowGroup(rowNumber) {
+    //   let level = 1;
+    //   let currentRow = rowNumber;
+    //   let condition = true;
 
-      while (condition) {
-        if (!this.rows[currentRow].parent) { condition = false; return level; }
-        level += 1;
-        currentRow = this.rows[currentRow].parent;
-      }
-      return level;
-    },
+    //   while (condition) {
+    //     if (!this.rows[currentRow].parent) { condition = false; return level; }
+    //     level += 1;
+    //     currentRow = this.rows[currentRow].parent;
+    //   }
+    //   return level;
+    // },
   },
 };

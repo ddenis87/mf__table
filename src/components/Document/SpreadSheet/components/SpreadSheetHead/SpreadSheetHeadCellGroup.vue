@@ -2,7 +2,8 @@
   <th class="head-column-group"
       :class="{
         'head-column-group_first-row': (currentRow === 1),
-        'head-column-group_first-column': (currentLevel === 1)
+        'head-column-group_first-column': (currentLevel === 1),
+        'head-column-group_first': (currentRow === 1 && currentLevel === 1),
       }"
       :style="shiftLeft"></th>
 </template>
@@ -37,11 +38,15 @@ export default {
   // box-shadow: inset 0px -1px 0 grey, inset 1px 0px 0 grey;
   background-color: #dadce0;
   z-index: 500;
+  
   &_first-column {
-    box-shadow: inset 0px -1px 0px grey, 1px 0px 0px grey
+    box-shadow: inset 0px -1px 0px grey, 1px 0px 0px grey, inset 1px 0px 0px grey;
   }
   &_first-row {
     box-shadow: inset 0px -1px 0px grey, inset 0px 1px 0px grey, 1px 0px 0px grey;
+  }
+  &_first {
+    box-shadow: inset 0px -1px 0px grey, 1px 0px 0px grey, inset 1px 1px 0px grey;
   }
 }
 </style>

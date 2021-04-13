@@ -1,21 +1,27 @@
 <template>
   <thead>
-    <tr v-if="isColumnsGroup"
+    <tr v-for="level in currentTableColumnLevel"
+        :key="level"
         class="head-row">
-      <spread-sheet-head-cell-group v-for="level in currentTableLevel"
-                                    :key="level"
-                                    :current-level="level"
-                                    :current-row="1"></spread-sheet-head-cell-group>
-      <spread-sheet-head-cell-title :current-level="currentTableLevel"
-                                    :current-row="1"></spread-sheet-head-cell-title>
+      <spread-sheet-head-cell-group v-for="levelRow in currentTableRowLevel"
+                                    :key="levelRow"
+                                    :current-level="levelRow"
+                                    :current-row="level"></spread-sheet-head-cell-group>
+      <spread-sheet-head-cell-title :current-level="currentTableRowLevel"
+                                    :current-row="level"></spread-sheet-head-cell-title>
 
       <template v-for="i in columnCount">
         <th :key="`head-row__column-group-${i}`"
             class="head-row__column-group"
-            :class="{'hidden': excludedColumns.has(`${i}`)}"
-            :style="getStyleColumnGroup(i)"
-            :data-column-parent="(excludedColumns.has(`${i}`) ? getColumnParent(i) : '0')">
-          <spread-sheet-btn-group v-if="isColumnGroup(i)"
+            :class="{
+              'hidden': excludedColumns.has(`${i}`),
+              'head-row__column-group_first-row': (level === 1),
+            }"
+            :style="getStyleColumnGroup(level, i)"
+            :data-column-parent="(excludedColumns.has(`${i}`) ? getColumnParent(i) : '0')"
+            :data-column-count-group="getColumnCountGroup(i)"
+            :data-column-number="i + currentTableRowLevel + 1">
+          <spread-sheet-btn-group v-if="isColumnGroup(i, level)"
                                   :data-column-group-parent="getColumnTitle(i)"
                                   data-column-group-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
         </th>
@@ -23,12 +29,12 @@
 
     </tr>
     <tr class="head-row">
-      <spread-sheet-head-cell-group v-for="level in currentTableLevel"
-                                    :key="level"
-                                    :current-level="level"
-                                    :current-row="2"></spread-sheet-head-cell-group>
-      <spread-sheet-head-cell-title :current-level="currentTableLevel"
-                                    :current-row="2"></spread-sheet-head-cell-title>
+      <spread-sheet-head-cell-group v-for="levelRow in currentTableRowLevel"
+                                    :key="levelRow"
+                                    :current-level="levelRow"
+                                    :current-row="currentTableColumnLevel + 1"></spread-sheet-head-cell-group>
+      <spread-sheet-head-cell-title :current-level="currentTableRowLevel"
+                                    :current-row="currentTableColumnLevel + 1"></spread-sheet-head-cell-title>
 
       <template v-for="i in columnCount">
         <th :key="`head-row__column-${i}`"
@@ -61,54 +67,30 @@ export default {
     SpreadSheet,
   ],
   props: {
-    currentTableLevel: { type: Number, default: 0 },
-
-    isRowsGroup: { type: Boolean, default: false },
-    columnCount: { type: Number, default: 10 },
+    currentTableColumnLevel: { type: Number, default: 0 },
+    currentTableRowLevel: { type: Number, default: 0 },
     columns: { type: Object },
-    rowGroupLevel: { type: Number, default: 1 },
-
-    shiftTitleColumn: { type: Number },
-    shiftTitleRow: { type: Object, default() { return { left: '0px' }; } },
+    columnCount: { type: Number, default: 10 },
   },
   computed: {
-    isColumnsGroup() {
-      return Object.values(this.columns).find((item) => Object.keys(item).includes('columnGroup')) || false;
-    },
-    styleColumnTitleRowTitle() {
-      return {
-        ...this.shiftTitleColumn,
-        // top: (this.isColumnsGroup) ? '22px' : '0px',
-        ...this.shiftTitleRow,
-      };
-    },
-    styleColumnGroupRowGroup() {
-      return {
-        top: '0px',
-        'max-width': '24px', // this.shiftTitleRow.left,
-        'min-width': '24px', // this.shiftTitleRow.left,
-      };
-    },
-    styleColumnGroupRowTitle() {
-      return {
-        ...this.shiftTitleColumn,
-        // top: (this.isColumnsGroup) ? '22px' : '0px',
-        'max-width': '24px', // this.shiftTitleRow.left,
-        'min-width': '24px', // this.shiftTitleRow.left,
-      };
-    },
   },
   methods: {
-    getStyleColumnGroup(columnNumber) {
+    getColumnCountGroup(columnNumber) {
+      const name = this.getColumnTitle(columnNumber);
+      if (!this.columns[name] || !this.columns[name].columnGroup) return 0;
+      return this.columns[name].columnGroup;
+    },
+
+    getStyleColumnGroup(level, columnNumber) {
       return {
-        height: this.shiftTitleColumn.top,
+        top: `${24 * (level - 1)}px`,
+        height: '22px',
         ...this.getWidthColumn(columnNumber),
       };
     },
     getStyleColumn(columnNumber) {
       return {
-        top: '24px',
-        // top: (this.isColumnsGroup) ? '22px' : '0px',
+        top: `${24 * this.currentTableColumnLevel}px`,
         ...this.getWidthColumn(columnNumber),
       };
     },
@@ -137,17 +119,60 @@ thead {
       top: 0px;
       padding: 2px;
       min-width: 94px;
-      box-shadow: inset 0px -1px 0px grey, inset 1px 0px 0px grey;
+      box-shadow: inset 0px -1px 0px grey, inset 1px 0px 0px grey, 0px -1px 0px grey;
       background-color: #dadce0;
-      z-index: 280;
+      z-index: 310;
     }
     &__column-group {
       position: sticky;
       top: 0px;
       vertical-align: middle;
       background-color: #dadce0;
-      box-shadow: inset 0px -1px 0px grey, inset 0px 1px 0px grey;
+      box-shadow: inset 0px -0px 0px grey;
       z-index: 300;
+      &_first-row {
+        box-shadow: inset 0px -0px 0px grey, inset 0px 1px 0px grey;
+      }
+      &_child {
+        &::before {
+          content: '';
+          position: absolute;
+          border: 1px solid #3F3F3F;
+          background-color: #3F3F3F;
+          width: 100px;
+          height: 0px;
+          left: 0px;
+          top: 12px;
+        }
+        &-last {
+          &::before {
+            content: '';
+            position: absolute;
+            border: 0;
+            background-color: unset;
+            border-right: 2px solid #3F3F3F;
+            border-top: 2px solid #3F3F3F;
+            width: 100%;
+            height: 8px;
+            left: 0px;
+            bottom: 4px;
+          }
+        }
+        &-first {
+          &::before {
+            content: '';
+            position: absolute;
+            border: 0;
+            border: 1px solid #3F3F3F;
+            background-color: #3F3F3F;
+            width: calc(50% - 7px);
+            height: 0px;
+            right: 0px;
+            top: 12px;
+          }
+        }
+      }
+
     }
     .hidden { display: none; }
   }

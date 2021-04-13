@@ -45,17 +45,12 @@ export default {
     SpreadSheet,
   ],
   props: {
-    currentTableLevel: { type: Number, default: 0 },
-
-    rowCount: { type: Number, default: 1 },
     rows: { type: Object },
-    rowGroupLevel: { type: Number, default: 1 },
-    columnCount: { type: Number, default: 10 },
+    rowCount: { type: Number, default: 1 },
     columns: { type: Object },
+    columnCount: { type: Number, default: 10 },
     cells: { type: Object },
-
-    // shiftTitleRow: { type: Object, default() { return { left: '0px' }; } },
-    isRowsGroup: { type: Boolean, default: false },
+    currentTableLevel: { type: Number, default: 0 },
   },
   data() {
     return {
@@ -110,13 +105,6 @@ export default {
       }
       return (level === this.getLevelRow(rowNumber));
     },
-    // isRowGroup(rowNumber) {
-    //   if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
-    //   for (let i = 1; i < this.rows[rowNumber].rowGroup; i += 1) {
-    //     this.excludedRow.add(`${rowNumber + i}`);
-    //   }
-    //   return true;
-    // },
     getLevelRow(rowNumber) {
       let level = 1;
       let currentRow = rowNumber;

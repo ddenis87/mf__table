@@ -6,18 +6,15 @@ export default {
     };
   },
   computed: {
-    // isRowsGroup() {
-    //   return Object.values(this.rows).find((item) => Object.keys(item).includes('rowGroup')) || false;
-    // },
   },
   methods: {
-    isColumnGroup(columnNumber) {
+    isColumnGroup(columnNumber, level = false) {
       const name = this.getColumnTitle(columnNumber);
       if (!this.columns[name] || !this.columns[name].columnGroup) return false;
       for (let i = 1; i < this.columns[name].columnGroup; i += 1) {
         this.excludedColumns.add(`${columnNumber + i}`);
       }
-      return true;
+      return (level === this.getLevelColumn(name));
     },
     getColumnParent(columnNumber) {
       const name = this.getColumnTitle(columnNumber);
@@ -27,17 +24,25 @@ export default {
       if (columnNumber > 702) return 'Infinity';
       if (columnNumber <= this.setChar.length) {
         const columnTitle = this.setChar[columnNumber - 1];
-        // this.columnsTitle[columnNumber] = columnTitle;
         return columnTitle;
       }
       if ((columnNumber % this.setChar.length) === 0) {
         const columnTitle = `${this.setChar[((columnNumber - this.setChar.length) / this.setChar.length) - 1]}${this.setChar[this.setChar.length - 1]}`;
-        // this.columnsTitle[columnNumber] = columnTitle;
         return columnTitle;
       }
       const columnTitle = `${this.setChar[(Math.floor(columnNumber / this.setChar.length)) - 1]}${this.setChar[(columnNumber % this.setChar.length) - 1]}`;
-      // this.columnsTitle[columnNumber] = columnTitle;
       return columnTitle;
+    },
+    getLevelColumn(columnName) {
+      let level = 1;
+      let currentColumn = columnName;
+      let condition = true;
+      while (condition) {
+        if (!this.columns[currentColumn]?.parent) { condition = false; return level; }
+        level += 1;
+        currentColumn = this.columns[currentColumn].parent;
+      }
+      return level;
     },
   },
 };
