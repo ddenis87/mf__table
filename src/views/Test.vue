@@ -90,8 +90,8 @@ export default {
       //  Variant 3
       rowsJSON: `{
         "5":{"height":40},
-        "6":{"height":30},
-        "7":{"height":30},
+        "6":{"height":50},
+        "7":{"height":60},
         "8":{"height":80},
         "14": {"rowGroup": "10"},
         "15": {"parent": "14"},

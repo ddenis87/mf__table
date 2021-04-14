@@ -1,38 +1,57 @@
 <template>
   <table class="spread-sheet-head">
+    <template v-for="level in columnLevelGroupMax">
+      <tr :key="level"
+          class="spread-sheet-head__row-group">
+        <template v-for="column in columnCount">
+          <th v-if="!columnExcluded.has(column)"
+              :key="column"
+              class="spread-sheet-head__column-group"
+              :style="getColumnStyle(column)">
+            <spread-sheet-btn-group v-if="isColumnGroup(column, level)">mdi-plus-box-outline</spread-sheet-btn-group>
+          </th>
+        </template>
+      </tr>
+    </template>
     <tr class="spread-sheet-head__row">
-      <td v-for="item in headCount"
-          :key="item"
-          class="spread-sheet-head__column">{{ getColumnTitle(item).toUpperCase() }}</td>
-
+      <template v-for="column in columnCount">
+      <th v-if="!columnExcluded.has(column)"
+          :key="column"
+          class="spread-sheet-head__column"
+          :style="getColumnStyle(column)">{{ getColumnTitle(column).toUpperCase() }}</th>
+      </template>
     </tr>
   </table>
 </template>
 
 <script>
+import SpreadSheet from './SpreadSheet';
+import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
+
 export default {
   name: 'SpreadSheetHead',
-  props: {
-    headCount: { type: Number, default: 25 },
+  components: {
+    SpreadSheetBtnGroup,
   },
-  data() {
-    return {
-      setChar: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-    };
+  mixins: [
+    SpreadSheet,
+  ],
+  props: {
+    columnCount: { type: Number, default: 25 },
+    columnExcluded: { type: Set, default() { return new Set(); } },
+    columns: { type: Object },
+    setCharacter: { type: Array },
   },
   methods: {
-    getColumnTitle(columnNumber) {
-      if (columnNumber > 702) return 'Infinity';
-      if (columnNumber <= this.setChar.length) {
-        const columnTitle = this.setChar[columnNumber - 1];
-        return columnTitle;
-      }
-      if ((columnNumber % this.setChar.length) === 0) {
-        const columnTitle = `${this.setChar[((columnNumber - this.setChar.length) / this.setChar.length) - 1]}${this.setChar[this.setChar.length - 1]}`;
-        return columnTitle;
-      }
-      const columnTitle = `${this.setChar[(Math.floor(columnNumber / this.setChar.length)) - 1]}${this.setChar[(columnNumber % this.setChar.length) - 1]}`;
-      return columnTitle;
+    isColumnGroup(columnNumber, level = false) {
+      const name = this.getColumnTitle(columnNumber);
+      if (!this.columns[name] || !this.columns[name].columnGroup) return false;
+      return (level === this.getColumnLevel(name) + 1);
+    },
+    getColumnStyle(columnNumber) {
+      return {
+        ...this.getColumnWidth(columnNumber),
+      };
     },
   },
 };
@@ -49,11 +68,23 @@ export default {
   &__row {
     .spread-sheet-head__column {
       min-width: 94px;
-      height: 24px;
+      height: 22px;
       border: thin solid grey;
       background-color: #dadce0;
       &:first-child {
         border-left: 0px;
+      }
+    }
+  }
+  &__row-group {
+    .spread-sheet-head__column-group {
+      min-width: 94px;
+      height: 22px;
+      background-color: #dadce0;
+    }
+    &:first-child {
+      .spread-sheet-head__column-group {
+        border-top: thin solid grey;
       }
     }
   }
