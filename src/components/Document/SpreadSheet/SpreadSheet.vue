@@ -1,6 +1,6 @@
 <template>
   <div class="sheet">
-    <table class="spread-sheet">
+    <table class="spread-sheet" @click="eventClickTable">
       <tr>
         <td class="spread-sheet__angle"
             :style="widthHead">
@@ -66,6 +66,24 @@ export default {
 
     cells: { type: Object },
     styles: { type: Array },
+  },
+  data() {
+    return {
+      currentSelectedCell: null,
+    };
+  },
+  methods: {
+    eventClickTable(evt) {
+      this.selectedCell(evt);
+    },
+    selectedCell(evt) {
+      console.log(evt);
+      if (!evt.target.closest('.spread-sheet-body__column')) return;
+      if (this.currentSelectedCell === evt.target) return;
+      if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('selected');
+      evt.target.classList.add('selected');
+      this.currentSelectedCell = evt.target;
+    },
   },
 };
 </script>

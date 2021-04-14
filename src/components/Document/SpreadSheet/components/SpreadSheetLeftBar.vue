@@ -54,7 +54,7 @@ export default {
   border-collapse: collapse;
   width: 100%;
   font-size: 0.75em;
-  color: rgba(0, 0, 0, 0.5);
+  color: rgba(0, 0, 0, 0.6);
   text-align: center;
   &__row {
     .spread-sheet-left-bar__column {

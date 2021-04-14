@@ -91,15 +91,17 @@ export default {
   position: relative;
   border-collapse: collapse;
   width: 100%;
-  font-size: 0.75em;
+  // font-size: 0.75em;
   color: rgba(0, 0, 0, 0.5);
   text-align: center;
   &__row {
     .spread-sheet-body__column {
+      position: relative;
       min-width: 94px;
       height: 24px;
       border-right: thin solid grey;
       border-bottom: thin solid grey;
+      font-size: 0.875em;
       white-space: nowrap;
       overflow: hidden;
     }
