@@ -8,9 +8,16 @@
         <th v-for="level in rowLevelGroupMax"
             :key="level"
             class="spread-sheet-left-bar__column-group">
-          <spread-sheet-btn-group v-if="isRowGroup(row, level)">mdi-plus-box-outline</spread-sheet-btn-group>
+          <spread-sheet-btn-group v-if="isRowGroupLevel(row, level)"
+                                  :data-row-parent="row">mdi-plus-box-outline</spread-sheet-btn-group>
         </th>
         <th class="spread-sheet-left-bar__column">{{ row }}</th>
+      </tr>
+      <tr v-if="!rowExcluded.has(row) && isRowGroup(row)"
+          :key="`slot-${row}`"
+          class="spread-sheet-left-bar__row hidden">
+        <th :colspan="rowLevelGroupMax + 1"
+            :data-row-parent-slot="getRowParent(row + 1)">I slot</th>
       </tr>
     </template>
   </table>
@@ -34,9 +41,16 @@ export default {
     rows: { type: Object },
   },
   methods: {
-    isRowGroup(rowNumber, level) {
+    isRowGroup(rowNumber) {
+      if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
+      return true;
+    },
+    isRowGroupLevel(rowNumber, level) {
       if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
       return (level === this.getRowLevel(rowNumber) + 1);
+    },
+    getRowParent(rowNumber) {
+      return this.rows[rowNumber].parent;
     },
     getRowStyle(rowNumber) {
       return {

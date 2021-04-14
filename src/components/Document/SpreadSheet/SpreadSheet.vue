@@ -74,10 +74,10 @@ export default {
   },
   methods: {
     eventClickTable(evt) {
+      console.log(evt.target.closest('button').getAttribute('data-row-parent'));
       this.selectedCell(evt);
     },
     selectedCell(evt) {
-      console.log(evt);
       if (!evt.target.closest('.spread-sheet-body__column')) return;
       if (this.currentSelectedCell === evt.target) return;
       if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('selected');
