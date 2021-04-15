@@ -1,23 +1,23 @@
 <template>
-  <table class="spread-sheet-left-bar">
+  <table class="spread-sheet-left-bar" @click.stop="eventClickTable">
     <template v-for="row in rowCount">
-      <tr v-if="!rowExcluded.has(row)"
+      <tr v-if="!rowExcluded.has(currentRow(row))"
           :key="row"
           class="spread-sheet-left-bar__row"
           :style="getRowStyle(row)">
         <th v-for="level in rowLevelGroupMax"
             :key="level"
             class="spread-sheet-left-bar__column-group">
-          <spread-sheet-btn-group v-if="isRowGroupLevel(row, level)"
-                                  :data-row-parent="row">mdi-plus-box-outline</spread-sheet-btn-group>
+          <spread-sheet-btn-group v-if="isRowGroupLevel(currentRow(row), level)"
+                                  :data-row-parent="currentRow(row)">mdi-plus-box-outline</spread-sheet-btn-group>
         </th>
         <th class="spread-sheet-left-bar__column">{{ currentRow(row) }}</th>
       </tr>
-      <tr v-if="!rowExcluded.has(row) && isRowGroup(currentRow(row))"
+      <tr v-if="!rowExcluded.has(currentRow(row)) && isRowGroup(currentRow(row))"
           :key="`slot-${row}`"
           class="spread-sheet-left-bar__row hidden">
-        <th :colspan="rowLevelGroupMax"
-            :data-row-parent-slot="getRowParent(currentRow(row + 1))">I slot</th>
+        <th :colspan="rowLevelGroupMax + 1"
+            :data-row-parent-slot="getRowParent(currentRow(row + 1))"></th>
       </tr>
     </template>
   </table>
@@ -27,6 +27,8 @@
 import SpreadSheet from './SpreadSheet';
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
+import SpreadSheetLeftBarGroup from './SpreadSheetLeftBarGroup';
+
 export default {
   name: 'SpreadSheetLeftBar',
   components: {
@@ -34,6 +36,7 @@ export default {
   },
   mixins: [
     SpreadSheet,
+    SpreadSheetLeftBarGroup,
   ],
   props: {
     rowCount: { type: Number, default: 100 },
@@ -41,11 +44,18 @@ export default {
     rows: { type: Object },
 
     rowParent: { type: Number, default: 0 },
+    rowLevelGroup: { type: Number, default: null },
+    rowChildLevel: { type: Number, default: 1 },
   },
   computed: {
     
   },
   methods: {
+    eventClickTable(evt) {
+      if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-row-parent')) {
+        this.toggleRowGroup(evt.target.closest('button'));
+      }
+    },
     currentRow(rowNumber) {
       return +rowNumber + +this.rowParent;
     },
@@ -55,11 +65,12 @@ export default {
     },
     isRowGroupLevel(rowNumber, level) {
       if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
-      return (level === this.getRowLevel(rowNumber) + 1);
+      console.log(level, ' - ', (this.getRowLevel(rowNumber) + 1));
+      // return (level === this.getRowLevel(rowNumber) + 1);
+      return (level === this.rowChildLevel);
     },
     getRowParent(rowNumber) {
-      // console.log(rowNumber);
-      return this.rows[rowNumber]?.parent;
+      return this.rows[rowNumber].parent;
     },
     getRowStyle(rowNumber) {
       return {
@@ -79,6 +90,8 @@ export default {
   font-size: 16px;
   color: rgba(0, 0, 0, 0.6);
   text-align: center;
+
+  margin-right: -2px;
   &__row {
     font-size: 0.75em;
     .spread-sheet-left-bar__column {

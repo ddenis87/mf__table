@@ -20,7 +20,6 @@ export default {
         rowCount: rowsOption.rowCount,
         rows: rowsOption.rows,
       };
-      // console.log(propertiesComponentMounted);
       this.mountedRowGroup(propertiesComponentMounted);
     },
     getRowsGroup(parent) {

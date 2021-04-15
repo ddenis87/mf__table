@@ -1,0 +1,74 @@
+import Vue from 'vue';
+import vuetify from '@/plugins/vuetify';
+import SpreadSheetLeftBar from './SpreadSheetLeftBar.vue';
+
+export default {
+  data() {
+    return {
+      openRowGroup: [],
+
+      currentRowChildLevel: this.rowChildLevel,
+    };
+  },
+  mounted() {
+
+  },
+  methods: {
+    toggleRowGroup(target) {
+      const parent = target.getAttribute('data-row-parent');
+      const targetInserting = target.closest('tr').nextElementSibling.querySelector(`[data-row-parent-slot="${parent}"]`);
+
+      const rowsOption = this.getRowsGroup(+parent);
+      const propertiesComponentMounted = {
+        parent,
+        targetInserting,
+        rowCount: +rowsOption.rowCount - 1,
+        rows: rowsOption.rows,
+      };
+      console.log(propertiesComponentMounted);
+      this.mountedRowGroup(propertiesComponentMounted);
+    },
+    getRowsGroup(parent) {
+      const rowCount = this.rows[parent].rowGroup;
+      // const rowsMap = new Array.from(Map(Object.entries(this.rows)));
+      const rows = {};
+      for (let i = 1; i < rowCount; i += 1) {
+        rows[parent + i] = this.rows[parent + i];
+      }
+      return {
+        rowCount,
+        rows,
+      };
+    },
+    
+    mountedRowGroup(properties) {
+      const SubClassVue = Vue.extend(SpreadSheetLeftBar);
+      this.openRowGroup[properties.parent] = new SubClassVue({
+        vuetify,
+        propsData: {
+          rowCount: properties.rowCount,
+          rowExcluded: this.getRowExcluded(properties.rows),
+          rows: properties.rows,
+          
+          rowParent: +properties.parent,
+          rowLevelGroup: this.rowLevelGroupMax,
+          rowChildLevel: this.currentRowChildLevel + 1,
+        },
+      }).$mount();
+      properties.targetInserting.prepend(this.openRowGroup[properties.parent].$el);
+      properties.targetInserting.closest('tr').classList.remove('hidden');
+    },
+    getRowExcluded(rows) {
+      const rowExcluded = new Set();
+      Object.entries(rows).forEach((row) => {
+        if (Object.keys(row[1]).includes('rowGroup')) {
+          for (let i = 1; i < row[1].rowGroup; i += 1) {
+            rowExcluded.add(+row[0] + i);
+          }
+        }
+      });
+      console.log(rowExcluded);
+      return rowExcluded;
+    },
+  },
+};
