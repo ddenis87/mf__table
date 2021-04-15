@@ -7,13 +7,15 @@
           :style="getRowStyle(row)">
         <th v-for="level in rowLevelGroupMax"
             :key="level"
-            class="spread-sheet-left-bar__column-group">
+            class="spread-sheet-left-bar__column-group"
+            :class="{'line': (rowChildLevel > 1 && level <= rowChildLevel - 1) }">
           <spread-sheet-btn-group v-if="isRowGroupLevel(currentRow(row), level)"
                                   :data-row-parent="currentRow(row)"
                                   data-row-group-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
         </th>
         <th class="spread-sheet-left-bar__column">{{ currentRow(row) }}</th>
       </tr>
+
       <tr v-if="!rowExcluded.has(currentRow(row)) && isRowGroup(currentRow(row))"
           :key="`slot-${row}`"
           class="spread-sheet-left-bar__row hidden">
@@ -25,9 +27,9 @@
 </template>
 
 <script>
-import SpreadSheet from './SpreadSheet';
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
+import SpreadSheet from './SpreadSheet';
 import SpreadSheetLeftBarGroup from './SpreadSheetLeftBarGroup';
 
 export default {
@@ -95,6 +97,7 @@ export default {
   &__row {
     font-size: 0.75em;
     .spread-sheet-left-bar__column {
+      position: relative;
       max-width: 60px;
       min-width: 60px;
       height: 24px;
@@ -102,12 +105,24 @@ export default {
       &:first-child {
         border-top: 0px;
       }
+      
     }
     .spread-sheet-left-bar__column-group {
       max-width: 20px;
       min-width: 20px;
       &:first-child {
         border-left: thin solid grey;
+      }
+    }
+    .line {
+      &::before {
+        content: '';
+        position: absolute;
+        border: 1px solid #3F3F3F;
+        background-color: #3F3F3F;
+        width: 0px;
+        height: 100px;
+        top: 0px;
       }
     }
     &:first-child {

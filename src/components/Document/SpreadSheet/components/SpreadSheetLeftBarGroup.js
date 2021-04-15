@@ -6,12 +6,8 @@ export default {
   data() {
     return {
       openRowGroup: [],
-
       currentRowChildLevel: this.rowChildLevel,
     };
-  },
-  mounted() {
-
   },
   methods: {
     toggleRowGroup(target) {
@@ -39,7 +35,7 @@ export default {
 
         this.openRowGroup[parent] = null;
         delete this.openRowGroup[parent];
-        
+
         btnIcon.classList.add('mdi-plus-box-outline');
         btnIcon.classList.remove('mdi-minus-box-outline');
 
