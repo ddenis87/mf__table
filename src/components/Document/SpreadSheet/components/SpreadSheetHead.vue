@@ -8,17 +8,27 @@
               :key="column"
               class="spread-sheet-head__column-group"
               :style="getColumnStyle(column)">
-            <spread-sheet-btn-group v-if="isColumnGroup(column, level)">mdi-plus-box-outline</spread-sheet-btn-group>
+            <spread-sheet-btn-group v-if="isColumnGroupLevel(column, level)">
+              mdi-plus-box-outline</spread-sheet-btn-group>
           </th>
+          <th v-if="!columnExcluded.has(column) && isColumnGroup(column)"
+              :key="`slot-${column}`"
+              class="spread-sheet-head__column-group hidden"
+              :rowspan="columnLevelGroupMax + 1"
+              :data-column-parent-slot="getColumnParent(column + 1)"></th>
         </template>
       </tr>
     </template>
+
     <tr class="spread-sheet-head__row">
       <template v-for="column in columnCount">
       <th v-if="!columnExcluded.has(column)"
           :key="column"
           class="spread-sheet-head__column"
           :style="getColumnStyle(column)">{{ getColumnTitle(column).toUpperCase() }}</th>
+      <!-- <th v-if="!columnExcluded.has(column) && isColumnGroup(column)"
+              :key="`slot-${column}`"
+              class="spread-sheet-head__column hidden"></th> -->
       </template>
     </tr>
   </table>
@@ -43,10 +53,19 @@ export default {
     setCharacter: { type: Array },
   },
   methods: {
-    isColumnGroup(columnNumber, level = false) {
+    isColumnGroup(columnNumber) {
+      const name = this.getColumnTitle(columnNumber);
+      if (!this.columns[name] || !this.columns[name].columnGroup) return false;
+      return true;
+    },
+    isColumnGroupLevel(columnNumber, level = false) {
       const name = this.getColumnTitle(columnNumber);
       if (!this.columns[name] || !this.columns[name].columnGroup) return false;
       return (level === this.getColumnLevel(name) + 1);
+    },
+    getColumnParent(columnNumber) {
+      const name = this.getColumnTitle(columnNumber);
+      return this.columns[name].parent;
     },
     getColumnStyle(columnNumber) {
       return {
@@ -88,6 +107,6 @@ export default {
       }
     }
   }
-  
+  .hidden { display: none; }
 }
 </style>

@@ -8,7 +8,10 @@
         <th v-for="level in rowLevelGroupMax"
             :key="level"
             class="spread-sheet-left-bar__column-group"
-            :class="{'line': (rowChildLevel > 1 && level <= rowChildLevel - 1) }">
+            :class="{
+              'line': (rowChildLevel > 1 && level <= rowChildLevel - 1 && row != rowCount),
+              'line_end': (level === rowChildLevel - 1 && row === rowCount)
+            }">
           <spread-sheet-btn-group v-if="isRowGroupLevel(currentRow(row), level)"
                                   :data-row-parent="currentRow(row)"
                                   data-row-group-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
@@ -102,6 +105,7 @@ export default {
       min-width: 60px;
       height: 24px;
       border: thin solid grey;
+      border-top: 0px;
       &:first-child {
         border-top: 0px;
       }
@@ -114,15 +118,44 @@ export default {
         border-left: thin solid grey;
       }
     }
+    .line_start {
+      position: relative;
+      &::before {
+        content: ' ';
+        position: absolute;
+        // left: 11px;
+        border-left: thin solid #3F3F3F;
+        background-color: #3F3F3F;
+        width: 0px;
+        height: 20px;
+        left: 10px;
+        height: calc(50% - 7px);
+        bottom: 0px;
+      }
+    }
     .line {
       &::before {
         content: '';
         position: absolute;
-        border: 1px solid #3F3F3F;
+        // left: 11px;
+        border-left: thin solid #3F3F3F;
         background-color: #3F3F3F;
         width: 0px;
-        height: 100px;
+        height: 100%;
         top: 0px;
+      }
+    }
+    .line_end {
+      &::before {
+        content: '';
+        position: absolute;
+        // border: 0;
+        border-left: 1px solid #3F3F3F;
+        border-bottom: 1px solid #3F3F3F;
+        width: 8px;
+        // height: 100%;
+        // left: 11px;
+        bottom: 0px;
       }
     }
     &:first-child {

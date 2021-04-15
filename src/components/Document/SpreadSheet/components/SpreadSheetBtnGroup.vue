@@ -22,5 +22,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.action-btn {
+  margin-left: 2px;
+}
 </style>

@@ -28,6 +28,7 @@ export default {
 
         btnIcon.classList.remove('mdi-plus-box-outline');
         btnIcon.classList.add('mdi-minus-box-outline');
+        target.closest('th').classList.add('line_start');
 
         target.setAttribute('data-row-group-status', 'open');
       } else {
@@ -38,6 +39,7 @@ export default {
 
         btnIcon.classList.add('mdi-plus-box-outline');
         btnIcon.classList.remove('mdi-minus-box-outline');
+        target.closest('th').classList.remove('line_start');
 
         target.setAttribute('data-row-group-status', 'close');
       }
