@@ -16,21 +16,38 @@ export default {
   methods: {
     toggleRowGroup(target) {
       const parent = target.getAttribute('data-row-parent');
+      const status = target.getAttribute('data-row-group-status');
       const targetInserting = target.closest('tr').nextElementSibling.querySelector(`[data-row-parent-slot="${parent}"]`);
+      const btnIcon = target.querySelector('i');
 
-      const rowsOption = this.getRowsGroup(+parent);
-      const propertiesComponentMounted = {
-        parent,
-        targetInserting,
-        rowCount: +rowsOption.rowCount - 1,
-        rows: rowsOption.rows,
-      };
-      console.log(propertiesComponentMounted);
-      this.mountedRowGroup(propertiesComponentMounted);
+      if (status === 'close') {
+        const rowsOption = this.getRowsGroup(+parent);
+        const propertiesComponentMounted = {
+          parent,
+          targetInserting,
+          rowCount: +rowsOption.rowCount - 1,
+          rows: rowsOption.rows,
+        };
+        this.mountedRowGroup(propertiesComponentMounted);
+
+        btnIcon.classList.remove('mdi-plus-box-outline');
+        btnIcon.classList.add('mdi-minus-box-outline');
+
+        target.setAttribute('data-row-group-status', 'open');
+      } else {
+        targetInserting.querySelector('table').remove();
+
+        this.openRowGroup[parent] = null;
+        delete this.openRowGroup[parent];
+        
+        btnIcon.classList.add('mdi-plus-box-outline');
+        btnIcon.classList.remove('mdi-minus-box-outline');
+
+        target.setAttribute('data-row-group-status', 'close');
+      }
     },
     getRowsGroup(parent) {
       const rowCount = this.rows[parent].rowGroup;
-      // const rowsMap = new Array.from(Map(Object.entries(this.rows)));
       const rows = {};
       for (let i = 1; i < rowCount; i += 1) {
         rows[parent + i] = this.rows[parent + i];

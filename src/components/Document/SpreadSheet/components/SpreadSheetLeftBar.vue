@@ -9,7 +9,8 @@
             :key="level"
             class="spread-sheet-left-bar__column-group">
           <spread-sheet-btn-group v-if="isRowGroupLevel(currentRow(row), level)"
-                                  :data-row-parent="currentRow(row)">mdi-plus-box-outline</spread-sheet-btn-group>
+                                  :data-row-parent="currentRow(row)"
+                                  data-row-group-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
         </th>
         <th class="spread-sheet-left-bar__column">{{ currentRow(row) }}</th>
       </tr>
@@ -66,7 +67,6 @@ export default {
     isRowGroupLevel(rowNumber, level) {
       if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
       console.log(level, ' - ', (this.getRowLevel(rowNumber) + 1));
-      // return (level === this.getRowLevel(rowNumber) + 1);
       return (level === this.rowChildLevel);
     },
     getRowParent(rowNumber) {
