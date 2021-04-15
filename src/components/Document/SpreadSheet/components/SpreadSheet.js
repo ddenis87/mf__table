@@ -23,8 +23,10 @@ export default {
       let level = 0;
       let currentRow = rowNumber;
       let condition = true;
+      console.log(rowNumber);
+      console.log(this.rows);
       while (condition) {
-        if (!this.rows[currentRow].parent) { condition = false; return level; }
+        if (!this.rows[currentRow]?.parent) { condition = false; return level; }
         level += 1;
         currentRow = this.rows[currentRow].parent;
       }

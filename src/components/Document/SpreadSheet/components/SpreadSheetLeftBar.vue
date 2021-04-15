@@ -11,13 +11,13 @@
           <spread-sheet-btn-group v-if="isRowGroupLevel(row, level)"
                                   :data-row-parent="row">mdi-plus-box-outline</spread-sheet-btn-group>
         </th>
-        <th class="spread-sheet-left-bar__column">{{ row }}</th>
+        <th class="spread-sheet-left-bar__column">{{ currentRow(row) }}</th>
       </tr>
-      <tr v-if="!rowExcluded.has(row) && isRowGroup(row)"
+      <tr v-if="!rowExcluded.has(row) && isRowGroup(currentRow(row))"
           :key="`slot-${row}`"
           class="spread-sheet-left-bar__row hidden">
-        <th :colspan="rowLevelGroupMax + 1"
-            :data-row-parent-slot="getRowParent(row + 1)">I slot</th>
+        <th :colspan="rowLevelGroupMax"
+            :data-row-parent-slot="getRowParent(currentRow(row + 1))">I slot</th>
       </tr>
     </template>
   </table>
@@ -39,8 +39,16 @@ export default {
     rowCount: { type: Number, default: 100 },
     rowExcluded: { type: Set, default() { return new Set(); } },
     rows: { type: Object },
+
+    rowParent: { type: Number, default: 0 },
+  },
+  computed: {
+    
   },
   methods: {
+    currentRow(rowNumber) {
+      return +rowNumber + +this.rowParent;
+    },
     isRowGroup(rowNumber) {
       if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
       return true;
@@ -50,7 +58,8 @@ export default {
       return (level === this.getRowLevel(rowNumber) + 1);
     },
     getRowParent(rowNumber) {
-      return this.rows[rowNumber].parent;
+      // console.log(rowNumber);
+      return this.rows[rowNumber]?.parent;
     },
     getRowStyle(rowNumber) {
       return {
@@ -67,10 +76,11 @@ export default {
   position: relative;
   border-collapse: collapse;
   width: 100%;
-  font-size: 0.75em;
+  font-size: 16px;
   color: rgba(0, 0, 0, 0.6);
   text-align: center;
   &__row {
+    font-size: 0.75em;
     .spread-sheet-left-bar__column {
       max-width: 60px;
       min-width: 60px;

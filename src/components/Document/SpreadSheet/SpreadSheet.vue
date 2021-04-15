@@ -39,6 +39,7 @@
 <script>
 import SpreadSheetStyle from './SpreadSheetStyle';
 import SpreadSheetGroup from './SpreadSheetGroup';
+import SpreadSheetGroupRow from './SpreadSheetGroupRow';
 
 import SpreadSheetAngle from './components/SpreadSheetAngle.vue';
 import SpreadSheetHead from './components/SpreadSheetHead.vue';
@@ -56,6 +57,7 @@ export default {
   mixins: [
     SpreadSheetStyle,
     SpreadSheetGroup,
+    SpreadSheetGroupRow,
   ],
   props: {
     columnCount: { type: Number, default: 25 },
@@ -74,7 +76,9 @@ export default {
   },
   methods: {
     eventClickTable(evt) {
-      console.log(evt.target.closest('button').getAttribute('data-row-parent'));
+      if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-row-parent')) {
+        this.toggleRowGroup(evt.target.closest('button'));
+      }
       this.selectedCell(evt);
     },
     selectedCell(evt) {
