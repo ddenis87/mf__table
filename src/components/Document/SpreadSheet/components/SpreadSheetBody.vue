@@ -16,6 +16,12 @@
           </td>
         </template>
       </tr>
+      <tr v-if="!rowExcluded.has(row) && isRowGroup(row)"
+          :key="`slot-${row}`"
+          class="spread-sheet-body__row hidden">
+        <td :colspan="columnCount"
+            :data-row-parent-slot="getRowParent(row + 1)"></td>
+      </tr>
     </template>
     
   </table>
@@ -23,11 +29,13 @@
 
 <script>
 import SpreadSheet from './SpreadSheet';
+import SpreadSheetBodyGroup from './SpreadSheetBodyGroup';
 
 export default {
   name: 'SpreadSheetBody',
   mixins: [
     SpreadSheet,
+    SpreadSheetBodyGroup,
   ],
   props: {
     rowCount: { type: Number, default: 100 },
@@ -45,6 +53,14 @@ export default {
     };
   },
   methods: {
+    isRowGroup(rowNumber) {
+      if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
+      return true;
+    },
+    getRowParent(rowNumber) {
+      return this.rows[rowNumber].parent;
+    },
+
     getValue(row, column) {
       const cellName = `${this.getColumnTitle(column)}${row}`;
       if (!this.cells[cellName]) return '';
@@ -92,7 +108,7 @@ export default {
   border-collapse: collapse;
   width: 100%;
   // font-size: 0.75em;
-  color: rgba(0, 0, 0, 0.5);
+  color: rgba(0, 0, 0, 0.87);
   text-align: center;
   &__row {
     .spread-sheet-body__column {

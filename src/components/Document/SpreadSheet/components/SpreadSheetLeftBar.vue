@@ -97,6 +97,7 @@ export default {
   text-align: center;
 
   margin-right: -2px;
+  margin-top: -2px;
   &__row {
     font-size: 0.75em;
     .spread-sheet-left-bar__column {

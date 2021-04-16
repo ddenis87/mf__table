@@ -19,10 +19,12 @@
             :style="widthHead">
           <spread-sheet-left-bar :row-count="rowCount"
                                  :row-excluded="rowExcluded"
-                                 :rows="rows"></spread-sheet-left-bar>
+                                 :rows="rows"
+                                 @open-row-group="openRowGroup"></spread-sheet-left-bar>
         </td>
         <td class="spread-sheet__body">
-          <spread-sheet-body :row-count="rowCount"
+          <spread-sheet-body ref="ssBody"
+                             :row-count="rowCount"
                              :row-excluded="rowExcluded"
                              :rows="rows"
                              :column-count="columnCount"
@@ -73,6 +75,9 @@ export default {
     };
   },
   methods: {
+    openRowGroup(parent) {
+      console.log('open body row - ', parent);
+    },
     eventClickTable(evt) {
       this.selectedCell(evt);
     },

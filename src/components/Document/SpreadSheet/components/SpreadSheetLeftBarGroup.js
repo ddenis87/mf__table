@@ -16,6 +16,8 @@ export default {
       const targetInserting = target.closest('tr').nextElementSibling.querySelector(`[data-row-parent-slot="${parent}"]`);
       const btnIcon = target.querySelector('i');
 
+      this.$emit('open-row-group', parent);
+
       if (status === 'close') {
         const rowsOption = this.getRowsGroup(+parent);
         const propertiesComponentMounted = {
