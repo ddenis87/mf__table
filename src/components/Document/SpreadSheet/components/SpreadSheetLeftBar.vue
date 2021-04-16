@@ -71,7 +71,7 @@ export default {
     },
     isRowGroupLevel(rowNumber, level) {
       if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
-      console.log(level, ' - ', (this.getRowLevel(rowNumber) + 1));
+      // console.log(level, ' - ', (this.getRowLevel(rowNumber) + 1));
       return (level === this.rowChildLevel);
     },
     getRowParent(rowNumber) {

@@ -31,7 +31,9 @@
                              :column-excluded="columnExcluded"
                              :columns="columns"
                              :cells="cells"
-                             :set-character="setCharacter"></spread-sheet-body>
+                             :set-character="setCharacter"
+                             
+                             :event-row-open-group-value="rowOpenGroupValue"></spread-sheet-body>
         </td>
       </tr>
     </table>
@@ -72,11 +74,13 @@ export default {
   data() {
     return {
       currentSelectedCell: null,
+
+      rowOpenGroupValue: 0,
     };
   },
   methods: {
     openRowGroup(parent) {
-      console.log('open body row - ', parent);
+      this.rowOpenGroupValue = +parent;
     },
     eventClickTable(evt) {
       this.selectedCell(evt);

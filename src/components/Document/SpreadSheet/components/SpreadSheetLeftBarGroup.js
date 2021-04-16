@@ -84,7 +84,7 @@ export default {
           }
         }
       });
-      console.log(rowExcluded);
+      // console.log(rowExcluded);
       return rowExcluded;
     },
   },

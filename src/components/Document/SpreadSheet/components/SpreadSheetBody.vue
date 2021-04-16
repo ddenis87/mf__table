@@ -1,5 +1,5 @@
 <template>
-  <table class="spread-sheet-body">
+  <table class="spread-sheet-body" ref="ssBody">
     <template v-for="row in rowCount">
       <tr v-if="!rowExcluded.has(row)"
           :key="row"
@@ -20,7 +20,8 @@
           :key="`slot-${row}`"
           class="spread-sheet-body__row hidden">
         <td :colspan="columnCount"
-            :data-row-parent-slot="getRowParent(row + 1)"></td>
+            :data-row-parent-slot="getRowParent(row + 1)"
+            data-row-group-status="close"></td>
       </tr>
     </template>
     
@@ -46,11 +47,22 @@ export default {
     columns: { type: Object },
     cells: { type: Object },
     setCharacter: { type: Array },
+
+    rowChildLevel: { type: Number, default: 1 },
+
+    eventRowOpenGroupValue: { type: Number, default: 0 },
   },
   data() {
     return {
       excludedCells: new Set(),
     };
+  },
+  watch: {
+    eventRowOpenGroupValue() {
+      console.log('open body row - ', this.eventRowOpenGroupValue);
+      // if () // проверить что событие принадлежит этому уровню
+      this.toggleRowGroup(this.eventRowOpenGroupValue);
+    },
   },
   methods: {
     isRowGroup(rowNumber) {
