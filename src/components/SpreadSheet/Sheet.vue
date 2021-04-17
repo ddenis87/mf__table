@@ -44,7 +44,6 @@ export default {
       rowsBody: [],
       columnsBody: [],
 
-      rowsEntries: [],
       rowsParents: {},
     };
   },
@@ -113,6 +112,9 @@ export default {
     },
     openRowGroup(rowParent) {
       this.rowsBody.splice(rowParent.index + 1, 0, ...this.rowsParents[rowParent.value]);
+      const btnIcon = rowParent.target.querySelector('i');
+      btnIcon.classList.remove('mdi-plus-box-outline');
+      btnIcon.classList.add('mdi-minus-box-outline');
     },
     closeRowGroup(rowParent) {
       const rowsCut = [];
@@ -121,6 +123,9 @@ export default {
         if (indexCut > -1) rowsCut.push(indexCut);
       }
       this.rowsBody = this.rowsBody.filter((item, index) => !rowsCut.includes(index));
+      const btnIcon = rowParent.target.querySelector('i');
+      btnIcon.classList.add('mdi-plus-box-outline');
+      btnIcon.classList.remove('mdi-minus-box-outline');
     },
     getRowLevel(rowNumber) {
       let level = 0;

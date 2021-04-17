@@ -38,10 +38,10 @@ export default {
     return {
       isShowDialog: false,
       countColumn: 25,
-      countRow: 100,
+      countRow: 1000,
       sheetSpace: {
         column: 25,
-        row: 100,
+        row: 1000,
       },
       columnsJSON: `{
         "a":{"width":120},
@@ -59,10 +59,10 @@ export default {
       }`,
       //  Variant 3
       rowsJSON: `{
-        "5":{"height":40},
-        "6":{"height":50},
-        "7":{"height":60},
-        "8":{"height":80},
+        "5":{"height":30},
+        "6":{"height":30},
+        "7":{"height":40},
+        "8":{"height":40},
         "14": {"rowGroup": "10"},
         "15": {"parent": "14"},
         "16": {"rowGroup": "7","parent": "14"},

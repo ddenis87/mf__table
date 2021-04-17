@@ -6,6 +6,7 @@
       <th v-for="level in rowLevelGroupMax"
           :key="level"
           class="column column-group"
+          :class="{'line': (row.parent) && getRowLevel(row) >= level }"
           :style="getStyleGroup(level)">
         <spread-sheet-btn-group v-if="isRowGroupLevel(row, level)"
                                 :data-row-index="index"
@@ -205,6 +206,18 @@ export default {
         box-shadow: 1px 0px 0px grey, inset 0px -1px 0px grey;
         white-space: nowrap;
         overflow: hidden;
+      }
+    }
+    .line {
+      &::before {
+        content: '';
+        position: absolute;
+        // left: 11px;
+        border-left: thin solid #3F3F3F;
+        background-color: #3F3F3F;
+        width: 0px;
+        height: 100%;
+        top: 0px;
       }
     }
     .selected::before {
