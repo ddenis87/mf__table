@@ -36,6 +36,9 @@ export default {
           rowExcluded: this.getRowExcluded(properties.rows),
           rows: properties.rows,
           
+          cells: this.cells,
+          setCharacter: this.setCharacter,
+
           rowParent: +properties.parent,
           rowLevelGroup: this.rowLevelGroupMax,
           rowChildLevel: this.currentRowChildLevel + 1,
@@ -54,6 +57,17 @@ export default {
         rowCount,
         rows,
       };
+    },
+    getRowExcluded(rows) {
+      const rowExcluded = new Set();
+      Object.entries(rows).forEach((row) => {
+        if (Object.keys(row[1]).includes('rowGroup')) {
+          for (let i = 1; i < row[1].rowGroup; i += 1) {
+            rowExcluded.add(+row[0] + i);
+          }
+        }
+      });
+      return rowExcluded;
     },
   },
 };

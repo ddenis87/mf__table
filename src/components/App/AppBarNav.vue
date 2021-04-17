@@ -30,6 +30,13 @@
             <v-list-item-icon><v-icon small>mdi-test-tube</v-icon></v-list-item-icon>
             <v-list-item-title>TEST</v-list-item-title>
           </v-list-item>
+          <v-list-item class="app-bar-nav__item"
+                      dense
+                      tag="router-link"
+                      to="/SpreadSheet">
+            <v-list-item-icon><v-icon small>mdi-test-tube</v-icon></v-list-item-icon>
+            <v-list-item-title>SpreadSheet</v-list-item-title>
+          </v-list-item>
         </v-list-item-group>
       </v-list>
     </v-toolbar-items>

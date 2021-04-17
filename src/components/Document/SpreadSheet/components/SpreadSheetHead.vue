@@ -26,9 +26,6 @@
           :key="column"
           class="spread-sheet-head__column"
           :style="getColumnStyle(column)">{{ getColumnTitle(column).toUpperCase() }}</th>
-      <!-- <th v-if="!columnExcluded.has(column) && isColumnGroup(column)"
-              :key="`slot-${column}`"
-              class="spread-sheet-head__column hidden"></th> -->
       </template>
     </tr>
   </table>

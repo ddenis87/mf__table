@@ -23,33 +23,16 @@
                     :columnCount="sheetSpace.column"
                     :rowCount="sheetSpace.row"></spread-sheet>
     </div>
-    <div class="test-control-right">
-      
-    </div>
-    <dialog-bar-right is-dialog-name="Setting" class="dialog"
-                      :is-dialog-show="isShowDialog"
-                      width="700"
-                      @close-dialog="isShowDialog = false">
-      <v-card class="dialog__item" >
-        <v-textarea rows="3" label="Columns" v-model="columnsJSON"></v-textarea>
-        <v-textarea rows="2" label="Rows" v-model="rowsJSON"></v-textarea>
-        <v-textarea rows="7" label="Cells" v-model="cellsJSON"></v-textarea>
-        <!-- <v-textarea rows="12" label="Styles" v-model="stylesJSON"></v-textarea> -->
-      </v-card>
-      
-    </dialog-bar-right>
   </div>
 </template>
 
 <script>
-import SpreadSheet from '@/components/Document/SpreadSheet/SpreadSheet.vue';
-import DialogBarRight from '@/components/Dialogs/DialogBarRight.vue'
+import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 
 export default {
   name: 'Test',
   components: {
     SpreadSheet,
-    DialogBarRight,
   },
   data() {
     return {
@@ -74,19 +57,6 @@ export default {
         "m":{"parent":"j"},
         "n":{"width":20}
       }`,
-      // rowsJSON: '{"5":{"height":40},"6":{"height":30},"7":{"height":30},"8":{"height":80}, "14": {"rowGroup": "10"}, "19": {"rowGroup": "3"}, "27": {"rowGroup": "2"}}',
-      
-      //  Variant 2
-      // rowsJSON: `{
-      //   "5":{"height":40},
-      //   "6":{"height":30},
-      //   "7":{"height":30},
-      //   "8":{"height":80},
-      //   "14": {"rowGroup": "10"},
-      //   "19": {"rowGroup": "3"},
-      //   "27": {"rowGroup": "2"}
-      // }`,
-
       //  Variant 3
       rowsJSON: `{
         "5":{"height":40},
@@ -159,56 +129,11 @@ export default {
         {"name":"c10","list":{"borderRight":"2px solid black"}},
         {"name":"c11","list":{"backgroundColor":"orange","fontSize":"0.5em","fontWeight":"bold","textTransform":"uppercase"}},
       ]`,
-      // columns: {
-      //   'a': { width: 120 },
-      //   'b': { width: 20 },
-      //   'c': { width: 20 },
-      //   'd': { width: 250 },
-      //   'e': { width: 100 },
-      // },
-
-      // rows: {
-      //   '5': { height: 40 },
-      //   '6': { height: 30 },
-      //   '7': { height: 30 },
-      //   '8': { height: 80 },
-      // },
-      
-
-      // cells: {
-      //   'b2': { value: 'Testing color', style: 'c1', },
-      //   'c3': { value: 'Cell testing size', style: 'c3', },
-      //   'd3': { value: 'Test form for display', colspan: 2, rowspan: 2, style: 'c0', },
-      //   'd5': { value: 'Testing upper', rowspan: 4, style: 'c5', },
-      //   'e8': { value: 'Testing lowercase', colspan: 2, rowspan: 2, style: 'c6' },
-      //   'b10': { value: 'Testing join column', colspan: 4, style: 'c4', },
-      //   'a12': { value: 'Testing font-weight', style: 'c2', },
-      // },
 
       styles: [
-        {
-          name: 'c0',
-          list: {
-            backgroundColor: 'orange',
-            color: 'white',
-            fontFamily: 'Area',
-            fontSize: '0.7em',
-          }
-        },
-        {
-          name: 'c1',
-          list: {
-            color: 'green',
-            fontSize: '0.9em',
-          }
-        },
-        {
-          name: 'c2',
-          list: {
-            fontWeight: 'bold',
-            fontSize: '1em'
-          }
-        },
+        { name: 'c0', list: { backgroundColor: 'orange', color: 'white', fontFamily: 'Area', fontSize: '0.7em', } },
+        { name: 'c1', list: { color: 'green', fontSize: '0.9em', } },
+        { name: 'c2', list: { fontWeight: 'bold', fontSize: '1em' } },
         {
           name: 'c3',
           list: {
@@ -216,13 +141,7 @@ export default {
             borderRight: '2px solid black',
           }
         },
-        {
-          name: 'c4',
-          list: {
-            // borderTop: '2px solid black',
-            borderBottom: '2px solid black',
-          }
-        },
+        { name: 'c4', list: { borderBottom: '2px solid black', } },
         {
           name: 'c5',
           list: {
@@ -255,12 +174,6 @@ export default {
     columns() { return JSON.parse(this.columnsJSON); },
     rows() { return JSON.parse(this.rowsJSON); },
     cells() { return JSON.parse(this.cellsJSON); },
-    // styles() { return JSON.parse(this.stylesJSON); },
-  },
-  mounted() {
-    // console.log(JSON.stringify(this.styles));
-    // console.log(JSON.stringify(this.cells));
-
   },
   methods: {
     commitSpace() {
@@ -301,6 +214,7 @@ export default {
     padding: 5px;
     width: calc(100vw - 0px);
     height: calc(100vh - 126px);
+    // border: thin solid black;
   }
 
   .dialog {
