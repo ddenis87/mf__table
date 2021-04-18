@@ -111,7 +111,9 @@ export default {
       }
     },
     openRowGroup(rowParent) {
+      console.time('FirstWay');
       this.rowsBody.splice(rowParent.index + 1, 0, ...this.rowsParents[rowParent.value]);
+      console.timeEnd('FirstWay');
       const btnIcon = rowParent.target.querySelector('i');
       btnIcon.classList.remove('mdi-plus-box-outline');
       btnIcon.classList.add('mdi-minus-box-outline');

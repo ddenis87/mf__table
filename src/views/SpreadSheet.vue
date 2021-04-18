@@ -37,10 +37,10 @@ export default {
   data() {
     return {
       isShowDialog: false,
-      countColumn: 25,
+      countColumn: 15,
       countRow: 1000,
       sheetSpace: {
-        column: 25,
+        column: 15,
         row: 1000,
       },
       columnsJSON: `{

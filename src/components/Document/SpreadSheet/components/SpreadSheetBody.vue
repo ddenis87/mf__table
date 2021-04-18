@@ -1,26 +1,26 @@
 <template>
   <table class="spread-sheet-body" ref="ssBody">
     <template v-for="row in rowCount">
-      <tr v-if="!rowExcluded.has(row)"
+      <tr v-if="!rowExcluded.has(currentRow(row))"
           :key="row"
           class="spread-sheet-body__row">
         <template v-for="column in columnCount">
           <td v-if="!excludedCells.has(`${getColumnTitle(column)}${row}`) && !columnExcluded.has(column)"
               :key="column"
               class="spread-sheet-body__column"
-              :class="getCellStyle(row, column)"
-              :style="getCellGeometry(row, column)"
-              :colspan="getColspan(row, column)"
-              :rowspan="getRowspan(row, column)">
+              :class="getCellStyle(currentRow(row), column)"
+              :style="getCellGeometry(currentRow(row), column)"
+              :colspan="getColspan(currentRow(row), column)"
+              :rowspan="getRowspan(currentRow(row), column)">
             {{ getValue(row, column) }}
           </td>
         </template>
       </tr>
-      <tr v-if="!rowExcluded.has(row) && isRowGroup(row)"
+      <tr v-if="!rowExcluded.has(currentRow(row)) && isRowGroup(currentRow(row))"
           :key="`slot-${row}`"
           class="spread-sheet-body__row hidden">
         <td :colspan="columnCount"
-            :data-row-parent-slot="getRowParent(row + 1)"
+            :data-row-parent-slot="getRowParent(currentRow(row + 1))"
             data-row-group-status="close"></td>
       </tr>
     </template>
@@ -48,6 +48,7 @@ export default {
     cells: { type: Object },
     setCharacter: { type: Array },
 
+    rowParent: { type: Number, default: 0 },
     rowChildLevel: { type: Number, default: 1 },
 
     eventRowOpenGroupValue: { type: Number, default: 0 },
@@ -65,6 +66,9 @@ export default {
     },
   },
   methods: {
+    currentRow(rowNumber) {
+      return +rowNumber + +this.rowParent;
+    },
     isRowGroup(rowNumber) {
       if (!this.rows[rowNumber] || !this.rows[rowNumber].rowGroup) return false;
       return true;

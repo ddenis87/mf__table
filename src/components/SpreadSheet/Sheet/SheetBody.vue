@@ -1,32 +1,36 @@
 <template>
   <table class="sheet-body" @click="eventClickBody">
-    <tr v-for="(row, index) in rows"
-        :key="index"
-        class="sheet-body__row">
-      <th v-for="level in rowLevelGroupMax"
-          :key="level"
-          class="column column-group"
-          :class="{'line': (row.parent) && getRowLevel(row) >= level }"
-          :style="getStyleGroup(level)">
-        <spread-sheet-btn-group v-if="isRowGroupLevel(row, level)"
-                                :data-row-index="index"
-                                :data-row-parent="row.value"
-                                :data-row-count="row.rowGroup - 1"
-                                data-row-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
-      </th>
-      <th class="column column-title"
-          :style="getStyleTitle(row.value)">{{ row.value }}</th>
-      <template v-for="column in columns">
-        <td v-if="!excludedCells.has(`${getColumnTitle(column.value)}${row.value}`)"
-          :key="`body-${column.value}`"
-          class="column column-body"
-          :class="getStyleContent(row.value, column.value)"
-          :style="getStyleGeometry(row.value, column.value)"
-          :colspan="getCellColspan(row.value, column.value)"
-          :rowspan="getCellRowspan(row.value, column.value)">{{ getCellValue(row.value, column.value) }}</td>
-      </template>
-      
-    </tr>
+    <!-- <v-virtual-scroll :items="rows" item-height="24">
+      <template v-slot:default="{ item }"> -->
+      <tr v-for="(item, index) in rows"
+          :key="item.value"
+          class="sheet-body__row">
+        <th v-for="level in rowLevelGroupMax"
+            :key="`${item.value}-${level}`"
+            class="column column-group"
+            :class="{'line': (item.parent) && getRowLevel(item) >= level }"
+            :style="getStyleGroup(level)">
+          <spread-sheet-btn-group v-if="isRowGroupLevel(item, level)"
+                                  :data-row-index="index"
+                                  :data-row-parent="item.value"
+                                  :data-row-count="item.rowGroup - 1"
+                                  data-row-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
+        </th>
+        <th class="column column-title"
+            :style="getStyleTitle(item.value)">{{ item.value }}</th>
+        <template v-for="column in columns">
+          <td v-if="!excludedCells.has(`${getColumnTitle(column.value)}${item.value}`)"
+            :key="`body-${item.value}-${column.value}`"
+            class="column column-body"
+            :class="getStyleContent(item.value, column.value)"
+            :style="getStyleGeometry(item.value, column.value)"
+            :colspan="getCellColspan(item.value, column.value)"
+            :rowspan="getCellRowspan(item.value, column.value)">{{ getCellValue(item.value, column.value) }}</td>
+        </template>
+      </tr>
+      <!-- </template> -->
+    <!-- </v-virtual-scroll> -->
+    
   </table>
 </template>
 
@@ -169,12 +173,15 @@ export default {
 
 <style lang="scss" scoped>
 .sheet-body {
+  display: table;
   position: relative;
   border-collapse: collapse;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   &__row {
+    display: table-row;
     .column {
+      display: table-cell;
       position: relative;
       height: 24px;
 

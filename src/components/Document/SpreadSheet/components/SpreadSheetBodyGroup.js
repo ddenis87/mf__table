@@ -36,6 +36,8 @@ export default {
           rowExcluded: this.getRowExcluded(properties.rows),
           rows: properties.rows,
           
+          columns: this.columns,
+
           cells: this.cells,
           setCharacter: this.setCharacter,
 

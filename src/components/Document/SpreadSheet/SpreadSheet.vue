@@ -20,7 +20,7 @@
           <spread-sheet-left-bar :row-count="rowCount"
                                  :row-excluded="rowExcluded"
                                  :rows="rows"
-                                 @open-row-group="openRowGroup"></spread-sheet-left-bar>
+                                 @open-row-group="eventClickTable"></spread-sheet-left-bar>
         </td>
         <td class="spread-sheet__body">
           <spread-sheet-body ref="ssBody"
@@ -79,11 +79,13 @@ export default {
     };
   },
   methods: {
-    openRowGroup(parent) {
+    // openRowGroup(parent) {
+      
+    // },
+    eventClickTable(parent) {
+      console.log('open', parent);
       this.rowOpenGroupValue = +parent;
-    },
-    eventClickTable(evt) {
-      this.selectedCell(evt);
+      // this.selectedCell(evt);
     },
     selectedCell(evt) {
       if (!evt.target.closest('.spread-sheet-body__column')) return;

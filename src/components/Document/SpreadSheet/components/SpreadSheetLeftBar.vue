@@ -1,5 +1,5 @@
 <template>
-  <table class="spread-sheet-left-bar" @click.stop="eventClickTable">
+  <table class="spread-sheet-left-bar" @click="eventClickTable">
     <template v-for="row in rowCount">
       <tr v-if="!rowExcluded.has(currentRow(row))"
           :key="row"
