@@ -1,11 +1,11 @@
 <template>
-  <table class="sheet-body" @click="eventClickBody">
+  <div class="sheet-body" @click="eventClickBody">
     <!-- <v-virtual-scroll :items="rows" item-height="24">
       <template v-slot:default="{ item }"> -->
-      <tr v-for="(item, index) in rows"
+      <div v-for="(item, index) in rows"
           :key="item.value"
           class="sheet-body__row">
-        <th v-for="level in rowLevelGroupMax"
+        <div v-for="level in rowLevelGroupMax"
             :key="`${item.value}-${level}`"
             class="column column-group"
             :class="{'line': (item.parent) && getRowLevel(item) >= level }"
@@ -15,23 +15,22 @@
                                   :data-row-parent="item.value"
                                   :data-row-count="item.rowGroup - 1"
                                   data-row-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
-        </th>
-        <th class="column column-title"
-            :style="getStyleTitle(item.value)">{{ item.value }}</th>
+        </div>
+        <div class="column column-title"
+            :style="getStyleTitle(item.value)">{{ item.value }}</div>
         <template v-for="column in columns">
-          <td v-if="!excludedCells.has(`${getColumnTitle(column.value)}${item.value}`)"
+          <div v-if="!excludedCells.has(`${getColumnTitle(column.value)}${item.value}`)"
             :key="`body-${item.value}-${column.value}`"
             class="column column-body"
             :class="getStyleContent(item.value, column.value)"
             :style="getStyleGeometry(item.value, column.value)"
             :colspan="getCellColspan(item.value, column.value)"
-            :rowspan="getCellRowspan(item.value, column.value)">{{ getCellValue(item.value, column.value) }}</td>
+            :rowspan="getCellRowspan(item.value, column.value)">{{ getCellValue(item.value, column.value) }}</div>
         </template>
-      </tr>
+      </div>
       <!-- </template> -->
     <!-- </v-virtual-scroll> -->
-    
-  </table>
+  </div>
 </template>
 
 <script>
@@ -142,10 +141,11 @@ export default {
       return this.cells[cellName].colspan;
     },
     getCellRowspan(row, column) {
-      const cellName = `${this.getColumnTitle(column)}${row}`;
+      const columnChar = this.getColumnTitle(column);
+      const cellName = `${columnChar}${row}`;
       if (!this.cells[cellName] || !this.cells[cellName].rowspan) return '';
       for (let i = 1; i < this.cells[cellName].rowspan; i += 1) {
-        this.excludedCells.add(`${this.getColumnTitle(column)}${row + i}`);
+        this.excludedCells.add(`${columnChar}${row + i}`);
         if (Object.keys(this.cells[cellName]).includes('colspan')) {
           for (let j = 1; j < this.cells[cellName].colspan; j += 1) {
             this.excludedCells.add(`${this.getColumnTitle(column + j)}${row + i}`);
@@ -157,8 +157,9 @@ export default {
     getColumnWidth(columnNumber) {
       const column = this.columns.find((item) => item.value === columnNumber);
       return {
-        'max-width': `${column.width}px`,
-        'min-width': `${column.width}px`,
+        // 'max-width': `${column.width}px`,
+        // 'min-width': `${column.width}px`,
+        'width': `${column.width}px`,
       };
     },
     getRowHeight(rowNumber) {
@@ -173,18 +174,17 @@ export default {
 
 <style lang="scss" scoped>
 .sheet-body {
-  display: table;
   position: relative;
-  border-collapse: collapse;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
+  // border: thin solid green;
   &__row {
-    display: table-row;
+    display: flex;
+    width: 100%;
+    // border: thin solid red;
     .column {
-      display: table-cell;
       position: relative;
       height: 24px;
-
       &-group, &-title {
         position: sticky;
         background-color: #dadce0;
@@ -193,7 +193,7 @@ export default {
       }
 
       &-group {
-        min-width: 20px;
+        width: 20px;
         z-index: 500;
         &:first-child {
           box-shadow:  inset 1px 0px 0px grey;
@@ -203,13 +203,12 @@ export default {
       &-title {
         box-shadow:  inset 1px 0px 0px grey, inset -1px 0px 0px grey, 0px -1px 0px grey;
         border-top: 0px;
-        min-width: 60px;
+        width: 60px;
         z-index: 400;
       }
       &-body {
         padding: 0px 2px;
-        min-width: 94px;
-        max-width: 94px;
+        width: 94px;
         box-shadow: 1px 0px 0px grey, inset 0px -1px 0px grey;
         white-space: nowrap;
         overflow: hidden;
