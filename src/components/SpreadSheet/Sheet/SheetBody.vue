@@ -1,6 +1,40 @@
 <template>
   <div class="sheet-body" @click="eventClickBody">
-    <div v-for="(row, rowIndex) in rows"
+    <RecycleScroller :items="rows"
+                     :item-size="22"
+                     key-field="value"
+                     v-slot="{ item, index }"
+                     class="scroller">
+      <div :key="`body-row-${item.value}`"
+          class="sheet-body__row"
+          :style="[{
+            'grid-template-columns': `
+            repeat(${rowLevelGroupMax}, minmax(20px, 20px))
+            60px
+            repeat(${columns.length}, auto)`
+          }]">
+        <div v-for="level in rowLevelGroupMax"
+            :key="`${item.value}-${level}`"
+            class="column column-group"
+            :style="getStyleGroup(level)">
+            <spread-sheet-btn-group v-if="isRowGroupLevel(item, level)">mdi-plus-box-outline</spread-sheet-btn-group>
+        </div>
+        <div class="column column-title"
+            :style="shiftTitle">{{ item.value }}</div>
+        <template v-for="(column, columnIndex) in columns">
+          <div v-if="!excludedCells.has(`${column.name}${item.value}`)"
+              :key="`body-${item.value}-${column.value}`"
+              class="column column-body"
+              :class="(cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].style : ''"
+              :style="getCellGeometry(item, index, column, columnIndex)">
+            {{ (cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].value : '' }}
+          </div>
+        </template>
+      </div>
+
+    </RecycleScroller>
+    
+    <!-- <div v-for="(row, rowIndex) in rows"
          :key="`body-row-${row.value}`"
          class="sheet-body__row"
          :style="[{
@@ -26,7 +60,7 @@
           {{ (cells[`${column.name}${row.value}`]) ? cells[`${column.name}${row.value}`].value : '' }}
         </div>
       </template>
-    </div>
+    </div> -->
 
     <!-- <v-virtual-scroll :items="rows" item-height="24">
       <template v-slot:default="{ item }"> -->
@@ -240,12 +274,20 @@ export default {
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
+  // height: calc(100vh - 210px);
+  // overflow: hidden;
+  // border: thin solid red;
+  // width: 100%;
+  .scroller {
+    height: calc(100vh - 210px);
+    width: calc(100vw - 18px);
+  }
   &__row {
     position: relative;
     display: grid;
     // grid-template-columns: repeat(auto-fill, minmax(auto, auto));
     grid-auto-rows: minmax(22px, 22px);
-    width: 100%;
+    // width: 100%;
     .column {
       display: inline-flex;
       align-items: center;

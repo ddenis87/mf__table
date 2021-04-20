@@ -9,7 +9,7 @@
       </td>
     </tr>
     <tr>
-      <td colspan="2">
+      <td colspan="2" class="sheet__body">
         <sheet-body :rowsCount="rowCount"
                     :rows="rowsBody"
                     :columns="columnsBody"
