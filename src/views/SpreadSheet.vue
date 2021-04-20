@@ -37,10 +37,10 @@ export default {
   data() {
     return {
       isShowDialog: false,
-      countColumn: 20,
+      countColumn: 25,
       countRow: 100,
       sheetSpace: {
-        column: 20,
+        column: 25,
         row: 100,
       },
       columnsJSON: `{
@@ -86,12 +86,12 @@ export default {
       cellsJSON: `{
         "b2":{"value":"Testing color","style":"c1"},
         "c3":{"value":"Cell testing size","style":"c3"},
-        "d3":{"value":"Test form for display","style":"c0"},
-        "d5":{"value":"Testing upper","style":"c5"},
-        "e8":{"value":"Testing lowercase","style":"c6"},
-        "b10":{"value":"Testing join column","style":"c4"},
+        "d3":{"value":"Test form for display","colspan":2,"rowspan":2,"style":"c0"},
+        "d5":{"value":"Testing upper","rowspan":4,"style":"c5"},
+        "e8":{"value":"Testing lowercase","colspan":2,"rowspan":2,"style":"c6"},
+        "b10":{"value":"Testing join column","colspan":4,"style":"c4"},
         "a12":{"value":"Testing font-weight","style":"c1"},
-        "a14":{"value":"Title group","style":"c2"},
+        "a14":{"value":"Title group","colspan":7,"style":"c2"},
         "a15":{"value":"","style":"c7 c9"},
         "g15":{"value":"","style":"c10"},
         "d15":{"value":"Test group"},
@@ -108,12 +108,12 @@ export default {
         "e17":{"value":"","style":"c8"},
         "f17":{"value":"","style":"c8"},
         "g17":{"value":"Test group","style":"c8 c10"},
-        "a19":{"value":"Заголовок вложенной группы","style":"c1"},
-        "a20":{"value":"Строка вложенной группы","style":"c1"},
-        "a21":{"value":"Строка вложенной группы","style":"c1"},
-        "a23":{"value":"Последняя строка группы","style":"c1"},
-        "a27":{"value":"Еще одна группа","style":"c1"},
-        "a28":{"value":"Строка группы вся оранжевая","style":"c11 c1"}
+        "a19":{"value":"Заголовок вложенной группы","colspan":5,"style":"c1"},
+        "a20":{"value":"Строка вложенной группы","colspan":5,"style":"c1"},
+        "a21":{"value":"Строка вложенной группы","colspan":5,"style":"c1"},
+        "a23":{"value":"Последняя строка группы","colspan":5,"style":"c1"},
+        "a27":{"value":"Еще одна группа","colspan":5,"style":"c1"},
+        "a28":{"value":"Строка группы вся оранжевая","colspan":5,"style":"c11 c1"}
       }`,
       stylesJSON: `[
         {"name":"c0","list":{"backgroundColor":"orange","color":"white","fontFamily":"Area","fontSize":"0.7em"}},

@@ -18,7 +18,7 @@
       <template v-for="column in columns">
       <th :key="`head-title-${column.value}`"
           class="sheet-head__column"
-          :style="getColumnStyle(column.value)">{{ getColumnTitle(column.value).toUpperCase() }}</th>
+          :style="getColumnStyle(column.value)">{{ column.display_name }}</th>
       </template>
     </tr>
   </table>
@@ -85,7 +85,8 @@ export default {
     .sheet-head__column {
       min-width: 94px;
       height: 22px;
-      border: thin solid grey;
+      // border-right: thin solid grey;
+      box-shadow: inset -1px 0px 0px grey, inset 0px -1px 0px grey, 0px -1px 0px grey;
       background-color: #dadce0;
       &:first-child {
         border-left: 0px;
@@ -97,6 +98,9 @@ export default {
       min-width: 94px;
       height: 22px;
       background-color: #dadce0;
+      &:last-child {
+        border-right: thin solid grey;
+      }
     }
     &:first-child {
       .sheet-head__column-group {

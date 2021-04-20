@@ -10,7 +10,8 @@
     </tr>
     <tr>
       <td colspan="2">
-        <sheet-body :rows="rowsBody"
+        <sheet-body :rowsCount="rowCount"
+                    :rows="rowsBody"
                     :columns="columnsBody"
                     :cells="cells"
                     :rowLevelGroupMax="rowLevelGroupMax"
@@ -43,7 +44,7 @@ export default {
       setCharacter: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       rowsBody: [],
       columnsBody: [],
-
+      columnsNameBody: [],
       rowsParents: {},
     };
   },
@@ -90,11 +91,20 @@ export default {
       let columnsBodyItem = {};
       if (this.columns[name]) {
         if (!this.columns[name].parent) {
-          columnsBodyItem = { value: i, ...this.columns[name] };
+          columnsBodyItem = {
+            value: i,
+            name,
+            display_name: name.toUpperCase(),
+            ...this.columns[name],
+          };
           this.columnsBody.push(columnsBodyItem);
         }
       } else {
-        columnsBodyItem.value = i;
+        columnsBodyItem = {
+          value: i,
+          name,
+          display_name: name.toUpperCase(),
+        };
         this.columnsBody.push(columnsBodyItem);
       }
     }
