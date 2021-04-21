@@ -1,41 +1,39 @@
 <template>
-  <div class="sheet-body" @click="eventClickBody">
+  <!-- <div class="sheet-body" @click="eventClickBody"> -->
     <RecycleScroller :items="rows"
                      :item-size="null"
                      sizeField="height"
                      key-field="value"
                      v-slot="{ item, index }"
-                     class="scroller">
-      <div :key="`body-row-${item.value}`"
-          class="sheet-body__row"
-          :style="[{
-            'grid-template-columns': `
-            repeat(${rowLevelGroupMax}, minmax(20px, 20px))
-            60px
-            ${templateRowBody}`,
-            'grid-template-rows': `${(item.height) ? item.height : '22'}px`,
-          }]">
-        <div v-for="level in rowLevelGroupMax"
-            :key="`${item.value}-${level}`"
-            class="column column-group"
-            :style="getStyleGroup(level)">
-            <spread-sheet-btn-group v-if="isRowGroupLevel(item, level)">mdi-plus-box-outline</spread-sheet-btn-group>
-        </div>
-        <div class="column column-title"
-            :style="shiftTitle">{{ item.value }}</div>
-        <template v-for="(column, columnIndex) in columns">
-          <div v-if="!excludedCells.has(`${column.name}${item.value}`)"
-              :key="`body-${item.value}-${column.value}`"
-              class="column column-body"
-              :class="(cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].style : ''"
-              :style="getCellGeometry(item, index, column, columnIndex)">
-            {{ (cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].value : '' }}
+                     class="sheet-body">
+        <div :key="`body-row-${item.value}`"
+            class="sheet-body__row"
+            :style="[{
+              'grid-template-columns': `
+              repeat(${rowLevelGroupMax}, minmax(20px, 20px))
+              60px
+              ${templateRowBody}`,
+              'grid-template-rows': `${(item.height) ? item.height : '22'}px`,
+            }]">
+          <div v-for="level in rowLevelGroupMax"
+              :key="`${item.value}-${level}`"
+              class="column column-group"
+              :style="getStyleGroup(level)">
+              <spread-sheet-btn-group v-if="isRowGroupLevel(item, level)">mdi-plus-box-outline</spread-sheet-btn-group>
           </div>
-        </template>
-      </div>
-
+          <div class="column column-title"
+              :style="shiftTitle">{{ item.value }}</div>
+          <template v-for="(column, columnIndex) in columns">
+            <div v-if="!excludedCells.has(`${column.name}${item.value}`)"
+                :key="`body-${item.value}-${column.value}`"
+                class="column column-body"
+                :class="(cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].style : ''"
+                :style="getCellGeometry(item, index, column, columnIndex)">
+              {{ (cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].value : '' }}
+            </div>
+          </template>
+        </div>
     </RecycleScroller>
-    
     <!-- <div v-for="(row, rowIndex) in rows"
          :key="`body-row-${row.value}`"
          class="sheet-body__row"
@@ -93,7 +91,7 @@
         </template> -->
       <!-- </template> -->
     <!-- </v-virtual-scroll> -->
-  </div>
+  <!-- </div> -->
 </template>
 
 <script>
@@ -223,7 +221,6 @@ export default {
         for (let i = 1; i < rowspan - 1; i += 1) {
           cellHeight += this.rows[rowIndex + i].height || 22;
           this.excludedCells.add(`${column.name}${row.value + i}`);
-          console.log(this.excludedCells);
         }
         cellGeometry['z-index'] = 1;
       }
@@ -285,17 +282,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import './SheetBody.scss';
 .sheet-body {
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
-  // height: calc(100vh - 210px);
-  // overflow: hidden;
-  // border: thin solid red;
-  // width: 100%;
-  .scroller {
-    height: calc(100vh - 210px);
-    width: calc(100vw - 18px);
+  height: calc(100vh - 210px);
+  // width: calc(100vw);
+  // overflow-x: scroll;
+  &::-webkit-scrollbar {
+    position: sticky;
+    display: block;
+    left: 0px;
+    width: $scrollWidth;
+    height: $scrollHeight;
+    border-radius: $scrollBorderRadius;
+    &-thumb {
+      border-radius: $scrollThumbBorderRadius;
+      background-color: $scrollThumbBackgroundColor;
+    }
   }
   &__row {
     position: relative;

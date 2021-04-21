@@ -74,6 +74,12 @@ export default {
         this.titleLoading = this.tableDiscription;
       }
     }, 300);
+    setTimeout(() => {
+      if (!this.tableDiscription) {
+        clearInterval(this.titleLoadingInterval);
+        this.titleLoading = 'Заргузка заняла слишком много времени, обновите страницу позже или обратитесь к администратору';
+      }
+    }, 10000);
   },
   methods: {
     freeSearch(option) {

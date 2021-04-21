@@ -37,11 +37,11 @@ export default {
   data() {
     return {
       isShowDialog: false,
-      countColumn: 25,
-      countRow: 200,
+      countColumn: 30,
+      countRow: 20000,
       sheetSpace: {
-        column: 25,
-        row: 200,
+        column: 30,
+        row: 20000,
       },
       columnsJSON: `{
         "a":{"width":120},
