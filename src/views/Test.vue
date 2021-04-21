@@ -89,8 +89,8 @@ export default {
 
       //  Variant 3
       rowsJSON: `{
-        "5":{"height":40},
-        "6":{"height":50},
+        "5":{"height":30},
+        "6":{"height":30},
         "7":{"height":40},
         "8":{"height":40},
         "14": {"rowGroup": "10"},
