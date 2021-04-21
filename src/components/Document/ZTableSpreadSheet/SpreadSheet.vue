@@ -32,7 +32,7 @@
                              :columns="columns"
                              :cells="cells"
                              :set-character="setCharacter"
-                             
+
                              :event-row-open-group-value="rowOpenGroupValue"></spread-sheet-body>
         </td>
       </tr>
@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     // openRowGroup(parent) {
-      
+
     // },
     eventClickTable(parent) {
       console.log('open', parent);

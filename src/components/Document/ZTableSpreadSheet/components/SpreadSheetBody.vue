@@ -24,7 +24,7 @@
             data-row-group-status="close"></td>
       </tr>
     </template>
-    
+
   </table>
 </template>
 

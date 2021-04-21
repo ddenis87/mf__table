@@ -1,6 +1,9 @@
 <template>
-  <div class="sheet-body" @click="eventClickBody">
-        
+  <virtual-list style="height: 360px; overflow-y: auto; width: 800px;"
+                :data-key="'value'"
+                :data-sources="rows"
+                :data-component="item" />
+  <!-- <div class="sheet-body" @click="eventClickBody">
     <div v-for="(row, rowIndex) in rows"
          :key="`body-row-${row.value}`"
          class="sheet-body__row"
@@ -29,17 +32,18 @@
         </div>
       </template>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <script>
 import SheetComponent from './SheetComponent';
-import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
+import SheetBodyItem from './SheetBodyItem.vue';
+// import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
 export default {
   name: 'SheetBody',
   components: {
-    SpreadSheetBtnGroup,
+    // SpreadSheetBtnGroup,
   },
   mixins: [
     SheetComponent,
@@ -53,10 +57,14 @@ export default {
   },
   data() {
     return {
+      item: SheetBodyItem,
       excludedCells: new Set(),
       currentSelectedCell: null,
       shiftTitle: { left: `${20 * this.rowLevelGroupMax}px` },
     };
+  },
+  mounted() {
+    console.log(this.rows);
   },
   methods: {
     eventClickBody(evt) {
@@ -162,7 +170,7 @@ export default {
         position: sticky;
         background-color: #dadce0;
         justify-content: center;
-        
+
         font-size: 0.75em;
         font-weight: bold;
         color: rgba(0, 0, 0, 0.6);
@@ -194,7 +202,7 @@ export default {
         white-space: nowrap;
         overflow: hidden;
       }
-      
+
     }
     .line {
       &::before {

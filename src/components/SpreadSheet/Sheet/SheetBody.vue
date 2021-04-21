@@ -226,7 +226,7 @@ export default {
       }
       cellGeometry.height = `${cellHeight}px` || '';
       cellGeometry.width = `${cellWidth}px` || '';
-      
+
       return cellGeometry;
     },
 
@@ -285,11 +285,10 @@ export default {
 @import './SheetBody.scss';
 .sheet-body {
   position: relative;
+  display: block;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   height: calc(100vh - 210px);
-  // width: calc(100vw);
-  // overflow-x: scroll;
   &::-webkit-scrollbar {
     position: sticky;
     display: block;
@@ -305,9 +304,7 @@ export default {
   &__row {
     position: relative;
     display: grid;
-    // grid-template-columns: repeat(auto-fill, minmax(auto, auto));
     grid-auto-rows: minmax(22px, 22px);
-    // width: 100%;
     .column {
       display: inline-flex;
       align-items: center;
@@ -316,7 +313,7 @@ export default {
         position: sticky;
         background-color: #dadce0;
         justify-content: center;
-        
+
         font-size: 0.75em;
         font-weight: bold;
         color: rgba(0, 0, 0, 0.6);
@@ -348,7 +345,7 @@ export default {
         white-space: nowrap;
         overflow: hidden;
       }
-      
+
     }
     .line {
       &::before {

@@ -54,7 +54,7 @@ export default {
     rowChildLevel: { type: Number, default: 1 },
   },
   computed: {
-    
+
   },
   methods: {
     eventClickTable(evt) {
@@ -82,7 +82,7 @@ export default {
         ...this.getRowHeight(rowNumber),
       };
     },
-    
+
   },
 };
 </script>
@@ -110,7 +110,7 @@ export default {
       &:first-child {
         border-top: 0px;
       }
-      
+
     }
     .spread-sheet-left-bar__column-group {
       max-width: 20px;

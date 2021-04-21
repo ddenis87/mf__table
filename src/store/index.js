@@ -9,8 +9,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    addressApi: 'https://an67.pythonanywhere.com/',
-    // addressApi: 'http://195.2.84.28/',
+    // addressApi: 'https://an67.pythonanywhere.com/',
+    addressApi: 'http://195.2.84.28/',
   },
   getters: {
     GET_ADDRESS_API(state) { return state.addressApi; },

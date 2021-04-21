@@ -21,7 +21,7 @@ export default {
           rowCount: +rowsOption.rowCount - 1,
           rows: rowsOption.rows,
         };
-        
+
         this.mountedRowGroup(propertiesComponentMounted);
 
         this.$refs.ssBody.querySelector(`[data-row-parent-slot="${parent}"]`).setAttribute('data-row-group-status', 'open');
@@ -35,7 +35,7 @@ export default {
           rowCount: properties.rowCount,
           rowExcluded: this.getRowExcluded(properties.rows),
           rows: properties.rows,
-          
+
           columns: this.columns,
 
           cells: this.cells,

@@ -57,7 +57,7 @@ export default {
         rows,
       };
     },
-    
+
     mountedRowGroup(properties) {
       const SubClassVue = Vue.extend(SpreadSheetLeftBar);
       this.openRowGroup[properties.parent] = new SubClassVue({
@@ -66,7 +66,7 @@ export default {
           rowCount: properties.rowCount,
           rowExcluded: this.getRowExcluded(properties.rows),
           rows: properties.rows,
-          
+
           rowParent: +properties.parent,
           rowLevelGroup: this.rowLevelGroupMax,
           rowChildLevel: this.currentRowChildLevel + 1,

@@ -3,7 +3,7 @@
     <tr class="sheet-left-bar__row"
         :style="rowStyle"> -->
     <template>
-      
+
     </template>
       <th v-for="level in rowLevelGroupMax"
           :key="level"
@@ -51,7 +51,7 @@ export default {
       // &:first-child {
       //   border-top: 0px;
       // }
-      
+
     }
     .sheet-left-bar__column-group {
       max-width: 20px;
