@@ -2,7 +2,7 @@
   <div class="body">
     <div class="left-bar"
          :style="`width: ${(22 * rowLevelGroupMax) + 62}px`">
-      <RecycleScroller :items="rows"
+      <RecycleScroller :items="rows" :buffer="1000"
                       :item-size="null"
                       sizeField="height"
                       key-field="value"
@@ -14,8 +14,7 @@
               :style="[{
                 'grid-template-columns': `
                 repeat(${rowLevelGroupMax}, minmax(20px, 20px))
-                60px
-                ${templateRowBody}`,
+                60px`,
                 'grid-template-rows': `${(item.height) ? item.height : '22'}px`,
               }]">
           <div v-for="level in rowLevelGroupMax"
@@ -46,14 +45,14 @@
                 ${templateRowBody}`,
                 'grid-template-rows': `${(item.height) ? item.height : '22'}px`,
               }]">
-            
             <template v-for="(column, columnIndex) in columns">
               <div v-if="!excludedCells.has(`${column.name}${item.value}`)"
                   :key="`body-${item.value}-${column.value}`"
                   class="column column-body"
                   :class="(cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].style : ''"
                   :style="getCellGeometry(item, index, column, columnIndex)">
-                {{ (cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].value : '' }}
+                {{ (cells[`${column.name}${item.value}`]) ?
+                cells[`${column.name}${item.value}`].value : (columnIndex === 0) ? '123' : '' }}
               </div>
             </template>
           </div>
@@ -63,7 +62,6 @@
       <div class="scroll-empty" :style="`height: ${22 * rows.length}px`"></div>
     </div>
   </div>
-  
 </template>
 
 <script>
@@ -302,10 +300,13 @@ export default {
     width: 100%;
     .sheet-body {
       position: relative;
-      height: 100%;
-       &::-webkit-scrollbar {
-        display: none;
-      }
+      width: 1200px;
+      height: calc(100% - 20px);
+      border: thin solid grey;
+      overflow-x: scroll;
+      //  &::-webkit-scrollbar {
+      //   display: none;
+      // }
       &__row {
         position: relative;
         display: grid;
