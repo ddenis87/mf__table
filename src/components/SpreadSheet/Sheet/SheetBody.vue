@@ -329,7 +329,8 @@ export default {
       }
 
       &-title {
-        box-shadow:  inset 1px 0px 0px grey, inset -1px 0px 0px grey, 0px -1px 0px grey;
+        border: thin solid grey;
+        // box-shadow:  inset 1px 0px 0px grey, inset -1px 0px 0px grey, 0px -1px 0px grey;
         border-top: 0px;
         width: 60px;
         z-index: 400;

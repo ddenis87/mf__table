@@ -55,10 +55,10 @@ export default {
     return {
       isShowDialog: false,
       countColumn: 25,
-      countRow: 100,
+      countRow: 10000,
       sheetSpace: {
         column: 25,
-        row: 100,
+        row: 10000,
       },
       columnsJSON: `{
         "a":{"width":120},
