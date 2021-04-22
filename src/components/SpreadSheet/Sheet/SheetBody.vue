@@ -1,6 +1,12 @@
 <template>
-  <!-- <div class="sheet-body" @click="eventClickBody"> -->
-    <RecycleScroller :items="rows"
+  <virtual-list style="height: 600px; overflow-y: auto; width: 1600px; border:"
+                :data-key="'value'"
+                :data-sources="rows"
+                :data-component="sheetBodyItem"
+                :extra-props="extraPropsComponent"
+                :bottom-threshold="1000">
+  </virtual-list>
+<!-- <RecycleScroller :items="rows"
                      :item-size="null"
                      sizeField="height"
                      key-field="value"
@@ -33,7 +39,8 @@
             </div>
           </template>
         </div>
-    </RecycleScroller>
+    </RecycleScroller> -->
+
     <!-- <div v-for="(row, rowIndex) in rows"
          :key="`body-row-${row.value}`"
          class="sheet-body__row"
@@ -96,12 +103,13 @@
 
 <script>
 import SheetComponent from './SheetComponent';
-import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
+// import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
+import SheetBodyItem from './SheetBodyItem.vue';
 
 export default {
   name: 'SheetBody',
   components: {
-    SpreadSheetBtnGroup,
+    // SpreadSheetBtnGroup,
   },
   mixins: [
     SheetComponent,
@@ -116,6 +124,7 @@ export default {
   },
   data() {
     return {
+      sheetBodyItem: SheetBodyItem,
       excludedCells: new Set(),
 
       currentSelectedCell: null,
@@ -131,6 +140,17 @@ export default {
       }
       console.log(templateRowBody);
       return templateRowBody;
+    },
+    extraPropsComponent() {
+      return {
+        rows: this.rows,
+        columns: this.columns,
+        cells: this.cells,
+        templateRowBody: this.templateRowBody,
+        shiftTitle: this.shiftTitle,
+        excludedCells: this.excludedCells,
+        rowLevelGroupMax: this.rowLevelGroupMax,
+      };
     },
     // widthHead() {
     //   return {
