@@ -1,27 +1,37 @@
 <template>
-  <table class="sheet-head">
+  <div class="sheet-head">
     <template v-for="level in columnLevelGroupMax">
-      <tr :key="level"
-          class="sheet-head__row-group">
+      <div :key="level"
+           class="sheet-head__row"
+           :style="[{
+              'grid-template-columns': `${templateRowBody} 8px`,
+              'grid-template-rows': `${'22'}px`,
+            }]">
         <template v-for="column in columns">
-          <th :key="`head-group-${column.value}`"
-              class="sheet-head__column-group"
-              :style="getColumnStyle(column.value)">
+          <div :key="`head-group-${column.value}`"
+               class="column column-group"
+               :style="getColumnStyle(column.value)">
             <spread-sheet-btn-group v-if="isColumnGroupLevel(column, level)">
               mdi-plus-box-outline</spread-sheet-btn-group>
-          </th>
+          </div>
         </template>
-      </tr>
+        <div class="column column-group column-end"></div>
+      </div>
     </template>
 
-    <tr class="sheet-head__row">
+    <div class="sheet-head__row"
+         :style="[{
+            'grid-template-columns': `${templateRowBody} 8px`,
+            'grid-template-rows': `${'22'}px`,
+          }]">
       <template v-for="column in columns">
-      <th :key="`head-title-${column.value}`"
-          class="sheet-head__column"
-          :style="getColumnStyle(column.value)">{{ column.display_name }}</th>
+        <div :key="`head-title-${column.value}`"
+             class="column column-title"
+             :style="getColumnStyle(column.value)">{{ column.display_name }}</div>
       </template>
-    </tr>
-  </table>
+      <div class="column column-title column-end"></div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -40,6 +50,16 @@ export default {
     columns: { type: Array },
     columnLevelGroupMax: { type: Number, default: 0 },
     // setCharacter: { type: Array },
+  },
+  computed: {
+    templateRowBody() {
+      let templateRowBody = '';
+      for (let i = 0; i < this.columns.length; i += 1) {
+        templateRowBody += `${this.columns[i].width || 94}px `;
+      }
+      console.log(templateRowBody);
+      return templateRowBody;
+    },
   },
   methods: {
     isColumnGroupLevel(column, level) {
@@ -76,37 +96,90 @@ export default {
 <style lang="scss" scoped>
 .sheet-head {
   position: relative;
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 0.75em;
-  color: rgba(0, 0, 0, 0.6);
-  text-align: center;
+  display: block;
+  // margin-right: 18px;
+  // width: 100%;
+  overflow-x: scroll;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
   &__row {
-    .sheet-head__column {
-      min-width: 94px;
-      height: 22px;
-      // border-right: thin solid grey;
-      box-shadow: inset -1px 0px 0px grey, inset 0px -1px 0px grey, 0px -1px 0px grey;
+    position: relative;
+    display: grid;
+    // grid-auto-rows: minmax(22px, 22px);
+    .column {
+      display: flex;
+      font-size: 0.75em;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
       background-color: #dadce0;
-      &:first-child {
-        border-left: 0px;
+      &-group {
+        // background-color: #dadce0;
+        &:last-child {
+          border-right: thin solid grey;
+        }
       }
-    }
-  }
-  &__row-group {
-    .sheet-head__column-group {
-      min-width: 94px;
-      height: 22px;
-      background-color: #dadce0;
-      &:last-child {
+      &-title {
+        // background-color: #dadce0;
+        border: thin solid grey;
+        border-left: 0px;
+        // box-shadow:  inset 1px 0px 0px grey, inset -1px 0px 0px grey, 0px -1px 0px grey;
+        // border-top: 0px;
+        // width: 60px;
+        &:first-child {
+          border-left: 0px;
+        }
+      }
+      &-end {
+        // border: 0px;
+        // box-shadow: 1px 0px 0px grey;
+        // border-left: thin solid grey;
         border-right: thin solid grey;
       }
     }
     &:first-child {
-      .sheet-head__column-group {
-        border-top: thin solid grey;
+      .column {
+        &-group {
+          box-shadow:  inset 0px 1px 0px grey;
+        }
       }
     }
   }
 }
+// .sheet-head {
+//   position: relative;
+//   border-collapse: collapse;
+//   width: 100%;
+//   font-size: 0.75em;
+//   color: rgba(0, 0, 0, 0.6);
+//   text-align: center;
+//   &__row {
+//     .sheet-head__column {
+//       min-width: 94px;
+//       height: 22px;
+//       // border-right: thin solid grey;
+//       box-shadow: inset -1px 0px 0px grey, inset 0px -1px 0px grey, 0px -1px 0px grey;
+//       background-color: #dadce0;
+//       &:first-child {
+//         border-left: 0px;
+//       }
+//     }
+//   }
+//   &__row-group {
+//     .sheet-head__column-group {
+//       min-width: 94px;
+//       height: 22px;
+//       background-color: #dadce0;
+//       &:last-child {
+//         border-right: thin solid grey;
+//       }
+//     }
+//     &:first-child {
+//       .sheet-head__column-group {
+//         border-top: thin solid grey;
+//       }
+//     }
+//   }
+// }
 </style>

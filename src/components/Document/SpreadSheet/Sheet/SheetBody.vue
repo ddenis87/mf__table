@@ -1,12 +1,12 @@
 <template>
-  <div class="body">
+  <div class="body" @click="eventClickBody">
     <div class="left-bar"
          :style="`width: ${(22 * rowLevelGroupMax) + 62}px`">
       <RecycleScroller :items="rows" :buffer="1000"
                       :item-size="null"
                       sizeField="height"
                       key-field="value"
-                      v-slot="{ item }"
+                      v-slot="{ item, index }"
                       class="sheet-body"
                       ref="BodyLeft">
         <div :key="`body-row-${item.value}`"
@@ -21,7 +21,11 @@
               :key="`${item.value}-${level}`"
               class="column column-group"
               :style="getStyleGroup(level)">
-              <spread-sheet-btn-group v-if="isRowGroupLevel(item, level)">mdi-plus-box-outline</spread-sheet-btn-group>
+              <spread-sheet-btn-group v-if="isRowGroupLevel(item, level)"
+                                      :data-row-index="index"
+                                      :data-row-parent="item.value"
+                                      :data-row-count="item.rowGroup - 1"
+                                      data-row-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
           </div>
           <div class="column column-title"
               :style="shiftTitle">{{ item.value }}</div>

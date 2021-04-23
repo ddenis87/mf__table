@@ -37,12 +37,12 @@ export default {
 @import './Sheet.scss';
 
 .spread-sheet {
-  position: relative;
+  // position: relative;
   width: 100%;
   height: 100%;
   border-radius: $borderRadius;
   box-shadow: $boxShadow;
-  overflow: scroll;
+  overflow: hidden;
   &::-webkit-scrollbar {
     width: $scrollWidth;
     height: $scrollHeight;

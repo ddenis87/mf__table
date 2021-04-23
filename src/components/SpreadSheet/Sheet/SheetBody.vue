@@ -1,11 +1,16 @@
 <template>
-  <virtual-list style="height: 600px; overflow-y: auto; width: 1600px; border:"
-                :data-key="'value'"
-                :data-sources="rows"
-                :data-component="sheetBodyItem"
-                :extra-props="extraPropsComponent"
-                :bottom-threshold="1000">
-  </virtual-list>
+  <div @click="eventClickBody">
+    <virtual-list class="sheet-body"
+                  style="height: calc(100vh - 202px); overflow-y: auto; width: calc(100vw - 10px);"
+                  :keeps="100"
+                  :data-key="'value'"
+                  :data-sources="rows"
+                  :data-component="sheetBodyItem"
+                  :extra-props="extraPropsComponent"
+                  @scroll="scrollBody">
+    </virtual-list>
+  </div>
+  
 <!-- <RecycleScroller :items="rows"
                      :item-size="null"
                      sizeField="height"
@@ -158,12 +163,19 @@ export default {
     //   };
     // },
   },
+  created() {
+    this.computedCellGeometry();
+  },
   mounted() {
-    console.log(this.rows);
-    console.log(this.columns);
+    // console.log(this.rows);
+    // console.log(this.columns);
   },
   methods: {
+    scrollBody(evt) {
+      this.$emit('scroll-body-x', evt.target.scrollLeft);
+    },
     eventClickBody(evt) {
+      console.log(evt);
       if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-row-parent')) {
         this.toggleRowGroup(evt.target.closest('button'));
         return true;
@@ -218,6 +230,28 @@ export default {
       if (!this.cells[cellName] || !this.cells[cellName].style) return {};
       return this.cells[cellName].style;
     },
+
+    computedCellGeometry() {
+      this.rows.forEach((row) => {
+        this.columns.forEach((column, columnIndex) => {
+          if (this.cells[`${column.name}${row.value}`] && this.cells[`${column.name}${row.value}`].colspan) {
+            const { colspan } = { ...this.cells[`${column.name}${row.value}`] };
+            for (let i = 1; i < colspan; i += 1) {
+              this.excludedCells.add(`${this.columns[columnIndex + i].name}${row.value}`);
+            }
+          }
+
+          if (this.cells[`${column.name}${row.value}`] && this.cells[`${column.name}${row.value}`].rowspan) {
+            const { rowspan } = { ...this.cells[`${column.name}${row.value}`] };
+            for (let i = 1; i < rowspan - 1; i += 1) {
+              this.excludedCells.add(`${column.name}${row.value + i}`);
+            }
+          }
+        });
+      });
+      console.log(this.excludedCells);
+    },
+
     getCellGeometry(row, rowIndex, column, columnIndex) {
       const cellGeometry = {};
       let cellWidth = column.width || null;
@@ -304,15 +338,8 @@ export default {
 <style lang="scss" scoped>
 @import './SheetBody.scss';
 .sheet-body {
-  position: relative;
-  display: block;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  height: calc(100vh - 210px);
   &::-webkit-scrollbar {
-    position: sticky;
     display: block;
-    left: 0px;
     width: $scrollWidth;
     height: $scrollHeight;
     border-radius: $scrollBorderRadius;
@@ -321,79 +348,98 @@ export default {
       background-color: $scrollThumbBackgroundColor;
     }
   }
-  &__row {
-    position: relative;
-    display: grid;
-    grid-auto-rows: minmax(22px, 22px);
-    .column {
-      display: inline-flex;
-      align-items: center;
-      background-color: white;
-      &-group, &-title {
-        position: sticky;
-        background-color: #dadce0;
-        justify-content: center;
-
-        font-size: 0.75em;
-        font-weight: bold;
-        color: rgba(0, 0, 0, 0.6);
-      }
-
-      &-group {
-        left: 0px;
-        width: 20px;
-        z-index: 500;
-        &:first-child {
-          box-shadow:  inset 1px 0px 0px grey;
-        }
-      }
-
-      &-title {
-        border: thin solid grey;
-        // box-shadow:  inset 1px 0px 0px grey, inset -1px 0px 0px grey, 0px -1px 0px grey;
-        border-top: 0px;
-        width: 60px;
-        z-index: 400;
-      }
-      &-body {
-        position: relative;
-        padding: 0px 2px;
-        width: 94px;
-        // border-left: thin solid grey;
-        // border-bottom: thin solid grey;
-        box-shadow: inset -1px 0px 0px grey, inset 0px -1px 0px grey;
-        box-sizing: border-box;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-
-    }
-    .line {
-      &::before {
-        content: '';
-        position: absolute;
-        // left: 11px;
-        border-left: thin solid #3F3F3F;
-        background-color: #3F3F3F;
-        width: 0px;
-        height: 100%;
-        top: 0px;
-      }
-    }
-    .selected::before {
-      content: '';
-      position: absolute;
-      top: 0px;
-      right: 0px;
-      bottom: 0px;
-      left: 0px;
-      // box-shadow: inset -1px -2px 0px #1a73e8, inset 2px 1px 0px #1a73e8;
-      border: 1px solid #1a73e8;
-      border-bottom: 2px solid #1a73e8;
-      border-right: 2px solid #1a73e8;
-      // z-index: 9999;
-      // box-shadow: 0 2px 6px 2px rgb(60 64 67 / 15%);
-    }
-  }
 }
+// .sheet-body {
+//   position: relative;
+//   display: block;
+//   font-family: Arial, Helvetica, sans-serif;
+//   font-size: 16px;
+//   height: calc(100vh - 210px);
+//   &::-webkit-scrollbar {
+//     position: sticky;
+//     display: block;
+//     left: 0px;
+//     width: $scrollWidth;
+//     height: $scrollHeight;
+//     border-radius: $scrollBorderRadius;
+//     &-thumb {
+//       border-radius: $scrollThumbBorderRadius;
+//       background-color: $scrollThumbBackgroundColor;
+//     }
+//   }
+//   &__row {
+//     position: relative;
+//     display: grid;
+//     grid-auto-rows: minmax(22px, 22px);
+//     .column {
+//       display: inline-flex;
+//       align-items: center;
+//       background-color: white;
+//       &-group, &-title {
+//         position: sticky;
+//         background-color: #dadce0;
+//         justify-content: center;
+
+//         font-size: 0.75em;
+//         font-weight: bold;
+//         color: rgba(0, 0, 0, 0.6);
+//       }
+
+//       &-group {
+//         left: 0px;
+//         width: 20px;
+//         z-index: 500;
+//         &:first-child {
+//           box-shadow:  inset 1px 0px 0px grey;
+//         }
+//       }
+
+//       &-title {
+//         border: thin solid grey;
+//         // box-shadow:  inset 1px 0px 0px grey, inset -1px 0px 0px grey, 0px -1px 0px grey;
+//         border-top: 0px;
+//         width: 60px;
+//         z-index: 400;
+//       }
+//       &-body {
+//         position: relative;
+//         padding: 0px 2px;
+//         width: 94px;
+//         // border-left: thin solid grey;
+//         // border-bottom: thin solid grey;
+//         box-shadow: inset -1px 0px 0px grey, inset 0px -1px 0px grey;
+//         box-sizing: border-box;
+//         white-space: nowrap;
+//         overflow: hidden;
+//       }
+
+//     }
+//     .line {
+//       &::before {
+//         content: '';
+//         position: absolute;
+//         // left: 11px;
+//         border-left: thin solid #3F3F3F;
+//         background-color: #3F3F3F;
+//         width: 0px;
+//         height: 100%;
+//         top: 0px;
+//       }
+//     }
+//     .selected::before {
+//       content: '';
+//       position: absolute;
+//       top: 0px;
+//       right: 0px;
+//       bottom: 0px;
+//       left: 0px;
+//       // box-shadow: inset -1px -2px 0px #1a73e8, inset 2px 1px 0px #1a73e8;
+//       border: 1px solid #1a73e8;
+//       border-bottom: 2px solid #1a73e8;
+//       border-right: 2px solid #1a73e8;
+//       // z-index: 9999;
+//       // box-shadow: 0 2px 6px 2px rgb(60 64 67 / 15%);
+//     }
+//   }
+// }
 </style>

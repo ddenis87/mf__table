@@ -1,24 +1,25 @@
 <template>
-  <table class="sheet">
-    <tr>
-      <td class="sheet__angle"
-          :style="{ 'min-width': `${60 + (20 * rowLevelGroupMax)}px` }"></td>
-      <td class="sheet__head">
-        <sheet-head :columns="columnsBody"
-                    :columnLevelGroupMax="columnLevelGroupMax"></sheet-head>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" class="sheet__body">
-        <sheet-body :rowsCount="rowCount"
-                    :rows="rowsBody"
-                    :columns="columnsBody"
-                    :cells="cells"
-                    :rowLevelGroupMax="rowLevelGroupMax"
-                    @toggle-row-group="toggleRowGroup"></sheet-body>
-      </td>
-    </tr>
-  </table>
+  <div class="sheet"
+       :style="{
+         'grid-template-columns': `${(20 * rowLevelGroupMax) + 60}px 1fr`,
+         'grid-template-rows': `${(22 * columnLevelGroupMax) + 22}px 1fr`,
+       }">
+    <div class="sheet__angle"></div>
+    <div class="sheet__head">
+      <sheet-head :columns="columnsBody"
+                  :columnLevelGroupMax="columnLevelGroupMax"
+                  ref="SheetHead"></sheet-head>
+    </div>
+    <div class="sheet__body">
+      <sheet-body :rowsCount="rowCount"
+                  :rows="rowsBody"
+                  :columns="columnsBody"
+                  :cells="cells"
+                  :rowLevelGroupMax="rowLevelGroupMax"
+                  @toggle-row-group="toggleRowGroup"
+                  @scroll-body-x="scrollBodyX"></sheet-body>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -73,6 +74,9 @@ export default {
       if (this.rows[i]) {
         if (!this.rows[i].parent) {
           rowsBodyItem = { value: i, ...this.rows[i] };
+          if (this.rows[i].rowGroup) {
+            rowsBodyItem.openGroup = 'close';
+          }
           rowsBodyItem.height = (this.rows[i].height) ? this.rows[i].height : 22;
           this.rowsBody.push(rowsBodyItem);
         }
@@ -110,16 +114,22 @@ export default {
         this.columnsBody.push(columnsBodyItem);
       }
     }
+    // console.log(this.rowsBody);
   },
   methods: {
+    scrollBodyX(scrollLeft) {
+      this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
+    },
     toggleRowGroup(rowParent) {
       console.log(rowParent);
       if (rowParent.status === 'close') {
         this.openRowGroup(rowParent);
         rowParent.target.setAttribute('data-row-status', 'open');
+        // this.rowsBody.find((item) => item.value === rowParent.value).openGroup = 'open';
       } else {
         this.closeRowGroup(rowParent);
         rowParent.target.setAttribute('data-row-status', 'close');
+        // this.rowsBody.find((item) => item.value === rowParent.value).openGroup = 'close';
       }
     },
     openRowGroup(rowParent) {
@@ -188,27 +198,24 @@ export default {
 @import './Sheet.scss';
 
 .sheet {
-  position: relative;
-  width: 100%;
-  border-collapse: collapse;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
+  display: grid;
+  grid-template-areas: "angle head" "body body";
+  height: 100%;
+  box-sizing: border-box;
   &__angle {
-    position: sticky;
-    top: 0px;
-    left: 0px;
-    min-width: 60px;
-    box-shadow: inset -1px -1px 0px grey, inset 1px 1px 0px grey;
+    grid-area: angle;
+    border: thin solid grey;
     background-color: #dadce0;
-    z-index: 900;
+    box-sizing: border-box;
   }
   &__head {
-    position: sticky;
-    top: 0px;
-    height: 22px;
-    background-color: #dadce0;
-    width: auto;
-    z-index: 800;
+    grid-area: head;
+    overflow: hidden;
+    box-sizing: border-box;
+    // margin-right: 18px;
+  }
+  &__body {
+    grid-area: body;
   }
 }
 </style>
