@@ -10,7 +10,7 @@
                   @scroll="scrollBody">
     </virtual-list>
   </div>
-  
+
 <!-- <RecycleScroller :items="rows"
                      :item-size="null"
                      sizeField="height"
@@ -21,12 +21,12 @@
             class="sheet-body__row"
             :style="[{
               'grid-template-columns': `
-              repeat(${rowLevelGroupMax}, minmax(20px, 20px))
+              repeat(${maxLevelGroupRow}, minmax(20px, 20px))
               60px
               ${templateRowBody}`,
               'grid-template-rows': `${(item.height) ? item.height : '22'}px`,
             }]">
-          <div v-for="level in rowLevelGroupMax"
+          <div v-for="level in maxLevelGroupRow"
               :key="`${item.value}-${level}`"
               class="column column-group"
               :style="getStyleGroup(level)">
@@ -51,11 +51,11 @@
          class="sheet-body__row"
          :style="[{
            'grid-template-columns': `
-           repeat(${rowLevelGroupMax}, minmax(20px, 20px))
+           repeat(${maxLevelGroupRow}, minmax(20px, 20px))
            60px
            repeat(${columns.length}, auto)`
          }]">
-      <div v-for="level in rowLevelGroupMax"
+      <div v-for="level in maxLevelGroupRow"
            :key="`${row.value}-${level}`"
            class="column column-group"
            :style="getStyleGroup(level)">
@@ -79,7 +79,7 @@
       <!-- <div v-for="(item, index) in rows"
           :key="item.value"
           class="sheet-body__row">
-        <div v-for="level in rowLevelGroupMax"
+        <div v-for="level in maxLevelGroupRow"
             :key="`${item.value}-${level}`"
             class="column column-group"
             :class="{'line': (item.parent) && getRowLevel(item) >= level }"
@@ -125,7 +125,7 @@ export default {
     columns: { type: Array },
     // columnsName: { type: Array, default() { return []; } },
     cells: { type: Object },
-    rowLevelGroupMax: { type: Number, default: 0 },
+    maxLevelGroupRow: { type: Number, default: 0 },
   },
   data() {
     return {
@@ -134,7 +134,7 @@ export default {
 
       currentSelectedCell: null,
 
-      shiftTitle: { left: `${20 * this.rowLevelGroupMax}px` },
+      shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
     };
   },
   computed: {
@@ -154,7 +154,7 @@ export default {
         templateRowBody: this.templateRowBody,
         shiftTitle: this.shiftTitle,
         excludedCells: this.excludedCells,
-        rowLevelGroupMax: this.rowLevelGroupMax,
+        rowLevelGroupMax: this.maxLevelGroupRow,
       };
     },
     // widthHead() {
@@ -222,7 +222,7 @@ export default {
     },
     // getStyleTitle() {
     //   return {
-    //     left: `${20 * this.rowLevelGroupMax}px`,
+    //     left: `${20 * this.maxLevelGroupRow}px`,
     //   };
     // },
     getStyleContent(row, column) {
@@ -262,11 +262,11 @@ export default {
           cellWidth += this.columns[columnIndex + i].width || 94;
           this.excludedCells.add(`${this.columns[columnIndex + i].name}${row.value}`);
         }
-        cellGeometry['grid-column-start'] = columnIndex + this.rowLevelGroupMax + 2;
-        cellGeometry['grid-column-end'] = (columnIndex + this.rowLevelGroupMax + 2) + colspan;
+        cellGeometry['grid-column-start'] = columnIndex + this.maxLevelGroupRow + 2;
+        cellGeometry['grid-column-end'] = (columnIndex + this.maxLevelGroupRow + 2) + colspan;
       }
-      cellGeometry['grid-column-start'] = columnIndex + this.rowLevelGroupMax + 2;
-      cellGeometry['grid-column-end'] = (columnIndex + this.rowLevelGroupMax + 2) + 1;
+      cellGeometry['grid-column-start'] = columnIndex + this.maxLevelGroupRow + 2;
+      cellGeometry['grid-column-end'] = (columnIndex + this.maxLevelGroupRow + 2) + 1;
 
       let cellHeight = row.height || null;
       if (this.cells[`${column.name}${row.value}`]

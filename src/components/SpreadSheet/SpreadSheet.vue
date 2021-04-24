@@ -1,56 +1,71 @@
 <template>
   <div class="spread-sheet">
-    <sheet :column-count="columnCount"
+    <sheet :rows="rows"
            :row-count="rowCount"
            :columns="columns"
-           :rows="rows"
+           :column-count="columnCount"
            :cells="cells"></sheet>
   </div>
 </template>
 
 <script>
 import Sheet from './Sheet.vue';
-import SpreadSheetStyle from './SpreadSheetStyle';
 
 export default {
   name: 'SpreadSheet',
   components: {
     Sheet,
   },
-  mixins: [
-    SpreadSheetStyle,
-  ],
   props: {
-    columnCount: { type: Number, default: 25 },
-    rowCount: { type: Number, default: 100 },
-
-    columns: { type: Object },
     rows: { type: Object },
-
+    rowCount: { type: Number, default: 1000 },
+    columns: { type: Object },
+    columnCount: { type: Number, default: 30 },
     cells: { type: Object },
     styles: { type: Array },
+  },
+  mounted() {
+    this.addingDocumentStyles();
+  },
+  methods: {
+    addingDocumentStyles() {
+      const stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
+      const elementDOMStyle = document.createElement('style');
+      let stylesString = '';
+      elementDOMStyle.setAttribute('type', 'text/css');
+
+      this.styles.forEach((element) => {
+        const stylesObject = {};
+        Object.entries(element.list).forEach((item) => {
+          const [styleName, styleValue] = [...item];
+          stylesObject[this.transformStringToKebabCase(styleName)] = styleValue;
+        });
+        stylesString += `${stylesPath} .${element.name} ${this.transformObjectToStringStyle(stylesObject)}`;
+      });
+
+      elementDOMStyle.innerText = `${stylesString}`;
+      document.querySelector('head').append(elementDOMStyle);
+    },
+
+    transformStringToKebabCase(styleName) {
+      return styleName.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+    },
+
+    transformObjectToStringStyle(object) {
+      return JSON.stringify(object).replace(/,/g, ';').replace(/"/g, '').replace(/}/g, ';}');
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import './Sheet.scss';
+@import './SpreadSheet.scss';
 
 .spread-sheet {
-  // position: relative;
   width: 100%;
   height: 100%;
   border-radius: $borderRadius;
   box-shadow: $boxShadow;
   overflow: hidden;
-  &::-webkit-scrollbar {
-    width: $scrollWidth;
-    height: $scrollHeight;
-    border-radius: $scrollBorderRadius;
-    &-thumb {
-      border-radius: $scrollThumbBorderRadius;
-      background-color: $scrollThumbBackgroundColor;
-    }
-  }
 }
 </style>

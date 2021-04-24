@@ -44,7 +44,7 @@ export default {
   props: {
     index: { type: Number },
     source: { type: Object, default() { return {}; } },
-    
+
     rows: Array,
     columns: Array,
     cells: Object,
