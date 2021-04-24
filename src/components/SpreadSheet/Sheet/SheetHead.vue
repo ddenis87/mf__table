@@ -63,9 +63,9 @@ export default {
   position: relative;
   display: block;
   overflow-x: scroll;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: $fontSize;
-
+  font-size: $headFontSize;
+  font-weight: $headFontWeight;
+  color: $headFontColor;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -74,9 +74,6 @@ export default {
     display: grid;
     .column {
       display: flex;
-      font-size: $headFontSize;
-      font-weight: $headFontWeight;
-      color: $headFontColor;
       justify-content: center;
       align-items: center;
       background-color: $backgroundColor;

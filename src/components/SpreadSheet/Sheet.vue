@@ -8,24 +8,25 @@
     <div class="sheet__head">
       <sheet-head ref="SheetHead"
                   :columns="tableColumns"
-                  :max-level-group-column="maxLevelGroupColumn"
-                  :template-row="templateRow"></sheet-head>
+                  :template-row="templateRow"
+                  :max-level-group-column="maxLevelGroupColumn"></sheet-head>
     </div>
     <div class="sheet__body">
-      <!-- <sheet-body :rowsCount="rowCount"
-                  :rows="rowsBody"
-                  :columns="columnsBody"
-                  :cells="cells"
+      <sheet-body :rows="tableRows"
+                  :columns="tableColumns"
+                  :cells="tableCells"
+                  :template-row="templateRow"
                   :max-level-group-row="maxLevelGroupRow"
+                  :set-excluded-cell="setExcludedCells"
                   @toggle-row-group="toggleRowGroup"
-                  @scroll-body-x="scrollBodyX"></sheet-body> -->
+                  @scroll-body-x="scrollBodyX"></sheet-body>
     </div>
   </div>
 </template>
 
 <script>
 import SheetHead from './Sheet/SheetHead.vue';
-// import SheetBody from './Sheet/SheetBody.vue';
+import SheetBody from './Sheet/SheetBody.vue';
 
 const CELL_WIDTH = 94;
 const CELL_HEIGHT = 22;
@@ -34,7 +35,7 @@ export default {
   name: 'Sheet',
   components: {
     SheetHead,
-    // SheetBody,
+    SheetBody,
   },
   props: {
     rows: { type: Object },
@@ -45,17 +46,15 @@ export default {
   },
   data() {
     return {
-      setHeaders: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-      tableColumns: [],
-      tableColumnsChildren: {},
+      setColumnName: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      setExcludedCells: [],
+      maxLevelGroupRow: this.getMaxLevelGroupRow(),
       maxLevelGroupColumn: this.getMaxLevelGroupColumn(),
       tableRows: [],
       tableRowsChildren: {},
-      maxLevelGroupRow: this.getMaxLevelGroupRow(),
-      // rowsBody: [],
-      // columnsBody: [],
-      // columnsNameBody: [],
-      // rowsParents: {},
+      tableColumns: [],
+      tableColumnsChildren: {},
+      tableCells: {},
     };
   },
   computed: {
@@ -66,92 +65,87 @@ export default {
       }
       return templateRow;
     },
-    // maxLevelGroupRow() {
-    //   const levelGroupMax = [];
-    //   Object.entries(this.rows).filter((item) => Object.keys(item[1]).includes('parent')).forEach((row) => {
-    //     levelGroupMax.push(this.getRowLevel(row[0]));
-    //   });
-    //   console.log('max row group - ', Math.max(...levelGroupMax));
-    //   return Math.max(...levelGroupMax);
-    // },
-    // maxLevelGroupColumn() {
-    //   const levelGroupMax = [];
-    //   Object.entries(this.columns).filter((item) => Object.keys(item[1]).includes('parent')).forEach((column) => {
-    //     levelGroupMax.push(this.getColumnLevel(column[0]));
-    //   });
-    //   console.log('max column group - ', Math.max(...levelGroupMax));
-    //   return Math.max(...levelGroupMax);
-    // },
   },
   created() {
-    // // rows array
-    // for (let i = 1; i < this.rowCount + 1; i += 1) {
-    //   let rowsBodyItem = {};
-    //   if (this.rows[i]) {
-    //     if (!this.rows[i].parent) {
-    //       rowsBodyItem = { value: i, ...this.rows[i] };
-    //       if (this.rows[i].rowGroup) {
-    //         rowsBodyItem.openGroup = 'close';
-    //       }
-    //       rowsBodyItem.height = (this.rows[i].height) ? this.rows[i].height : 22;
-    //       this.rowsBody.push(rowsBodyItem);
-    //     }
-    //   } else {
-    //     rowsBodyItem.value = i;
-    //     rowsBodyItem.height = 22;
-    //     this.rowsBody.push(rowsBodyItem);
-    //   }
-    //   if (this.rows[i] && this.rows[i]?.rowGroup) this.rowsParents[i] = [];
-    // }
-    // Object.entries(this.rows).filter((item) => Object.keys(item[1]).includes('parent')).forEach((row) => {
-    //   this.rowsParents[row[1].parent].push({ value: row[0], ...row[1] });
-    // });
-
-    // // columns array
-    // for (let i = 1; i < this.columnCount + 1; i += 1) {
-    //   const name = this.getColumnTitle(i);
-    //   let columnsBodyItem = {};
-    //   if (this.columns[name]) {
-    //     if (!this.columns[name].parent) {
-    //       columnsBodyItem = {
-    //         value: i,
-    //         name,
-    //         display_name: name.toUpperCase(),
-    //         ...this.columns[name],
-    //       };
-    //       this.columnsBody.push(columnsBodyItem);
-    //     }
-    //   } else {
-    //     columnsBodyItem = {
-    //       value: i,
-    //       name,
-    //       display_name: name.toUpperCase(),
-    //     };
-    //     this.columnsBody.push(columnsBodyItem);
-    //   }
-    // }
     this.createRows();
     this.createColumns();
+    this.createSetExcludedCells();
   },
   methods: {
+    scrollBodyX(scrollLeft) {
+      this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
+    },
+    toggleRowGroup(rowParent) {
+      console.log(rowParent);
+      if (rowParent.status === 'close') {
+        this.openRowGroup(rowParent);
+        rowParent.target.setAttribute('data-row-status', 'open');
+        // this.rowsBody.find((item) => item.value === rowParent.value).openGroup = 'open';
+      } else {
+        this.closeRowGroup(rowParent);
+        rowParent.target.setAttribute('data-row-status', 'close');
+        // this.rowsBody.find((item) => item.value === rowParent.value).openGroup = 'close';
+      }
+    },
+
     getMaxLevelGroupColumn() {
-      const maxLevelGroup = [];
+      const maxLevelGroup = [0];
       Object.entries(this.columns).filter((item) => Object.keys(item[1]).includes('parent')).forEach((column) => {
         maxLevelGroup.push(this.getColumnLevel(column[0]));
       });
       return Math.max(...maxLevelGroup);
     },
     getMaxLevelGroupRow() {
-      const maxLevelGroup = [];
+      const maxLevelGroup = [0];
       Object.entries(this.rows).filter((item) => Object.keys(item[1]).includes('parent')).forEach((row) => {
         maxLevelGroup.push(this.getRowLevel(row[0]));
       });
       return Math.max(...maxLevelGroup);
     },
+
+    createSetExcludedCells() {
+      Object.entries(this.cells).forEach((item) => {
+        const [cellName, cellValue] = item;
+        const cellRow = +cellName.replace(/[a-z]/g, '');
+        const cellColumn = cellName.replace(/[0-9]/g, '');
+        const cellValueKeys = Object.keys(cellValue);
+
+        this.tableCells[cellName] = { ...cellValue };
+        let colspan = 0;
+        if (cellValueKeys.includes('colspan')) {
+          colspan = cellValue.colspan;
+          // this.setExcludedCells[cellRow] = [];
+          for (let i = 1; i < colspan; i += 1) {
+            const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellColumn) + i);
+            this.setExcludedCells.push(`${columnNameNext}${cellRow}`);
+            // this.setExcludedCells[cellRow].push(`${columnNameNext}${cellRow}`);
+          }
+          this.tableCells[cellName]['grid-column-start'] = this.maxLevelGroupRow + 2;
+          this.tableCells[cellName]['grid-column-end'] = this.maxLevelGroupRow + 2 + colspan;
+        } else {
+          this.tableCells[cellName]['grid-column-start'] = this.maxLevelGroupRow + 2;
+          this.tableCells[cellName]['grid-column-end'] = this.maxLevelGroupRow + 2 + 1;
+        }
+
+        let cellHeight = (this.rows[`${cellRow}`]) ? this.rows[`${cellRow}`].height || 22 : 22;
+        if (cellValueKeys.includes('rowspan')) {
+          for (let i = 1; i < cellValue.rowspan; i += 1) {
+            // if (!this.setExcludedCells[cellRow + i]) this.setExcludedCells[cellRow + i] = [];
+            // this.setExcludedCells[cellRow + i].push(`${cellColumn}${cellRow + i}`);
+            this.setExcludedCells.push(`${cellColumn}${cellRow + i}`);
+            cellHeight += (this.rows[`${cellRow + i}`]) ? this.rows[`${cellRow + i}`].height || 22 : 22;
+          }
+        }
+        this.tableCells[cellName].height = cellHeight;
+      });
+      console.log(this.tableCells);
+      console.log(this.setExcludedCells);
+    },
+
     createColumns() {
       const columnsKeys = Object.keys(this.columns);
       for (let i = 1; i < this.columnCount + 1; i += 1) {
-        const columnName = this.getColumnTitle(i);
+        const columnName = this.getColumnNameForNumber(i);
         const columnItem = {
           value: i,
           name: columnName,
@@ -176,8 +170,9 @@ export default {
           this.tableColumns.push(columnItem);
         }
       }
-      console.log(this.tableColumns);
+      // console.log(this.tableColumns);
     },
+
     createRows() {
       const rowsKeys = Object.keys(this.rows);
       for (let i = 1; i < this.rowCount + 1; i += 1) {
@@ -189,9 +184,14 @@ export default {
         };
         if (rowsKeys.includes(`${i}`)) {
           Object.assign(rowItem, { ...this.rows[i] });
-          if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) rowItem.openGroup = false;
+          if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
+            rowItem.openGroup = false;
+            rowItem.rowLevel = this.getRowLevel(`${i}`);
+          }
           if (Object.keys(this.rows[`${i}`]).includes('parent')) {
-            if (!this.tableRowsChildren[this.rows[`${i}`].parent]) this.tableRowsChildren[this.rows[`${i}`].parent] = [];
+            if (!this.tableRowsChildren[this.rows[`${i}`].parent]) {
+              this.tableRowsChildren[this.rows[`${i}`].parent] = [];
+            }
             this.tableRowsChildren[this.rows[`${i}`].parent].push(rowItem);
           } else {
             this.tableRows.push(rowItem);
@@ -200,22 +200,9 @@ export default {
           this.tableRows.push(rowItem);
         }
       }
+      // console.log(this.tableRows);
     },
-    // scrollBodyX(scrollLeft) {
-    //   this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
-    // },
-    // toggleRowGroup(rowParent) {
-    //   console.log(rowParent);
-    //   if (rowParent.status === 'close') {
-    //     this.openRowGroup(rowParent);
-    //     rowParent.target.setAttribute('data-row-status', 'open');
-    //     // this.rowsBody.find((item) => item.value === rowParent.value).openGroup = 'open';
-    //   } else {
-    //     this.closeRowGroup(rowParent);
-    //     rowParent.target.setAttribute('data-row-status', 'close');
-    //     // this.rowsBody.find((item) => item.value === rowParent.value).openGroup = 'close';
-    //   }
-    // },
+
     // openRowGroup(rowParent) {
     //   console.time('FirstWay');
     //   this.rowsBody.splice(rowParent.index + 1, 0, ...this.rowsParents[rowParent.value]);
@@ -257,22 +244,28 @@ export default {
       }
       return level;
     },
-    getColumnTitle(columnNumber) {
+    getColumnNameForNumber(columnNumber) {
       if (columnNumber > 702) return 'Infinity';
-      if (columnNumber <= this.setHeaders.length) {
-        const columnTitle = this.setHeaders[columnNumber - 1];
-        return columnTitle;
+      if (columnNumber <= this.setColumnName.length) {
+        const columnName = this.setColumnName[columnNumber - 1];
+        return columnName;
       }
-      if ((columnNumber % this.setHeaders.length) === 0) {
-        const columnTitle = `${this.setHeaders[
-          ((columnNumber - this.setHeaders.length) / this.setHeaders.length) - 1
-        ]}${this.setHeaders[this.setHeaders.length - 1]}`;
-        return columnTitle;
+      if ((columnNumber % this.setColumnName.length) === 0) {
+        const columnName = `${this.setColumnName[
+          ((columnNumber - this.setColumnName.length) / this.setColumnName.length) - 1
+        ]}${this.setColumnName[this.setColumnName.length - 1]}`;
+        return columnName;
       }
-      const columnTitle = `${this.setHeaders[
-        (Math.floor(columnNumber / this.setHeaders.length)) - 1
-      ]}${this.setHeaders[(columnNumber % this.setHeaders.length) - 1]}`;
-      return columnTitle;
+      const columnName = `${this.setColumnName[
+        (Math.floor(columnNumber / this.setColumnName.length)) - 1
+      ]}${this.setColumnName[(columnNumber % this.setColumnName.length) - 1]}`;
+      return columnName;
+    },
+    getColumnNumberForName(columnName) {
+      if (columnName.length === 1) return this.setColumnName.findIndex((item) => item === columnName) + 1;
+      const indexFirst = this.setColumnName.findIndex((item) => item === columnName[0]) + 1;
+      const indexSecond = this.setColumnName.findIndex((item) => item === columnName[1]) + 1;
+      return (indexFirst * this.setColumnName.length) + indexSecond;
     },
   },
 };

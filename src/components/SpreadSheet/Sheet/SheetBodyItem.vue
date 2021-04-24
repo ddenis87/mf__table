@@ -3,12 +3,12 @@
        class="sheet-body__row"
        :style="[{
          'grid-template-columns': `
-         repeat(${rowLevelGroupMax}, minmax(20px, 20px))
+         repeat(${maxLevelGroupRow}, minmax(20px, 20px))
          60px
-         ${templateRowBody}`,
+         ${templateRow}`,
          'grid-template-rows': `${(source.height) ? source.height : '22'}px`,
        }]">
-    <div v-for="level in rowLevelGroupMax"
+    <div v-for="level in maxLevelGroupRow"
         :key="`${source.value}-${level}`"
         class="column column-group"
         :class="{'column-stop': (source.value === 1)}"
@@ -22,11 +22,11 @@
     <div class="column column-title"
         :style="shiftTitle">{{ source.value }}</div>
     <template v-for="(column, columnIndex) in columns">
-      <div v-if="!excludedCells.has(`${column.name}${source.value}`)"
+      <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
           :key="`body-${source.value}-${column.value}`"
           class="column column-body"
           :class="(cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].style : ''"
-          :style="getCellGeometry(source, index, column, columnIndex)">
+          :style="getCellGeometry(source, column, columnIndex)">
         {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }}
       </div>
     </template>
@@ -42,88 +42,41 @@ export default {
     SpreadSheetBtnGroup,
   },
   props: {
-    index: { type: Number },
+    index: { type: Number }, // ????
     source: { type: Object, default() { return {}; } },
-
-    rows: Array,
     columns: Array,
-    cells: Object,
-    shiftTitle: Object,
-    excludedCells: Set,
-    rowLevelGroupMax: Number,
-    templateRowBody: String,
+    cells: { type: Object, default() { return {}; } },
+    setExcludedCell: { type: Array },
+    maxLevelGroupRow: { type: Number, default: 0 },
+    templateRow: { type: String, default: '' },
   },
   data() {
     return {
-      // cRows: this.rows,
-      // columns: this.extraProps.columns,
-      // cells: this.extraProps.cells,
-      // cTemplateRowBody: this.templateRowBody,
-      // shiftTitle: this.extraProps.shiftTitle,
-      // excludedCells: this.extraProps.excludedCells,
-      // cRowLevelGroupMax: this.rowLevelGroupMax,
+      shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
     };
   },
-  computed: {
-    // cTemplateRowBody() {
-    //   console.log(this.templateRowBody);
-    //   return this.templateRowBody;
-    // },
-  },
+
   methods: {
-    eventClickRow(evt) {
-      this.$emit('toggleGroup', evt);
-    },
     getStyleGroup(level) {
       return {
         left: `${20 * (+level - 1)}px`,
       };
     },
     isRowGroupLevel(row, level) {
-      if (!Object.keys(row).includes('rowGroup')) return false;
-      return (level === this.getRowLevel(row) + 1);
+      return (Object.keys(row).includes('rowLevel') && (row.rowLevel + 1) === level);
     },
-    getRowLevel(row) {
-      let level = 0;
-      let currentRow = row;
-      let condition = true;
-      while (condition) {
-        if (!currentRow) { condition = false; return level; }
-        if (!Object.keys(currentRow).includes('parent')) { condition = false; return level; }
-        level += 1;
-        currentRow = this.rows.find((item) => item.value === currentRow.parent);
-      }
-      return level;
-    },
-    getCellGeometry(row, rowIndex, column, columnIndex) {
+    getCellGeometry(row, column, columnIndex) {
       const cellGeometry = {};
-      let cellWidth = column.width || null;
-      if (this.cells[`${column.name}${row.value}`]
-        && this.cells[`${column.name}${row.value}`].colspan) {
-        const { colspan } = { ...this.cells[`${column.name}${row.value}`] };
-        for (let i = 1; i < colspan; i += 1) {
-          cellWidth += this.columns[columnIndex + i].width || 94;
-          // this.excludedCells.add(`${this.columns[columnIndex + i].name}${row.value}`);
-        }
-        cellGeometry['grid-column-start'] = columnIndex + this.rowLevelGroupMax + 2;
-        cellGeometry['grid-column-end'] = (columnIndex + this.rowLevelGroupMax + 2) + colspan;
-      }
-      cellGeometry['grid-column-start'] = columnIndex + this.rowLevelGroupMax + 2;
-      cellGeometry['grid-column-end'] = (columnIndex + this.rowLevelGroupMax + 2) + 1;
-
-      let cellHeight = row.height || null;
-      if (this.cells[`${column.name}${row.value}`]
-        && this.cells[`${column.name}${row.value}`].rowspan) {
-        const { rowspan } = { ...this.cells[`${column.name}${row.value}`] };
-        for (let i = 1; i < rowspan - 1; i += 1) {
-          cellHeight += this.rows[rowIndex + i].height || 22;
-          // this.excludedCells.add(`${column.name}${row.value + i}`);
-        }
+      const cellName = `${column.name}${row.value}`;
+      if (this.cells[cellName]) {
+        cellGeometry['grid-column-start'] = this.cells[cellName]['grid-column-start'] + columnIndex;
+        cellGeometry['grid-column-end'] = this.cells[cellName]['grid-column-end'] + columnIndex;
+        cellGeometry.height = `${this.cells[cellName].height}px`;
         cellGeometry['z-index'] = 1;
+      } else {
+        cellGeometry['grid-column-start'] = columnIndex + this.maxLevelGroupRow + 2;
+        cellGeometry['grid-column-end'] = (columnIndex + this.maxLevelGroupRow + 2) + 1;
       }
-      cellGeometry.height = `${cellHeight}px` || '';
-      cellGeometry.width = `${cellWidth}px` || '';
-
       return cellGeometry;
     },
   },
@@ -164,7 +117,6 @@ export default {
 
     &-title {
       border: thin solid grey;
-      // box-shadow:  inset 1px 0px 0px grey, inset -1px 0px 0px grey, 0px -1px 0px grey;
       border-top: 0px;
       width: 60px;
       z-index: 400;
@@ -172,10 +124,9 @@ export default {
     &-body {
       position: relative;
       padding: 0px 2px;
-      width: 94px;
+      width: 100%;
       border-right: thin solid grey;
       border-bottom: thin solid grey;
-      // box-shadow: inset -1px 0px 0px grey, inset 0px -1px 0px grey;
       box-sizing: border-box;
       white-space: nowrap;
       overflow: hidden;

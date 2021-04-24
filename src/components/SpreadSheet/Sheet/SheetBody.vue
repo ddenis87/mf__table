@@ -7,171 +7,43 @@
                   :data-sources="rows"
                   :data-component="sheetBodyItem"
                   :extra-props="extraPropsComponent"
-                  @scroll="scrollBody">
+                  @scroll="scrollBodyX">
     </virtual-list>
   </div>
-
-<!-- <RecycleScroller :items="rows"
-                     :item-size="null"
-                     sizeField="height"
-                     key-field="value"
-                     v-slot="{ item, index }"
-                     class="sheet-body">
-        <div :key="`body-row-${item.value}`"
-            class="sheet-body__row"
-            :style="[{
-              'grid-template-columns': `
-              repeat(${maxLevelGroupRow}, minmax(20px, 20px))
-              60px
-              ${templateRowBody}`,
-              'grid-template-rows': `${(item.height) ? item.height : '22'}px`,
-            }]">
-          <div v-for="level in maxLevelGroupRow"
-              :key="`${item.value}-${level}`"
-              class="column column-group"
-              :style="getStyleGroup(level)">
-              <spread-sheet-btn-group v-if="isRowGroupLevel(item, level)">mdi-plus-box-outline</spread-sheet-btn-group>
-          </div>
-          <div class="column column-title"
-              :style="shiftTitle">{{ item.value }}</div>
-          <template v-for="(column, columnIndex) in columns">
-            <div v-if="!excludedCells.has(`${column.name}${item.value}`)"
-                :key="`body-${item.value}-${column.value}`"
-                class="column column-body"
-                :class="(cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].style : ''"
-                :style="getCellGeometry(item, index, column, columnIndex)">
-              {{ (cells[`${column.name}${item.value}`]) ? cells[`${column.name}${item.value}`].value : '' }}
-            </div>
-          </template>
-        </div>
-    </RecycleScroller> -->
-
-    <!-- <div v-for="(row, rowIndex) in rows"
-         :key="`body-row-${row.value}`"
-         class="sheet-body__row"
-         :style="[{
-           'grid-template-columns': `
-           repeat(${maxLevelGroupRow}, minmax(20px, 20px))
-           60px
-           repeat(${columns.length}, auto)`
-         }]">
-      <div v-for="level in maxLevelGroupRow"
-           :key="`${row.value}-${level}`"
-           class="column column-group"
-           :style="getStyleGroup(level)">
-          <spread-sheet-btn-group v-if="isRowGroupLevel(row, level)">mdi-plus-box-outline</spread-sheet-btn-group>
-      </div>
-      <div class="column column-title"
-           :style="shiftTitle">{{ row.value }}</div>
-      <template v-for="(column, columnIndex) in columns">
-        <div v-if="!excludedCells.has(`${column.name}${row.value}`)"
-             :key="`body-${row.value}-${column.value}`"
-             class="column column-body"
-             :class="(cells[`${column.name}${row.value}`]) ? cells[`${column.name}${row.value}`].style : ''"
-             :style="getCellGeometry(row, rowIndex, column, columnIndex)">
-          {{ (cells[`${column.name}${row.value}`]) ? cells[`${column.name}${row.value}`].value : '' }}
-        </div>
-      </template>
-    </div> -->
-
-    <!-- <v-virtual-scroll :items="rows" item-height="24">
-      <template v-slot:default="{ item }"> -->
-      <!-- <div v-for="(item, index) in rows"
-          :key="item.value"
-          class="sheet-body__row">
-        <div v-for="level in maxLevelGroupRow"
-            :key="`${item.value}-${level}`"
-            class="column column-group"
-            :class="{'line': (item.parent) && getRowLevel(item) >= level }"
-            :style="getStyleGroup(level)">
-          <spread-sheet-btn-group v-if="isRowGroupLevel(item, level)"
-                                  :data-row-index="index"
-                                  :data-row-parent="item.value"
-                                  :data-row-count="item.rowGroup - 1"
-                                  data-row-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
-        </div>
-        <div class="column column-title"
-            :style="getStyleTitle(item.value)">{{ item.value }}</div> -->
-        <!-- <template v-for="column in columns">
-          <div v-if="!excludedCells.has(`${getColumnTitle(column.value)}${item.value}`)"
-            :key="`body-${item.value}-${column.value}`"
-            class="column column-body"
-            :class="getStyleContent(item.value, column.value)"
-            :style="getStyleGeometry(item.value, column.value)"
-            :colspan="getCellColspan(item.value, column.value)"
-            :rowspan="getCellRowspan(item.value, column.value)">{{ getCellValue(item.value, column.value) }}</div>
-        </template> -->
-      <!-- </template> -->
-    <!-- </v-virtual-scroll> -->
-  <!-- </div> -->
 </template>
 
 <script>
-import SheetComponent from './SheetComponent';
-// import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 import SheetBodyItem from './SheetBodyItem.vue';
 
 export default {
   name: 'SheetBody',
-  components: {
-    // SpreadSheetBtnGroup,
-  },
-  mixins: [
-    SheetComponent,
-  ],
   props: {
-    rowsCount: { type: Number, default: 0 },
     rows: { type: Array },
     columns: { type: Array },
-    // columnsName: { type: Array, default() { return []; } },
     cells: { type: Object },
+    templateRow: { type: String, default: '' },
     maxLevelGroupRow: { type: Number, default: 0 },
+    setExcludedCell: { type: Array },
   },
   data() {
     return {
       sheetBodyItem: SheetBodyItem,
-      excludedCells: new Set(),
-
-      currentSelectedCell: null,
-
-      shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
     };
   },
   computed: {
-    templateRowBody() {
-      let templateRowBody = '';
-      for (let i = 0; i < this.columns.length - 1; i += 1) {
-        templateRowBody += `${this.columns[i].width || 94}px `;
-      }
-      console.log(templateRowBody);
-      return templateRowBody;
-    },
     extraPropsComponent() {
       return {
-        rows: this.rows,
         columns: this.columns,
         cells: this.cells,
-        templateRowBody: this.templateRowBody,
-        shiftTitle: this.shiftTitle,
-        excludedCells: this.excludedCells,
-        rowLevelGroupMax: this.maxLevelGroupRow,
+        templateRow: this.templateRow,
+        setExcludedCell: this.setExcludedCell,
+        maxLevelGroupRow: this.maxLevelGroupRow,
       };
     },
-    // widthHead() {
-    //   return {
-    //     'max-width': `${60 + (20 * 3)}px`,
-    //   };
-    // },
   },
-  created() {
-    this.computedCellGeometry();
-  },
-  mounted() {
-    // console.log(this.rows);
-    // console.log(this.columns);
-  },
+
   methods: {
-    scrollBody(evt) {
+    scrollBodyX(evt) {
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
     eventClickBody(evt) {
@@ -192,151 +64,20 @@ export default {
         target,
       });
     },
-    selectedCell(evt) {
-      if (!evt.target.closest('.column-body')) return;
-      if (this.currentSelectedCell === evt.target) return;
-      if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('selected');
-      evt.target.classList.add('selected');
-      this.currentSelectedCell = evt.target;
-    },
-    isRowGroupLevel(row, level) {
-      if (!Object.keys(row).includes('rowGroup')) return false;
-      return (level === this.getRowLevel(row) + 1);
-    },
-    getRowLevel(row) {
-      let level = 0;
-      let currentRow = row;
-      let condition = true;
-      while (condition) {
-        if (!currentRow) { condition = false; return level; }
-        if (!Object.keys(currentRow).includes('parent')) { condition = false; return level; }
-        level += 1;
-        currentRow = this.rows.find((item) => item.value === currentRow.parent);
-      }
-      return level;
-    },
-    getStyleGroup(level) {
-      return {
-        left: `${20 * (+level - 1)}px`,
-      };
-    },
-    // getStyleTitle() {
-    //   return {
-    //     left: `${20 * this.maxLevelGroupRow}px`,
-    //   };
-    // },
-    getStyleContent(row, column) {
-      const cellName = `${this.getColumnTitle(column)}${row}`;
-      if (!this.cells[cellName] || !this.cells[cellName].style) return {};
-      return this.cells[cellName].style;
-    },
 
-    computedCellGeometry() {
-      this.rows.forEach((row) => {
-        this.columns.forEach((column, columnIndex) => {
-          if (this.cells[`${column.name}${row.value}`] && this.cells[`${column.name}${row.value}`].colspan) {
-            const { colspan } = { ...this.cells[`${column.name}${row.value}`] };
-            for (let i = 1; i < colspan; i += 1) {
-              this.excludedCells.add(`${this.columns[columnIndex + i].name}${row.value}`);
-            }
-          }
-
-          if (this.cells[`${column.name}${row.value}`] && this.cells[`${column.name}${row.value}`].rowspan) {
-            const { rowspan } = { ...this.cells[`${column.name}${row.value}`] };
-            for (let i = 1; i < rowspan - 1; i += 1) {
-              this.excludedCells.add(`${column.name}${row.value + i}`);
-            }
-          }
-        });
-      });
-      console.log(this.excludedCells);
-    },
-
-    getCellGeometry(row, rowIndex, column, columnIndex) {
-      const cellGeometry = {};
-      let cellWidth = column.width || null;
-      if (this.cells[`${column.name}${row.value}`]
-        && this.cells[`${column.name}${row.value}`].colspan) {
-        const { colspan } = { ...this.cells[`${column.name}${row.value}`] };
-        for (let i = 1; i < colspan; i += 1) {
-          cellWidth += this.columns[columnIndex + i].width || 94;
-          this.excludedCells.add(`${this.columns[columnIndex + i].name}${row.value}`);
-        }
-        cellGeometry['grid-column-start'] = columnIndex + this.maxLevelGroupRow + 2;
-        cellGeometry['grid-column-end'] = (columnIndex + this.maxLevelGroupRow + 2) + colspan;
-      }
-      cellGeometry['grid-column-start'] = columnIndex + this.maxLevelGroupRow + 2;
-      cellGeometry['grid-column-end'] = (columnIndex + this.maxLevelGroupRow + 2) + 1;
-
-      let cellHeight = row.height || null;
-      if (this.cells[`${column.name}${row.value}`]
-        && this.cells[`${column.name}${row.value}`].rowspan) {
-        const { rowspan } = { ...this.cells[`${column.name}${row.value}`] };
-        for (let i = 1; i < rowspan - 1; i += 1) {
-          cellHeight += this.rows[rowIndex + i].height || 22;
-          this.excludedCells.add(`${column.name}${row.value + i}`);
-        }
-        cellGeometry['z-index'] = 1;
-      }
-      cellGeometry.height = `${cellHeight}px` || '';
-      cellGeometry.width = `${cellWidth}px` || '';
-
-      return cellGeometry;
-    },
-
-    // getStyleGeometry(row, column) {
-    //   return {
-    //     // ...this.getRowHeight(row),
-    //     ...this.getColumnWidth(column),
-    //   };
-    // },
-    // getCellValue(row, column) {
-    //   const cellName = `${this.getColumnTitle(column)}${row}`;
-    //   if (!this.cells[cellName]) return '';
-    //   return this.cells[cellName].value;
-    // },
-    // getCellColspan(row, column) {
-    //   const cellName = `${this.getColumnTitle(column)}${row}`;
-    //   if (!this.cells[cellName] || !this.cells[cellName].colspan) return '';
-    //   for (let i = 1; i < this.cells[cellName].colspan; i += 1) {
-    //     this.excludedCells.add(`${this.getColumnTitle(column + i)}${row}`);
-    //   }
-    //   return this.cells[cellName].colspan;
-    // },
-    // getCellRowspan(row, column) {
-    //   const columnChar = this.getColumnTitle(column);
-    //   const cellName = `${columnChar}${row}`;
-    //   if (!this.cells[cellName] || !this.cells[cellName].rowspan) return '';
-    //   for (let i = 1; i < this.cells[cellName].rowspan; i += 1) {
-    //     this.excludedCells.add(`${columnChar}${row + i}`);
-    //     if (Object.keys(this.cells[cellName]).includes('colspan')) {
-    //       for (let j = 1; j < this.cells[cellName].colspan; j += 1) {
-    //         this.excludedCells.add(`${this.getColumnTitle(column + j)}${row + i}`);
-    //       }
-    //     }
-    //   }
-    //   return this.cells[cellName].rowspan;
-    // },
-    // getColumnWidth(columnNumber) {
-    //   const column = this.columns.find((item) => item.value === columnNumber);
-    //   return {
-    //     // 'max-width': `${column.width}px`,
-    //     // 'min-width': `${column.width}px`,
-    //     width: `${column.width}px`,
-    //   };
-    // },
-    // getRowHeight(rowNumber) {
-    //   const row = this.rows.find((item) => item.value === rowNumber);
-    //   return {
-    //     height: `${row.height}px`,
-    //   };
+    // selectedCell(evt) {
+    //   if (!evt.target.closest('.column-body')) return;
+    //   if (this.currentSelectedCell === evt.target) return;
+    //   if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('selected');
+    //   evt.target.classList.add('selected');
+    //   this.currentSelectedCell = evt.target;
     // },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import './SheetBody.scss';
+@import './Variables.scss';
 .sheet-body {
   &::-webkit-scrollbar {
     display: block;
@@ -349,70 +90,6 @@ export default {
     }
   }
 }
-// .sheet-body {
-//   position: relative;
-//   display: block;
-//   font-family: Arial, Helvetica, sans-serif;
-//   font-size: 16px;
-//   height: calc(100vh - 210px);
-//   &::-webkit-scrollbar {
-//     position: sticky;
-//     display: block;
-//     left: 0px;
-//     width: $scrollWidth;
-//     height: $scrollHeight;
-//     border-radius: $scrollBorderRadius;
-//     &-thumb {
-//       border-radius: $scrollThumbBorderRadius;
-//       background-color: $scrollThumbBackgroundColor;
-//     }
-//   }
-//   &__row {
-//     position: relative;
-//     display: grid;
-//     grid-auto-rows: minmax(22px, 22px);
-//     .column {
-//       display: inline-flex;
-//       align-items: center;
-//       background-color: white;
-//       &-group, &-title {
-//         position: sticky;
-//         background-color: #dadce0;
-//         justify-content: center;
-
-//         font-size: 0.75em;
-//         font-weight: bold;
-//         color: rgba(0, 0, 0, 0.6);
-//       }
-
-//       &-group {
-//         left: 0px;
-//         width: 20px;
-//         z-index: 500;
-//         &:first-child {
-//           box-shadow:  inset 1px 0px 0px grey;
-//         }
-//       }
-
-//       &-title {
-//         border: thin solid grey;
-//         // box-shadow:  inset 1px 0px 0px grey, inset -1px 0px 0px grey, 0px -1px 0px grey;
-//         border-top: 0px;
-//         width: 60px;
-//         z-index: 400;
-//       }
-//       &-body {
-//         position: relative;
-//         padding: 0px 2px;
-//         width: 94px;
-//         // border-left: thin solid grey;
-//         // border-bottom: thin solid grey;
-//         box-shadow: inset -1px 0px 0px grey, inset 0px -1px 0px grey;
-//         box-sizing: border-box;
-//         white-space: nowrap;
-//         overflow: hidden;
-//       }
-
 //     }
 //     .line {
 //       &::before {
