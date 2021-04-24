@@ -38,10 +38,10 @@ export default {
     return {
       isShowDialog: false,
       countColumn: 30,
-      countRow: 10000,
+      countRow: 20000,
       sheetSpace: {
         column: 30,
-        row: 10000,
+        row: 20000,
       },
       columnsJSON: `{
         "a":{"width":120},
@@ -93,8 +93,12 @@ export default {
         "a12":{"value":"Testing font-weight","style":"c1"},
         "a14":{"value":"Title group","colspan":7,"style":"c2"},
         "a15":{"value":"","style":"c7 c9"},
-        "g15":{"value":"","style":"c10"},
-        "d15":{"value":"Test group"},
+        "b15":{"value":"","style":"c7"},
+        "c15":{"value":"","style":"c7"},
+        "d15":{"value":"Test group","style":"c7"},
+        "e15":{"value":"","style":"c7"},
+        "f15":{"value":"","style":"c7"},
+        "g15":{"value":"","style":"c7 c10"},
         "a16":{"value":"","style":"c9"},
         "c16":{"value":"Test group"},
         "d16":{"value":"Test group","style":"c0 c11"},

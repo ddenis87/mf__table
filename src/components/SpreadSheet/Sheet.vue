@@ -9,7 +9,8 @@
       <sheet-head ref="SheetHead"
                   :columns="tableColumns"
                   :template-row="templateRow"
-                  :max-level-group-column="maxLevelGroupColumn"></sheet-head>
+                  :max-level-group-column="maxLevelGroupColumn"
+                  @toggle-column-group="toggleColumnGroup"></sheet-head>
     </div>
     <div class="sheet__body">
       <sheet-body :rows="tableRows"
@@ -76,16 +77,60 @@ export default {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
     },
     toggleRowGroup(rowParent) {
-      console.log(rowParent);
-      if (rowParent.status === 'close') {
+      // console.log(rowParent);
+      if (!rowParent.status) {
         this.openRowGroup(rowParent);
-        rowParent.target.setAttribute('data-row-status', 'open');
-        // this.rowsBody.find((item) => item.value === rowParent.value).openGroup = 'open';
+        this.tableRows.find((item) => item.value === rowParent.value).openGroup = true;
       } else {
         this.closeRowGroup(rowParent);
-        rowParent.target.setAttribute('data-row-status', 'close');
-        // this.rowsBody.find((item) => item.value === rowParent.value).openGroup = 'close';
+        this.tableRows.find((item) => item.value === rowParent.value).openGroup = false;
       }
+    },
+    toggleColumnGroup(columnParent) {
+      // console.log(columnParent);
+      if (!columnParent.status) {
+        this.openColumnGroup(columnParent);
+        this.tableColumns.find((item) => item.value === columnParent.value).openGroup = true;
+      } else {
+        this.closeColumnGroup(columnParent);
+        this.tableColumns.find((item) => item.value === columnParent.value).openGroup = false;
+      }
+    },
+
+    openRowGroup(rowParent) {
+      console.time('FirstWay');
+      this.tableRows.splice(rowParent.index + 1, 0, ...this.tableRowsChildren[rowParent.value]);
+      console.timeEnd('FirstWay');
+    },
+    closeRowGroup(rowParent) {
+      const rowsCut = [];
+      for (let i = 1; i < rowParent.count + 1; i += 1) {
+        const indexCut = this.tableRows.findIndex((item) => +item.value === rowParent.value + i);
+        if (indexCut > -1) {
+          rowsCut.push(indexCut);
+          if (this.tableRows[rowParent.index + i].rowGroup) this.tableRows[rowParent.index + i].openGroup = false;
+        }
+      }
+      this.tableRows = this.tableRows.filter((item, index) => !rowsCut.includes(index));
+    },
+    openColumnGroup(columnParent) {
+      console.time('FirstWay');
+      const columnName = this.getColumnNameForNumber(columnParent.value);
+      this.tableColumns.splice(columnParent.index + 1, 0, ...this.tableColumnsChildren[columnName]);
+      console.timeEnd('FirstWay');
+    },
+    closeColumnGroup(columnParent) {
+      const columnCut = [];
+      for (let i = 1; i < columnParent.count + 1; i += 1) {
+        const indexCut = this.tableColumns.findIndex((item) => +item.value === columnParent.value + i);
+        if (indexCut > -1) {
+          columnCut.push(indexCut);
+          if (this.tableColumns[columnParent.index + i].columnGroup) {
+            this.tableColumns[columnParent.index + i].openGroup = false;
+          }
+        }
+      }
+      this.tableColumns = this.tableColumns.filter((item, index) => !columnCut.includes(index));
     },
 
     getMaxLevelGroupColumn() {
@@ -138,8 +183,6 @@ export default {
         }
         this.tableCells[cellName].height = cellHeight;
       });
-      console.log(this.tableCells);
-      console.log(this.setExcludedCells);
     },
 
     createColumns() {
@@ -170,7 +213,7 @@ export default {
           this.tableColumns.push(columnItem);
         }
       }
-      // console.log(this.tableColumns);
+      console.log(this.tableColumns);
     },
 
     createRows() {
@@ -200,28 +243,9 @@ export default {
           this.tableRows.push(rowItem);
         }
       }
-      // console.log(this.tableRows);
+      console.log(this.tableRows);
     },
 
-    // openRowGroup(rowParent) {
-    //   console.time('FirstWay');
-    //   this.rowsBody.splice(rowParent.index + 1, 0, ...this.rowsParents[rowParent.value]);
-    //   console.timeEnd('FirstWay');
-    //   const btnIcon = rowParent.target.querySelector('i');
-    //   btnIcon.classList.remove('mdi-plus-box-outline');
-    //   btnIcon.classList.add('mdi-minus-box-outline');
-    // },
-    // closeRowGroup(rowParent) {
-    //   const rowsCut = [];
-    //   for (let i = 1; i < rowParent.count + 1; i += 1) {
-    //     const indexCut = this.rowsBody.findIndex((item) => +item.value === rowParent.value + i);
-    //     if (indexCut > -1) rowsCut.push(indexCut);
-    //   }
-    //   this.rowsBody = this.rowsBody.filter((item, index) => !rowsCut.includes(index));
-    //   const btnIcon = rowParent.target.querySelector('i');
-    //   btnIcon.classList.add('mdi-plus-box-outline');
-    //   btnIcon.classList.remove('mdi-minus-box-outline');
-    // },
     getRowLevel(rowNumber) {
       let level = 0;
       let currentRow = rowNumber;
@@ -244,6 +268,7 @@ export default {
       }
       return level;
     },
+
     getColumnNameForNumber(columnNumber) {
       if (columnNumber > 702) return 'Infinity';
       if (columnNumber <= this.setColumnName.length) {

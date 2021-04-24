@@ -17,7 +17,9 @@
                                 :data-row-index="index"
                                 :data-row-parent="source.value"
                                 :data-row-count="source.rowGroup - 1"
-                                data-row-status="close">mdi-plus-box-outline</spread-sheet-btn-group>
+                                :data-row-status="source.openGroup">
+          {{ (source.openGroup) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+        </spread-sheet-btn-group>
     </div>
     <div class="column column-title"
         :style="shiftTitle">{{ source.value }}</div>

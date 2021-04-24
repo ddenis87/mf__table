@@ -1,5 +1,5 @@
 <template>
-  <div class="sheet-head">
+  <div class="sheet-head" @click="eventClickHead">
     <template v-for="level in maxLevelGroupColumn">
       <div :key="level"
            class="sheet-head__row"
@@ -7,12 +7,16 @@
              'grid-template-columns': `${templateRow} 8px`,
              'grid-template-rows': `${'22'}px`,
            }]">
-        <template v-for="column in columns">
+        <template v-for="(column, index) in columns">
           <div :key="`head-group-${column.value}`"
                class="column column-group"
                :style="{'width': column.width}">
-            <spread-sheet-btn-group v-if="isColumnGroup(column, level)">
-              mdi-plus-box-outline
+            <spread-sheet-btn-group v-if="isColumnGroup(column, level)"
+                                    :data-column-index="index"
+                                    :data-column-parent="column.value"
+                                    :data-column-count="column.columnGroup - 1"
+                                    :data-column-status="column.openGroup">
+              {{ (column.openGroup) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
             </spread-sheet-btn-group>
           </div>
         </template>
@@ -49,6 +53,20 @@ export default {
     templateRow: { type: String, default: '' },
   },
   methods: {
+    eventClickHead(evt) {
+      if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-column-parent')) {
+        this.toggleColumnGroup(evt.target.closest('button'));
+      }
+    },
+    toggleColumnGroup(target) {
+      this.$emit('toggle-column-group', {
+        value: +target.getAttribute('data-column-parent'),
+        index: +target.getAttribute('data-column-index'),
+        count: +target.getAttribute('data-column-count'),
+        status: !!target.getAttribute('data-column-status'),
+        target,
+      });
+    },
     isColumnGroup(column, level) {
       return (Object.keys(column).includes('columnGroup') && level === column.columnLevel + 1);
     },

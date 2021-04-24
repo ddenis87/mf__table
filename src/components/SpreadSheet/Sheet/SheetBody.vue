@@ -47,7 +47,6 @@ export default {
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
     eventClickBody(evt) {
-      console.log(evt);
       if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-row-parent')) {
         this.toggleRowGroup(evt.target.closest('button'));
         return true;
@@ -60,7 +59,7 @@ export default {
         value: +target.getAttribute('data-row-parent'),
         index: +target.getAttribute('data-row-index'),
         count: +target.getAttribute('data-row-count'),
-        status: target.getAttribute('data-row-status'),
+        status: !!target.getAttribute('data-row-status'),
         target,
       });
     },
