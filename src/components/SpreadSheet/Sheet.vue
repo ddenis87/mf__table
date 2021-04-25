@@ -19,6 +19,7 @@
                   :template-row="templateRow"
                   :max-level-group-row="maxLevelGroupRow"
                   :set-excluded-cell="setExcludedCells"
+                  :template-table-width="templateTableWidth"
                   @toggle-row-group="toggleRowGroup"
                   @scroll-body-x="scrollBodyX"></sheet-body>
     </div>
@@ -59,6 +60,13 @@ export default {
     };
   },
   computed: {
+    templateTableWidth() {
+      let templateTableWidth = 0;
+      this.tableColumns.forEach((item) => {
+        templateTableWidth += item.width;
+      });
+      return templateTableWidth;
+    },
     templateRow() {
       let templateRow = '';
       for (let i = 0; i < this.tableColumns.length; i += 1) {
@@ -212,14 +220,6 @@ export default {
             if (i === (columnNumberParent + columnParentGroupCount)) {
               columnItem.columnGroupEnd = true;
             }
-            // console.log(
-            //   +this.columns[this.columns[columnName].parent].columnGroup,
-            //   ' - ',
-            //   i,
-            //   ' - ',
-            //   this.getColumnNumberForName(this.columns[columnName].parent)
-            //   + (+this.columns[this.columns[columnName].parent].columnGroup - 1),
-            // );
           } else {
             this.tableColumns.push(columnItem);
           }
@@ -227,7 +227,7 @@ export default {
           this.tableColumns.push(columnItem);
         }
       }
-      console.log(this.tableColumns);
+      // console.log(this.tableColumns);
     },
 
     createRows() {
@@ -256,14 +256,6 @@ export default {
             if (i === (rowNumberParent + rowParentGroupCount)) {
               rowItem.rowGroupEnd = true;
             }
-            // console.log(
-            //   +this.rows[this.rows[`${i}`].parent].rowGroup,
-            //   ' - ',
-            //   i,
-            //   ' - ',
-            //   +this.rows[`${i}`].parent
-            //   + (+this.rows[this.rows[`${i}`].parent].rowGroup - 1),
-            // );
           } else {
             this.tableRows.push(rowItem);
           }
@@ -271,7 +263,7 @@ export default {
           this.tableRows.push(rowItem);
         }
       }
-      console.log(this.tableRows);
+      // console.log(this.tableRows);
     },
 
     getRowLevel(rowNumber) {

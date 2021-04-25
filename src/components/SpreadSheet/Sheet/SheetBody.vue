@@ -2,6 +2,7 @@
   <div @click="eventClickBody">
     <virtual-list class="sheet-body"
                   style="height: calc(100vh - 202px); overflow-y: auto; width: calc(100vw - 10px);"
+                  :wrap-style="{width: `${templateTableWidth}px`}"
                   :keeps="100"
                   :data-key="'value'"
                   :data-sources="rows"
@@ -22,6 +23,7 @@ export default {
     columns: { type: Array },
     cells: { type: Object },
     templateRow: { type: String, default: '' },
+    templateTableWidth: { type: Number, default: 0 },
     maxLevelGroupRow: { type: Number, default: 0 },
     setExcludedCell: { type: Array },
   },
@@ -64,13 +66,13 @@ export default {
       });
     },
 
-    // selectedCell(evt) {
-    //   if (!evt.target.closest('.column-body')) return;
-    //   if (this.currentSelectedCell === evt.target) return;
-    //   if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('selected');
-    //   evt.target.classList.add('selected');
-    //   this.currentSelectedCell = evt.target;
-    // },
+    selectedCell(evt) {
+      if (!evt.target.closest('.column-body')) return;
+      if (this.currentSelectedCell === evt.target) return;
+      if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('selected');
+      evt.target.classList.add('selected');
+      this.currentSelectedCell = evt.target;
+    },
   },
 };
 </script>
@@ -89,19 +91,7 @@ export default {
     }
   }
 }
-//     }
-//     .line {
-//       &::before {
-//         content: '';
-//         position: absolute;
-//         // left: 11px;
-//         border-left: thin solid #3F3F3F;
-//         background-color: #3F3F3F;
-//         width: 0px;
-//         height: 100%;
-//         top: 0px;
-//       }
-//     }
+
 //     .selected::before {
 //       content: '';
 //       position: absolute;

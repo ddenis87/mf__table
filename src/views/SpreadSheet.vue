@@ -37,11 +37,11 @@ export default {
   data() {
     return {
       isShowDialog: false,
-      countColumn: 30,
-      countRow: 20000,
+      countColumn: 50,
+      countRow: 30000,
       sheetSpace: {
-        column: 30,
-        row: 20000,
+        column: 50,
+        row: 30000,
       },
       columnsJSON: `{
         "a":{"width":120},
@@ -50,7 +50,7 @@ export default {
         "d":{"width":250},
         "e":{"width":100},
         "h":{"columnGroup":"6"},
-        "i":{"parent":"h"},
+        "i":{"parent":"h","width":50},
         "j":{"columnGroup":"4","parent":"h"},
         "k":{"parent":"j"},
         "l":{"parent":"j"},
@@ -84,9 +84,14 @@ export default {
       }`,
       
       cellsJSON: `{
+        "k1":{"value":"Text - k1","style":"c1"},
+        "l2":{"value":"Text - l2","style":"c1"},
+        "m3":{"value":"Text - m3","style":"c1"},
         "b2":{"value":"Testing color","style":"c1"},
         "c3":{"value":"Cell testing size","style":"c3"},
         "d3":{"value":"Test form for display","colspan":2,"rowspan":2,"style":"c0"},
+        "h3":{"value":"Open Me","style":"c1"},
+        "j4":{"value":"Open Me","style":"c1"},
         "d5":{"value":"Testing upper","rowspan":4,"style":"c5"},
         "e8":{"value":"Testing lowercase","colspan":2,"rowspan":2,"style":"c6"},
         "b10":{"value":"Testing join column","colspan":4,"style":"c4"},

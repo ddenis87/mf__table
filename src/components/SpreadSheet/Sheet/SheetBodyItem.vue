@@ -95,6 +95,7 @@ export default {
   display: grid;
   grid-auto-rows: minmax(22px, 22px);
   .column {
+    position: relative;
     display: inline-flex;
     align-items: center;
     background-color: white;
@@ -170,6 +171,18 @@ export default {
       border-left: 1px solid #3F3F3F;
       border-bottom: 1px solid #3F3F3F;
       background-color: unset;
+    }
+  }
+  .selected {
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0px;
+      bottom: 0px;
+      left: 0px;
+      right: 0px;
+      border: 1px solid #1a73e8;
+      z-index: 200;
     }
   }
 }
