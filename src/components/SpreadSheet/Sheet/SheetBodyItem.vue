@@ -11,15 +11,19 @@
     <div v-for="level in maxLevelGroupRow"
         :key="`${source.value}-${level}`"
         class="column column-group"
-        :class="{'column-stop': (source.value === 1)}"
+        :class="{
+          'line-start': (source.openGroup === true && source.rowLevel === level - 1),
+          'line': (source.parent && level <= source.rowLevel),
+          'line-end': (source.rowGroupEnd && source.rowLevel === level),
+        }"
         :style="getStyleGroup(level)">
-        <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
-                                :data-row-index="index"
-                                :data-row-parent="source.value"
-                                :data-row-count="source.rowGroup - 1"
-                                :data-row-status="source.openGroup">
+        <sheet-btn-group v-if="isRowGroupLevel(source, level)"
+                         :data-row-index="index"
+                         :data-row-parent="source.value"
+                         :data-row-count="source.rowGroup - 1"
+                         :data-row-status="source.openGroup">
           {{ (source.openGroup) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
-        </spread-sheet-btn-group>
+        </sheet-btn-group>
     </div>
     <div class="column column-title"
         :style="shiftTitle">{{ source.value }}</div>
@@ -36,12 +40,12 @@
 </template>
 
 <script>
-import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
+import SheetBtnGroup from './SheetBtnGroup.vue';
 
 export default {
   name: 'SheetBodyItem',
   components: {
-    SpreadSheetBtnGroup,
+    SheetBtnGroup,
   },
   props: {
     index: { type: Number }, // ????
@@ -65,7 +69,7 @@ export default {
       };
     },
     isRowGroupLevel(row, level) {
-      return (Object.keys(row).includes('rowLevel') && (row.rowLevel + 1) === level);
+      return (Object.keys(row).includes('rowGroup') && (row.rowLevel + 1) === level);
     },
     getCellGeometry(row, column, columnIndex) {
       const cellGeometry = {};
@@ -132,6 +136,40 @@ export default {
       box-sizing: border-box;
       white-space: nowrap;
       overflow: hidden;
+    }
+  }
+  .line-start {
+    &::before {
+      content: '';
+      position: absolute;
+      top: calc(50% + 5px);
+      width: 0px;
+      height: 50%;
+      border-left: thin solid #3F3F3F;
+      background-color: #3F3F3F;
+    }
+  }
+  .line {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0px;
+      width: 0px;
+      height: 100%;
+      border-left: thin solid #3F3F3F;
+      background-color: #3F3F3F;
+    }
+  }
+  .line-end {
+    &::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      bottom: 0px;
+      width: 8px;
+      border-left: 1px solid #3F3F3F;
+      border-bottom: 1px solid #3F3F3F;
+      background-color: unset;
     }
   }
 }

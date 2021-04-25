@@ -194,18 +194,32 @@ export default {
           name: columnName,
           display_name: columnName.toUpperCase(),
           width: CELL_WIDTH,
+          columnLevel: this.getColumnLevel(columnName),
         };
         if (columnsKeys.includes(columnName)) {
           Object.assign(columnItem, { ...this.columns[columnName] });
           if (Object.keys(this.columns[columnName]).includes('columnGroup')) {
             columnItem.openGroup = false;
-            columnItem.columnLevel = this.getColumnLevel(columnName);
+            // columnItem.columnLevel = this.getColumnLevel(columnName);
           }
           if (Object.keys(this.columns[columnName]).includes('parent')) {
             if (!this.tableColumnsChildren[this.columns[columnName].parent]) {
               this.tableColumnsChildren[this.columns[columnName].parent] = [];
             }
             this.tableColumnsChildren[this.columns[columnName].parent].push(columnItem);
+            const columnNumberParent = this.getColumnNumberForName(this.columns[columnName].parent);
+            const columnParentGroupCount = +this.columns[this.columns[columnName].parent].columnGroup - 1;
+            if (i === (columnNumberParent + columnParentGroupCount)) {
+              columnItem.columnGroupEnd = true;
+            }
+            // console.log(
+            //   +this.columns[this.columns[columnName].parent].columnGroup,
+            //   ' - ',
+            //   i,
+            //   ' - ',
+            //   this.getColumnNumberForName(this.columns[columnName].parent)
+            //   + (+this.columns[this.columns[columnName].parent].columnGroup - 1),
+            // );
           } else {
             this.tableColumns.push(columnItem);
           }
@@ -224,18 +238,32 @@ export default {
           name: i,
           display_name: i,
           height: CELL_HEIGHT,
+          rowLevel: this.getRowLevel(`${i}`),
         };
         if (rowsKeys.includes(`${i}`)) {
           Object.assign(rowItem, { ...this.rows[i] });
           if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
             rowItem.openGroup = false;
-            rowItem.rowLevel = this.getRowLevel(`${i}`);
+            // rowItem.rowLevel = this.getRowLevel(`${i}`);
           }
           if (Object.keys(this.rows[`${i}`]).includes('parent')) {
             if (!this.tableRowsChildren[this.rows[`${i}`].parent]) {
               this.tableRowsChildren[this.rows[`${i}`].parent] = [];
             }
             this.tableRowsChildren[this.rows[`${i}`].parent].push(rowItem);
+            const rowNumberParent = +this.rows[`${i}`].parent;
+            const rowParentGroupCount = +this.rows[this.rows[`${i}`].parent].rowGroup - 1;
+            if (i === (rowNumberParent + rowParentGroupCount)) {
+              rowItem.rowGroupEnd = true;
+            }
+            // console.log(
+            //   +this.rows[this.rows[`${i}`].parent].rowGroup,
+            //   ' - ',
+            //   i,
+            //   ' - ',
+            //   +this.rows[`${i}`].parent
+            //   + (+this.rows[this.rows[`${i}`].parent].rowGroup - 1),
+            // );
           } else {
             this.tableRows.push(rowItem);
           }
@@ -262,7 +290,7 @@ export default {
       let currentColumn = columnName;
       let condition = true;
       while (condition) {
-        if (!this.columns[currentColumn].parent) { condition = false; return level; }
+        if (!this.columns[currentColumn]?.parent) { condition = false; return level; }
         level += 1;
         currentColumn = this.columns[currentColumn].parent;
       }
