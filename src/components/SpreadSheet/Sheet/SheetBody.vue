@@ -1,5 +1,6 @@
 <template>
-  <div @click="eventClickBody">
+  <div @click="eventClickBody"
+       @dblclick="eventDblclickBody">
     <virtual-list class="sheet-body"
                   style="height: calc(100vh - 202px); overflow-y: auto; width: calc(100vw - 10px);"
                   :wrap-style="{width: `${templateTableWidth}px`}"
@@ -45,6 +46,9 @@ export default {
   },
 
   methods: {
+    eventDblclickBody(evt) {
+      console.log(evt.target);
+    },
     scrollBodyX(evt) {
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
@@ -91,21 +95,4 @@ export default {
     }
   }
 }
-
-//     .selected::before {
-//       content: '';
-//       position: absolute;
-//       top: 0px;
-//       right: 0px;
-//       bottom: 0px;
-//       left: 0px;
-//       // box-shadow: inset -1px -2px 0px #1a73e8, inset 2px 1px 0px #1a73e8;
-//       border: 1px solid #1a73e8;
-//       border-bottom: 2px solid #1a73e8;
-//       border-right: 2px solid #1a73e8;
-//       // z-index: 9999;
-//       // box-shadow: 0 2px 6px 2px rgb(60 64 67 / 15%);
-//     }
-//   }
-// }
 </style>
