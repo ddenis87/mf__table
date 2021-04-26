@@ -20,24 +20,29 @@
                   :max-level-group-row="maxLevelGroupRow"
                   :set-excluded-cell="setExcludedCells"
                   :template-table-width="templateTableWidth"
+                  @dblclick-cell="startCellEditing"
                   @toggle-row-group="toggleRowGroup"
                   @scroll-body-x="scrollBodyX"></sheet-body>
     </div>
+    <cell-wrapper-editing ref="DOMCellWrapperEditing"></cell-wrapper-editing>
   </div>
 </template>
 
 <script>
 import SheetHead from './Sheet/SheetHead.vue';
 import SheetBody from './Sheet/SheetBody.vue';
+import CellWrapperEditing from './Sheet/CellWrapperEditing.vue';
 
 const CELL_WIDTH = 94;
-const CELL_HEIGHT = 22;
+const CELL_HEIGHT = 24;
+const CELL_TYPE_DEFAULT = 'string';
 
 export default {
   name: 'Sheet',
   components: {
     SheetHead,
     SheetBody,
+    CellWrapperEditing,
   },
   props: {
     rows: { type: Object },
@@ -81,6 +86,22 @@ export default {
     this.createSetExcludedCells();
   },
   methods: {
+    startCellEditing(evt) {
+      console.log(evt.target.getAttribute('data-name'));
+      const cellName = evt.target.getAttribute('data-name');
+      const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
+      const cellType = this.tableCells[cellName]?.type
+        || this.tableColumns.find((column) => column.name === cellNameColumn).type
+        || this.tableRows.find((row) => row.name === cellNameRow).type
+        || CELL_TYPE_DEFAULT;
+      console.log(cellType);
+    },
+    parseCellName(cellName) {
+      return {
+        cellNameColumn: cellName.replace(/[0-9]/g, ''),
+        cellNameRow: +cellName.replace(/[a-z]/g, ''),
+      };
+    },
     scrollBodyX(scrollLeft) {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
     },
@@ -180,13 +201,13 @@ export default {
           this.tableCells[cellName]['grid-column-end'] = this.maxLevelGroupRow + 2 + 1;
         }
 
-        let cellHeight = (this.rows[`${cellRow}`]) ? this.rows[`${cellRow}`].height || 22 : 22;
+        let cellHeight = (this.rows[`${cellRow}`]) ? this.rows[`${cellRow}`].height || CELL_HEIGHT : CELL_HEIGHT;
         if (cellValueKeys.includes('rowspan')) {
           for (let i = 1; i < cellValue.rowspan; i += 1) {
             // if (!this.setExcludedCells[cellRow + i]) this.setExcludedCells[cellRow + i] = [];
             // this.setExcludedCells[cellRow + i].push(`${cellColumn}${cellRow + i}`);
             this.setExcludedCells.push(`${cellColumn}${cellRow + i}`);
-            cellHeight += (this.rows[`${cellRow + i}`]) ? this.rows[`${cellRow + i}`].height || 22 : 22;
+            cellHeight += (this.rows[`${cellRow + i}`]) ? this.rows[`${cellRow + i}`].height || CELL_HEIGHT : CELL_HEIGHT;
           }
         }
         this.tableCells[cellName].height = cellHeight;
@@ -227,7 +248,7 @@ export default {
           this.tableColumns.push(columnItem);
         }
       }
-      // console.log(this.tableColumns);
+      console.log(this.tableColumns);
     },
 
     createRows() {

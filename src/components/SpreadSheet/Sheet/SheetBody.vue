@@ -1,6 +1,6 @@
 <template>
   <div @click="eventClickBody"
-       @dblclick="eventDblclickBody">
+       @dblclick="eventDblClickBody">
     <virtual-list class="sheet-body"
                   style="height: calc(100vh - 202px); overflow-y: auto; width: calc(100vw - 10px);"
                   :wrap-style="{width: `${templateTableWidth}px`}"
@@ -11,6 +11,7 @@
                   :extra-props="extraPropsComponent"
                   @scroll="scrollBodyX">
     </virtual-list>
+    
   </div>
 </template>
 
@@ -46,8 +47,16 @@ export default {
   },
 
   methods: {
-    eventDblclickBody(evt) {
-      console.log(evt.target);
+    eventDblClickBody(evt) {
+      if (evt.target.hasAttribute('data-name')) this.$emit('dblclick-cell', evt);
+      // console.log(evt.target.getAttribute('data-name'));
+      // if (!evt.target.hasAttribute('data-name')) return;
+      // console.log(evt.target.getAttribute('data-name'));
+      // const editingComponent = this.$refs.EditingComponent;
+      // const targetInsert = evt.target;
+      // targetInsert.append(editingComponent);
+      // editingComponent.firstElementChild.focus();
+      // editingComponent.firstElementChild.select();
     },
     scrollBodyX(evt) {
       this.$emit('scroll-body-x', evt.target.scrollLeft);

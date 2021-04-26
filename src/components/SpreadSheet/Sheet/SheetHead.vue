@@ -109,6 +109,7 @@ export default {
       &-title {
         border: $borderStyle;
         border-left: 0px;
+        cursor: default;
         &:first-child {
           border-left: 0px;
         }

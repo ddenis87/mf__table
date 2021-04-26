@@ -32,7 +32,8 @@
           :key="`body-${source.value}-${column.value}`"
           class="column column-body"
           :class="(cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].style : ''"
-          :style="getCellGeometry(source, column, columnIndex)">
+          :style="getCellGeometry(source, column, columnIndex)"
+          :data-name="`${column.name}${source.name}`">
         {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }}
       </div>
     </template>
@@ -111,6 +112,7 @@ export default {
       font-size: 0.75em;
       font-weight: bold;
       color: rgba(0, 0, 0, 0.6);
+      cursor: default;
     }
 
     &-group {
@@ -137,6 +139,7 @@ export default {
       box-sizing: border-box;
       white-space: nowrap;
       overflow: hidden;
+      cursor: cell;
     }
   }
   .line-start {
