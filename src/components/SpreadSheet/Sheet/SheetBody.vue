@@ -27,7 +27,7 @@ export default {
     templateRow: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
     maxLevelGroupRow: { type: Number, default: 0 },
-    setExcludedCell: { type: Array },
+    setExcludedCells: { type: Object, default() { return {}; } },
   },
   data() {
     return {
@@ -45,7 +45,7 @@ export default {
         columns: this.columns,
         cells: this.cells,
         templateRow: this.templateRow,
-        setExcludedCell: this.setExcludedCell,
+        setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
         maxLevelGroupRow: this.maxLevelGroupRow,
       };
     },
@@ -54,6 +54,10 @@ export default {
   methods: {
     eventKeydown(evt) {
       evt.preventDefault();
+      if (evt.code === 'ArrowRight') this.shiftCursorNext();
+      if (evt.code === 'ArrowLeft') this.shiftCursorPrevious();
+      if (evt.code === 'ArrowUp') this.shiftCursorUp();
+      if (evt.code === 'ArrowDown') this.shiftCursorDown();
       // console.log(evt.target);
       if (evt.code === 'ArrowRight' && evt.target.nextElementSibling) {
         const eventClick = new Event('click', { bubbles: true });
@@ -82,6 +86,35 @@ export default {
         elementPrevious.dispatchEvent(eventClick);
       }
       // console.log(evt);
+    },
+    shiftCursorNext(target) {
+      if (!target.nextElementSibling) return false;
+      const newTarget = null;
+      this.focusCell(newTarget);
+      return true;
+    },
+    shiftCursorPrevious(target) {
+      if (!target.previousElementSibling) return false;
+      const newTarget = null;
+      this.focusCell(newTarget);
+      return true;
+    },
+    shiftCursorUp(target) {
+      if (!target.parentElement.parentElement.nextElementSibling) return false;
+      const newTarget = null;
+      this.focusCell(newTarget);
+      return true;
+    },
+    shiftCursorDown(target) {
+      if (!target.parentElement.parentElement.previousElementSibling) return false;
+      const newTarget = null;
+      this.focusCell(newTarget);
+      return true;
+    },
+    focusCell(target) {
+      const eventClick = new Event('click', { bubbles: true });
+      target.focus();
+      target.dispatchEvent(eventClick);
     },
     eventDblClickBody(evt) {
       if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);

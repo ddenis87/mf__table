@@ -18,7 +18,7 @@
                   :cells="tableCells"
                   :template-row="templateRow"
                   :max-level-group-row="maxLevelGroupRow"
-                  :set-excluded-cell="setExcludedCells"
+                  :set-excluded-cells="setExcludedCells"
                   :template-table-width="templateTableWidth"
                   @edit-cell="startCellEditing"
                   @toggle-row-group="toggleRowGroup"
@@ -54,7 +54,8 @@ export default {
   data() {
     return {
       setColumnName: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-      setExcludedCells: [],
+      // setExcludedCells: [],
+      setExcludedCells: {},
       maxLevelGroupRow: this.getMaxLevelGroupRow(),
       maxLevelGroupColumn: this.getMaxLevelGroupColumn(),
       tableRows: [],
@@ -129,9 +130,9 @@ export default {
     },
 
     openRowGroup(rowParent) {
-      console.time('FirstWay');
+      console.time('RowWay');
       this.tableRows.splice(rowParent.index + 1, 0, ...this.tableRowsChildren[rowParent.value]);
-      console.timeEnd('FirstWay');
+      console.timeEnd('RowWay');
     },
     closeRowGroup(rowParent) {
       const rowsCut = [];
@@ -145,10 +146,10 @@ export default {
       this.tableRows = this.tableRows.filter((item, index) => !rowsCut.includes(index));
     },
     openColumnGroup(columnParent) {
-      console.time('FirstWay');
+      console.time('ColumnWay');
       const columnName = this.getColumnNameForNumber(columnParent.value);
       this.tableColumns.splice(columnParent.index + 1, 0, ...this.tableColumnsChildren[columnName]);
-      console.timeEnd('FirstWay');
+      console.timeEnd('ColumnWay');
     },
     closeColumnGroup(columnParent) {
       const columnCut = [];
@@ -189,11 +190,11 @@ export default {
         let colspan = 0;
         if (cellValueKeys.includes('colspan')) {
           colspan = cellValue.colspan;
-          // this.setExcludedCells[cellRow] = [];
+          this.setExcludedCells[cellName] = [];
           for (let i = 1; i < colspan; i += 1) {
             const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + i);
-            this.setExcludedCells.push(`${columnNameNext}${cellNameRow}`);
-            // this.setExcludedCells[cellRow].push(`${columnNameNext}${cellRow}`);
+            // this.setExcludedCells.push(`${columnNameNext}${cellNameRow}`);
+            this.setExcludedCells[cellName].push(`${columnNameNext}${cellNameRow}`);
           }
           this.tableCells[cellName]['grid-column-start'] = this.maxLevelGroupRow + 2;
           this.tableCells[cellName]['grid-column-end'] = this.maxLevelGroupRow + 2 + colspan;
@@ -204,16 +205,17 @@ export default {
 
         let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || CELL_HEIGHT : CELL_HEIGHT;
         if (cellValueKeys.includes('rowspan')) {
+          if (!Object.keys(this.setExcludedCells).includes(cellName)) this.setExcludedCells[cellName] = [];
           for (let i = 1; i < cellValue.rowspan; i += 1) {
-            // if (!this.setExcludedCells[cellRow + i]) this.setExcludedCells[cellRow + i] = [];
-            // this.setExcludedCells[cellRow + i].push(`${cellColumn}${cellRow + i}`);
-            this.setExcludedCells.push(`${cellNameColumn}${cellNameRow + i}`);
+            // this.setExcludedCells.push(`${cellNameColumn}${cellNameRow + i}`);
+            this.setExcludedCells[cellName].push(`${cellNameColumn}${cellNameRow + i}`);
             // if colspan
             if (cellValueKeys.includes('colspan')) {
               colspan = cellValue.colspan;
               for (let j = 1; j < colspan; j += 1) {
                 const cellNameColumnNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + j);
-                this.setExcludedCells.push(`${cellNameColumnNext}${cellNameRow + i}`);
+                // this.setExcludedCells.push(`${cellNameColumnNext}${cellNameRow + i}`);
+                this.setExcludedCells[cellName].push(`${cellNameColumnNext}${cellNameRow + i}`);
               }
             }
             cellHeight += (this.rows[`${cellNameRow + i}`]) ? this.rows[`${cellNameRow + i}`].height || CELL_HEIGHT : CELL_HEIGHT;
@@ -221,6 +223,8 @@ export default {
         }
         this.tableCells[cellName].height = cellHeight;
       });
+      // console.log(this.setExcludedCells);
+      // console.log([].concat(...Object.values(this.setExcludedCells)));
     },
 
     createColumns() {
