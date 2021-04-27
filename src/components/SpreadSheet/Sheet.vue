@@ -20,7 +20,7 @@
                   :max-level-group-row="maxLevelGroupRow"
                   :set-excluded-cell="setExcludedCells"
                   :template-table-width="templateTableWidth"
-                  @dblclick-cell="startCellEditing"
+                  @edit-cell="startCellEditing"
                   @toggle-row-group="toggleRowGroup"
                   @scroll-body-x="scrollBodyX"></sheet-body>
     </div>
@@ -87,21 +87,23 @@ export default {
   },
   methods: {
     startCellEditing(evt) {
-      console.log(evt.target.getAttribute('data-name'));
       const cellName = evt.target.getAttribute('data-name');
+      const cellType = this.getCellType(cellName);
+      const targetInsert = evt.target;
+      console.log(evt.target.getAttribute('data-name'));
+      console.log(cellType);
+      console.log(targetInsert);
+    },
+
+    getCellType(cellName) {
       const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
       const cellType = this.tableCells[cellName]?.type
-        || this.tableColumns.find((column) => column.name === cellNameColumn).type
         || this.tableRows.find((row) => row.name === cellNameRow).type
+        || this.tableColumns.find((column) => column.name === cellNameColumn).type
         || CELL_TYPE_DEFAULT;
-      console.log(cellType);
+      return cellType;
     },
-    parseCellName(cellName) {
-      return {
-        cellNameColumn: cellName.replace(/[0-9]/g, ''),
-        cellNameRow: +cellName.replace(/[a-z]/g, ''),
-      };
-    },
+
     scrollBodyX(scrollLeft) {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
     },
@@ -180,8 +182,7 @@ export default {
     createSetExcludedCells() {
       Object.entries(this.cells).forEach((item) => {
         const [cellName, cellValue] = item;
-        const cellRow = +cellName.replace(/[a-z]/g, '');
-        const cellColumn = cellName.replace(/[0-9]/g, '');
+        const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
         const cellValueKeys = Object.keys(cellValue);
 
         this.tableCells[cellName] = { ...cellValue };
@@ -190,8 +191,8 @@ export default {
           colspan = cellValue.colspan;
           // this.setExcludedCells[cellRow] = [];
           for (let i = 1; i < colspan; i += 1) {
-            const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellColumn) + i);
-            this.setExcludedCells.push(`${columnNameNext}${cellRow}`);
+            const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + i);
+            this.setExcludedCells.push(`${columnNameNext}${cellNameRow}`);
             // this.setExcludedCells[cellRow].push(`${columnNameNext}${cellRow}`);
           }
           this.tableCells[cellName]['grid-column-start'] = this.maxLevelGroupRow + 2;
@@ -201,13 +202,21 @@ export default {
           this.tableCells[cellName]['grid-column-end'] = this.maxLevelGroupRow + 2 + 1;
         }
 
-        let cellHeight = (this.rows[`${cellRow}`]) ? this.rows[`${cellRow}`].height || CELL_HEIGHT : CELL_HEIGHT;
+        let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || CELL_HEIGHT : CELL_HEIGHT;
         if (cellValueKeys.includes('rowspan')) {
           for (let i = 1; i < cellValue.rowspan; i += 1) {
             // if (!this.setExcludedCells[cellRow + i]) this.setExcludedCells[cellRow + i] = [];
             // this.setExcludedCells[cellRow + i].push(`${cellColumn}${cellRow + i}`);
-            this.setExcludedCells.push(`${cellColumn}${cellRow + i}`);
-            cellHeight += (this.rows[`${cellRow + i}`]) ? this.rows[`${cellRow + i}`].height || CELL_HEIGHT : CELL_HEIGHT;
+            this.setExcludedCells.push(`${cellNameColumn}${cellNameRow + i}`);
+            // if colspan
+            if (cellValueKeys.includes('colspan')) {
+              colspan = cellValue.colspan;
+              for (let j = 1; j < colspan; j += 1) {
+                const cellNameColumnNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + j);
+                this.setExcludedCells.push(`${cellNameColumnNext}${cellNameRow + i}`);
+              }
+            }
+            cellHeight += (this.rows[`${cellNameRow + i}`]) ? this.rows[`${cellNameRow + i}`].height || CELL_HEIGHT : CELL_HEIGHT;
           }
         }
         this.tableCells[cellName].height = cellHeight;
@@ -309,7 +318,12 @@ export default {
       }
       return level;
     },
-
+    parseCellName(cellName) {
+      return {
+        cellNameColumn: cellName.replace(/[0-9]/g, ''),
+        cellNameRow: +cellName.replace(/[a-z]/g, ''),
+      };
+    },
     getColumnNameForNumber(columnNumber) {
       if (columnNumber > 702) return 'Infinity';
       if (columnNumber <= this.setColumnName.length) {

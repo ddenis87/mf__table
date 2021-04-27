@@ -33,7 +33,8 @@
           class="column column-body"
           :class="(cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].style : ''"
           :style="getCellGeometry(source, column, columnIndex)"
-          :data-name="`${column.name}${source.name}`">
+          :data-name="`${column.name}${source.name}`"
+          :tabindex="columnIndex">
         {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }}
       </div>
     </template>
@@ -139,6 +140,7 @@ export default {
       box-sizing: border-box;
       white-space: nowrap;
       overflow: hidden;
+      outline: none;
       cursor: cell;
     }
   }

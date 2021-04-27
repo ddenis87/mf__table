@@ -1,5 +1,7 @@
 <template>
-  <div class="cell-wrapper-edit">123</div>
+  <div class="cell-wrapper-edit">
+    <input type="text"/>
+  </div>
 </template>
 
 <script>

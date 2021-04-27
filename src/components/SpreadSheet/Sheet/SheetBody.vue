@@ -1,6 +1,7 @@
 <template>
   <div @click="eventClickBody"
-       @dblclick="eventDblClickBody">
+       @dblclick="eventDblClickBody"
+       @keydown="eventKeydown">
     <virtual-list class="sheet-body"
                   style="height: calc(100vh - 202px); overflow-y: auto; width: calc(100vw - 10px);"
                   :wrap-style="{width: `${templateTableWidth}px`}"
@@ -11,7 +12,6 @@
                   :extra-props="extraPropsComponent"
                   @scroll="scrollBodyX">
     </virtual-list>
-    
   </div>
 </template>
 
@@ -32,6 +32,11 @@ export default {
   data() {
     return {
       sheetBodyItem: SheetBodyItem,
+      currentCursorPosition: {
+        cellName: null,
+        row: null,
+        column: null,
+      },
     };
   },
   computed: {
@@ -47,16 +52,39 @@ export default {
   },
 
   methods: {
+    eventKeydown(evt) {
+      evt.preventDefault();
+      // console.log(evt.target);
+      if (evt.code === 'ArrowRight' && evt.target.nextElementSibling) {
+        const eventClick = new Event('click', { bubbles: true });
+        evt.target.nextElementSibling.focus();
+        evt.target.nextElementSibling.dispatchEvent(eventClick);
+      }
+      if (evt.code === 'ArrowLeft' && evt.target.previousElementSibling) {
+        const eventClick = new Event('click', { bubbles: true });
+        evt.target.previousElementSibling.focus();
+        evt.target.previousElementSibling.dispatchEvent(eventClick);
+      }
+      if (evt.code === 'ArrowDown' && evt.target.parentElement.parentElement.nextElementSibling) {
+        const elementIndex = +evt.target.getAttribute('tabindex') + 1;
+        const elementParentNext = evt.target.parentElement.parentElement.nextElementSibling;
+        const elementNext = elementParentNext.firstChild.children[this.maxLevelGroupRow + elementIndex];
+        const eventClick = new Event('click', { bubbles: true });
+        elementNext.focus();
+        elementNext.dispatchEvent(eventClick);
+      }
+      if (evt.code === 'ArrowUp' && evt.target.parentElement.parentElement.previousElementSibling) {
+        const elementIndex = +evt.target.getAttribute('tabindex') + 1;
+        const elementParentPrevious = evt.target.parentElement.parentElement.previousElementSibling;
+        const elementPrevious = elementParentPrevious.firstChild.children[this.maxLevelGroupRow + elementIndex];
+        const eventClick = new Event('click', { bubbles: true });
+        elementPrevious.focus();
+        elementPrevious.dispatchEvent(eventClick);
+      }
+      // console.log(evt);
+    },
     eventDblClickBody(evt) {
-      if (evt.target.hasAttribute('data-name')) this.$emit('dblclick-cell', evt);
-      // console.log(evt.target.getAttribute('data-name'));
-      // if (!evt.target.hasAttribute('data-name')) return;
-      // console.log(evt.target.getAttribute('data-name'));
-      // const editingComponent = this.$refs.EditingComponent;
-      // const targetInsert = evt.target;
-      // targetInsert.append(editingComponent);
-      // editingComponent.firstElementChild.focus();
-      // editingComponent.firstElementChild.select();
+      if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
     },
     scrollBodyX(evt) {
       this.$emit('scroll-body-x', evt.target.scrollLeft);
