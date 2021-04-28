@@ -15,13 +15,13 @@
       </div>
     </div>
     <div class="test-table">
-      <spread-sheet :columns="columns"
+      <!-- <spread-sheet :columns="columns"
                     :rows="rows"
                     :cells="cells"
                     :styles="styles"
                     
                     :columnCount="sheetSpace.column"
-                    :rowCount="sheetSpace.row"></spread-sheet>
+                    :rowCount="sheetSpace.row"></spread-sheet> -->
     </div>
     <div class="test-control-right">
       
@@ -42,13 +42,13 @@
 </template>
 
 <script>
-import SpreadSheet from '@/components/Document/SpreadSheet/SpreadSheet.vue';
+// import SpreadSheet from '@/components/Document/SpreadSheet/SpreadSheet.vue';
 import DialogBarRight from '@/components/Dialogs/DialogBarRight.vue'
 
 export default {
   name: 'Test',
   components: {
-    SpreadSheet,
+    // SpreadSheet,
     DialogBarRight,
   },
   data() {
