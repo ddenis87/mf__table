@@ -1,5 +1,6 @@
 <template>
-  <div @click="eventClickBody"
+  <div ref="TableBody"
+       @click="eventClickBody"
        @dblclick="eventDblClickBody"
        @keydown="eventKeydown">
     <virtual-list class="sheet-body"
@@ -34,8 +35,8 @@ export default {
       sheetBodyItem: SheetBodyItem,
       currentCursorPosition: {
         cellName: null,
-        row: null,
-        column: null,
+        cellRow: null,
+        cellColumn: null,
       },
     };
   },
@@ -54,63 +55,99 @@ export default {
   methods: {
     eventKeydown(evt) {
       evt.preventDefault();
-      if (evt.code === 'ArrowRight') this.shiftCursorNext();
-      if (evt.code === 'ArrowLeft') this.shiftCursorPrevious();
-      if (evt.code === 'ArrowUp') this.shiftCursorUp();
-      if (evt.code === 'ArrowDown') this.shiftCursorDown();
-      // console.log(evt.target);
-      if (evt.code === 'ArrowRight' && evt.target.nextElementSibling) {
-        const eventClick = new Event('click', { bubbles: true });
-        evt.target.nextElementSibling.focus();
-        evt.target.nextElementSibling.dispatchEvent(eventClick);
-      }
-      if (evt.code === 'ArrowLeft' && evt.target.previousElementSibling) {
-        const eventClick = new Event('click', { bubbles: true });
-        evt.target.previousElementSibling.focus();
-        evt.target.previousElementSibling.dispatchEvent(eventClick);
-      }
-      if (evt.code === 'ArrowDown' && evt.target.parentElement.parentElement.nextElementSibling) {
-        const elementIndex = +evt.target.getAttribute('tabindex') + 1;
-        const elementParentNext = evt.target.parentElement.parentElement.nextElementSibling;
-        const elementNext = elementParentNext.firstChild.children[this.maxLevelGroupRow + elementIndex];
-        const eventClick = new Event('click', { bubbles: true });
-        elementNext.focus();
-        elementNext.dispatchEvent(eventClick);
-      }
-      if (evt.code === 'ArrowUp' && evt.target.parentElement.parentElement.previousElementSibling) {
-        const elementIndex = +evt.target.getAttribute('tabindex') + 1;
-        const elementParentPrevious = evt.target.parentElement.parentElement.previousElementSibling;
-        const elementPrevious = elementParentPrevious.firstChild.children[this.maxLevelGroupRow + elementIndex];
-        const eventClick = new Event('click', { bubbles: true });
-        elementPrevious.focus();
-        elementPrevious.dispatchEvent(eventClick);
-      }
-      // console.log(evt);
+      this.$emit('scroll-body-x', evt.target.scrollLeft);
+      if (evt.code === 'ArrowRight') this.moveCursorNext(evt.target);
+      if (evt.code === 'ArrowLeft') this.moveCursorPrevious(evt.target);
+      if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
+      if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
     },
-    shiftCursorNext(target) {
-      if (!target.nextElementSibling) return false;
-      const newTarget = null;
-      this.focusCell(newTarget);
+    moveCursorNext(target) {
+      const elementNextDOM = target.nextSibling;
+      if (!elementNextDOM) return false;
+      if (elementNextDOM.classList) {
+        this.focusCell(elementNextDOM);
+        return true;
+      }
+      const elementNext = target.nextElementSibling;
+      if (Object.keys(this.setExcludedCells).includes(this.currentCursorPosition.cellName)) {
+        this.focusCell(elementNext);
+        return true;
+      }
+      const cellName = target.getAttribute('data-name');
+      const { cellRow, cellColumn } = this.parseCellName(cellName);
+      const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
+      const cellColumnNext = this.columns.find((column) => column.value === cellColumnNumber + 1).name;
+      const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnNext}${cellRow}`))[0];
+      this.focusCell(this.getCellNodeForName(cellNameJoin));
       return true;
     },
-    shiftCursorPrevious(target) {
-      if (!target.previousElementSibling) return false;
-      const newTarget = null;
-      this.focusCell(newTarget);
+
+    moveCursorPrevious(target) {
+      const elementPreviousDOM = target.previousSibling;
+      if (!elementPreviousDOM) return false;
+      if (elementPreviousDOM.classList) {
+        this.focusCell(elementPreviousDOM);
+        return true;
+      }
+      const elementPrevious = target.previousElementSibling;
+      if (Object.keys(this.setExcludedCells).includes(this.currentCursorPosition.cellName)) {
+        this.focusCell(elementPrevious);
+        return true;
+      }
+      const cellName = target.getAttribute('data-name');
+      const { cellRow, cellColumn } = this.parseCellName(cellName);
+      const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
+      const cellColumnPrevious = this.columns.find((column) => column.value === cellColumnNumber - 1).name;
+      const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnPrevious}${cellRow}`))[0];
+      this.focusCell(this.getCellNodeForName(cellNameJoin));
       return true;
     },
-    shiftCursorUp(target) {
-      if (!target.parentElement.parentElement.nextElementSibling) return false;
-      const newTarget = null;
-      this.focusCell(newTarget);
-      return true;
-    },
-    shiftCursorDown(target) {
+    moveCursorUp(target) {
       if (!target.parentElement.parentElement.previousElementSibling) return false;
-      const newTarget = null;
-      this.focusCell(newTarget);
+      const cellName = target.getAttribute('data-name');
+      const { cellColumn } = this.parseCellName(cellName);
+      let { cellRow } = this.parseCellName(cellName);
+      let cellNamePrevious = `${cellColumn}${cellRow - 1}`;
+      if (this.getCellNodeForName(cellNamePrevious)) {
+        this.focusCell(this.getCellNodeForName(cellNamePrevious));
+      } else {
+        cellRow = this.rows[this.rows.findIndex((row) => row.value === cellRow) - 1].value;
+        cellNamePrevious = `${cellColumn}${cellRow}`;
+        if (this.getCellNodeForName(cellNamePrevious)) {
+          this.focusCell(this.getCellNodeForName(cellNamePrevious));
+        } else {
+          const cellNameJoin = Object.entries(this.setExcludedCells)
+            .find((item) => item[1].includes(cellNamePrevious))[0];
+          this.focusCell(this.getCellNodeForName(cellNameJoin));
+        }
+        // console.log(cellNamePrevious);
+      }
       return true;
     },
+    moveCursorDown(target) {
+      if (!target.parentElement.parentElement.nextElementSibling) return false;
+      const cellName = target.getAttribute('data-name');
+      const { cellColumn } = this.parseCellName(cellName);
+      let { cellRow } = this.parseCellName(cellName);
+      const rowspan = this.cells[cellName] ? this.cells[cellName].rowspan || 1 : 1;
+      let cellNameNext = `${cellColumn}${cellRow + rowspan}`;
+      if (this.getCellNodeForName(cellNameNext)) {
+        this.focusCell(this.getCellNodeForName(cellNameNext));
+      } else {
+        cellRow = this.rows[this.rows.findIndex((row) => row.value === cellRow) + rowspan].value;
+        cellNameNext = `${cellColumn}${cellRow}`;
+        if (this.getCellNodeForName(cellNameNext)) {
+          this.focusCell(this.getCellNodeForName(cellNameNext));
+        } else {
+          const cellNameJoin = Object.entries(this.setExcludedCells)
+            .find((item) => item[1].includes(cellNameNext))[0];
+          this.focusCell(this.getCellNodeForName(cellNameJoin));
+        }
+        // console.log(cellNameNext);
+      }
+      return true;
+    },
+
     focusCell(target) {
       const eventClick = new Event('click', { bubbles: true });
       target.focus();
@@ -146,6 +183,25 @@ export default {
       if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('selected');
       evt.target.classList.add('selected');
       this.currentSelectedCell = evt.target;
+      this.setCurrentCursorPosition(evt.target);
+    },
+
+    setCurrentCursorPosition(target) {
+      const cellName = target.getAttribute('data-name');
+      this.currentCursorPosition = {
+        cellName,
+        cellRowPrevious: this.currentCursorPosition.cellRow,
+        ...this.parseCellName(cellName),
+      };
+    },
+    getCellNodeForName(cellName) {
+      return this.$refs.TableBody.querySelector(`[data-name="${cellName}"]`);
+    },
+    parseCellName(cellName) {
+      return {
+        cellColumn: cellName.replace(/[0-9]/g, ''),
+        cellRow: +cellName.replace(/[a-z]/g, ''),
+      };
     },
   },
 };
