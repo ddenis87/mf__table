@@ -124,12 +124,12 @@ export default {
         "e17":{"value":"","style":"c8"},
         "f17":{"value":"","style":"c8"},
         "g17":{"value":"Test group","style":"c8 c10"},
-        "a19":{"value":"Заголовок вложенной группы","colspan":5,"style":"c1"},
-        "a20":{"value":"Строка вложенной группы","colspan":5,"style":"c1"},
-        "a21":{"value":"Строка вложенной группы","colspan":5,"style":"c1"},
-        "a23":{"value":"Последняя строка группы","colspan":5,"style":"c1"},
+        "d19":{"value":"Заголовок вложенной группы","style":"c1"},
+        "d20":{"value":"Строка вложенной группы","style":"c1"},
+        "d21":{"value":"Строка вложенной группы","style":"c1"},
+        "d23":{"value":"Последняя строка группы","style":"c1"},
         "a27":{"value":"Еще одна группа","style":"c1"},
-        "a28":{"value":"Строка группы вся оранжевая","colspan":5,"style":"c11 c1"}
+        "a28":{"value":"Строка группы вся оранжевая","style":"c11 c1"}
       }`,
       stylesJSON: `[
         {"name":"c0","list":{"backgroundColor":"orange","color":"white","fontFamily":"Area","fontSize":"0.7em"}},

@@ -110,6 +110,8 @@ export default {
     },
 
     scrollBodyX(scrollLeft) {
+      console.log('SpreadSheet - Call function scrollX', new Date().getTime());
+      console.log('----------------');
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
     },
     toggleRowGroup(rowParent) {

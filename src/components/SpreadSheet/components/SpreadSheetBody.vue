@@ -23,7 +23,7 @@
     <virtual-list ref="SheetBody"
                   class="sheet-body"
                   :style="[
-                    getVirtualListHeight,
+                    heightVirtualList,
                     {'overflow-y': 'auto', 'width': 'calc(100vw - 10px)', 'position': 'relative',}
                   ]"
                   :wrap-style="{width: `${templateTableWidth}px`, position: 'relative'}"
@@ -39,6 +39,9 @@
 
 <script>
 import SpreadSheetBodyItem from './SpreadSheetBodyItem.vue';
+
+const WIDTH_TITLE_LEFT = 60;
+const WIDTH_COLUMN_GROUP = 20;
 
 export default {
   name: 'SpreadSheetBody',
@@ -66,9 +69,16 @@ export default {
     };
   },
   computed: {
-    getVirtualListHeight() {
-      // console.log(this.rowsFixed);
-      let heightBodyFixed = 202;
+    widthFixedColumn() {
+      let width = (WIDTH_COLUMN_GROUP * this.maxLevelGroupRow) + WIDTH_TITLE_LEFT;
+      this.columns.forEach((column) => {
+        if (column.fixed) width += column.width;
+      });
+      console.log(width);
+      return width;
+    },
+    heightVirtualList() {
+      let heightBodyFixed = 202; //  поправить 202 высота
       for (let i = 0; i < this.rowsFixed.length; i += 1) {
         heightBodyFixed += this.rowsFixed[i].height;
       }
@@ -89,9 +99,7 @@ export default {
   methods: {
     eventKeydown(evt) {
       evt.preventDefault();
-      // this.scrollBodyX(evt.target.closest('.sheet-body'));
-      console.log(this.$refs.SheetBody.$el.scrollLeft);
-      // this.$emit('scroll-body-x', this.$refs.SheetBody.$el.scrollLeft);
+      console.log('SpreadSheetBody - Event keydown', new Date().getTime());
       this.$emit('scroll-body-x', evt.target.closest('.sheet-body').scrollLeft);
       if (evt.code === 'ArrowRight') this.moveCursorNext(evt.target);
       if (evt.code === 'ArrowLeft') this.moveCursorPrevious(evt.target);
@@ -187,6 +195,9 @@ export default {
 
     focusCell(target) {
       const eventClick = new Event('click', { bubbles: true });
+      if (target.getBoundingClientRect().left < this.widthFixedColumn) {
+        this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
+      }
       target.focus();
       target.dispatchEvent(eventClick);
     },
@@ -195,6 +206,7 @@ export default {
     },
     scrollBodyX(evt) {
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
+      console.log('SpreadSheetBody - Event scroll', new Date().getTime());
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
     eventClickBody(evt) {

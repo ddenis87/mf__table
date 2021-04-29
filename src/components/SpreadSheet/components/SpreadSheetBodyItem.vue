@@ -65,7 +65,6 @@ export default {
       shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
     };
   },
-
   methods: {
     fixedCell(column) {
       const fixed = {};
