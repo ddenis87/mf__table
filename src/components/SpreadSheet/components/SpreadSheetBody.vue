@@ -3,8 +3,28 @@
        @click="eventClickBody"
        @dblclick="eventDblClickBody"
        @keydown="eventKeydown">
+    <div ref="SheetBodyFixed"
+         class="sheet-body-fixed">
+      <div class="sheet-body-fixed__item"
+           :style="{width: `${templateTableWidth}px`, position: 'relative'}">
+        <template v-for="(rowFixed, rowFixedIndex) in rowsFixed">
+          <spread-sheet-body-item :source="rowFixed"
+                                  :key="rowFixedIndex"
+                                  :columns="columns"
+                                  :cells="cells"
+                                  :set-excluded-cell="[].concat(...Object.values(setExcludedCells))"
+                                  :max-level-group-row="maxLevelGroupRow"
+                                  :templateRow="templateRow"></spread-sheet-body-item>
+          <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
+        </template>
+      </div>
+    </div>
+    
     <virtual-list class="sheet-body"
-                  style="height: calc(100vh - 202px); overflow-y: auto; width: calc(100vw - 10px); position: relative;"
+                  :style="[
+                    getVirtualListHeight,
+                    {'overflow-y': 'auto', 'width': 'calc(100vw - 10px)', 'position': 'relative',}
+                  ]"
                   :wrap-style="{width: `${templateTableWidth}px`, position: 'relative'}"
                   :keeps="100"
                   :data-key="'value'"
@@ -21,8 +41,12 @@ import SpreadSheetBodyItem from './SpreadSheetBodyItem.vue';
 
 export default {
   name: 'SpreadSheetBody',
+  components: {
+    SpreadSheetBodyItem,
+  },
   props: {
     rows: { type: Array },
+    rowsFixed: { type: Array },
     columns: { type: Array },
     cells: { type: Object },
     templateRow: { type: String, default: '' },
@@ -41,6 +65,16 @@ export default {
     };
   },
   computed: {
+    getVirtualListHeight() {
+      // console.log(this.rowsFixed);
+      let heightBodyFixed = 202;
+      for (let i = 0; i < this.rowsFixed.length; i += 1) {
+        heightBodyFixed += this.rowsFixed[i].height;
+      }
+      return {
+        height: `calc(100vh - ${heightBodyFixed}px)`,
+      };
+    },
     extraPropsComponent() {
       return {
         columns: this.columns,
@@ -52,8 +86,8 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$refs.TableBody.firstChild.firstChild.firstChild);
-    this.$refs.TableBody.firstChild.firstChild.firstChild.classList.add('stop');
+    // console.log(this.$refs.TableBody.firstChild.firstChild.firstChild);
+    // this.$refs.TableBody.firstChild.firstChild.firstChild.classList.add('stop');
   },
   methods: {
     eventKeydown(evt) {
@@ -160,6 +194,7 @@ export default {
       if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
     },
     scrollBodyX(evt) {
+      this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
     eventClickBody(evt) {
@@ -212,6 +247,22 @@ export default {
 
 <style lang="scss" scoped>
 @import './Variables.scss';
+
+.sheet-body-fixed {
+  position: relative;
+  width: calc(100vw - 10px);
+  overflow-y: auto;
+  &__item {
+    display: flex;
+    &_end {
+      display:  block;
+      min-width: 10px;
+    }
+  }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 .sheet-body {
   &::-webkit-scrollbar {
     display: block;
@@ -224,9 +275,4 @@ export default {
     }
   }
 }
-  .stop {
-    position: sticky;
-    top: 0px;
-    z-index: 100;
-  }
 </style>

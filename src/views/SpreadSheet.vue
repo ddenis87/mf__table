@@ -44,7 +44,7 @@ export default {
         row: 30000,
       },
       columnsJSON: `{
-        "a":{"width":120},
+        "a":{"width":120,"fixed":"true"},
         "b":{"width":20},
         "c":{"width":20},
         "d":{"width":250,"type":"number"},
@@ -60,6 +60,7 @@ export default {
       }`,
       //  Variant 3
       rowsJSON: `{
+        "1":{"fixed":"true"},
         "3":{"type":"choice"},
         "5":{"height":30},
         "6":{"height":30},
@@ -101,7 +102,7 @@ export default {
         "e8":{"value":"Testing lowercase","colspan":2,"rowspan":2,"style":"c6"},
         "b10":{"value":"Testing join column","colspan":4,"style":"c4"},
         "a12":{"value":"Testing font-weight","style":"c1"},
-        "a14":{"value":"Title group","colspan":7,"style":"c2"},
+        "a14":{"value":"Title group","style":"c2"},
         "a15":{"value":"","style":"c7 c9"},
         "b15":{"value":"","style":"c7"},
         "c15":{"value":"","style":"c7"},
@@ -127,7 +128,7 @@ export default {
         "a20":{"value":"Строка вложенной группы","colspan":5,"style":"c1"},
         "a21":{"value":"Строка вложенной группы","colspan":5,"style":"c1"},
         "a23":{"value":"Последняя строка группы","colspan":5,"style":"c1"},
-        "a27":{"value":"Еще одна группа","colspan":5,"style":"c1"},
+        "a27":{"value":"Еще одна группа","style":"c1"},
         "a28":{"value":"Строка группы вся оранжевая","colspan":5,"style":"c11 c1"}
       }`,
       stylesJSON: `[
@@ -188,7 +189,7 @@ export default {
   grid-template-columns: 1fr;
   max-width: 100%;
 
-  border: thin solid red;
+  // border: thin solid red;
   &-control-top {
     grid-area: control-top;
     display: flex;

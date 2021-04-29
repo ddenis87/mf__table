@@ -6,6 +6,7 @@
            :style="[{
              'grid-template-columns': `${templateRow} 8px`,
              'grid-template-rows': `${'22'}px`,
+             'width': `${templateTableWidth}px`,
            }]">
         <template v-for="(column, index) in columns">
           <div :key="`head-group-${column.value}`"
@@ -15,7 +16,10 @@
                  'line': (column.parent && level <= column.columnLevel),
                  'line-end': (column.columnGroupEnd),
                }"
-               :style="{'width': column.width}">
+               :style="[
+                 {'width': column.width},
+                 fixedCell(column)
+               ]">
             <spread-sheet-btn-group v-if="isColumnGroup(column, level)"
                              :data-column-index="index"
                              :data-column-parent="column.value"
@@ -33,11 +37,15 @@
          :style="[{
             'grid-template-columns': `${templateRow} 8px`,
             'grid-template-rows': `${'22'}px`,
+            'width': `${templateTableWidth}px`,
           }]">
       <template v-for="column in columns">
         <div :key="`head-title-${column.value}`"
              class="column column-title"
-             :style="{'width': column.width}">{{ column.display_name }}</div>
+             :style="[
+               {'width': column.width},
+               fixedCell(column)
+             ]">{{ column.display_name }}</div>
       </template>
       <div class="column column-title column-end"></div>
     </div>
@@ -56,8 +64,23 @@ export default {
     columns: { type: Array },
     maxLevelGroupColumn: { type: Number, default: 0 },
     templateRow: { type: String, default: '' },
+    templateTableWidth: { type: Number, default: 0 },
   },
   methods: {
+    fixedCell(column) {
+      const fixed = {};
+      if (column.fixed) {
+        fixed.position = 'sticky';
+        fixed['z-index'] = 100;
+        fixed.left = 0; //  (20 * this.maxLevelGroupRow) + 60;
+        const columnCurrentIndex = this.columns.findIndex((item) => item === column);
+        for (let i = columnCurrentIndex - 1; i === 0; i -= 1) {
+          fixed.left += this.columns[i].width;
+        }
+        fixed.left += 'px';
+      }
+      return fixed;
+    },
     eventClickHead(evt) {
       if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-column-parent')) {
         this.toggleColumnGroup(evt.target.closest('button'));

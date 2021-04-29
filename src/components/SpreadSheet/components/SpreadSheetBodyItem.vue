@@ -1,7 +1,6 @@
 <template>
   <div :key="`body-row-${source.value}`"
        class="sheet-body__row"
-       :class="{'stop': (index === 0)}"
        :style="[{
          'grid-template-columns': `
          repeat(${maxLevelGroupRow}, minmax(20px, 20px))
@@ -32,8 +31,10 @@
       <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
           :key="`body-${source.value}-${column.value}`"
           class="column column-body"
-          :class="(cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].style : ''"
-          :style="getCellGeometry(source, column, columnIndex)"
+          :class="[
+            (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].style : '',
+          ]"
+          :style="[getCellGeometry(source, column, columnIndex), fixedCell(column)]"
           :data-name="`${column.name}${source.name}`"
           :tabindex="columnIndex">
         {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }}
@@ -66,6 +67,20 @@ export default {
   },
 
   methods: {
+    fixedCell(column) {
+      const fixed = {};
+      if (column.fixed) {
+        fixed.position = 'sticky';
+        fixed['z-index'] = 100;
+        fixed.left = (20 * this.maxLevelGroupRow) + 60;
+        const columnCurrentIndex = this.columns.findIndex((item) => item === column);
+        for (let i = columnCurrentIndex - 1; i === 0; i -= 1) {
+          fixed.left += this.columns[i].width;
+        }
+        fixed.left += 'px';
+      }
+      return fixed;
+    },
     getStyleGroup(level) {
       return {
         left: `${20 * (+level - 1)}px`,
@@ -97,6 +112,11 @@ export default {
   position: relative;
   display: grid;
   grid-auto-rows: minmax(22px, 22px);
+  // .stop {
+  //   position: sticky;
+  //   left: 60px;
+  //   z-index: 100;
+  // }
   .column {
     position: relative;
     display: inline-flex;
@@ -133,7 +153,7 @@ export default {
       z-index: 400;
     }
     &-body {
-      position: relative;
+      // position: relative;
       padding: 0px 2px;
       width: 100%;
       border-right: thin solid grey;
@@ -188,13 +208,13 @@ export default {
       left: 0px;
       right: 0px;
       border: 1px solid #1a73e8;
-      z-index: 200;
+      z-index: 90;
     }
   }
 }
-.stop {
-  position: sticky;
-  top: 0px;
-  z-index: 100;
-}
+// .stop {
+//   position: sticky;
+//   left: 60px;
+//   z-index: 100;
+// }
 </style>

@@ -8,22 +8,24 @@
     <div class="sheet__angle"></div>
     <div class="sheet__head">
       <spread-sheet-head ref="SheetHead"
-                  :columns="tableColumns"
-                  :template-row="templateRow"
-                  :max-level-group-column="maxLevelGroupColumn"
-                  @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
+                         :columns="tableColumns"
+                         :template-row="templateRow"
+                         :template-table-width="templateTableWidth"
+                         :max-level-group-column="maxLevelGroupColumn"
+                         @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
     </div>
     <div class="sheet__body">
       <spread-sheet-body :rows="tableRows"
-                  :columns="tableColumns"
-                  :cells="tableCells"
-                  :template-row="templateRow"
-                  :max-level-group-row="maxLevelGroupRow"
-                  :set-excluded-cells="setExcludedCells"
-                  :template-table-width="templateTableWidth"
-                  @edit-cell="startCellEditing"
-                  @toggle-row-group="toggleRowGroup"
-                  @scroll-body-x="scrollBodyX"></spread-sheet-body>
+                         :rows-fixed="tableRowsFixed"
+                         :columns="tableColumns"
+                         :cells="tableCells"
+                         :template-row="templateRow"
+                         :max-level-group-row="maxLevelGroupRow"
+                         :set-excluded-cells="setExcludedCells"
+                         :template-table-width="templateTableWidth"
+                         @edit-cell="startCellEditing"
+                         @toggle-row-group="toggleRowGroup"
+                         @scroll-body-x="scrollBodyX"></spread-sheet-body>
     </div>
   </div>
 </div>
@@ -60,6 +62,7 @@ export default {
       maxLevelGroupColumn: this.getMaxLevelGroupColumn(),
       tableRows: [],
       tableRowsChildren: {},
+      tableRowsFixed: [],
       tableColumns: [],
       tableColumnsChildren: {},
       tableCells: {},
@@ -291,6 +294,8 @@ export default {
             if (i === (rowNumberParent + rowParentGroupCount)) {
               rowItem.rowGroupEnd = true;
             }
+          } else if (rowItem.fixed) {
+            this.tableRowsFixed.push(rowItem);
           } else {
             this.tableRows.push(rowItem);
           }
