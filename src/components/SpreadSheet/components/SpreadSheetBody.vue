@@ -5,21 +5,19 @@
        @keydown="eventKeydown">
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed">
-      <div class="sheet-body-fixed__item"
-           :style="{width: `${templateTableWidth}px`, position: 'relative'}">
-        <template v-for="(rowFixed, rowFixedIndex) in rowsFixed">
+      <div class="sheet-body-fixed__item" v-for="(rowFixed, rowFixedIndex) in rowsFixed"
+           :style="{width: `${templateTableWidth}px`, position: 'relative'}" :key="rowFixedIndex">
+        <!-- <template> -->
           <spread-sheet-body-item :source="rowFixed"
-                                  :key="rowFixedIndex"
                                   :columns="columns"
                                   :cells="cells"
                                   :set-excluded-cell="[].concat(...Object.values(setExcludedCells))"
                                   :max-level-group-row="maxLevelGroupRow"
                                   :templateRow="templateRow"></spread-sheet-body-item>
           <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
-        </template>
+        <!-- </template> -->
       </div>
     </div>
-    
     <virtual-list ref="SheetBody"
                   class="sheet-body"
                   :style="[
@@ -32,7 +30,8 @@
                   :data-sources="rows"
                   :data-component="sheetBodyItem"
                   :extra-props="extraPropsComponent"
-                  @scroll="scrollBodyX">
+                  @scroll="scrollBodyX"
+                  @resized="eventResized">
     </virtual-list>
   </div>
 </template>
@@ -61,6 +60,7 @@ export default {
   data() {
     return {
       sheetBodyItem: SpreadSheetBodyItem,
+      currentSelectedCell: null,
       currentCursorPosition: {
         cellName: null,
         cellRow: null,
@@ -97,10 +97,16 @@ export default {
     },
   },
   methods: {
+    eventResized() {
+      // setTimeout(() => {}, 50);
+      if (!this.currentCursorPosition.cellName) return;
+      this.focusCell(this.getCellNodeForName(this.currentCursorPosition.cellName));
+      // console.log(this.currentCursorPosition.cellName);
+    },
     eventKeydown(evt) {
       evt.preventDefault();
-      console.log('SpreadSheetBody - Event keydown', new Date().getTime());
-      this.$emit('scroll-body-x', evt.target.closest('.sheet-body').scrollLeft);
+      // console.log('SpreadSheetBody - Event keydown', new Date().getTime());
+      // this.$emit('scroll-body-x', evt.target.closest('.sheet-body').scrollLeft);
       if (evt.code === 'ArrowRight') this.moveCursorNext(evt.target);
       if (evt.code === 'ArrowLeft') this.moveCursorPrevious(evt.target);
       if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
@@ -148,7 +154,9 @@ export default {
       return true;
     },
     moveCursorUp(target) {
-      if (!target.parentElement.parentElement.previousElementSibling) return false;
+      if (!target.parentElement.parentElement.previousElementSibling) {
+        if (!target.closest('.sheet-body') || !target.closest('.sheet-body').previousElementSibling) return false;
+      }
       const cellName = target.getAttribute('data-name');
       const { cellColumn } = this.parseCellName(cellName);
       let { cellRow } = this.parseCellName(cellName);
@@ -170,7 +178,9 @@ export default {
       return true;
     },
     moveCursorDown(target) {
-      if (!target.parentElement.parentElement.nextElementSibling) return false;
+      if (!target.parentElement.parentElement.nextElementSibling) {
+        if (!target.closest('.sheet-body-fixed') || !target.closest('.sheet-body-fixed').nextElementSibling) return false;
+      }
       const cellName = target.getAttribute('data-name');
       const { cellColumn } = this.parseCellName(cellName);
       let { cellRow } = this.parseCellName(cellName);
