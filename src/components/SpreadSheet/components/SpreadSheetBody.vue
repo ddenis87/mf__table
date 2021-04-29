@@ -20,7 +20,8 @@
       </div>
     </div>
     
-    <virtual-list class="sheet-body"
+    <virtual-list ref="SheetBody"
+                  class="sheet-body"
                   :style="[
                     getVirtualListHeight,
                     {'overflow-y': 'auto', 'width': 'calc(100vw - 10px)', 'position': 'relative',}
@@ -85,13 +86,12 @@ export default {
       };
     },
   },
-  mounted() {
-    // console.log(this.$refs.TableBody.firstChild.firstChild.firstChild);
-    // this.$refs.TableBody.firstChild.firstChild.firstChild.classList.add('stop');
-  },
   methods: {
     eventKeydown(evt) {
       evt.preventDefault();
+      // this.scrollBodyX(evt.target.closest('.sheet-body'));
+      console.log(this.$refs.SheetBody.$el.scrollLeft);
+      // this.$emit('scroll-body-x', this.$refs.SheetBody.$el.scrollLeft);
       this.$emit('scroll-body-x', evt.target.closest('.sheet-body').scrollLeft);
       if (evt.code === 'ArrowRight') this.moveCursorNext(evt.target);
       if (evt.code === 'ArrowLeft') this.moveCursorPrevious(evt.target);

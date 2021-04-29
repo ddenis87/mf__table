@@ -208,7 +208,7 @@ export default {
       left: 0px;
       right: 0px;
       border: 1px solid #1a73e8;
-      z-index: 90;
+      z-index: 110;
     }
   }
 }
