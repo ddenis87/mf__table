@@ -1,5 +1,6 @@
 <template>
   <div ref="TableBody"
+       class="spread-sheet-body"
        @click="eventClickBody"
        @dblclick="eventDblClickBody"
        @keydown="eventKeydown">
@@ -13,7 +14,7 @@
                                   :cells="cells"
                                   :set-excluded-cell="[].concat(...Object.values(setExcludedCells))"
                                   :max-level-group-row="maxLevelGroupRow"
-                                  :templateRow="templateRow"></spread-sheet-body-item>
+                                  :template-column-width="templateColumnWidth"></spread-sheet-body-item>
           <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
         <!-- </template> -->
       </div>
@@ -52,7 +53,7 @@ export default {
     rowsFixed: { type: Array },
     columns: { type: Array },
     cells: { type: Object },
-    templateRow: { type: String, default: '' },
+    templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
     maxLevelGroupRow: { type: Number, default: 0 },
     setExcludedCells: { type: Object, default() { return {}; } },
@@ -90,7 +91,7 @@ export default {
       return {
         columns: this.columns,
         cells: this.cells,
-        templateRow: this.templateRow,
+        templateColumnWidth: this.templateColumnWidth,
         setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
         maxLevelGroupRow: this.maxLevelGroupRow,
       };
@@ -221,6 +222,10 @@ export default {
     },
     eventClickBody(evt) {
       if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-row-parent')) {
+        console.log(this.currentSelectedCell);
+        this.currentSelectedCell.classList.remove('selected');
+        this.currentSelectedCell = null;
+        this.currentCursorPosition.cellName = null;
         this.toggleRowGroup(evt.target.closest('button'));
         return true;
       }
@@ -268,33 +273,38 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import './Variables.scss';
+@import '../SpreadSheet.scss';
+.spread-sheet-body {
+  font-size: $bodyFontSize;
+  font-weight: $bodyFontWeight;
+  color: $bodyFontColor;
+  .sheet-body-fixed {
+    position: relative;
+    width: calc(100vw - 10px);
+    overflow-y: auto;
+    &__item {
+      display: flex;
+      &_end {
+        display:  block;
+        min-width: 10px;
+      }
+    }
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  .sheet-body {
+    &::-webkit-scrollbar {
+      display: block;
+      width: $scrollWidth;
+      height: $scrollHeight;
+      border-radius: $scrollBorderRadius;
+      &-thumb {
+        border-radius: $scrollThumbBorderRadius;
+        background-color: $scrollThumbBackgroundColor;
+      }
+    }
+  }
+}
 
-.sheet-body-fixed {
-  position: relative;
-  width: calc(100vw - 10px);
-  overflow-y: auto;
-  &__item {
-    display: flex;
-    &_end {
-      display:  block;
-      min-width: 10px;
-    }
-  }
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-.sheet-body {
-  &::-webkit-scrollbar {
-    display: block;
-    width: $scrollWidth;
-    height: $scrollHeight;
-    border-radius: $scrollBorderRadius;
-    &-thumb {
-      border-radius: $scrollThumbBorderRadius;
-      background-color: $scrollThumbBackgroundColor;
-    }
-  }
-}
 </style>

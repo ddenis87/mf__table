@@ -3,11 +3,7 @@
     <template v-for="level in maxLevelGroupColumn">
       <div :key="level"
            class="sheet-head__row"
-           :style="[{
-             'grid-template-columns': `${templateRow} 8px`,
-             'grid-template-rows': `${'22'}px`,
-             'width': `${templateTableWidth}px`,
-           }]">
+           :style="templateColumnHeight">
         <template v-for="(column, index) in columns">
           <div :key="`head-group-${column.value}`"
                class="column column-group"
@@ -34,11 +30,7 @@
     </template>
 
     <div class="sheet-head__row"
-         :style="[{
-            'grid-template-columns': `${templateRow} 8px`,
-            'grid-template-rows': `${'22'}px`,
-            'width': `${templateTableWidth}px`,
-          }]">
+         :style="templateColumnHeight">
       <template v-for="column in columns">
         <div :key="`head-title-${column.value}`"
              class="column column-title"
@@ -55,6 +47,8 @@
 <script>
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
+const CELL_HEIGHT = 22;
+
 export default {
   name: 'SpreadSheetHead',
   components: {
@@ -63,8 +57,17 @@ export default {
   props: {
     columns: { type: Array },
     maxLevelGroupColumn: { type: Number, default: 0 },
-    templateRow: { type: String, default: '' },
+    templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
+  },
+  computed: {
+    templateColumnHeight() {
+      return {
+        'grid-template-columns': `${this.templateColumnWidth} 8px`,
+        'grid-template-rows': `${CELL_HEIGHT}px`,
+        'width': `${this.templateTableWidth}px`,
+      };
+    },
   },
   methods: {
     fixedCell(column) {
@@ -103,13 +106,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import './Variables.scss';
+@import '../SpreadSheet.scss';
 
 .sheet-head {
   position: relative;
   display: block;
   overflow-x: scroll;
-  // overflow-x: hidden;
   font-size: $headFontSize;
   font-weight: $headFontWeight;
   color: $headFontColor;

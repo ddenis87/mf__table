@@ -1,15 +1,12 @@
 <template>
 <div class="spread-sheet">
   <div class="sheet"
-       :style="{
-         'grid-template-columns': `${(20 * maxLevelGroupRow) + 60}px 1fr`,
-         'grid-template-rows': `${(22 * maxLevelGroupColumn) + 22}px 1fr`,
-       }">
+       :style="templateSheet">
     <div class="sheet__angle"></div>
     <div class="sheet__head">
       <spread-sheet-head ref="SheetHead"
                          :columns="tableColumns"
-                         :template-row="templateRow"
+                         :template-column-width="templateColumnWidth"
                          :template-table-width="templateTableWidth"
                          :max-level-group-column="maxLevelGroupColumn"
                          @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
@@ -19,7 +16,7 @@
                          :rows-fixed="tableRowsFixed"
                          :columns="tableColumns"
                          :cells="tableCells"
-                         :template-row="templateRow"
+                         :template-column-width="templateColumnWidth"
                          :max-level-group-row="maxLevelGroupRow"
                          :set-excluded-cells="setExcludedCells"
                          :template-table-width="templateTableWidth"
@@ -35,8 +32,10 @@
 import SpreadSheetHead from './components/SpreadSheetHead.vue';
 import SpreadSheetBody from './components/SpreadSheetBody.vue';
 
+const CELL_HEIGHT = 22;
 const CELL_WIDTH = 94;
-const CELL_HEIGHT = 24;
+const CELL_WIDTH_LEFT_TITLE = 60;
+const CELL_WIDTH_LEFT_GROUP = 20;
 const CELL_TYPE_DEFAULT = 'string';
 
 export default {
@@ -69,6 +68,12 @@ export default {
     };
   },
   computed: {
+    templateSheet() {
+      return {
+        'grid-template-columns': `${(CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE}px 1fr`,
+        'grid-template-rows': `${(CELL_HEIGHT * this.maxLevelGroupColumn) + CELL_HEIGHT}px 1fr`,
+      };
+    },
     templateTableWidth() {
       let templateTableWidth = 0;
       this.tableColumns.forEach((item) => {
@@ -76,12 +81,12 @@ export default {
       });
       return templateTableWidth;
     },
-    templateRow() {
-      let templateRow = '';
+    templateColumnWidth() {
+      let templateColumnWidth = '';
       for (let i = 0; i < this.tableColumns.length; i += 1) {
-        templateRow += `${this.tableColumns[i].width}px `;
+        templateColumnWidth += `${this.tableColumns[i].width}px `;
       }
-      return templateRow;
+      return templateColumnWidth;
     },
   },
   created() {
@@ -397,7 +402,8 @@ export default {
   border-radius: $borderRadius;
   box-shadow: $boxShadow;
   overflow: hidden;
-
+  font-family: $fontFamily;
+  font-size: $fontSize;
   .sheet {
     display: grid;
     grid-template-areas: "angle head" "body body";

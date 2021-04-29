@@ -5,7 +5,7 @@
          'grid-template-columns': `
          repeat(${maxLevelGroupRow}, minmax(20px, 20px))
          60px
-         ${templateRow}`,
+         ${templateColumnWidth}`,
          'grid-template-rows': `${(source.height) ? source.height : '22'}px`,
        }]">
     <div v-for="level in maxLevelGroupRow"
@@ -58,7 +58,7 @@ export default {
     cells: { type: Object, default() { return {}; } },
     setExcludedCell: { type: Array },
     maxLevelGroupRow: { type: Number, default: 0 },
-    templateRow: { type: String, default: '' },
+    templateColumnWidth: { type: String, default: '' },
   },
   data() {
     return {
@@ -207,7 +207,7 @@ export default {
       left: 0px;
       right: 0px;
       border: 1px solid #1a73e8;
-      z-index: 110;
+      z-index: 90;
     }
   }
 }
