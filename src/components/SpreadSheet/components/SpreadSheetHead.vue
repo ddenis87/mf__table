@@ -12,10 +12,7 @@
                  'line': (column.parent && level <= column.columnLevel),
                  'line-end': (column.columnGroupEnd),
                }"
-               :style="[
-                 {'width': column.width},
-                 fixedCell(column)
-               ]">
+               :style="getStyleCellFixed(column)">
             <spread-sheet-btn-group v-if="isColumnGroup(column, level)"
                              :data-column-index="index"
                              :data-column-parent="column.value"
@@ -34,10 +31,7 @@
       <template v-for="column in columns">
         <div :key="`head-title-${column.value}`"
              class="column column-title"
-             :style="[
-               {'width': column.width},
-               fixedCell(column)
-             ]">{{ column.display_name }}</div>
+             :style="getStyleCellFixed(column)">{{ column.display_name }}</div>
       </template>
       <div class="column column-title column-end"></div>
     </div>
@@ -65,12 +59,12 @@ export default {
       return {
         'grid-template-columns': `${this.templateColumnWidth} 8px`,
         'grid-template-rows': `${CELL_HEIGHT}px`,
-        'width': `${this.templateTableWidth}px`,
+        width: `${this.templateTableWidth}px`,
       };
     },
   },
   methods: {
-    fixedCell(column) {
+    getStyleCellFixed(column) {
       const fixed = {};
       if (column.fixed) {
         fixed.position = 'sticky';

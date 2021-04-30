@@ -12,6 +12,13 @@
                          @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
     </div>
     <div class="sheet__body">
+      <!-- <spread-sheet-body-static :rows="tableRows"
+                                :columns="tableColumns"
+                                :cells="tableCells"
+                                :templateTableWidth="templateTableWidth"
+                                :templateColumnWidth="templateColumnWidth"
+                                :maxLevelGroupRow="maxLevelGroupRow"
+                                :setExcludedCells="setExcludedCells"></spread-sheet-body-static> -->
       <spread-sheet-body :rows="tableRows"
                          :rows-fixed="tableRowsFixed"
                          :columns="tableColumns"
@@ -31,6 +38,7 @@
 <script>
 import SpreadSheetHead from './components/SpreadSheetHead.vue';
 import SpreadSheetBody from './components/SpreadSheetBody.vue';
+// import SpreadSheetBodyStatic from './components/SpreadSheetBodyStatic.vue';
 
 const CELL_HEIGHT = 22;
 const CELL_WIDTH = 94;
@@ -43,6 +51,7 @@ export default {
   components: {
     SpreadSheetHead,
     SpreadSheetBody,
+    // SpreadSheetBodyStatic,
   },
   props: {
     rows: { type: Object },
@@ -87,6 +96,19 @@ export default {
         templateColumnWidth += `${this.tableColumns[i].width}px `;
       }
       return templateColumnWidth;
+    },
+  },
+  watch: {
+    rowCount() {
+      this.tableRows = [];
+      this.tableRowsChildren = {};
+      this.tableRowsFixed = [];
+      this.createRows();
+    },
+    columnCount() {
+      this.tableColumns = [];
+      this.tableColumnsChildren = {};
+      this.createColumns();
     },
   },
   created() {

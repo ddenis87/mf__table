@@ -19,7 +19,6 @@
                     :rows="rows"
                     :cells="cells"
                     :styles="styles"
-                    
                     :columnCount="sheetSpace.column"
                     :rowCount="sheetSpace.row"></spread-sheet>
     </div>

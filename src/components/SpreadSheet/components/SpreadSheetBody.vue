@@ -26,7 +26,7 @@
                     {'overflow-y': 'auto', 'width': 'calc(100vw - 10px)', 'position': 'relative',}
                   ]"
                   :wrap-style="{width: `${templateTableWidth}px`, position: 'relative'}"
-                  :keeps="100"
+                  :keeps="80"
                   :data-key="'value'"
                   :data-sources="rows"
                   :data-component="sheetBodyItem"
@@ -102,7 +102,6 @@ export default {
       // setTimeout(() => {}, 50);
       if (!this.currentCursorPosition.cellName) return;
       this.focusCell(this.getCellNodeForName(this.currentCursorPosition.cellName));
-      // console.log(this.currentCursorPosition.cellName);
     },
     eventKeydown(evt) {
       evt.preventDefault();
@@ -170,6 +169,7 @@ export default {
         if (this.getCellNodeForName(cellNamePrevious)) {
           this.focusCell(this.getCellNodeForName(cellNamePrevious));
         } else {
+          console.log(cellNamePrevious);
           const cellNameJoin = Object.entries(this.setExcludedCells)
             .find((item) => item[1].includes(cellNamePrevious))[0];
           this.focusCell(this.getCellNodeForName(cellNameJoin));
@@ -206,6 +206,7 @@ export default {
 
     focusCell(target) {
       const eventClick = new Event('click', { bubbles: true });
+      if (!target) return;
       if (target.getBoundingClientRect().left < this.widthFixedColumn) {
         this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
       }
@@ -222,10 +223,11 @@ export default {
     },
     eventClickBody(evt) {
       if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-row-parent')) {
-        console.log(this.currentSelectedCell);
-        this.currentSelectedCell.classList.remove('selected');
-        this.currentSelectedCell = null;
-        this.currentCursorPosition.cellName = null;
+        if (this.currentSelectedCell) {
+          this.currentSelectedCell.classList.remove('selected');
+          this.currentSelectedCell = null;
+          this.currentCursorPosition.cellName = null;
+        }
         this.toggleRowGroup(evt.target.closest('button'));
         return true;
       }
