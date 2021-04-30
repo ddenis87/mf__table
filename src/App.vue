@@ -38,14 +38,27 @@ export default {
 </script>
 
 <style lang="scss">
+$scrollWidth: 8px;
+$scrollHeight: 8px;
+$scrollBorderRadius: 4px;
+$scrollThumbBorderRadius: 3px;
+$scrollThumbBackgroundColor: rgba(0,0,0,0.2);
+
 html, body {
-  overflow: hidden;
+  overflow: auto;
   height: 100%;
   box-sizing: border-box;
   a { text-decoration: none; }
-}
-.app {
-  overflow: hidden;
+  &::-webkit-scrollbar {
+    display: block;
+    width: $scrollWidth;
+    height: $scrollHeight;
+    border-radius: $scrollBorderRadius;
+    &-thumb {
+      border-radius: $scrollThumbBorderRadius;
+      background-color: $scrollThumbBackgroundColor;
+    }
+  }
 }
 .tooltip-text {
   display: block;

@@ -12,14 +12,16 @@
                          @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
     </div>
     <div class="sheet__body">
-      <!-- <spread-sheet-body-static :rows="tableRows"
+      <spread-sheet-body-static v-if="printMode"
+                                :rows="tableRows"
                                 :columns="tableColumns"
                                 :cells="tableCells"
                                 :templateTableWidth="templateTableWidth"
                                 :templateColumnWidth="templateColumnWidth"
                                 :maxLevelGroupRow="maxLevelGroupRow"
-                                :setExcludedCells="setExcludedCells"></spread-sheet-body-static> -->
-      <spread-sheet-body :rows="tableRows"
+                                :setExcludedCells="setExcludedCells"></spread-sheet-body-static>
+      <spread-sheet-body v-if="!printMode"
+                         :rows="tableRows"
                          :rows-fixed="tableRowsFixed"
                          :columns="tableColumns"
                          :cells="tableCells"
@@ -38,7 +40,7 @@
 <script>
 import SpreadSheetHead from './components/SpreadSheetHead.vue';
 import SpreadSheetBody from './components/SpreadSheetBody.vue';
-// import SpreadSheetBodyStatic from './components/SpreadSheetBodyStatic.vue';
+import SpreadSheetBodyStatic from './components/SpreadSheetBodyStatic.vue';
 
 const CELL_HEIGHT = 22;
 const CELL_WIDTH = 94;
@@ -51,7 +53,7 @@ export default {
   components: {
     SpreadSheetHead,
     SpreadSheetBody,
-    // SpreadSheetBodyStatic,
+    SpreadSheetBodyStatic,
   },
   props: {
     rows: { type: Object },
@@ -60,6 +62,8 @@ export default {
     columnCount: { type: Number, default: 30 },
     cells: { type: Object },
     styles: { type: Array },
+
+    printMode: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -137,8 +141,8 @@ export default {
     },
 
     scrollBodyX(scrollLeft) {
-      console.log('SpreadSheet - Call function scrollX', new Date().getTime());
-      console.log('----------------');
+      // console.log('SpreadSheet - Call function scrollX', new Date().getTime());
+      // console.log('----------------');
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
     },
     toggleRowGroup(rowParent) {

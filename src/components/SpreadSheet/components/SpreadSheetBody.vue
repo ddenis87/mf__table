@@ -5,18 +5,19 @@
        @dblclick="eventDblClickBody"
        @keydown="eventKeydown">
     <div ref="SheetBodyFixed"
-         class="sheet-body-fixed">
-      <div class="sheet-body-fixed__item" v-for="(rowFixed, rowFixedIndex) in rowsFixed"
-           :style="{width: `${templateTableWidth}px`, position: 'relative'}" :key="rowFixedIndex">
-        <!-- <template> -->
-          <spread-sheet-body-item :source="rowFixed"
-                                  :columns="columns"
-                                  :cells="cells"
-                                  :set-excluded-cell="[].concat(...Object.values(setExcludedCells))"
-                                  :max-level-group-row="maxLevelGroupRow"
-                                  :template-column-width="templateColumnWidth"></spread-sheet-body-item>
-          <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
-        <!-- </template> -->
+         class="sheet-body-fixed"
+         @scroll="scrollBodyFixedX">
+      <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
+           class="sheet-body-fixed__item"
+           :key="rowFixedIndex"
+           :style="{width: `${templateTableWidth}px`, position: 'relative'}">
+        <spread-sheet-body-item :source="rowFixed"
+                                :columns="columns"
+                                :cells="cells"
+                                :set-excluded-cell="[].concat(...Object.values(setExcludedCells))"
+                                :max-level-group-row="maxLevelGroupRow"
+                                :template-column-width="templateColumnWidth"></spread-sheet-body-item>
+        <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
       </div>
     </div>
     <virtual-list ref="SheetBody"
@@ -105,8 +106,6 @@ export default {
     },
     eventKeydown(evt) {
       evt.preventDefault();
-      // console.log('SpreadSheetBody - Event keydown', new Date().getTime());
-      // this.$emit('scroll-body-x', evt.target.closest('.sheet-body').scrollLeft);
       if (evt.code === 'ArrowRight') this.moveCursorNext(evt.target);
       if (evt.code === 'ArrowLeft') this.moveCursorPrevious(evt.target);
       if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
@@ -209,6 +208,7 @@ export default {
       if (!target) return;
       if (target.getBoundingClientRect().left < this.widthFixedColumn) {
         this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
+        this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
       }
       target.focus();
       target.dispatchEvent(eventClick);
@@ -218,7 +218,12 @@ export default {
     },
     scrollBodyX(evt) {
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
-      console.log('SpreadSheetBody - Event scroll', new Date().getTime());
+      // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
+      this.$emit('scroll-body-x', evt.target.scrollLeft);
+    },
+    scrollBodyFixedX(evt) {
+      this.$refs.SheetBody.$el.scrollLeft = evt.target.scrollLeft;
+      // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
     eventClickBody(evt) {
@@ -283,7 +288,8 @@ export default {
   .sheet-body-fixed {
     position: relative;
     width: calc(100vw - 10px);
-    overflow-y: auto;
+    overflow: hidden;
+    // overflow-y: auto;
     &__item {
       display: flex;
       &_end {

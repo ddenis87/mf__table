@@ -105,7 +105,7 @@ export default {
 .sheet-head {
   position: relative;
   display: block;
-  overflow-x: scroll;
+  overflow-x: hidden;
   font-size: $headFontSize;
   font-weight: $headFontWeight;
   color: $headFontColor;
