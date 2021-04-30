@@ -22,12 +22,14 @@
 
 import LayoutEmpty from '@/layout/LayoutEmpty.vue';
 import LayoutMain from '@/layout/LayoutMain.vue';
+import LayoutPrint from '@/layout/LayoutPrint.vue';
 
 export default {
   name: 'App',
   components: {
     LayoutEmpty,
     LayoutMain,
+    LayoutPrint,
   },
   computed: {
     layout() { return `Layout${this.$route.meta.layout || 'Main'}`; },

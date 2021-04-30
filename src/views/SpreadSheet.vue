@@ -13,6 +13,9 @@
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="() => isShowDialog = true">Setting</v-btn>
       </div>
+      <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" @click="movePrintPage">Print</v-btn>
+      </div>
     </div>
     <div class="test-table">
       <spread-sheet :columns="columns"
@@ -36,11 +39,11 @@ export default {
   data() {
     return {
       isShowDialog: false,
-      countColumn: 50,
-      countRow: 30000,
+      countColumn: 20,
+      countRow: 1000,
       sheetSpace: {
-        column: 50,
-        row: 30000,
+        column: 20,
+        row: 1000,
       },
       columnsJSON: `{
         "a":{"width":120,"fixed":"true"},
@@ -176,6 +179,9 @@ export default {
       this.sheetSpace.column = +this.countColumn;
       this.sheetSpace.row = +this.countRow;
       console.log(this.sheetSpace);
+    },
+    movePrintPage() {
+      this.$router.push('/SpreadSheetPrint');
     },
   },
 };

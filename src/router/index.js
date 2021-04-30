@@ -53,6 +53,12 @@ const routes = [
     meta: { layout: 'Main' },
     component: () => import('@/views/SpreadSheet.vue'),
   },
+  {
+    path: '/SpreadSheetPrint',
+    name: 'SpreadSheetPrint',
+    meta: { layout: 'Print' },
+    component: () => import('@/views/SpreadSheet.vue'),
+  },
   // {
   //   path: '/about',
   //   name: 'About',
