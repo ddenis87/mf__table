@@ -34,6 +34,6 @@ export default {
 
 <style lang="scss" scoped>
 .spread-sheet-print {
-  border: thin solid green;
+  // border: thin solid grey;
 }
 </style>

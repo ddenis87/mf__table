@@ -1,10 +1,14 @@
 <template>
-<div class="spread-sheet">
+<div :class="{
+  'spread-sheet': !printMode,
+  'spread-sheet-print': printMode,
+}">
   <div class="sheet"
        :style="templateSheet">
     <div class="sheet__angle"></div>
     <div class="sheet__head">
       <spread-sheet-head ref="SheetHead"
+                         v-if="!printMode"
                          :columns="tableColumns"
                          :template-column-width="templateColumnWidth"
                          :template-table-width="templateTableWidth"
@@ -19,7 +23,8 @@
                                 :templateTableWidth="templateTableWidth"
                                 :templateColumnWidth="templateColumnWidth"
                                 :maxLevelGroupRow="maxLevelGroupRow"
-                                :setExcludedCells="setExcludedCells"></spread-sheet-body-static>
+                                :setExcludedCells="setExcludedCells"
+                                :print-mode="printMode"></spread-sheet-body-static>
       <spread-sheet-body v-if="!printMode"
                          :rows="tableRows"
                          :rows-fixed="tableRowsFixed"
@@ -40,7 +45,7 @@
 <script>
 import SpreadSheetHead from './components/SpreadSheetHead.vue';
 import SpreadSheetBody from './components/SpreadSheetBody.vue';
-import SpreadSheetBodyStatic from './components/SpreadSheetBodyStatic.vue';
+import SpreadSheetBodyStatic from './components/SpreadSheetBodyPrint.vue';
 
 const CELL_HEIGHT = 22;
 const CELL_WIDTH = 94;
@@ -233,11 +238,11 @@ export default {
             // this.setExcludedCells.push(`${columnNameNext}${cellNameRow}`);
             this.setExcludedCells[cellName].push(`${columnNameNext}${cellNameRow}`);
           }
-          this.tableCells[cellName]['grid-column-start'] = this.maxLevelGroupRow + 2;
-          this.tableCells[cellName]['grid-column-end'] = this.maxLevelGroupRow + 2 + colspan;
+          this.tableCells[cellName]['grid-column-start'] = (this.printMode) ? 1 : (this.maxLevelGroupRow + 2);
+          this.tableCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + colspan;
         } else {
-          this.tableCells[cellName]['grid-column-start'] = this.maxLevelGroupRow + 2;
-          this.tableCells[cellName]['grid-column-end'] = this.maxLevelGroupRow + 2 + 1;
+          this.tableCells[cellName]['grid-column-start'] = (this.printMode) ? 1 : (this.maxLevelGroupRow + 2);
+          this.tableCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + 1;
         }
 
         let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || CELL_HEIGHT : CELL_HEIGHT;
@@ -260,7 +265,7 @@ export default {
         }
         this.tableCells[cellName].height = cellHeight;
       });
-      // console.log(this.setExcludedCells);
+      console.log(this.tableCells);
       // console.log([].concat(...Object.values(this.setExcludedCells)));
     },
 
@@ -391,7 +396,12 @@ export default {
       return (indexFirst * this.setColumnName.length) + indexSecond;
     },
     addingDocumentStyles() {
-      const stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
+      let stylesPath = '';
+      stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
+      if (this.printMode) {
+        stylesPath = ' .spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
+      }
+      // const stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
       const elementDOMStyle = document.createElement('style');
       let stylesString = '';
       elementDOMStyle.setAttribute('type', 'text/css');
@@ -445,6 +455,22 @@ export default {
       grid-area: head;
       overflow: hidden;
       box-sizing: border-box;
+    }
+    &__body {
+      grid-area: body;
+    }
+  }
+}
+.spread-sheet-print {
+  display: grid;
+  grid-template-areas: "head" "body";
+  height: 100%;
+  box-shadow: $boxShadow;
+  font-family: $fontFamily;
+  font-size: 14px;
+  .sheet {
+    &__head {
+      grid-area: head;
     }
     &__body {
       grid-area: body;

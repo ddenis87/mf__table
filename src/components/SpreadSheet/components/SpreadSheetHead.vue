@@ -53,6 +53,8 @@ export default {
     maxLevelGroupColumn: { type: Number, default: 0 },
     templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
+
+    printMode: { type: Boolean, default: false },
   },
   computed: {
     templateColumnHeight() {

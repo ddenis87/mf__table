@@ -5,8 +5,7 @@
        @dblclick="eventDblClickBody"
        @keydown="eventKeydown">
     <div ref="SheetBodyFixed"
-         class="sheet-body-fixed"
-         @scroll="scrollBodyFixedX">
+         class="sheet-body-fixed">
       <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
            class="sheet-body-fixed__item"
            :key="rowFixedIndex"
@@ -14,7 +13,7 @@
         <spread-sheet-body-item :source="rowFixed"
                                 :columns="columns"
                                 :cells="cells"
-                                :set-excluded-cell="[].concat(...Object.values(setExcludedCells))"
+                                :set-excluded-cell="setExcludedCellsArray"
                                 :max-level-group-row="maxLevelGroupRow"
                                 :template-column-width="templateColumnWidth"></spread-sheet-body-item>
         <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
@@ -71,6 +70,7 @@ export default {
     };
   },
   computed: {
+    setExcludedCellsArray() { return [].concat(...Object.values(this.setExcludedCells)); },
     widthFixedColumn() {
       let width = (WIDTH_COLUMN_GROUP * this.maxLevelGroupRow) + WIDTH_TITLE_LEFT;
       this.columns.forEach((column) => {
@@ -210,6 +210,11 @@ export default {
         this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
         this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
       }
+      if (target.getBoundingClientRect().right > target.closest('.spread-sheet-body').getBoundingClientRect().right) {
+        const delta = target.getBoundingClientRect().right - target.closest('.spread-sheet-body').getBoundingClientRect().right;
+        this.$refs.SheetBody.$el.scrollLeft += delta + 8;
+        this.$refs.SheetBodyFixed.scrollLeft += delta + 8;
+      }
       target.focus();
       target.dispatchEvent(eventClick);
     },
@@ -221,10 +226,10 @@ export default {
       // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
-    scrollBodyFixedX(evt) {
-      this.$refs.SheetBody.$el.scrollLeft = evt.target.scrollLeft;
+    scrollBodyFixedX() {
+      // this.$refs.SheetBody.$el.scrollLeft = evt.target.scrollLeft;
       // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
-      this.$emit('scroll-body-x', evt.target.scrollLeft);
+      // this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
     eventClickBody(evt) {
       if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-row-parent')) {

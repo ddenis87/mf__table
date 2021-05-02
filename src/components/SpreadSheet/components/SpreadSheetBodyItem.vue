@@ -1,32 +1,28 @@
 <template>
   <div :key="`body-row-${source.value}`"
        class="sheet-body__row"
-       :style="[{
-         'grid-template-columns': `
-         repeat(${maxLevelGroupRow}, minmax(20px, 20px))
-         60px
-         ${templateColumnWidth}`,
-         'grid-template-rows': `${(source.height) ? source.height : '22'}px`,
-       }]">
-    <div v-for="level in maxLevelGroupRow"
-        :key="`${source.value}-${level}`"
-        class="column column-group"
-        :class="{
-          'line-start': (source.openGroup === true && source.rowLevel === level - 1),
-          'line': (source.parent && level <= source.rowLevel),
-          'line-end': (source.rowGroupEnd && source.rowLevel === level),
-        }"
-        :style="getStyleGroup(level)">
-        <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
-                         :data-row-index="index"
-                         :data-row-parent="source.value"
-                         :data-row-count="source.rowGroup - 1"
-                         :data-row-status="source.openGroup">
-          {{ (source.openGroup) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
-        </spread-sheet-btn-group>
-    </div>
-    <div class="column column-title"
-        :style="shiftTitle">{{ source.value }}</div>
+       :style="templateRow(source.height)">
+    <template v-if="!printMode">
+      <div v-for="level in maxLevelGroupRow"
+          :key="`${source.value}-${level}`"
+          class="column column-group"
+          :class="{
+            'line-start': (source.openGroup === true && source.rowLevel === level - 1),
+            'line': (source.parent && level <= source.rowLevel),
+            'line-end': (source.rowGroupEnd && source.rowLevel === level),
+          }"
+          :style="getStyleGroup(level)">
+          <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
+                          :data-row-index="index"
+                          :data-row-parent="source.value"
+                          :data-row-count="source.rowGroup - 1"
+                          :data-row-status="source.openGroup">
+            {{ (source.openGroup) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+          </spread-sheet-btn-group>
+      </div>
+      <div class="column column-title"
+          :style="shiftTitle">{{ source.value }}</div>
+    </template>
     <template v-for="(column, columnIndex) in columns">
       <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
           :key="`body-${source.value}-${column.value}`"
@@ -59,19 +55,34 @@ export default {
     setExcludedCell: { type: Array },
     maxLevelGroupRow: { type: Number, default: 0 },
     templateColumnWidth: { type: String, default: '' },
+
+    printMode: { type: Boolean, default: false },
   },
   data() {
     return {
       shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
     };
   },
+  computed: {
+  },
   methods: {
+    templateRow(height) {
+      const templateRow = {
+        'grid-template-rows': `${height || '22'}px`,
+      };
+      if (this.printMode) {
+        templateRow['grid-template-columns'] = this.templateColumnWidth;
+      } else {
+        templateRow['grid-template-columns'] = `repeat(${this.maxLevelGroupRow}, minmax(20px, 20px)) 60px ${this.templateColumnWidth}`;
+      }
+      return templateRow;
+    },
     fixedCell(column) {
       const fixed = {};
       if (column.fixed) {
         fixed.position = 'sticky';
         fixed['z-index'] = 100;
-        fixed.left = (20 * this.maxLevelGroupRow) + 60;
+        fixed.left = (this.printMode) ? 0 : (20 * this.maxLevelGroupRow) + 60;
         const columnCurrentIndex = this.columns.findIndex((item) => item === column);
         for (let i = columnCurrentIndex - 1; i === 0; i -= 1) {
           fixed.left += this.columns[i].width;
@@ -97,8 +108,8 @@ export default {
         cellGeometry.height = `${this.cells[cellName].height}px`;
         cellGeometry['z-index'] = 1;
       } else {
-        cellGeometry['grid-column-start'] = columnIndex + this.maxLevelGroupRow + 2;
-        cellGeometry['grid-column-end'] = (columnIndex + this.maxLevelGroupRow + 2) + 1;
+        cellGeometry['grid-column-start'] = columnIndex + (this.printMode) ? 0 : (this.maxLevelGroupRow + 2);
+        cellGeometry['grid-column-end'] = (columnIndex + ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2))) + 1;
       }
       return cellGeometry;
     },

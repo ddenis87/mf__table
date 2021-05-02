@@ -45,12 +45,11 @@ $scrollThumbBorderRadius: 3px;
 $scrollThumbBackgroundColor: rgba(0,0,0,0.2);
 
 html, body {
-  overflow: auto;
   height: 100%;
   box-sizing: border-box;
   a { text-decoration: none; }
   &::-webkit-scrollbar {
-    display: block;
+    display: none;
     width: $scrollWidth;
     height: $scrollHeight;
     border-radius: $scrollBorderRadius;
