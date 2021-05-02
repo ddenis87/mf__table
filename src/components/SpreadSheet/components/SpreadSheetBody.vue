@@ -1,7 +1,7 @@
 <template>
   <div ref="TableBody"
        class="spread-sheet-body"
-       @click="eventClickBody"
+       @click="clickBody"
        @dblclick="eventDblClickBody"
        @keydown="eventKeydown">
     <div ref="SheetBodyFixed"
@@ -112,25 +112,43 @@ export default {
       if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
     },
     moveCursorNext(target) {
-      const elementNextDOM = target.nextSibling;
-      if (!elementNextDOM) return false;
-      if (elementNextDOM.classList) {
-        this.focusCell(elementNextDOM);
+      if (!target.nextSibling) return false;
+      if (target.nextSibling.nodeName === 'DIV') {
+        this.focusCell(target.nextSibling);
         return true;
       }
-      const elementNext = target.nextElementSibling;
-      if (Object.keys(this.setExcludedCells).includes(this.currentCursorPosition.cellName)) {
-        this.focusCell(elementNext);
+      if (!target.nextElementSibling) return false;
+      const currentCellName = target.getAttribute('data-name');
+      if (this.setExcludedCells[currentCellName]) {
+        this.focusCell(target.nextElementSibling);
         return true;
       }
-      const cellName = target.getAttribute('data-name');
-      const { cellRow, cellColumn } = this.parseCellName(cellName);
-      const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
-      const cellColumnNext = this.columns.find((column) => column.value === cellColumnNumber + 1).name;
-      const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnNext}${cellRow}`))[0];
-      this.focusCell(this.getCellNodeForName(cellNameJoin));
+      const { cellRow, cellColumn } = this.parseCellName(currentCellName);
+      const cellColumnNext = this.columns[this.columns.findIndex((item) => item.name === cellColumn) + 1].name;
+      const mergedCell = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnNext}${cellRow}`))[0];
+      this.focusCell(this.getCellNodeForName(mergedCell));
       return true;
     },
+    // moveCursorNext(target) {
+    //   const elementNextDOM = target.nextSibling;
+    //   if (!elementNextDOM) return false;
+    //   if (elementNextDOM.classList) {
+    //     this.focusCell(elementNextDOM);
+    //     return true;
+    //   }
+    //   const elementNext = target.nextElementSibling;
+    //   if (Object.keys(this.setExcludedCells).includes(this.currentCursorPosition.cellName)) {
+    //     this.focusCell(elementNext);
+    //     return true;
+    //   }
+    //   const cellName = target.getAttribute('data-name');
+    //   const { cellRow, cellColumn } = this.parseCellName(cellName);
+    //   const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
+    //   const cellColumnNext = this.columns.find((column) => column.value === cellColumnNumber + 1).name;
+    //   const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnNext}${cellRow}`))[0];
+    //   this.focusCell(this.getCellNodeForName(cellNameJoin));
+    //   return true;
+    // },
 
     moveCursorPrevious(target) {
       const elementPreviousDOM = target.previousSibling;
@@ -226,24 +244,12 @@ export default {
       // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
-    scrollBodyFixedX() {
-      // this.$refs.SheetBody.$el.scrollLeft = evt.target.scrollLeft;
-      // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
-      // this.$emit('scroll-body-x', evt.target.scrollLeft);
-    },
-    eventClickBody(evt) {
-      if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-row-parent')) {
-        if (this.currentSelectedCell) {
-          this.currentSelectedCell.classList.remove('selected');
-          this.currentSelectedCell = null;
-          this.currentCursorPosition.cellName = null;
-        }
-        this.toggleRowGroup(evt.target.closest('button'));
-        return true;
-      }
-      this.selectedCell(evt);
-      return true;
-    },
+    // scrollBodyFixedX() {
+    // this.$refs.SheetBody.$el.scrollLeft = evt.target.scrollLeft;
+    // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
+    // this.$emit('scroll-body-x', evt.target.scrollLeft);
+    // },
+
     toggleRowGroup(target) {
       this.$emit('toggle-row-group', {
         value: +target.getAttribute('data-row-parent'),
@@ -270,6 +276,14 @@ export default {
         cellRowPrevious: this.currentCursorPosition.cellRow,
         ...this.parseCellName(cellName),
       };
+    },
+
+    clickBody(evt) {
+      if (evt.target.closest('button')) {
+        this.toggleRowGroup(evt.target.closest('button'));
+      } else {
+        this.selectedCell(evt);
+      }
     },
     getCellNodeForName(cellName) {
       return this.$refs.TableBody.querySelector(`[data-name="${cellName}"]`);
