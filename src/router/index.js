@@ -54,6 +54,12 @@ const routes = [
     component: () => import('@/views/SpreadSheet.vue'),
   },
   {
+    path: '/Spread',
+    name: 'Spread',
+    meta: { layout: 'Main' },
+    component: () => import('@/views/Spread.vue'),
+  },
+  {
     path: '/SpreadSheetPrint',
     name: 'SpreadSheetPrint',
     meta: { layout: 'Print' },
