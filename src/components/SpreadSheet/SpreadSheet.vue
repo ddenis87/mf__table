@@ -47,11 +47,13 @@ import SpreadSheetHead from './components/SpreadSheetHead.vue';
 import SpreadSheetBody from './components/SpreadSheetBody.vue';
 import SpreadSheetBodyStatic from './components/SpreadSheetBodyPrint.vue';
 
-const CELL_HEIGHT = 22;
-const CELL_WIDTH = 94;
-const CELL_WIDTH_LEFT_TITLE = 60;
-const CELL_WIDTH_LEFT_GROUP = 20;
-const CELL_TYPE_DEFAULT = 'string';
+import {
+  CELL_HEIGHT,
+  CELL_WIDTH,
+  CELL_WIDTH_LEFT_TITLE,
+  CELL_WIDTH_LEFT_GROUP,
+  CELL_TYPE_DEFAULT,
+} from './SpreadSheetConst';
 
 export default {
   name: 'SpreadSheet',
@@ -73,7 +75,6 @@ export default {
   data() {
     return {
       setColumnName: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-      // setExcludedCells: [],
       setExcludedCells: {},
       maxLevelGroupRow: this.getMaxLevelGroupRow(),
       maxLevelGroupColumn: this.getMaxLevelGroupColumn(),

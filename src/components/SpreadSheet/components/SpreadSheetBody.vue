@@ -40,8 +40,10 @@
 <script>
 import SpreadSheetBodyItem from './SpreadSheetBodyItem.vue';
 
-const WIDTH_TITLE_LEFT = 60;
-const WIDTH_COLUMN_GROUP = 20;
+import {
+  CELL_WIDTH_LEFT_TITLE,
+  CELL_WIDTH_LEFT_GROUP,
+} from '../SpreadSheetConst';
 
 export default {
   name: 'SpreadSheetBody',
@@ -72,7 +74,7 @@ export default {
   computed: {
     setExcludedCellsArray() { return [].concat(...Object.values(this.setExcludedCells)); },
     widthFixedColumn() {
-      let width = (WIDTH_COLUMN_GROUP * this.maxLevelGroupRow) + WIDTH_TITLE_LEFT;
+      let width = (CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE;
       this.columns.forEach((column) => {
         if (column.fixed) width += column.width;
       });
