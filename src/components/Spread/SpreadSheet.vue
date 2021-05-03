@@ -64,10 +64,7 @@ export default {
   props: {
     columns: { type: Array, default() { return []; } },
     rows: { type: Array, default() { return []; } },
-    rowsFixed: { type: Array, default() { return []; } },
     cells: { type: Object, default() { return {}; } },
-    maxLevelGroupRow: { type: Number, default: 0 },
-    maxLevelGroupColumn: { type: Number, default: 0 },
     printMode: { type: Boolean, default: false },
   },
   data() {
@@ -75,16 +72,29 @@ export default {
       setOpenGroupColumns: [],
       setOpenGroupRows: [],
       setExcludedCells: {},
-      // maxLevelGroupRow: this.getMaxLevelGroupRow(),
-      // maxLevelGroupColumn: this.getMaxLevelGroupColumn(),
+      rowsFixed: [],
     };
   },
   computed: {
+    maxLevelGroupRow() {
+      const maxLevelGroup = [0];
+      this.rows.filter((row) => Object.keys(row).includes('parent')).forEach((row) => {
+        maxLevelGroup.push(row.rowLevel);
+      });
+      return Math.max(...maxLevelGroup);
+    },
+    maxLevelGroupColumn() {
+      const maxLevelGroup = [0];
+      console.log(this.columns.filter((column) => Object.keys(column).includes('parent')));
+      this.columns.filter((column) => Object.keys(column).includes('parent')).forEach((column) => {
+        maxLevelGroup.push(column.columnLevel);
+      });
+      return Math.max(...maxLevelGroup);
+    },
     tableColumns() {
       return this.columns.filter((column) => this.setOpenGroupColumns.includes(column.parent) || !column.parent);
     },
     tableRows() {
-      // console.log(this.rows.filter((row) => this.setOpenGroupRows.includes(+row.parent) || !row.parent));
       return this.rows.filter((row) => this.setOpenGroupRows.includes(+row.parent) || !row.parent);
     },
     tableRowsFixed() {
@@ -113,6 +123,9 @@ export default {
       }
       return templateColumnWidth;
     },
+  },
+  created() {
+    // this.addingDocumentStyles();
   },
   methods: {
     scrollBodyX(scrollLeft) {
@@ -149,6 +162,37 @@ export default {
         }
         this.recursiveClosingRowGroup(item.name);
       });
+    },
+    addingDocumentStyles() {
+      let stylesPath = '';
+      stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
+      if (this.printMode) {
+        stylesPath = ' .spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
+      }
+      // const stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
+      const elementDOMStyle = document.createElement('style');
+      let stylesString = '';
+      elementDOMStyle.setAttribute('type', 'text/css');
+
+      this.styles.forEach((element) => {
+        const stylesObject = {};
+        Object.entries(element.list).forEach((item) => {
+          const [styleName, styleValue] = [...item];
+          stylesObject[this.transformStringToKebabCase(styleName)] = styleValue;
+        });
+        stylesString += `${stylesPath} .${element.name} ${this.transformObjectToStringStyle(stylesObject)}`;
+      });
+
+      elementDOMStyle.innerText = `${stylesString}`;
+      document.querySelector('head').append(elementDOMStyle);
+    },
+
+    transformStringToKebabCase(styleName) {
+      return styleName.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+    },
+
+    transformObjectToStringStyle(object) {
+      return JSON.stringify(object).replace(/,/g, ';').replace(/"/g, '').replace(/}/g, ';}');
     },
   },
 };

@@ -19,9 +19,7 @@
     </div>
     <div class="test-table">
       <spread-sheet :columns="columnsTable"
-                    :rows="rowsTable"
-                    :max-level-group-column="maxLevelGroupColumn"
-                    :max-level-group-row="maxLevelGroupRow"></spread-sheet>
+                    :rows="rowsTable"></spread-sheet>
     </div>
   </div>
 </template>
@@ -32,9 +30,6 @@ import SpreadData from './SpreadSheetData';
 
 const CELL_HEIGHT = 22;
 const CELL_WIDTH = 94;
-// const CELL_WIDTH_LEFT_TITLE = 60;
-// const CELL_WIDTH_LEFT_GROUP = 20;
-// const CELL_TYPE_DEFAULT = 'string';
 
 export default {
   name: 'Spread',
@@ -53,20 +48,7 @@ export default {
   computed: {
     rows() { return JSON.parse(this.rowsJSON) },
     columns() { return JSON.parse(this.columnsJSON) },
-    maxLevelGroupColumn() {
-      const maxLevelGroup = [0];
-      Object.entries(this.columns).filter((item) => Object.keys(item[1]).includes('parent')).forEach((column) => {
-        maxLevelGroup.push(this.getColumnLevel(column[0]));
-      });
-      return Math.max(...maxLevelGroup);
-    },
-    maxLevelGroupRow() {
-      const maxLevelGroup = [0];
-      Object.entries(this.rows).filter((item) => Object.keys(item[1]).includes('parent')).forEach((row) => {
-        maxLevelGroup.push(this.getRowLevel(row[0]));
-      });
-      return Math.max(...maxLevelGroup);
-    },
+    cells() { return JSON.parse(this.cellsJSON) },
     rowsTable() {
       const rowsTable = [];
       const rowsKeys = Object.keys(this.rows);
@@ -82,13 +64,8 @@ export default {
           Object.assign(rowItem, { ...this.rows[i] });
           if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
             rowItem.openGroup = false;
-            // rowItem.rowLevel = this.getRowLevel(`${i}`);
           }
           if (Object.keys(this.rows[`${i}`]).includes('parent')) {
-            // if (!this.tableRowsChildren[this.rows[`${i}`].parent]) {
-            //   this.tableRowsChildren[this.rows[`${i}`].parent] = [];
-            // }
-            // this.tableRowsChildren[this.rows[`${i}`].parent].push(rowItem);
             const rowNumberParent = +this.rows[`${i}`].parent;
             const rowParentGroupCount = +this.rows[this.rows[`${i}`].parent].rowGroup - 1;
             if (i === (rowNumberParent + rowParentGroupCount)) {
@@ -122,13 +99,8 @@ export default {
           Object.assign(columnItem, { ...this.columns[columnName] });
           if (Object.keys(this.columns[columnName]).includes('columnGroup')) {
             columnItem.openGroup = false;
-            // columnItem.columnLevel = this.getColumnLevel(columnName);
           }
           if (Object.keys(this.columns[columnName]).includes('parent')) {
-            // if (!this.tableColumnsChildren[this.columns[columnName].parent]) {
-            //   this.tableColumnsChildren[this.columns[columnName].parent] = [];
-            // }
-            // this.tableColumnsChildren[this.columns[columnName].parent].push(columnItem);
             const columnNumberParent = this.getColumnNumberForName(this.columns[columnName].parent);
             const columnParentGroupCount = +this.columns[this.columns[columnName].parent].columnGroup - 1;
             if (i === (columnNumberParent + columnParentGroupCount)) {
