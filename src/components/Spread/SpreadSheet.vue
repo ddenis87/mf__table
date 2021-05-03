@@ -118,30 +118,37 @@ export default {
     scrollBodyX(scrollLeft) {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
     },
-    getChildrenGroupRow(rowParent) {
-      this.rows.filter((row) => +row.parent === rowParent).forEach((item) => {
-        if (item.rowGroup) {
-          console.log(item.value);
-          this.getChildrenGroupRow(item.value);
-        }
-      });
-    },
     toggleRowGroup(rowGroup) {
       if (this.setOpenGroupRows.includes(rowGroup.value)) {
-        // console.log(rowGroup);
-        // console.log(this.rows.filter((row) => +row.parent === rowGroup.value));
-        this.getChildrenGroupRow(rowGroup.value);
+        this.recursiveClosingRowGroup(rowGroup.value);
         this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowGroup.value), 1);
       } else {
         this.setOpenGroupRows.push(rowGroup.value);
       }
     },
+    recursiveClosingRowGroup(rowParent) {
+      this.rows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
+        if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
+          this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
+        }
+        this.recursiveClosingRowGroup(item.value);
+      });
+    },
     toggleColumnGroup(columnGroup) {
       if (this.setOpenGroupColumns.includes(columnGroup.name)) {
+        this.recursiveClosingColumnGroup(columnGroup.name);
         this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnGroup.name), 1);
       } else {
         this.setOpenGroupColumns.push(columnGroup.name);
       }
+    },
+    recursiveClosingColumnGroup(columnParent) {
+      this.columns.filter((column) => (column.parent === columnParent && column.columnGroup)).forEach((item) => {
+        if (this.setOpenGroupColumns.findIndex((element) => element === item.name) > -1) {
+          this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((element) => element === item.name), 1);
+        }
+        this.recursiveClosingRowGroup(item.name);
+      });
     },
   },
 };
