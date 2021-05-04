@@ -17,7 +17,7 @@
                           :data-row-parent="source.value"
                           :data-row-count="source.rowGroup - 1"
                           :data-row-status="source.openGroup">
-            {{ (setOpenGroupRows.includes(source.value)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+            {{ (source.openGroup) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
           </spread-sheet-btn-group>
       </div>
       <div class="column column-title"
@@ -28,8 +28,7 @@
           :key="`body-${source.value}-${column.value}`"
           class="column column-body"
           :class="[
-            (cells[`${column.name}${source.value}`])
-              ? cells[`${column.name}${source.value}`].style : '',
+            (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].style : '',
           ]"
           :style="[getCellGeometry(source, column, columnIndex), fixedCell(column)]"
           :data-name="`${column.name}${source.name}`"
@@ -56,7 +55,7 @@ export default {
     setExcludedCell: { type: Array },
     maxLevelGroupRow: { type: Number, default: 0 },
     templateColumnWidth: { type: String, default: '' },
-    setOpenGroupRows: { type: Array, default() { return []; } },
+
     printMode: { type: Boolean, default: false },
   },
   data() {

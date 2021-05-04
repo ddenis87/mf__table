@@ -8,24 +8,27 @@
         <v-text-field label="Строки" v-model="countRow"></v-text-field>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3">Commit</v-btn>
+        <v-btn small dark color="blue darken-3" @click="commitSpace">Commit</v-btn>
       </div>
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3">Setting</v-btn>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3">Print</v-btn>
+        <v-btn small dark color="blue darken-3" @click="movePrintPage">Print</v-btn>
       </div>
     </div>
     <div class="test-table">
       <spread-sheet :columns="columnsTable"
-                    :rows="rowsTable"></spread-sheet>
+                    :rows="rowsTable"
+                    :cells="cellsTable"
+                    :set-excluded-cells="setExcludedCells"
+                    :styles="styles"></spread-sheet>
     </div>
   </div>
 </template>
 
 <script>
-import SpreadSheet from '@/components/Spread/SpreadSheet.vue';
+import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 import SpreadData from './SpreadSheetData';
 
 const CELL_HEIGHT = 22;
@@ -43,12 +46,64 @@ export default {
       setColumnName: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       ...SpreadData,
       tableRowsFixed: [],
+      setExcludedCells: {},
     };
   },
   computed: {
     rows() { return JSON.parse(this.rowsJSON) },
     columns() { return JSON.parse(this.columnsJSON) },
     cells() { return JSON.parse(this.cellsJSON) },
+    maxLevelGroupRow() {
+      const maxLevelGroup = [0];
+      Object.entries(this.rows).filter((item) => Object.keys(item[1]).includes('parent')).forEach((row) => {
+        maxLevelGroup.push(this.getRowLevel(row[0]));
+      });
+      return Math.max(...maxLevelGroup);
+    },
+    cellsTable() {
+      console.log('cellsTable');
+      const tableCells = {};
+      Object.entries(this.cells).forEach((item) => {
+        const [cellName, cellValue] = item;
+        const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
+        const cellValueKeys = Object.keys(cellValue);
+
+        tableCells[cellName] = { ...cellValue };
+        let colspan = 0;
+        if (cellValueKeys.includes('colspan')) {
+          colspan = cellValue.colspan;
+          this.setExcludedCells[cellName] = [];
+          for (let i = 1; i < colspan; i += 1) {
+            const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + i);
+            this.setExcludedCells[cellName].push(`${columnNameNext}${cellNameRow}`);
+          }
+          tableCells[cellName]['grid-column-start'] = (this.printMode) ? 1 : (this.maxLevelGroupRow + 2);
+          tableCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + colspan;
+        } else {
+          tableCells[cellName]['grid-column-start'] = (this.printMode) ? 1 : (this.maxLevelGroupRow + 2);
+          tableCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + 1;
+        }
+
+        let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || CELL_HEIGHT : CELL_HEIGHT;
+        if (cellValueKeys.includes('rowspan')) {
+          if (!Object.keys(this.setExcludedCells).includes(cellName)) this.setExcludedCells[cellName] = [];
+          for (let i = 1; i < cellValue.rowspan; i += 1) {
+            this.setExcludedCells[cellName].push(`${cellNameColumn}${cellNameRow + i}`);
+            if (cellValueKeys.includes('colspan')) {
+              colspan = cellValue.colspan;
+              for (let j = 1; j < colspan; j += 1) {
+                const cellNameColumnNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + j);
+                this.setExcludedCells[cellName].push(`${cellNameColumnNext}${cellNameRow + i}`);
+              }
+            }
+            cellHeight += (this.rows[`${cellNameRow + i}`]) ? this.rows[`${cellNameRow + i}`].height || CELL_HEIGHT : CELL_HEIGHT;
+          }
+        }
+        tableCells[cellName].height = cellHeight;
+      });
+      // console.log(tableCells);
+      return tableCells;
+    },
     rowsTable() {
       const rowsTable = [];
       const rowsKeys = Object.keys(this.rows);
@@ -72,8 +127,6 @@ export default {
               rowItem.rowGroupEnd = true;
             }
             rowsTable.push(rowItem);
-          } else if (rowItem.fixed) {
-            this.tableRowsFixed.push(rowItem);
           } else {
             rowsTable.push(rowItem);
           }
@@ -119,6 +172,14 @@ export default {
     },
   },
   methods: {
+    commitSpace() {
+      this.sheetSpace.column = +this.countColumn;
+      this.sheetSpace.row = +this.countRow;
+      console.log(this.sheetSpace);
+    },
+    movePrintPage() {
+      this.$router.push('/SpreadSheetPrint');
+    },
     getColumnNameForNumber(columnNumber) {
       if (columnNumber > 702) return 'Infinity';
       if (columnNumber <= this.setColumnName.length) {
@@ -163,6 +224,12 @@ export default {
         currentColumn = this.columns[currentColumn].parent;
       }
       return level;
+    },
+    parseCellName(cellName) {
+      return {
+        cellNameColumn: cellName.replace(/[0-9]/g, ''),
+        cellNameRow: +cellName.replace(/[a-z]/g, ''),
+      };
     },
   },
 };

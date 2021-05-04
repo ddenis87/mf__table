@@ -59,7 +59,6 @@ export default {
     templateTableWidth: { type: Number, default: 0 },
     maxLevelGroupRow: { type: Number, default: 0 },
     setExcludedCells: { type: Object, default() { return {}; } },
-    setOpenGroupRows: { type: Array, default() { return []; } },
   },
   data() {
     return {
@@ -98,7 +97,6 @@ export default {
         templateColumnWidth: this.templateColumnWidth,
         setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
         maxLevelGroupRow: this.maxLevelGroupRow,
-        setOpenGroupRows: this.setOpenGroupRows,
       };
     },
   },

@@ -16,10 +16,9 @@
             <spread-sheet-btn-group v-if="isColumnGroup(column, level)"
                              :data-column-index="index"
                              :data-column-parent="column.value"
-                             :data-column-name="column.name"
                              :data-column-count="column.columnGroup - 1"
                              :data-column-status="column.openGroup">
-              {{ (setOpenGroupColumn.includes(column.name)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+              {{ (column.openGroup) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
             </spread-sheet-btn-group>
           </div>
         </template>
@@ -42,9 +41,7 @@
 <script>
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
-import {
-  CELL_HEIGHT,
-} from '../SpreadSheetConst';
+const CELL_HEIGHT = 22;
 
 export default {
   name: 'SpreadSheetHead',
@@ -53,10 +50,11 @@ export default {
   },
   props: {
     columns: { type: Array },
+    maxLevelGroupColumn: { type: Number, default: 0 },
     templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
-    maxLevelGroupColumn: { type: Number, default: 0 },
-    setOpenGroupColumn: { type: Array, default() { return []; } },
+
+    printMode: { type: Boolean, default: false },
   },
   computed: {
     templateColumnHeight() {
@@ -90,7 +88,6 @@ export default {
     toggleColumnGroup(target) {
       this.$emit('toggle-column-group', {
         value: +target.getAttribute('data-column-parent'),
-        name: target.getAttribute('data-column-name'),
         index: +target.getAttribute('data-column-index'),
         count: +target.getAttribute('data-column-count'),
         status: !!target.getAttribute('data-column-status'),

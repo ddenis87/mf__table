@@ -48,12 +48,6 @@ const routes = [
     component: () => import('@/views/Test.vue'),
   },
   {
-    path: '/SpreadSheet',
-    name: 'SpreadSheet',
-    meta: { layout: 'Main' },
-    component: () => import('@/views/SpreadSheet.vue'),
-  },
-  {
     path: '/Spread',
     name: 'Spread',
     meta: { layout: 'Main' },
