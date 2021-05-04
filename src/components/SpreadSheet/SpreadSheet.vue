@@ -367,7 +367,7 @@ export default {
         cellNameRow: +cellName.replace(/[a-z]/g, ''),
       };
     },
-    
+
     addingDocumentStyles() {
       let stylesPath = '';
       stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';

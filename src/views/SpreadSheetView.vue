@@ -1,7 +1,8 @@
 <template>
-  <div class="test">
-    <div class="test-control-top">
-      <spread-sheet-edit></spread-sheet-edit>
+  <div class="spread-sheet-view">
+    <spread-sheet-edit v-if="isEditCellActive"
+                       :style="cellEditStyle"></spread-sheet-edit>
+    <div class="spread-sheet-view__control-top">
       <div class="item">
         <v-text-field label="Столбцы" v-model="countColumn"></v-text-field>
       </div>
@@ -18,7 +19,7 @@
         <v-btn small dark color="blue darken-3" @click="movePrintPage">Print</v-btn>
       </div>
     </div>
-    <div class="test-table">
+    <div class="spread-sheet-view__table">
       <spread-sheet :columns="columns"
                     :columnsCount="sheetSpace.column"
                     :rows="rows"
@@ -58,17 +59,45 @@ export default {
     return {
       ...SpreadSheetData,
       isShowDialog: false,
+      isEditCellActive: false,
+      editCellGeometry: {
+        width: 0,
+        height: 0,
+        left: 0,
+        top: 0,
+      },
     };
   },
   computed: {
     rows() { return JSON.parse(this.rowsJSON); },
     columns() { return JSON.parse(this.columnsJSON); },
     cells() { return JSON.parse(this.cellsJSON); },
+    cellEditStyle() {
+      console.log({
+        width: `${this.editCellGeometry.width}px`,
+        height: `${this.editCellGeometry.height}px`,
+        left: `${this.editCellGeometry.left}px`,
+        top: `${this.editCellGeometry.top}px`,
+      });
+      return {
+        width: `${this.editCellGeometry.width}px`,
+        height: `${this.editCellGeometry.height}px`,
+        left: `${this.editCellGeometry.left}px`,
+        top: `${this.editCellGeometry.top}px`,
+      };
+    },
   },
   methods: {
-    editCell(cellName) {
-      console.log(cellName);
-      console.log(cellName.target.getBoundingClientRect());
+    editCell(cell) {
+      const cellGeometry = cell.target.getBoundingClientRect();
+      this.editCellGeometry.width = cellGeometry.width;
+      this.editCellGeometry.height = cellGeometry.height;
+      this.editCellGeometry.left = cellGeometry.left;
+      this.editCellGeometry.top = cellGeometry.top;
+      console.log(this.editCellGeometry);
+      this.isEditCellActive = true;
+      console.log(cell);
+      console.log(cell.target.getBoundingClientRect());
     },
     commitSpace() {
       this.sheetSpace.column = +this.countColumn;
@@ -83,7 +112,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.test {
+.spread-sheet-view {
+  position: relative;
   display: grid;
   grid-template-areas: "control-top" "table";
   grid-template-rows: 60px 1fr;
@@ -91,7 +121,7 @@ export default {
   max-width: 100%;
 
   // border: thin solid red;
-  &-control-top {
+  &__control-top {
     grid-area: control-top;
     display: flex;
     justify-content: flex-start;
@@ -106,7 +136,7 @@ export default {
     }
     // border: thin solid green;
   }
-  &-table {
+  &__table {
     grid-area: table;
     padding: 5px;
     width: calc(100vw - 0px);

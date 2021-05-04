@@ -60,7 +60,7 @@ export default {
     "33": {"parent": "27"},
     "34": {"parent": "27"}
   }`,
-  
+
   cellsJSON: `{
     "d2":{"style":"fn1_3 fn4","value":"Квитанция"},
 
@@ -146,7 +146,7 @@ export default {
     { name: 'br2', list: { borderBottom: '2px solid black' } },
     { name: 'br3', list: { borderLeft: '2px solid black' } },
     { name: 'br4', list: { borderRight: '2px solid black' } },
-    
+
     { name: 'fn0', list: { fontSize: '0.8em', justifyContent: 'center', whiteSpace: 'unset' } },
     { name: 'fn1', list: { fontSize: '0.8em' } },
     { name: 'fn1_2', list: { fontSize: '0.9em' } },
