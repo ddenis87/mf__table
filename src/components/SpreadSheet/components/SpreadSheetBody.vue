@@ -109,6 +109,14 @@ export default {
     touchMove() {
       console.log('touch');
     },
+    scrollBodyX(evt, range) {
+      console.log(range);
+      console.log('scroll');
+      // if если элемент попадает в высоту родителя
+      this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
+      // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
+      this.$emit('scroll-body-x', evt.target.scrollLeft);
+    },
     eventResized() {
       // setTimeout(() => {}, 50);
       if (!this.currentCursorPosition.cellName) return;
@@ -188,18 +196,44 @@ export default {
       const { cellColumn } = this.parseCellName(cellName);
       let { cellRow } = this.parseCellName(cellName);
       let cellNamePrevious = `${cellColumn}${cellRow - 1}`;
-      if (this.getCellNodeForName(cellNamePrevious)) {
-        this.focusCell(this.getCellNodeForName(cellNamePrevious));
+
+      let geometryBody = target.closest('.spread-sheet-body').getBoundingClientRect();
+      if (!geometryBody) {
+        geometryBody = target.closest('.spread-sheet-fixed').getBoundingClientRect();
+      }
+      let geometryPreviousNode = this.getCellNodeForName(cellNamePrevious);
+      if (geometryPreviousNode) {
+        // console.log(geometryPreviousNode.getBoundingClientRect().top, ' - ', geometryBody.top + 10);
+        if (geometryPreviousNode.getBoundingClientRect().top < geometryBody.top + 10) {
+          const delta = (geometryBody.top + 10) - geometryPreviousNode.getBoundingClientRect().top;
+          // console.log(delta);
+          this.$refs.SheetBody.$el.scrollTop -= delta + 12;
+        }
+        this.focusCell(geometryPreviousNode);
       } else {
         cellRow = this.rows[this.rows.findIndex((row) => row.value === cellRow) - 1].value;
         cellNamePrevious = `${cellColumn}${cellRow}`;
-        if (this.getCellNodeForName(cellNamePrevious)) {
-          this.focusCell(this.getCellNodeForName(cellNamePrevious));
+        geometryPreviousNode = this.getCellNodeForName(cellNamePrevious);
+        if (geometryPreviousNode) {
+          // console.log(geometryPreviousNode.getBoundingClientRect().top, ' - ', geometryBody.top + 10);
+          if (geometryPreviousNode.getBoundingClientRect().top < geometryBody.top + 10) {
+            const delta = (geometryBody.top + 10) - geometryPreviousNode.getBoundingClientRect().top;
+            // console.log(delta);
+            this.$refs.SheetBody.$el.scrollTop -= delta + 12;
+          }
+          this.focusCell(geometryPreviousNode);
         } else {
-          console.log(cellNamePrevious);
+          // console.log(cellNamePrevious);
           const cellNameJoin = Object.entries(this.setExcludedCells)
             .find((item) => item[1].includes(cellNamePrevious))[0];
-          this.focusCell(this.getCellNodeForName(cellNameJoin));
+          geometryPreviousNode = this.getCellNodeForName(cellNameJoin);
+          // console.log(geometryPreviousNode.getBoundingClientRect().top, ' - ', geometryBody.top + 10);
+          if (geometryPreviousNode.getBoundingClientRect().top < geometryBody.top + 10) {
+            const delta = (geometryBody.top + 10) - geometryPreviousNode.getBoundingClientRect().top;
+            // console.log(delta);
+            this.$refs.SheetBody.$el.scrollTop -= delta + 12;
+          }
+          this.focusCell(geometryPreviousNode);
         }
         // console.log(cellNamePrevious);
       }
@@ -214,16 +248,36 @@ export default {
       let { cellRow } = this.parseCellName(cellName);
       const rowspan = this.cells[cellName] ? this.cells[cellName].rowspan || 1 : 1;
       let cellNameNext = `${cellColumn}${cellRow + rowspan}`;
-      if (this.getCellNodeForName(cellNameNext)) {
-        this.focusCell(this.getCellNodeForName(cellNameNext));
+
+      const geometryVirtualScroll = target.closest('.spread-sheet-body').getBoundingClientRect();
+
+      let geometryNextNode = this.getCellNodeForName(cellNameNext);
+      if (geometryNextNode) {
+        if (geometryNextNode.getBoundingClientRect().bottom > geometryVirtualScroll.bottom) {
+          const delta = geometryNextNode.getBoundingClientRect().bottom - geometryVirtualScroll.bottom;
+          this.$refs.SheetBody.$el.scrollTop += delta + 8;
+        }
+        this.focusCell(geometryNextNode);
       } else {
         cellRow = this.rows[this.rows.findIndex((row) => row.value === cellRow) + rowspan].value;
         cellNameNext = `${cellColumn}${cellRow}`;
-        if (this.getCellNodeForName(cellNameNext)) {
-          this.focusCell(this.getCellNodeForName(cellNameNext));
+        geometryNextNode = this.getCellNodeForName(cellNameNext);
+        if (geometryNextNode) {
+          if (geometryNextNode.getBoundingClientRect().bottom > geometryVirtualScroll.bottom) {
+            const delta = geometryNextNode.getBoundingClientRect().bottom - geometryVirtualScroll.bottom;
+            this.$refs.SheetBody.$el.scrollTop += delta + 8;
+          }
+          this.focusCell(geometryNextNode);
         } else {
           const cellNameJoin = Object.entries(this.setExcludedCells)
             .find((item) => item[1].includes(cellNameNext))[0];
+          geometryNextNode = this.getCellNodeForName(cellNameJoin);
+          if (geometryNextNode) {
+            if (geometryNextNode.getBoundingClientRect().bottom > geometryVirtualScroll.bottom) {
+              const delta = geometryNextNode.getBoundingClientRect().bottom - geometryVirtualScroll.bottom;
+              this.$refs.SheetBody.$el.scrollTop += delta + 8;
+            }
+          }
           this.focusCell(this.getCellNodeForName(cellNameJoin));
         }
         // console.log(cellNameNext);
@@ -238,22 +292,22 @@ export default {
         this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
         this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
       }
-      if (target.getBoundingClientRect().right > target.closest('.spread-sheet-body').getBoundingClientRect().right) {
-        const delta = target.getBoundingClientRect().right - target.closest('.spread-sheet-body').getBoundingClientRect().right;
+      const geometryVirtualScroll = target.closest('.spread-sheet-body').getBoundingClientRect();
+      if (target.getBoundingClientRect().right > geometryVirtualScroll.right) {
+        const delta = target.getBoundingClientRect().right - geometryVirtualScroll.right;
         this.$refs.SheetBody.$el.scrollLeft += delta + 8;
         this.$refs.SheetBodyFixed.scrollLeft += delta + 8;
       }
+      // if (target.getBoundingClientRect().top > geometryVirtualScroll.top) {
+      //   const delta = target.getBoundingClientRect().bottom - geometryVirtualScroll.bottom;
+      //   this.$refs.SheetBody.$el.scrollTop += delta + 8;
+      // }
+      // console.log(target.getBoundingClientRect().top, ' - ', target.closest('.sheet-body').getBoundingClientRect().top);
       target.focus();
       target.dispatchEvent(eventClick);
     },
     eventDblClickBody(evt) {
       if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
-    },
-    scrollBodyX(evt) {
-      console.log('scroll');
-      this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
-      // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
-      this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
     // scrollBodyFixedX() {
     // this.$refs.SheetBody.$el.scrollLeft = evt.target.scrollLeft;
