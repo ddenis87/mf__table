@@ -52,6 +52,7 @@ import SpreadSheetBodyStatic from './components/SpreadSheetBodyPrint.vue';
 
 import {
   CELL_HEIGHT,
+  CELL_WIDTH,
   CELL_WIDTH_LEFT_TITLE,
   CELL_WIDTH_LEFT_GROUP,
   CELL_TYPE_DEFAULT,
@@ -65,45 +66,158 @@ export default {
     SpreadSheetBodyStatic,
   },
   props: {
-    columns: { type: Array, default() { return []; } },
-    rows: { type: Array, default() { return []; } },
+    columns: { type: Object, default() { return {}; } },
+    columnsCount: { type: Number, default: 20 },
+    rows: { type: Object, default() { return {}; } },
+    rowsCount: { type: Number, default: 100 },
     cells: { type: Object, default() { return {}; } },
-    setExcludedCells: { type: Object, default() { return {}; } },
     styles: { type: Array, default() { return []; } },
     printMode: { type: Boolean, default: false },
   },
   data() {
     return {
+      setColumnName: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       setOpenGroupColumns: [],
       setOpenGroupRows: [],
+      setExcludedCells: {},
     };
   },
   computed: {
     maxLevelGroupRow() {
       const maxLevelGroup = [0];
-      this.rows.filter((row) => Object.keys(row).includes('parent')).forEach((row) => {
+      this.prepareRows.filter((row) => Object.keys(row).includes('parent')).forEach((row) => {
         maxLevelGroup.push(row.rowLevel);
       });
       return Math.max(...maxLevelGroup);
     },
     maxLevelGroupColumn() {
       const maxLevelGroup = [0];
-      this.columns.filter((column) => Object.keys(column).includes('parent')).forEach((column) => {
+      this.prepareColumns.filter((column) => Object.keys(column).includes('parent')).forEach((column) => {
         maxLevelGroup.push(column.columnLevel);
       });
       return Math.max(...maxLevelGroup);
     },
     tableColumns() {
-      return this.columns.filter((column) => this.setOpenGroupColumns.includes(column.parent) || !column.parent);
+      return this.prepareColumns.filter((column) => this.setOpenGroupColumns.includes(column.parent) || !column.parent);
+    },
+    prepareColumns() {
+      const prepareColumns = [];
+      const columnsKeys = Object.keys(this.columns);
+      for (let i = 1; i < this.columnsCount + 1; i += 1) {
+        const columnName = this.getColumnNameForNumber(i);
+        const columnItem = {
+          value: i,
+          name: columnName,
+          display_name: columnName.toUpperCase(),
+          width: CELL_WIDTH,
+          columnLevel: this.getColumnLevel(columnName),
+        };
+        if (columnsKeys.includes(columnName)) {
+          Object.assign(columnItem, { ...this.columns[columnName] });
+          if (Object.keys(this.columns[columnName]).includes('columnGroup')) {
+            columnItem.openGroup = false;
+          }
+          if (Object.keys(this.columns[columnName]).includes('parent')) {
+            const columnNumberParent = this.getColumnNumberForName(this.columns[columnName].parent);
+            const columnParentGroupCount = +this.columns[this.columns[columnName].parent].columnGroup - 1;
+            if (i === (columnNumberParent + columnParentGroupCount)) {
+              columnItem.columnGroupEnd = true;
+            }
+            prepareColumns.push(columnItem);
+          } else {
+            prepareColumns.push(columnItem);
+          }
+        } else {
+          prepareColumns.push(columnItem);
+        }
+      }
+      // console.log(columnsTable);
+      return prepareColumns;
     },
     tableRows() {
-      return this.rows.filter((row) => ((this.setOpenGroupRows.includes(+row.parent) || !row.parent) && !row.fixed));
+      return this.prepareRows.filter((row) => ((this.setOpenGroupRows.includes(+row.parent)
+        || !row.parent) && !row.fixed));
+    },
+    prepareRows() {
+      const prepareRows = [];
+      const rowsKeys = Object.keys(this.rows);
+      for (let i = 1; i < this.rowsCount + 1; i += 1) {
+        const rowItem = {
+          value: i,
+          name: i,
+          display_name: i,
+          height: CELL_HEIGHT,
+          rowLevel: this.getRowLevel(`${i}`),
+        };
+        if (rowsKeys.includes(`${i}`)) {
+          Object.assign(rowItem, { ...this.rows[i] });
+          if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
+            rowItem.openGroup = false;
+          }
+          if (Object.keys(this.rows[`${i}`]).includes('parent')) {
+            const rowNumberParent = +this.rows[`${i}`].parent;
+            const rowParentGroupCount = +this.rows[this.rows[`${i}`].parent].rowGroup - 1;
+            if (i === (rowNumberParent + rowParentGroupCount)) {
+              rowItem.rowGroupEnd = true;
+            }
+            prepareRows.push(rowItem);
+          } else {
+            prepareRows.push(rowItem);
+          }
+        } else {
+          prepareRows.push(rowItem);
+        }
+      }
+      return prepareRows;
     },
     tableRowsFixed() {
-      return this.rows.filter((row) => row.fixed);
+      return this.prepareRows.filter((row) => row.fixed);
     },
     tableCells() {
-      return this.cells;
+      return this.prepareCells;
+    },
+    prepareCells() {
+      const prepareCells = {};
+      Object.entries(this.cells).forEach((item) => {
+        const [cellName, cellValue] = item;
+        const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
+        const cellValueKeys = Object.keys(cellValue);
+
+        prepareCells[cellName] = { ...cellValue };
+        let colspan = 0;
+        if (cellValueKeys.includes('colspan')) {
+          colspan = cellValue.colspan;
+          this.setExcludedCells[cellName] = [];
+          for (let i = 1; i < colspan; i += 1) {
+            const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + i);
+            this.setExcludedCells[cellName].push(`${columnNameNext}${cellNameRow}`);
+          }
+          prepareCells[cellName]['grid-column-start'] = (this.printMode) ? 1 : (this.maxLevelGroupRow + 2);
+          prepareCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + colspan;
+        } else {
+          prepareCells[cellName]['grid-column-start'] = (this.printMode) ? 1 : (this.maxLevelGroupRow + 2);
+          prepareCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + 1;
+        }
+
+        let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || CELL_HEIGHT : CELL_HEIGHT;
+        if (cellValueKeys.includes('rowspan')) {
+          if (!Object.keys(this.setExcludedCells).includes(cellName)) this.setExcludedCells[cellName] = [];
+          for (let i = 1; i < cellValue.rowspan; i += 1) {
+            this.setExcludedCells[cellName].push(`${cellNameColumn}${cellNameRow + i}`);
+            if (cellValueKeys.includes('colspan')) {
+              colspan = cellValue.colspan;
+              for (let j = 1; j < colspan; j += 1) {
+                const cellNameColumnNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + j);
+                this.setExcludedCells[cellName].push(`${cellNameColumnNext}${cellNameRow + i}`);
+              }
+            }
+            cellHeight += (this.rows[`${cellNameRow + i}`]) ? this.rows[`${cellNameRow + i}`].height || CELL_HEIGHT : CELL_HEIGHT;
+          }
+        }
+        prepareCells[cellName].height = cellHeight;
+      });
+      // console.log(tableCells);
+      return prepareCells;
     },
     templateSheet() {
       return {
@@ -150,6 +264,51 @@ export default {
         || CELL_TYPE_DEFAULT;
       return cellType;
     },
+    getColumnNameForNumber(columnNumber) {
+      if (columnNumber > 702) return 'Infinity';
+      if (columnNumber <= this.setColumnName.length) {
+        const columnName = this.setColumnName[columnNumber - 1];
+        return columnName;
+      }
+      if ((columnNumber % this.setColumnName.length) === 0) {
+        const columnName = `${this.setColumnName[
+          ((columnNumber - this.setColumnName.length) / this.setColumnName.length) - 1
+        ]}${this.setColumnName[this.setColumnName.length - 1]}`;
+        return columnName;
+      }
+      const columnName = `${this.setColumnName[
+        (Math.floor(columnNumber / this.setColumnName.length)) - 1
+      ]}${this.setColumnName[(columnNumber % this.setColumnName.length) - 1]}`;
+      return columnName;
+    },
+    getColumnNumberForName(columnName) {
+      if (columnName.length === 1) return this.setColumnName.findIndex((item) => item === columnName) + 1;
+      const indexFirst = this.setColumnName.findIndex((item) => item === columnName[0]) + 1;
+      const indexSecond = this.setColumnName.findIndex((item) => item === columnName[1]) + 1;
+      return (indexFirst * this.setColumnName.length) + indexSecond;
+    },
+    getRowLevel(rowNumber) {
+      let level = 0;
+      let currentRow = rowNumber;
+      let condition = true;
+      while (condition) {
+        if (!this.rows[currentRow]?.parent) { condition = false; return level; }
+        level += 1;
+        currentRow = this.rows[currentRow].parent;
+      }
+      return level;
+    },
+    getColumnLevel(columnName) {
+      let level = 0;
+      let currentColumn = columnName;
+      let condition = true;
+      while (condition) {
+        if (!this.columns[currentColumn]?.parent) { condition = false; return level; }
+        level += 1;
+        currentColumn = this.columns[currentColumn].parent;
+      }
+      return level;
+    },
     parseCellName(cellName) {
       return {
         cellNameColumn: cellName.replace(/[0-9]/g, ''),
@@ -168,7 +327,7 @@ export default {
       }
     },
     recursiveClosingRowGroup(rowParent) {
-      this.rows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
+      this.prepareRows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
         if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
           this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
         }
@@ -184,7 +343,7 @@ export default {
       }
     },
     recursiveClosingColumnGroup(columnParent) {
-      this.columns.filter((column) => (column.parent === columnParent && column.columnGroup)).forEach((item) => {
+      this.prepareColumns.filter((column) => (column.parent === columnParent && column.columnGroup)).forEach((item) => {
         if (this.setOpenGroupColumns.findIndex((element) => element === item.name) > -1) {
           this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((element) => element === item.name), 1);
         }

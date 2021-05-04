@@ -44,9 +44,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../SpreadSheet.scss';
 .spread-sheet-body-print {
-  .sheet-body-print {
-    // border: thin solid grey;
-  }
+  font-size: $bodyFontSize;
+  font-weight: $bodyFontWeight;
+  color: $bodyFontColor;
 }
 </style>
