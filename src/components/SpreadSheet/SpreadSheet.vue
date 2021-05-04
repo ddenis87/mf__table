@@ -17,7 +17,7 @@
                           @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
       </div>
       <div class="sheet__body">
-        <!-- <spread-sheet-body-static v-if="printMode"
+        <spread-sheet-body-static v-if="printMode"
                                   :rows="tableRows"
                                   :columns="tableColumns"
                                   :cells="tableCells"
@@ -25,7 +25,7 @@
                                   :templateColumnWidth="templateColumnWidth"
                                   :maxLevelGroupRow="maxLevelGroupRow"
                                   :setExcludedCells="setExcludedCells"
-                                  :print-mode="printMode"></spread-sheet-body-static> -->
+                                  :print-mode="printMode"></spread-sheet-body-static>
         <spread-sheet-body v-if="!printMode"
                           :rows="tableRows"
                           :rows-fixed="tableRowsFixed"
@@ -36,8 +36,10 @@
                           :set-excluded-cells="setExcludedCells"
                           :template-table-width="templateTableWidth"
                           :set-open-group-rows="setOpenGroupRows"
+                          @edit-cell="startCellEditing"
                           @toggle-row-group="toggleRowGroup"
-                          @scroll-body-x="scrollBodyX"></spread-sheet-body>
+                          @scroll-body-x="scrollBodyX"
+                          @touchmove="touchMove"></spread-sheet-body>
       </div>
     </div>
   </div>
@@ -46,12 +48,13 @@
 <script>
 import SpreadSheetHead from './components/SpreadSheetHead.vue';
 import SpreadSheetBody from './components/SpreadSheetBody.vue';
-// import SpreadSheetBodyStatic from './components/SpreadSheetBodyPrint.vue';
+import SpreadSheetBodyStatic from './components/SpreadSheetBodyPrint.vue';
 
 import {
   CELL_HEIGHT,
   CELL_WIDTH_LEFT_TITLE,
   CELL_WIDTH_LEFT_GROUP,
+  CELL_TYPE_DEFAULT,
 } from './SpreadSheetConst';
 
 export default {
@@ -59,7 +62,7 @@ export default {
   components: {
     SpreadSheetHead,
     SpreadSheetBody,
-    // SpreadSheetBodyStatic,
+    SpreadSheetBodyStatic,
   },
   props: {
     columns: { type: Array, default() { return []; } },
@@ -85,7 +88,6 @@ export default {
     },
     maxLevelGroupColumn() {
       const maxLevelGroup = [0];
-      console.log(this.columns.filter((column) => Object.keys(column).includes('parent')));
       this.columns.filter((column) => Object.keys(column).includes('parent')).forEach((column) => {
         maxLevelGroup.push(column.columnLevel);
       });
@@ -128,6 +130,32 @@ export default {
     this.addingDocumentStyles();
   },
   methods: {
+    touchMove(evt) {
+      console.log(evt);
+    },
+    startCellEditing(evt) {
+      const cellName = evt.target.getAttribute('data-name');
+      const cellType = this.getCellType(cellName);
+      const targetInsert = evt.target;
+      console.log(evt.target.getAttribute('data-name'));
+      console.log(cellType);
+      console.log(targetInsert);
+    },
+
+    getCellType(cellName) {
+      const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
+      const cellType = this.tableCells[cellName]?.type
+        || this.tableRows.find((row) => row.name === cellNameRow).type
+        || this.tableColumns.find((column) => column.name === cellNameColumn).type
+        || CELL_TYPE_DEFAULT;
+      return cellType;
+    },
+    parseCellName(cellName) {
+      return {
+        cellNameColumn: cellName.replace(/[0-9]/g, ''),
+        cellNameRow: +cellName.replace(/[a-z]/g, ''),
+      };
+    },
     scrollBodyX(scrollLeft) {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
     },

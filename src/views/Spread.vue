@@ -29,7 +29,7 @@
 
 <script>
 import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
-import SpreadData from './SpreadSheetData';
+import SpreadSheetData from './SpreadSheetData';
 
 const CELL_HEIGHT = 22;
 const CELL_WIDTH = 94;
@@ -44,7 +44,7 @@ export default {
   data() {
     return {
       setColumnName: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-      ...SpreadData,
+      ...SpreadSheetData,
       tableRowsFixed: [],
       setExcludedCells: {},
     };
@@ -61,7 +61,6 @@ export default {
       return Math.max(...maxLevelGroup);
     },
     cellsTable() {
-      console.log('cellsTable');
       const tableCells = {};
       Object.entries(this.cells).forEach((item) => {
         const [cellName, cellValue] = item;
@@ -167,7 +166,7 @@ export default {
           columnsTable.push(columnItem);
         }
       }
-      console.log(columnsTable);
+      // console.log(columnsTable);
       return columnsTable;
     },
   },

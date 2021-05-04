@@ -3,7 +3,7 @@
        class="spread-sheet-body"
        @click="clickBody"
        @dblclick="eventDblClickBody"
-       @keydown="eventKeydown">
+       @keydown="eventKeydown" @touchmove="touchMove">
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed">
       <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
@@ -103,6 +103,9 @@ export default {
     },
   },
   methods: {
+    touchMove() {
+      console.log('touch');
+    },
     eventResized() {
       // setTimeout(() => {}, 50);
       if (!this.currentCursorPosition.cellName) return;
@@ -244,6 +247,7 @@ export default {
       if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
     },
     scrollBodyX(evt) {
+      console.log('scroll');
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
       this.$emit('scroll-body-x', evt.target.scrollLeft);

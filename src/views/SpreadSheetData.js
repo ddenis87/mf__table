@@ -1,11 +1,11 @@
 export default {
   countColumn: 50,
-  countRow: 30000,
+  countRow: 100,
   columnCount: 50,
-  rowCount: 30000,
+  rowCount: 100,
   sheetSpace: {
     column: 50,
-    row: 30000,
+    row: 100,
   },
   columnsJSON: `{
     "a":{"width":10},
