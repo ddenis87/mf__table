@@ -13,5 +13,5 @@
 /src/componentsInteraction
 /src/components/TheForms
 /src/components/TheTable
-/src/views
+# /src/views
 /src/components/Document/ZSpreadSheet

@@ -36,7 +36,7 @@
                           :set-excluded-cells="setExcludedCells"
                           :template-table-width="templateTableWidth"
                           :set-open-group-rows="setOpenGroupRows"
-                          @edit-cell="startCellEditing"
+                          @edit-cell="editCell"
                           @toggle-row-group="toggleRowGroup"
                           @scroll-body-x="scrollBodyX"
                           @touchmove="touchMove"></spread-sheet-body>
@@ -247,13 +247,20 @@ export default {
     touchMove(evt) {
       console.log(evt);
     },
-    startCellEditing(evt) {
+
+    editCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
-      const cellType = this.getCellType(cellName);
-      const targetInsert = evt.target;
-      console.log(evt.target.getAttribute('data-name'));
-      console.log(cellType);
-      console.log(targetInsert);
+      const cellProps = {
+        name: cellName,
+        target: evt.target,
+        type: this.getCellType(cellName),
+      };
+      this.$emit('edit-cell', cellProps);
+      // const cellType = this.getCellType(cellName);
+      // const targetInsert = evt.target;
+      // console.log(evt.target.getAttribute('data-name'));
+      // console.log(cellType);
+      // console.log(targetInsert);
     },
 
     getCellType(cellName) {
@@ -264,6 +271,47 @@ export default {
         || CELL_TYPE_DEFAULT;
       return cellType;
     },
+
+    scrollBodyX(scrollLeft) {
+      this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
+    },
+
+    toggleRowGroup(rowGroup) {
+      if (this.setOpenGroupRows.includes(rowGroup.value)) {
+        this.recursiveClosingRowGroup(rowGroup.value);
+        this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowGroup.value), 1);
+      } else {
+        this.setOpenGroupRows.push(rowGroup.value);
+      }
+    },
+
+    recursiveClosingRowGroup(rowParent) {
+      this.prepareRows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
+        if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
+          this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
+        }
+        this.recursiveClosingRowGroup(item.value);
+      });
+    },
+
+    toggleColumnGroup(columnGroup) {
+      if (this.setOpenGroupColumns.includes(columnGroup.name)) {
+        this.recursiveClosingColumnGroup(columnGroup.name);
+        this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnGroup.name), 1);
+      } else {
+        this.setOpenGroupColumns.push(columnGroup.name);
+      }
+    },
+
+    recursiveClosingColumnGroup(columnParent) {
+      this.prepareColumns.filter((column) => (column.parent === columnParent && column.columnGroup)).forEach((item) => {
+        if (this.setOpenGroupColumns.findIndex((element) => element === item.name) > -1) {
+          this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((element) => element === item.name), 1);
+        }
+        this.recursiveClosingRowGroup(item.name);
+      });
+    },
+
     getColumnNameForNumber(columnNumber) {
       if (columnNumber > 702) return 'Infinity';
       if (columnNumber <= this.setColumnName.length) {
@@ -281,12 +329,14 @@ export default {
       ]}${this.setColumnName[(columnNumber % this.setColumnName.length) - 1]}`;
       return columnName;
     },
+
     getColumnNumberForName(columnName) {
       if (columnName.length === 1) return this.setColumnName.findIndex((item) => item === columnName) + 1;
       const indexFirst = this.setColumnName.findIndex((item) => item === columnName[0]) + 1;
       const indexSecond = this.setColumnName.findIndex((item) => item === columnName[1]) + 1;
       return (indexFirst * this.setColumnName.length) + indexSecond;
     },
+
     getRowLevel(rowNumber) {
       let level = 0;
       let currentRow = rowNumber;
@@ -298,6 +348,7 @@ export default {
       }
       return level;
     },
+
     getColumnLevel(columnName) {
       let level = 0;
       let currentColumn = columnName;
@@ -309,47 +360,14 @@ export default {
       }
       return level;
     },
+
     parseCellName(cellName) {
       return {
         cellNameColumn: cellName.replace(/[0-9]/g, ''),
         cellNameRow: +cellName.replace(/[a-z]/g, ''),
       };
     },
-    scrollBodyX(scrollLeft) {
-      this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
-    },
-    toggleRowGroup(rowGroup) {
-      if (this.setOpenGroupRows.includes(rowGroup.value)) {
-        this.recursiveClosingRowGroup(rowGroup.value);
-        this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowGroup.value), 1);
-      } else {
-        this.setOpenGroupRows.push(rowGroup.value);
-      }
-    },
-    recursiveClosingRowGroup(rowParent) {
-      this.prepareRows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
-        if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
-          this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
-        }
-        this.recursiveClosingRowGroup(item.value);
-      });
-    },
-    toggleColumnGroup(columnGroup) {
-      if (this.setOpenGroupColumns.includes(columnGroup.name)) {
-        this.recursiveClosingColumnGroup(columnGroup.name);
-        this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnGroup.name), 1);
-      } else {
-        this.setOpenGroupColumns.push(columnGroup.name);
-      }
-    },
-    recursiveClosingColumnGroup(columnParent) {
-      this.prepareColumns.filter((column) => (column.parent === columnParent && column.columnGroup)).forEach((item) => {
-        if (this.setOpenGroupColumns.findIndex((element) => element === item.name) > -1) {
-          this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((element) => element === item.name), 1);
-        }
-        this.recursiveClosingRowGroup(item.name);
-      });
-    },
+    
     addingDocumentStyles() {
       let stylesPath = '';
       stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
@@ -360,7 +378,6 @@ export default {
       const elementDOMStyle = document.createElement('style');
       let stylesString = '';
       elementDOMStyle.setAttribute('type', 'text/css');
-
       this.styles.forEach((element) => {
         const stylesObject = {};
         Object.entries(element.list).forEach((item) => {
@@ -369,7 +386,6 @@ export default {
         });
         stylesString += `${stylesPath} .${element.name} ${this.transformObjectToStringStyle(stylesObject)}`;
       });
-
       elementDOMStyle.innerText = `${stylesString}`;
       document.querySelector('head').append(elementDOMStyle);
     },

@@ -6,7 +6,7 @@
                   :rowsCount="sheetSpace.row"
                   :cells="cells"
                   :styles="styles"
-                  :print-mode="printMode"></spread-sheet>
+                  :print-mode="true"></spread-sheet>
   </div>
 </template>
 
@@ -21,17 +21,13 @@ export default {
   },
   data() {
     return {
-      setColumnName: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       ...SpreadSheetData,
-      printMode: true,
     };
   },
   computed: {
     columns() { return JSON.parse(this.columnsJSON); },
     rows() { return JSON.parse(this.rowsJSON); },
     cells() { return JSON.parse(this.cellsJSON); },
-  },
-  methods: {
   },
 };
 </script>

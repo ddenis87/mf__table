@@ -102,6 +102,9 @@ export default {
       };
     },
   },
+  mounted() {
+    if ('ontouchstart' in window) { console.log('touch screen'); }
+  },
   methods: {
     touchMove() {
       console.log('touch');

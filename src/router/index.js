@@ -42,16 +42,10 @@ const routes = [
     component: () => import('@/views/TablesPage.vue'),
   },
   {
-    path: '/Test',
-    name: 'Test',
+    path: '/SpreadSheetView',
+    name: 'SpreadSheetView',
     meta: { layout: 'Main' },
-    component: () => import('@/views/Test.vue'),
-  },
-  {
-    path: '/Spread',
-    name: 'Spread',
-    meta: { layout: 'Main' },
-    component: () => import('@/views/Spread.vue'),
+    component: () => import('@/views/SpreadSheetView.vue'),
   },
   {
     path: '/SpreadSheetPrint',
@@ -59,14 +53,6 @@ const routes = [
     meta: { layout: 'Print' },
     component: () => import('@/views/SpreadSheetPrint.vue'),
   },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
 ];
 
 const router = new VueRouter({

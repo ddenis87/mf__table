@@ -1,6 +1,7 @@
 <template>
   <div class="test">
     <div class="test-control-top">
+      <spread-sheet-edit></spread-sheet-edit>
       <div class="item">
         <v-text-field label="Столбцы" v-model="countColumn"></v-text-field>
       </div>
@@ -11,7 +12,7 @@
         <v-btn small dark color="blue darken-3" @click="commitSpace">Commit</v-btn>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3">Setting</v-btn>
+        <v-btn small dark color="blue darken-3" @click="() => isShowDialog = true">Setting</v-btn>
       </div>
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="movePrintPage">Print</v-btn>
@@ -23,33 +24,52 @@
                     :rows="rows"
                     :rowsCount="sheetSpace.row"
                     :cells="cells"
-                    :styles="styles"></spread-sheet>
+                    :styles="styles"
+                    @edit-cell="editCell"></spread-sheet>
     </div>
+    <dialog-bar-right is-dialog-name="Setting" class="dialog"
+                      :is-dialog-show="isShowDialog"
+                      width="700"
+                      @close-dialog="isShowDialog = false">
+      <v-card class="dialog__item" >
+        <v-textarea rows="7" label="Columns" v-model="columnsJSON"></v-textarea>
+        <v-textarea rows="7" label="Rows" v-model="rowsJSON"></v-textarea>
+        <v-textarea rows="7" label="Cells" v-model="cellsJSON"></v-textarea>
+      </v-card>
+    </dialog-bar-right>
   </div>
 </template>
 
 <script>
 import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
+import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
+import DialogBarRight from '@/components/Dialogs/DialogBarRight.vue';
+
 import SpreadSheetData from './SpreadSheetData';
 
 export default {
-  name: 'Spread',
+  name: 'SpreadSheetView',
   components: {
     SpreadSheet,
+    SpreadSheetEdit,
+    DialogBarRight,
   },
   data() {
     return {
       ...SpreadSheetData,
-      tableRowsFixed: [],
-      setExcludedCells: {},
+      isShowDialog: false,
     };
   },
   computed: {
-    rows() { return JSON.parse(this.rowsJSON) },
-    columns() { return JSON.parse(this.columnsJSON) },
-    cells() { return JSON.parse(this.cellsJSON) },
+    rows() { return JSON.parse(this.rowsJSON); },
+    columns() { return JSON.parse(this.columnsJSON); },
+    cells() { return JSON.parse(this.cellsJSON); },
   },
   methods: {
+    editCell(cellName) {
+      console.log(cellName);
+      console.log(cellName.target.getBoundingClientRect());
+    },
     commitSpace() {
       this.sheetSpace.column = +this.countColumn;
       this.sheetSpace.row = +this.countRow;

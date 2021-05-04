@@ -1,6 +1,6 @@
 <template>
   <div class="layout-print">
-    <router-view />
+    <router-view/>
   </div>
 </template>
 
