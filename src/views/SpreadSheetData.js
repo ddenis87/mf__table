@@ -13,7 +13,7 @@ export default {
     "c":{"width":10},
     "d":{"width":120,"type":"number"},
     "e":{"width":80},
-    "f":{"width":100, "type":"data"},
+    "f":{"width":100, "type":"date"},
     "g":{"width":100},
     "h":{"width":50},
     "i":{"width":50},
