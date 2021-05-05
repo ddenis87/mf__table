@@ -215,8 +215,10 @@ export default {
       content: '';
       position: absolute;
       top: 0px;
+      // height: inherit;
       bottom: 0px;
       left: 0px;
+      // width: inherit;
       right: 0px;
       border: 1px solid #1a73e8;
       z-index: 90;

@@ -64,8 +64,8 @@ export default {
       isDialogShow: false,
       isDialogX: 0,
       isDialogY: 0,
-      fieldValue: (this.inputValue) ? this.inputValue.split('-').reverse().join('.') : null,
-      fieldValueDate: (this.inputValue) ? this.inputValue : null,
+      fieldValue: ((this.inputValue) && (new Date(this.inputValue) != 'Invalid Date')) ? this.inputValue.split('-').reverse().join('.') : null,
+      fieldValueDate: ((this.inputValue) && (new Date(this.inputValue) != 'Invalid Date')) ? this.inputValue : null,
       fieldMask: [/[0123]/,/\d/,'.',/[01]/,/\d/,'.',/[2]/,/[0]/,/\d/,/\d/],
       fieldElementDOM: null,
     }

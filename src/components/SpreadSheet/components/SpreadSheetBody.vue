@@ -110,15 +110,20 @@ export default {
       console.log('touch');
     },
     scrollBodyX(evt, range) {
-      console.log(range);
       console.log('scroll');
-      // if если элемент попадает в высоту родителя
+      console.log('getSize(8) - ', this.$refs.SheetBody.getSize(8));
+      console.log('getSizes - ', this.$refs.SheetBody.getSizes());
+      console.log('getOffset - ', this.$refs.SheetBody.getOffset());
+      console.log('getClientSize - ', this.$refs.SheetBody.getClientSize());
+      console.log('getScrollSize - ', this.$refs.SheetBody.getScrollSize());
+      console.log('scroll, properties range - ', range);
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
     eventResized() {
       // setTimeout(() => {}, 50);
+      // if если элемент попадает в высоту родителя
       if (!this.currentCursorPosition.cellName) return;
       this.focusCell(this.getCellNodeForName(this.currentCursorPosition.cellName));
     },
@@ -128,6 +133,9 @@ export default {
       if (evt.code === 'ArrowLeft') this.moveCursorPrevious(evt.target);
       if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
       if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
+      if (evt.code.includes('Key') || evt.code.includes('Numpad') || evt.code.includes('Digit') || evt.code === 'Enter') {
+        if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
+      }
     },
     moveCursorNext(target) {
       if (!target.nextSibling) return false;

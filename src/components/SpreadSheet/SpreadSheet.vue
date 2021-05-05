@@ -250,17 +250,17 @@ export default {
 
     editCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
+      const cellGeometry = evt.target.getBoundingClientRect();
       const cellProps = {
         name: cellName,
         target: evt.target,
         type: this.getCellType(cellName),
+        top: cellGeometry.top - ((this.maxLevelGroupColumn * CELL_HEIGHT) + CELL_HEIGHT),
+        left: cellGeometry.left,
+        width: cellGeometry.width,
+        height: cellGeometry.height,
       };
       this.$emit('edit-cell', cellProps);
-      // const cellType = this.getCellType(cellName);
-      // const targetInsert = evt.target;
-      // console.log(evt.target.getAttribute('data-name'));
-      // console.log(cellType);
-      // console.log(targetInsert);
     },
 
     getCellType(cellName) {

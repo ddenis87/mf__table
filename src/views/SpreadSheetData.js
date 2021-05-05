@@ -87,7 +87,7 @@ export default {
     "j5":{"style":"br0 fn0","value":"Начислено за месяц","colspan":2},
     "l5":{"style":"br0 fn0","value":"Итого к оплате","rowspan":2},
     "m5":{"style":"br0 fn0","value":"Оплачено","rowspan":2},
-    "d6":{"style":"br0 br3 fn1_2 fn2 fn4","value":"апрель 2021 г."},
+    "d6":{"style":"br0 br3 fn1_2 fn2 fn4","value":"2021-05-12","type":"date"},
     "h6":{"style":"br0 fn0","value":"пред."},
     "i6":{"style":"br0 fn0","value":"тек."},
     "j6":{"style":"br0 fn0","value":"куб. м."},
@@ -136,8 +136,10 @@ export default {
     "g11":{"style":"br0 fn1 fn2 fn3","value":"X","colspan":4},
     "k11":{"style":"br0 fn1 fn2 fn4","value":"0,00"},
     "l11":{"style":"br0 fn1 fn2 fn4","value":"0,00"},
-    "m11":{"style":"br0 fn1 fn2","value":""}
+    "m11":{"style":"br0 fn1 fn2","value":""},
     
+    "d13":{"style":"fn1","value":"Я дата","type":"date"},
+    "f13":{"style":"fn1","value":"Я число","type":"number"}
   }`,
 
   styles: [

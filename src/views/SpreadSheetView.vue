@@ -1,7 +1,11 @@
 <template>
   <div class="spread-sheet-view">
-    <spread-sheet-edit v-if="isEditCellActive"
-                       :style="cellEditStyle"></spread-sheet-edit>
+    <spread-sheet-edit ref="SpreadSheetEditDOM"
+                       v-if="isCellEditActive"
+                       :style="cellEditStyle"
+                       v-bind="cellEditProps"
+                       @editing-accept="editingAccept"
+                       @edit-blur="editingAccept"></spread-sheet-edit>
     <div class="spread-sheet-view__control-top">
       <div class="item">
         <v-text-field label="Столбцы" v-model="countColumn"></v-text-field>
@@ -58,51 +62,67 @@ export default {
   data() {
     return {
       ...SpreadSheetData,
+      cells: {},
       isShowDialog: false,
-      isEditCellActive: false,
-      editCellGeometry: {
+      isCellEditActive: false,
+      cellEditGeometry: {
         width: 0,
         height: 0,
         left: 0,
         top: 0,
       },
+      cellEditProps: {},
     };
   },
   computed: {
     rows() { return JSON.parse(this.rowsJSON); },
     columns() { return JSON.parse(this.columnsJSON); },
-    cells() { return JSON.parse(this.cellsJSON); },
+    // cells() { return JSON.parse(this.cellsJSON); },
     cellEditStyle() {
-      console.log({
-        width: `${this.editCellGeometry.width}px`,
-        height: `${this.editCellGeometry.height}px`,
-        left: `${this.editCellGeometry.left}px`,
-        top: `${this.editCellGeometry.top}px`,
-      });
       return {
-        width: `${this.editCellGeometry.width}px`,
-        height: `${this.editCellGeometry.height}px`,
-        left: `${this.editCellGeometry.left}px`,
-        top: `${this.editCellGeometry.top}px`,
+        width: `${this.cellEditGeometry.width}px`,
+        height: `${this.cellEditGeometry.height}px`,
+        left: `${this.cellEditGeometry.left}px`,
+        top: `${this.cellEditGeometry.top}px`,
       };
     },
   },
+  created() {
+    this.cells = JSON.parse(this.cellsJSON);
+  },
   methods: {
-    editCell(cell) {
-      const cellGeometry = cell.target.getBoundingClientRect();
-      this.editCellGeometry.width = cellGeometry.width;
-      this.editCellGeometry.height = cellGeometry.height;
-      this.editCellGeometry.left = cellGeometry.left;
-      this.editCellGeometry.top = cellGeometry.top;
-      console.log(this.editCellGeometry);
-      this.isEditCellActive = true;
-      console.log(cell);
-      console.log(cell.target.getBoundingClientRect());
+    editingAccept(option) {
+      if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});
+      this.cells[option.cellName].value = option.value;
+      this.editBlur();
+      // console.log(option);
+    },
+    editCell(cellProps) {
+      console.log(cellProps);
+      this.cellEditGeometry.width = cellProps.width + 1;
+      this.cellEditGeometry.height = cellProps.height + 1;
+      this.cellEditGeometry.left = cellProps.left - 1;
+      this.cellEditGeometry.top = cellProps.top + 1;
+
+      this.cellEditProps.cellName = cellProps.name;
+      this.cellEditProps.cellType = cellProps.type;
+      this.cellEditProps.cellValue = (this.cells[cellProps.name] && this.cells[cellProps.name].value) ? this.cells[cellProps.name].value : '';
+      this.isCellEditActive = true;
+      setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 50);
+    },
+    editBlur() {
+      this.isCellEditActive = false;
+      this.cellEditGeometry.width = 0;
+      this.cellEditGeometry.height = 0;
+      this.cellEditGeometry.left = 0;
+      this.cellEditGeometry.top = 0;
+      this.cellEditProps.cellName = undefined;
+      this.cellEditProps.cellType = undefined;
+      this.cellEditProps.cellValue = undefined;
     },
     commitSpace() {
       this.sheetSpace.column = +this.countColumn;
       this.sheetSpace.row = +this.countRow;
-      console.log(this.sheetSpace);
     },
     movePrintPage() {
       this.$router.push('/SpreadSheetPrint');
