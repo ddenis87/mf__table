@@ -232,6 +232,20 @@ export default {
       return true;
     },
     moveCursorUp(target) {
+      // if (!target.closest('.sheet-body__row').previousElementSibling) {
+      //   if (!target.closest('.sheet-body')) {}
+      // }
+      const cellName = target.getAttribute('data-name');
+      const { cellColumn, cellRow } = this.parseCellName(cellName);
+      const cellPreviousName = `${cellColumn}${cellRow - 1}`;
+      const cellPreviousDOM = this.getCellNodeForName(cellPreviousName);
+      this.focusCell(cellPreviousDOM);
+      console.log(target);
+    },
+    getExpectedDOMNodeCell() {
+      
+    },
+    moveCursorUpOld(target) {
       if (!target.parentElement.parentElement.previousElementSibling) {
         if (!target.closest('.sheet-body') || !target.closest('.sheet-body').previousElementSibling) return false;
       }

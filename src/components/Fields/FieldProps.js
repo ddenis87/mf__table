@@ -1,3 +1,3 @@
 export default {
-  isDense: { type: Boolean, default: true },
+  isDense: { type: Boolean, default: false },
 };

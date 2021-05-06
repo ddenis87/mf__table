@@ -8,9 +8,9 @@ export default {
     row: 1000,
   },
   columnsJSON: `{
-    "a":{"width":10},
-    "b":{"width":10},
-    "c":{"width":10},
+    "a":{"width":10,"fixed":"true"},
+    "b":{"width":10,"fixed":"true"},
+    "c":{"width":10,"fixed":"true"},
     "d":{"width":120},
     "e":{"width":80},
     "f":{"width":100},
@@ -29,7 +29,6 @@ export default {
   }`,
   //  Variant 3
   rowsJSON: `{
-    "1":{"fixed":"true"},
     "2":{"height":40},
     "5":{"height":30},
     "6":{"height":30},

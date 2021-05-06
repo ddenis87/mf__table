@@ -15,7 +15,7 @@
 
 <script>
 import props from './FieldProps';
-import fieldComputed from './FieldComputed';
+import fieldPropsComputed from './FieldComputed';
 
 export default {
   name: 'FieldString',
@@ -23,7 +23,7 @@ export default {
     ...props,
   },
   computed: {
-    ...fieldComputed,
+    ...fieldPropsComputed,
   },
   mounted() {
     console.log(this.fieldPropsComputed);
@@ -37,5 +37,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.field {
+  border: thin solid green;
+}
 </style>
