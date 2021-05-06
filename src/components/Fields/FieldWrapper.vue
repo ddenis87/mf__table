@@ -1,6 +1,6 @@
 <template>
   <div class="field">
-    <slot v-bind=""></slot>
+    <slot></slot>
   </div>
 </template>
 

@@ -53,6 +53,12 @@ const routes = [
     meta: { layout: 'Print' },
     component: () => import('@/views/SpreadSheetPrint.vue'),
   },
+  {
+    path: '/Test',
+    name: 'Test',
+    meta: { layout: 'Main' },
+    component: () => import('@/views/Test.vue'),
+  },
 ];
 
 const router = new VueRouter({
