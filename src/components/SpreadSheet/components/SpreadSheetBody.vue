@@ -26,12 +26,13 @@
                     {'overflow-y': 'auto', 'width': 'calc(100vw - 10px)', 'position': 'relative',}
                   ]"
                   :wrap-style="{width: `${templateTableWidth}px`, position: 'relative'}"
-                  :keeps="80"
+                  :keeps="70"
+                  :estimate-size="22"
                   :data-key="'value'"
                   :data-sources="rows"
                   :data-component="sheetBodyItem"
                   :extra-props="extraPropsComponent"
-                  @scroll="scrollBodyX"
+                  @scroll="scrollBody"
                   @resized="eventResized">
     </virtual-list>
   </div>
@@ -64,6 +65,8 @@ export default {
   data() {
     return {
       sheetBodyItem: SpreadSheetBodyItem,
+      sheetBodyGeometry: null,
+      currentSelectedCellName: null,
       currentSelectedCell: null,
       currentCursorPosition: {
         cellName: null,
@@ -79,7 +82,7 @@ export default {
       this.columns.forEach((column) => {
         if (column.fixed) width += column.width;
       });
-      console.log(width);
+      // console.log(width);
       return width;
     },
     heightVirtualList() {
@@ -104,29 +107,82 @@ export default {
   },
   mounted() {
     if ('ontouchstart' in window) { console.log('touch screen'); }
+    this.sheetBodyGeometry = this.$refs.SheetBody.$el.getBoundingClientRect();
   },
   methods: {
     touchMove() {
       console.log('touch');
     },
-    scrollBodyX(evt, range) {
-      console.log('scroll');
-      console.log('getSize(8) - ', this.$refs.SheetBody.getSize(8));
-      console.log('getSizes - ', this.$refs.SheetBody.getSizes());
-      console.log('getOffset - ', this.$refs.SheetBody.getOffset());
-      console.log('getClientSize - ', this.$refs.SheetBody.getClientSize());
-      console.log('getScrollSize - ', this.$refs.SheetBody.getScrollSize());
-      console.log('scroll, properties range - ', range);
+    scrollBody(evt) {
+      // console.log('scroll');
+      // console.log('getSize(8) - ', this.$refs.SheetBody.getSize(8));
+      // console.log('getSizes - ', this.$refs.SheetBody.getSizes());
+      // console.log('getOffset - ', this.$refs.SheetBody.getOffset());
+      // console.log('getClientSize - ', this.$refs.SheetBody.getClientSize());
+      // console.log('getScrollSize - ', this.$refs.SheetBody.getScrollSize());
+      // console.log('scroll, properties range - ', range);
+
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
-      // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
       this.$emit('scroll-body-x', evt.target.scrollLeft);
+      const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
+      if (!this.currentSelectedCellName || !cellSelectedNode) return;
+      const cellSelectedGeometry = cellSelectedNode.getBoundingClientRect();
+      if (cellSelectedGeometry.top > this.sheetBodyGeometry.top - 10
+        && cellSelectedGeometry.bottom < this.sheetBodyGeometry.bottom) {
+        this.focusCell(cellSelectedNode);
+      }
     },
     eventResized() {
-      // setTimeout(() => {}, 50);
-      // if если элемент попадает в высоту родителя
-      if (!this.currentCursorPosition.cellName) return;
-      this.focusCell(this.getCellNodeForName(this.currentCursorPosition.cellName));
+      if (!this.currentSelectedCellName) return;
+      const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
+      if (!cellSelectedNode) return;
+      const cellSelectedGeometry = cellSelectedNode.getBoundingClientRect();
+      if (cellSelectedGeometry.top > this.sheetBodyGeometry.top - 10
+        && cellSelectedGeometry.bottom < this.sheetBodyGeometry.bottom) {
+        this.focusCell(cellSelectedNode);
+      }
     },
+    clickBody(evt) {
+      if (evt.target.closest('button')) this.toggleRowGroup(evt.target.closest('button'));
+      if (evt.target.closest('.column-body')) this.selectedCell(evt.target.closest('.column-body').getAttribute('data-name'));
+    },
+    focusCell(target) {
+      if (target.getBoundingClientRect().left < this.widthFixedColumn) {
+        this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
+        this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
+      }
+      const geometryVirtualScroll = target.closest('.spread-sheet-body').getBoundingClientRect();
+      if (target.getBoundingClientRect().right > geometryVirtualScroll.right) {
+        const delta = target.getBoundingClientRect().right - geometryVirtualScroll.right;
+        this.$refs.SheetBody.$el.scrollLeft += delta + 8;
+        this.$refs.SheetBodyFixed.scrollLeft += delta + 8;
+      }
+      target.focus();
+      this.selectedCell(target.getAttribute('data-name'));
+    },
+    selectedCell(cellName) {
+      const cellNode = this.getCellNodeForName(cellName);
+      if (cellName === this.currentSelectedCellName) {
+        cellNode.classList.add('selected');
+        return;
+      }
+      if (this.currentSelectedCellName && this.getCellNodeForName(this.currentSelectedCellName)) {
+        this.getCellNodeForName(this.currentSelectedCellName).classList.remove('selected');
+      }
+      if (!cellNode) return;
+      cellNode.classList.add('selected');
+      this.currentSelectedCellName = cellName;
+    },
+
+    setCurrentCursorPosition(target) {
+      const cellName = target.getAttribute('data-name');
+      this.currentCursorPosition = {
+        cellName,
+        cellRowPrevious: this.currentCursorPosition.cellRow,
+        ...this.parseCellName(cellName),
+      };
+    },
+
     eventKeydown(evt) {
       evt.preventDefault();
       if (evt.code === 'ArrowRight') this.moveCursorNext(evt.target);
@@ -155,27 +211,6 @@ export default {
       this.focusCell(this.getCellNodeForName(mergedCell));
       return true;
     },
-    // moveCursorNext(target) {
-    //   const elementNextDOM = target.nextSibling;
-    //   if (!elementNextDOM) return false;
-    //   if (elementNextDOM.classList) {
-    //     this.focusCell(elementNextDOM);
-    //     return true;
-    //   }
-    //   const elementNext = target.nextElementSibling;
-    //   if (Object.keys(this.setExcludedCells).includes(this.currentCursorPosition.cellName)) {
-    //     this.focusCell(elementNext);
-    //     return true;
-    //   }
-    //   const cellName = target.getAttribute('data-name');
-    //   const { cellRow, cellColumn } = this.parseCellName(cellName);
-    //   const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
-    //   const cellColumnNext = this.columns.find((column) => column.value === cellColumnNumber + 1).name;
-    //   const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnNext}${cellRow}`))[0];
-    //   this.focusCell(this.getCellNodeForName(cellNameJoin));
-    //   return true;
-    // },
-
     moveCursorPrevious(target) {
       const elementPreviousDOM = target.previousSibling;
       if (!elementPreviousDOM) return false;
@@ -293,35 +328,9 @@ export default {
       return true;
     },
 
-    focusCell(target) {
-      const eventClick = new Event('click', { bubbles: true });
-      if (!target) return;
-      if (target.getBoundingClientRect().left < this.widthFixedColumn) {
-        this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
-        this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
-      }
-      const geometryVirtualScroll = target.closest('.spread-sheet-body').getBoundingClientRect();
-      if (target.getBoundingClientRect().right > geometryVirtualScroll.right) {
-        const delta = target.getBoundingClientRect().right - geometryVirtualScroll.right;
-        this.$refs.SheetBody.$el.scrollLeft += delta + 8;
-        this.$refs.SheetBodyFixed.scrollLeft += delta + 8;
-      }
-      // if (target.getBoundingClientRect().top > geometryVirtualScroll.top) {
-      //   const delta = target.getBoundingClientRect().bottom - geometryVirtualScroll.bottom;
-      //   this.$refs.SheetBody.$el.scrollTop += delta + 8;
-      // }
-      // console.log(target.getBoundingClientRect().top, ' - ', target.closest('.sheet-body').getBoundingClientRect().top);
-      target.focus();
-      target.dispatchEvent(eventClick);
-    },
     eventDblClickBody(evt) {
       if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
     },
-    // scrollBodyFixedX() {
-    // this.$refs.SheetBody.$el.scrollLeft = evt.target.scrollLeft;
-    // console.log('SpreadSheetBody - Event scroll', new Date().getTime());
-    // this.$emit('scroll-body-x', evt.target.scrollLeft);
-    // },
 
     toggleRowGroup(target) {
       this.$emit('toggle-row-group', {
@@ -333,31 +342,6 @@ export default {
       });
     },
 
-    selectedCell(evt) {
-      if (!evt.target.closest('.column-body')) return;
-      if (this.currentSelectedCell === evt.target) return;
-      if (this.currentSelectedCell) this.currentSelectedCell.classList.remove('selected');
-      evt.target.classList.add('selected');
-      this.currentSelectedCell = evt.target;
-      this.setCurrentCursorPosition(evt.target);
-    },
-
-    setCurrentCursorPosition(target) {
-      const cellName = target.getAttribute('data-name');
-      this.currentCursorPosition = {
-        cellName,
-        cellRowPrevious: this.currentCursorPosition.cellRow,
-        ...this.parseCellName(cellName),
-      };
-    },
-
-    clickBody(evt) {
-      if (evt.target.closest('button')) {
-        this.toggleRowGroup(evt.target.closest('button'));
-      } else {
-        this.selectedCell(evt);
-      }
-    },
     getCellNodeForName(cellName) {
       return this.$refs.TableBody.querySelector(`[data-name="${cellName}"]`);
     },

@@ -32,6 +32,11 @@ export default {
     ElField,
     ElFieldProps,
   ],
+  data() {
+    return {
+      fieldValue: +this.inputValue,
+    };
+  },
   methods: {
     eventInput() {
       this.emitInputValue();

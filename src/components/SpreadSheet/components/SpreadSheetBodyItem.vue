@@ -123,11 +123,6 @@ export default {
   position: relative;
   display: grid;
   grid-auto-rows: minmax(22px, 22px);
-  // .stop {
-  //   position: sticky;
-  //   left: 60px;
-  //   z-index: 100;
-  // }
   .column {
     position: relative;
     display: inline-flex;
@@ -164,7 +159,6 @@ export default {
       z-index: 400;
     }
     &-body {
-      // position: relative;
       padding: 0px 2px;
       width: 100%;
       border-right: thin solid grey;
@@ -215,19 +209,12 @@ export default {
       content: '';
       position: absolute;
       top: 0px;
-      // height: inherit;
       bottom: 0px;
       left: 0px;
-      // width: inherit;
       right: 0px;
       border: 1px solid #1a73e8;
       z-index: 90;
     }
   }
 }
-// .stop {
-//   position: sticky;
-//   left: 60px;
-//   z-index: 100;
-// }
 </style>
