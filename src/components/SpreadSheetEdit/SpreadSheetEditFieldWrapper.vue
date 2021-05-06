@@ -58,6 +58,6 @@ export default {
   overflow: hidden;
   margin: 0 3px;
   margin-top: -18.5px;
-  font-size: 0.7em;
+  font-size: 0.8rem;
 }
 </style>

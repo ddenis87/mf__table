@@ -1,6 +1,6 @@
 <template>
   <div class="field">
-    <slot></slot>
+    <slot v-bind=""></slot>
   </div>
 </template>
 
@@ -15,8 +15,8 @@ export default {
     fieldProps() {
       return {
         dense: this.isDense,
-      }
+      };
     },
   },
-}
+};
 </script>

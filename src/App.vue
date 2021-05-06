@@ -47,6 +47,7 @@ $scrollThumbBackgroundColor: rgba(0,0,0,0.2);
 html, body {
   height: 100%;
   box-sizing: border-box;
+  font-size: 16px;
   a { text-decoration: none; }
   &::-webkit-scrollbar {
     display: none;
