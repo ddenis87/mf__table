@@ -34,13 +34,15 @@
           :style="[getCellGeometry(source, column, columnIndex), fixedCell(column, columnIndex)]"
           :data-name="`${column.name}${source.name}`"
           :tabindex="columnIndex">
-        {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }}
+        {{ formattedData(column.name, source) }}
       </div>
     </template>
   </div>
 </template>
 
 <script>
+import formattedData from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
 export default {
@@ -67,6 +69,30 @@ export default {
   computed: {
   },
   methods: {
+    formattedData(columnName, row) {
+      if (!this.cells[`${columnName}${row.value}`]) return '';
+      const cell = this.cells[`${columnName}${row.value}`];
+      const cellValue = cell.value;
+      const cellType = cell.type
+        || row.type
+        || this.columns.find((column) => column.name === columnName).type
+        || 'string';
+      return formattedData(cellValue, { valueType: cellType });
+    },
+    // getCellType(cellName) {
+    //   const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
+    //   const cellType = this.tableCells[cellName]?.type
+    //     || this.tableRows.find((row) => row.name === cellNameRow).type
+    //     || this.tableColumns.find((column) => column.name === cellNameColumn).type
+    //     || CELL_TYPE_DEFAULT;
+    //   return cellType;
+    // },
+    // parseCellName(cellName) {
+    //   return {
+    //     cellNameColumn: cellName.replace(/[0-9]/g, ''),
+    //     cellNameRow: +cellName.replace(/[a-z]/g, ''),
+    //   };
+    // },
     templateRow(height) {
       const templateRow = {
         'grid-template-rows': `${height || '22'}px`,

@@ -95,7 +95,7 @@ export default {
     "k6":{"style":"br0 fn0","value":"руб."},
 
     "d7":{"style":"br0 br3 fn1 fn3","value":"Газоснабжение","type":"string"},
-    "e7":{"style":"br0 fn0 fn4","value":"276.00"},
+    "e7":{"style":"br0 fn0 fn4","value":"+276.00"},
     "f7":{"style":"br0 fn0 fn4","value":"276.00"},
     "g7":{"style":"br0 fn1 fn2","value":"138 руб. за куб. м.","type":"string"},
     "h7":{"style":"br0 fn0 fn4","value":"35"},

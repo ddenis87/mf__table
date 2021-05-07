@@ -1,5 +1,8 @@
 #Invalid
-/src/tests
+# /src/tests
+/src/tests/unit/App
+/src/tests/unit/Elements
+/src/tests/unit/Profile
 /src/store
 # /src/components
 /src/components/Elements
