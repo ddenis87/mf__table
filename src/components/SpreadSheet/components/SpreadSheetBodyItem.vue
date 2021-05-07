@@ -31,7 +31,7 @@
             (cells[`${column.name}${source.value}`])
               ? cells[`${column.name}${source.value}`].style : '',
           ]"
-          :style="[getCellGeometry(source, column, columnIndex), fixedCell(column)]"
+          :style="[getCellGeometry(source, column, columnIndex), fixedCell(column, columnIndex)]"
           :data-name="`${column.name}${source.name}`"
           :tabindex="columnIndex">
         {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }}
@@ -78,14 +78,13 @@ export default {
       }
       return templateRow;
     },
-    fixedCell(column) {
+    fixedCell(column, columnIndex) {
       const fixed = {};
       if (column.fixed) {
         fixed.position = 'sticky';
         fixed['z-index'] = 100;
-        fixed.left = (this.printMode) ? 0 : (20 * this.maxLevelGroupRow) + 60;
-        const columnCurrentIndex = this.columns.findIndex((item) => item === column);
-        for (let i = columnCurrentIndex - 1; i === 0; i -= 1) {
+        fixed.left = (20 * this.maxLevelGroupRow) + 60;
+        for (let i = 0; i < columnIndex; i += 1) {
           fixed.left += this.columns[i].width;
         }
         fixed.left += 'px';

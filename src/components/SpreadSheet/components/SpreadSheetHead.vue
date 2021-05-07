@@ -29,10 +29,10 @@
 
     <div class="sheet-head__row"
          :style="templateColumnHeight">
-      <template v-for="column in columns">
+      <template v-for="(column, columnIndex) in columns">
         <div :key="`head-title-${column.value}`"
              class="column column-title"
-             :style="getStyleCellFixed(column)">{{ column.display_name }}</div>
+             :style="getStyleCellFixed(column, columnIndex)">{{ column.display_name }}</div>
       </template>
       <div class="column column-title column-end"></div>
     </div>
@@ -68,14 +68,14 @@ export default {
     },
   },
   methods: {
-    getStyleCellFixed(column) {
+    getStyleCellFixed(column, columnIndex) {
       const fixed = {};
       if (column.fixed) {
         fixed.position = 'sticky';
         fixed['z-index'] = 100;
         fixed.left = 0; //  (20 * this.maxLevelGroupRow) + 60;
-        const columnCurrentIndex = this.columns.findIndex((item) => item === column);
-        for (let i = columnCurrentIndex - 1; i === 0; i -= 1) {
+        // const columnCurrentIndex = this.columns.findIndex((item) => item === column);
+        for (let i = 0; i < columnIndex; i += 1) {
           fixed.left += this.columns[i].width;
         }
         fixed.left += 'px';

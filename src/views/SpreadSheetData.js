@@ -29,6 +29,7 @@ export default {
   }`,
   //  Variant 3
   rowsJSON: `{
+    "1":{"fixed":"true"},
     "2":{"height":40},
     "5":{"height":30},
     "6":{"height":30},

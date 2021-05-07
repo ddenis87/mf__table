@@ -3,7 +3,7 @@
        class="spread-sheet-body"
        @click="clickBody"
        @dblclick="eventDblClickBody"
-       @keydown="eventKeydown" @touchmove="touchMove">
+       @keydown="eventKeydown">
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed">
       <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
@@ -110,20 +110,10 @@ export default {
     this.sheetBodyGeometry = this.$refs.SheetBody.$el.getBoundingClientRect();
   },
   methods: {
-    touchMove() {
-      console.log('touch');
-    },
     scrollBody(evt) {
-      // console.log('scroll');
-      // console.log('getSize(8) - ', this.$refs.SheetBody.getSize(8));
-      // console.log('getSizes - ', this.$refs.SheetBody.getSizes());
-      // console.log('getOffset - ', this.$refs.SheetBody.getOffset());
-      // console.log('getClientSize - ', this.$refs.SheetBody.getClientSize());
-      // console.log('getScrollSize - ', this.$refs.SheetBody.getScrollSize());
-      // console.log('scroll, properties range - ', range);
-
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       this.$emit('scroll-body-x', evt.target.scrollLeft);
+
       const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
       if (!this.currentSelectedCellName || !cellSelectedNode) return;
       const cellSelectedGeometry = cellSelectedNode.getBoundingClientRect();
@@ -232,9 +222,10 @@ export default {
       return true;
     },
     moveCursorUp(target) {
-      // if (!target.closest('.sheet-body__row').previousElementSibling) {
-      //   if (!target.closest('.sheet-body')) {}
-      // }
+      const rowPrevious = target.closest('.sheet-body__row').parentElement.previousElementSibling;
+      if (!rowPrevious && this.rowsFixed.length === 0) return;
+      if (target.closest('.sheet-body-fixed') && !rowPrevious) return;
+
       const cellName = target.getAttribute('data-name');
       const { cellColumn, cellRow } = this.parseCellName(cellName);
       const cellPreviousName = `${cellColumn}${cellRow - 1}`;
@@ -243,7 +234,6 @@ export default {
       console.log(target);
     },
     getExpectedDOMNodeCell() {
-      
     },
     moveCursorUpOld(target) {
       if (!target.parentElement.parentElement.previousElementSibling) {
