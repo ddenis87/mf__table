@@ -24,11 +24,14 @@ function formattedDataDisplay(
         minFD: 'minimumFractionDigits',
         currency: 'currency',
         currencyView: 'currencyDisplay',
+        group: 'useGrouping',
       };
       Object.entries(FORMAT_STRING_MAP).forEach((item) => {
         const [itemKey, itemValue] = item;
         if (Object.keys(formattedOptionKey).includes(itemKey)) {
-          formattedOption[formattedOptionKey[itemKey]] = itemValue;
+          let newItemValue = itemValue;
+          if (itemValue === 'false') newItemValue = false;
+          formattedOption[formattedOptionKey[itemKey]] = newItemValue;
         }
       });
       const formatted = new Intl.NumberFormat('ru', formattedOption);
@@ -41,11 +44,35 @@ function formattedDataDisplay(
       }
       return newValue;
     },
-    date: () => value.split('-').reverse().join('.'),
+    date: () => {
+      const prepareValue = value.split('.').reverse().join('-');
+      const formattedOption = {};
+      const formattedOptionKey = {
+        d: 'day',
+        m: 'month',
+        y: 'year',
+      };
+      Object.entries(FORMAT_STRING_MAP).forEach((item) => {
+        const [itemKey, itemValue] = item;
+        if (Object.keys(formattedOptionKey).includes(itemKey)) {
+          formattedOption[formattedOptionKey[itemKey]] = itemValue;
+        }
+      });
+      const formatted = new Intl.DateTimeFormat('ru', formattedOption);
+      const newValue = formatted.format(new Date(prepareValue));
+      return newValue;
+    },
+    boolean: () => {
+      let valueTrue = 'Да';
+      let valueFalse = 'Нет';
+      if (FORMAT_STRING_MAP_KEYS.includes('true')) valueTrue = FORMAT_STRING_MAP.true;
+      if (FORMAT_STRING_MAP_KEYS.includes('false')) valueFalse = FORMAT_STRING_MAP.false;
+      let newValue = valueFalse;
+      if (value === true || value === 1) newValue = valueTrue;
+      return newValue;
+    },
   };
-  formattedValue = TYPES[valueType]();
-  // if (Object.keys(FORMAT_STRING_MAP).includes('positive')
-  //   && FORMAT_STRING_MAP['positive'] === 'true') formattedValue = `+${formattedValue}`;
+  formattedValue = (TYPES[valueType]) ? TYPES[valueType]() : value;
   return `${valuePrefix}${formattedValue}${valueSuffix}`;
 }
 
