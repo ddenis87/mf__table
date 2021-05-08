@@ -33,6 +33,7 @@ Key values are specified through '='. Keys are listed with '$' without spaces.
 |  | maxFD | Maximum number of decimal places (minFD - 20) | 20 |
 |  | minID | Minimum number of characters for integer part (1 - 21) | 21 |
 |  | group | Grouping values by triads: <br>  <li>true</li>, <li>false</li> | true |
+|  | color | Text color depending on value: <br> <li>true</li>, <li>false</li> <br> Return HTML: <br> `<span :color='(value > 0) ? 'green' : 'red'>value</span>` | false |
 | date | | | |
 |  | d | Day format: <br> <li>2-digit</li>, <li>numeric</li> | numeric |
 |  | m | Month format: <br> <li>2-digit</li>, <li>numeric</li>, <li>narrow</li>, <li>short</li>, <li>long</li> | numeric |
