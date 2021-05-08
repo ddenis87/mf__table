@@ -48,7 +48,13 @@ Formatted value in string type.
 
 ### Examples
 ```javascript
+<<<<<<< HEAD
 formattedDataDisplay('text')// 'text'
 formattedDataDisplay(35, { valueType: 'number', formatString: 'positive=true$minFD=2' })// '+35,00'
 formattedDataDisplay('2021-04-01', { valueType: 'date', formatString: 'd=numeric$m=numeric$y=2-digit' })// '01.04.21'
+=======
+formattedDataDisplay('text')  // 'text'
+formattedDataDisplay(35, { valueType: 'number', formatString: 'positive=true$minFD=2' })  // '+35,00'
+formattedDataDisplay('2021-04-01', { valueType: 'date', formatString: 'd=numeric$m=numeric$y=2-digit' })  // '01.04.21'
+>>>>>>> 6e9bcd8f29b74bf77186ec077b4b4d1365308b6f
 ```
