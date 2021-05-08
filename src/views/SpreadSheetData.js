@@ -12,7 +12,7 @@ export default {
     "b":{"width":10,"fixed":"true"},
     "c":{"width":10,"fixed":"true"},
     "d":{"width":120},
-    "e":{"width":80},
+    "e":{"width":80,"formatString":"positive=true$minFD=2$color=true"},
     "f":{"width":100},
     "g":{"width":100},
     "h":{"width":50},

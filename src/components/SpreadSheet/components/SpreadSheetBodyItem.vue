@@ -33,8 +33,8 @@
           ]"
           :style="[getCellGeometry(source, column, columnIndex), fixedCell(column, columnIndex)]"
           :data-name="`${column.name}${source.name}`"
-          :tabindex="columnIndex">
-        {{ formattedData(column.name, source) }}
+          :tabindex="columnIndex"
+          v-html="formattedData(column.name, source)">
       </div>
     </template>
   </div>
@@ -71,13 +71,21 @@ export default {
   methods: {
     formattedData(columnName, row) {
       if (!this.cells[`${columnName}${row.value}`]) return '';
+      const formattedOption = {};
       const cell = this.cells[`${columnName}${row.value}`];
       const cellValue = cell.value;
       const cellType = cell.type
         || row.type
         || this.columns.find((column) => column.name === columnName).type
         || 'string';
-      return formattedData(cellValue, { valueType: cellType });
+      formattedOption.valueType = cellType;
+      const cellFormatString = cell.formatString
+        || row.formatString
+        || this.columns.find((column) => column.name === columnName).formatString
+        || null;
+      if (cellFormatString) formattedOption.formatString = cellFormatString;
+      console.log(formattedOption);
+      return formattedData(cellValue, formattedOption);
     },
     // getCellType(cellName) {
     //   const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
