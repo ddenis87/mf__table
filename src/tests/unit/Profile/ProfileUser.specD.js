@@ -26,16 +26,16 @@ const factory = (option = {}) => {
   })
 }
 
-describe('ProfileUser', () => {
-  it('Mount component', () => {
-    const wrapper = factory();
-    expect(wrapper.html()).toContain('profile-user-bar__user-name');
-    expect(wrapper.html()).toContain('v-btn');
-  });
-  it('Stor, getter', () => {
-    const wrapper = factory();
-    expect(wrapper.html()).toContain('Denis');
-  });
+// describe('ProfileUser', () => {
+  // it('Mount component', () => {
+  //   const wrapper = factory();
+  //   expect(wrapper.html()).toContain('profile-user-bar__user-name');
+  //   expect(wrapper.html()).toContain('v-btn');
+  // });
+  // it('Stor, getter', () => {
+  //   const wrapper = factory();
+  //   expect(wrapper.html()).toContain('Denis');
+  // });
   // it('Snapshot html', () => {
   //   const wrapper = factory();
   //   expect(wrapper.html()).toMatchSnapshot();
@@ -55,4 +55,4 @@ describe('ProfileUser', () => {
   //   console.log(wrapper.html());
   //   // expect(wrapper.html()).toContain('Войти');
   // });
-})
+// })
