@@ -14,7 +14,6 @@ function formattedDataDisplay(
     if (itemValue) FORMAT_STRING_MAP[itemKey] = itemValue;
   });
   const FORMAT_STRING_MAP_KEYS = Object.keys(FORMAT_STRING_MAP);
-  // console.log(FORMAT_STRING_MAP);
   const TYPES = {
     string: () => value,
     number: () => {
