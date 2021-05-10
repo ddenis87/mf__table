@@ -381,16 +381,16 @@ export default {
     }
   }
   .sheet-body {
-    &::-webkit-scrollbar {
-      display: block;
-      width: $scrollWidth;
-      height: $scrollHeight;
-      border-radius: $scrollBorderRadius;
-      &-thumb {
-        border-radius: $scrollThumbBorderRadius;
-        background-color: $scrollThumbBackgroundColor;
-      }
-    }
+    // &::-webkit-scrollbar {
+    //   display: block;
+    //   width: $scrollWidth;
+    //   height: $scrollHeight;
+    //   border-radius: $scrollBorderRadius;
+    //   &-thumb {
+    //     border-radius: $scrollThumbBorderRadius;
+    //     background-color: $scrollThumbBackgroundColor;
+    //   }
+    // }
   }
 }
 

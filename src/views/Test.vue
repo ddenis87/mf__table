@@ -7,7 +7,62 @@
         </v-col>
       </v-row>
     </v-card>
-    <div class="test-head"></div>
+    <div class="test-head" ref="bHead">
+      <div class="head-item">1</div>
+      <div class="head-item">2</div>
+      <div class="head-item">3</div>
+      <div class="head-item">4</div>
+      <div class="head-item">5</div>
+      <div class="head-item">6</div>
+      <div class="head-item">7</div>
+      <div class="head-item">8</div>
+      <div class="head-item">9</div>
+      <div class="head-item">10</div>
+      <div class="head-item">11</div>
+      <div class="head-item">12</div>
+      <div class="head-item">13</div>
+      <div class="head-item">1</div>
+      <div class="head-item">2</div>
+      <div class="head-item">3</div>
+      <div class="head-item">4</div>
+      <div class="head-item">5</div>
+      <div class="head-item">6</div>
+      <div class="head-item">7</div>
+      <div class="head-item">8</div>
+      <div class="head-item">9</div>
+      <div class="head-item">10</div>
+      <div class="head-item">11</div>
+      <div class="head-item">12</div>
+      <div class="head-item">13</div>
+    </div>
+    <div class="test-body" ref="bBody" @scroll="evtScrollX">
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+      <div class="body-item">123</div>
+    </div>
   </div>
 </template>
 
@@ -21,6 +76,12 @@ export default {
     // FieldWrapper,
     FieldString,
   },
+  methods: {
+    evtScrollX(evt) {
+      console.log(evt.target.scrollLeft);
+      this.$refs.bHead.scrollLeft = evt.target.scrollLeft;
+    },
+  },
 };
 </script>
 
@@ -32,9 +93,30 @@ export default {
     width: 500px;
   }
   &-head {
-    width: 1000px;
+    display: flex;
+    gap: 5px;
+    padding: 5px;
+    width: 100%;
     height: 100px;
     border: thin solid green;
+    overflow-x: scroll;
+    .head-item {
+      min-width: 100px;
+      border: thin solid blue;
+    }
+  }
+  &-body {
+    display: flex;
+    gap: 5px;
+    padding: 5px;
+    width: 100%;
+    height: 100px;
+    border: thin solid grey;
+    overflow-x: scroll;
+    .body-item {
+      min-width: 100px;
+      border: thin solid blue;
+    }
   }
 }
 </style>
