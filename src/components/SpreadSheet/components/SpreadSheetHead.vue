@@ -140,6 +140,7 @@ export default {
         }
       }
       &-end {
+        min-width: 17px;
         border-right: $borderStyle;
       }
     }

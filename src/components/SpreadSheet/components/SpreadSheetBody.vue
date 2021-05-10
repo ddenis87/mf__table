@@ -143,8 +143,8 @@ export default {
       const geometryVirtualScroll = target.closest('.spread-sheet-body').getBoundingClientRect();
       if (target.getBoundingClientRect().right > geometryVirtualScroll.right) {
         const delta = target.getBoundingClientRect().right - geometryVirtualScroll.right;
-        this.$refs.SheetBody.$el.scrollLeft += delta + 8;
-        this.$refs.SheetBodyFixed.scrollLeft += delta + 8;
+        this.$refs.SheetBody.$el.scrollLeft += delta + 17;
+        this.$refs.SheetBodyFixed.scrollLeft += delta + 17;
       }
       target.focus();
       this.selectedCell(target.getAttribute('data-name'));
@@ -202,7 +202,8 @@ export default {
     },
     moveCursorPrevious(target) {
       const elementPreviousDOM = target.previousSibling;
-      if (!elementPreviousDOM) return false;
+      console.log(elementPreviousDOM);
+      if (!elementPreviousDOM || elementPreviousDOM.closest('.column-title')) return false;
       if (elementPreviousDOM.classList) {
         this.focusCell(elementPreviousDOM);
         return true;
@@ -220,7 +221,7 @@ export default {
       this.focusCell(this.getCellNodeForName(cellNameJoin));
       return true;
     },
-    moveCursorUp(target) {
+    moveCursorUpOld(target) {
       const rowPrevious = target.closest('.sheet-body__row').parentElement.previousElementSibling;
       if (!rowPrevious && this.rowsFixed.length === 0) return;
       if (target.closest('.sheet-body-fixed') && !rowPrevious) return;
@@ -234,7 +235,7 @@ export default {
     },
     getExpectedDOMNodeCell() {
     },
-    moveCursorUpOld(target) {
+    moveCursorUp(target) {
       if (!target.parentElement.parentElement.previousElementSibling) {
         if (!target.closest('.sheet-body') || !target.closest('.sheet-body').previousElementSibling) return false;
       }
@@ -373,14 +374,14 @@ export default {
       display: flex;
       &_end {
         display:  block;
-        min-width: 10px;
+        min-width: 20px;
       }
     }
     &::-webkit-scrollbar {
       display: none;
     }
   }
-  .sheet-body {
+  // .sheet-body {
     // &::-webkit-scrollbar {
     //   display: block;
     //   width: $scrollWidth;
@@ -391,7 +392,7 @@ export default {
     //     background-color: $scrollThumbBackgroundColor;
     //   }
     // }
-  }
+  // }
 }
 
 </style>
