@@ -113,7 +113,6 @@ export default {
     scrollBody(evt) {
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       this.$emit('scroll-body-x', evt.target.scrollLeft);
-
       // const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
       // if (!this.currentSelectedCellName || !cellSelectedNode) return;
       // const cellSelectedGeometry = cellSelectedNode.getBoundingClientRect();
