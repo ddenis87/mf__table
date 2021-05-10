@@ -7,6 +7,7 @@
         </v-col>
       </v-row>
     </v-card>
+    <div class="test-head"></div>
   </div>
 </template>
 
@@ -29,6 +30,11 @@ export default {
   &__card {
     padding: 20px;
     width: 500px;
+  }
+  &-head {
+    width: 1000px;
+    height: 100px;
+    border: thin solid green;
   }
 }
 </style>
