@@ -14,13 +14,21 @@
         <v-text-field label="Строки" v-model="countRow"></v-text-field>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="commitSpace">Commit</v-btn>
+        <v-btn small dark color="blue darken-3" width="80" @click="commitSpace">Commit</v-btn>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="() => isShowDialog = true">Setting</v-btn>
+        <v-btn small dark color="blue darken-3" width="80" @click="() => isShowDialog = true">Setting</v-btn>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="movePrintPage">Print</v-btn>
+        <v-btn small dark color="blue darken-3" width="80" @click="movePrintPage">Print</v-btn>
+      </div>
+      <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" width="80" @click="saveJSONFile">
+          <v-icon small left>mdi-cloud-download-outline</v-icon>Save</v-btn>
+      </div>
+      <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" width="80">
+          <v-icon small left>mdi-file-upload-outline</v-icon>Open</v-btn>
       </div>
     </div>
     <div class="spread-sheet-view__table">
@@ -50,6 +58,7 @@ import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
 import DialogBarRight from '@/components/Dialogs/DialogBarRight.vue';
 
+import apiJSONFile from '@/plugins/apiJSONFile/apiJSONFile';
 import SpreadSheetData from './SpreadSheetData';
 
 export default {
@@ -91,6 +100,9 @@ export default {
     this.cells = JSON.parse(this.cellsJSON);
   },
   methods: {
+    saveJSONFile() {
+      apiJSONFile.dowloadJSONFile(this.cells);
+    },
     editingAccept(option) {
       if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});
       this.cells[option.cellName].value = option.value;

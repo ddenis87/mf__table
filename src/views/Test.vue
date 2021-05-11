@@ -139,7 +139,6 @@ export default {
     }
   }
   &-body {
-    
     padding: 5px;
     width: 100%;
     height: 100px;
