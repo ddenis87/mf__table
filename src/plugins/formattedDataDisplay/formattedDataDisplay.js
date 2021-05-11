@@ -33,7 +33,7 @@ function formattedDataDisplay(
           formattedOption[formattedOptionKey[itemKey]] = newItemValue;
         }
       });
-      const formatted = new Intl.NumberFormat('ru', formattedOption);
+      const formatted = new Intl.NumberFormat('ru-RU', formattedOption);
       let newValue = formatted.format(value);
       if (FORMAT_STRING_MAP_KEYS.includes('positive')
         && FORMAT_STRING_MAP.positive === 'true'
@@ -57,7 +57,7 @@ function formattedDataDisplay(
           formattedOption[formattedOptionKey[itemKey]] = itemValue;
         }
       });
-      const formatted = new Intl.DateTimeFormat('ru', formattedOption);
+      const formatted = new Intl.DateTimeFormat('ru-RU', formattedOption);
       const newValue = formatted.format(new Date(prepareValue));
       return newValue;
     },

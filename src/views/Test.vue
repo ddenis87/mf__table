@@ -36,32 +36,62 @@
       <div class="head-item">13</div>
     </div>
     <div class="test-body" ref="bBody" @scroll="evtScrollX">
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
-      <div class="body-item">123</div>
+      <div class="body-row">
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+      </div>
+      <div class="body-row">
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+        <div class="body-item">123</div>
+      </div>
     </div>
   </div>
 </template>
@@ -79,7 +109,9 @@ export default {
   methods: {
     evtScrollX(evt) {
       console.log(evt.target.scrollLeft);
+      // setTimeout(() => {
       this.$refs.bHead.scrollLeft = evt.target.scrollLeft;
+      // }, 100);
     },
   },
 };
@@ -96,23 +128,27 @@ export default {
     display: flex;
     gap: 5px;
     padding: 5px;
+    margin-bottom: 10px;
     width: 100%;
     height: 100px;
     border: thin solid green;
-    overflow-x: scroll;
+    overflow-x: hidden;
     .head-item {
       min-width: 100px;
       border: thin solid blue;
     }
   }
   &-body {
-    display: flex;
-    gap: 5px;
+    
     padding: 5px;
     width: 100%;
     height: 100px;
     border: thin solid grey;
     overflow-x: scroll;
+    .body-row {
+      display: flex;
+      gap: 5px;
+    }
     .body-item {
       min-width: 100px;
       border: thin solid blue;

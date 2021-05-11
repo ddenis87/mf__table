@@ -201,6 +201,22 @@ export default {
       return true;
     },
     moveCursorPrevious(target) {
+      if (!target.previousSibling) return false;
+      if (target.previousSibling.nodeName === 'DIV' && target.previousSibling.closest('.column-body')) {
+        this.focusCell(target.previousSibling);
+        return true;
+      }
+      if (target.previousSibling.nodeName === 'DIV' && target.previousSibling.closest('.column-title')) return false;
+      console.log(target.previousSibling.nodeName);
+      const currentCellName = target.getAttribute('data-name');
+      const { cellRow, cellColumn } = this.parseCellName(currentCellName);
+      const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
+      const cellColumnPrevious = this.columns.find((column) => column.value === cellColumnNumber - 1).name;
+      const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnPrevious}${cellRow}`))[0];
+      this.focusCell(this.getCellNodeForName(cellNameJoin));
+      return true;
+    },
+    moveCursorPreviousOld(target) {
       const elementPreviousDOM = target.previousSibling;
       console.log(elementPreviousDOM);
       if (!elementPreviousDOM || elementPreviousDOM.closest('.column-title')) return false;
