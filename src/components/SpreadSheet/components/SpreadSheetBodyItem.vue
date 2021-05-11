@@ -103,6 +103,8 @@ export default {
       };
       if (this.printMode) {
         templateRow['grid-template-columns'] = this.templateColumnWidth;
+      } else if (this.maxLevelGroupRow === 0) {
+        templateRow['grid-template-columns'] = `60px ${this.templateColumnWidth}`;
       } else {
         templateRow['grid-template-columns'] = `repeat(${this.maxLevelGroupRow}, minmax(20px, 20px)) 60px ${this.templateColumnWidth}`;
       }

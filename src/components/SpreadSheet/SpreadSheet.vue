@@ -33,6 +33,7 @@
                           :cells="tableCells"
                           :template-column-width="templateColumnWidth"
                           :max-level-group-row="maxLevelGroupRow"
+                          :max-level-group-column="maxLevelGroupColumn"
                           :set-excluded-cells="setExcludedCells"
                           :template-table-width="templateTableWidth"
                           :set-open-group-rows="setOpenGroupRows"
@@ -237,6 +238,7 @@ export default {
       for (let i = 0; i < this.tableColumns.length; i += 1) {
         templateColumnWidth += `${this.tableColumns[i].width}px `;
       }
+      console.log(templateColumnWidth);
       return templateColumnWidth;
     },
   },

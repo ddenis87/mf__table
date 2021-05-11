@@ -58,8 +58,8 @@ import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
 import DialogBarRight from '@/components/Dialogs/DialogBarRight.vue';
 
-import apiJSONFile from '@/plugins/apiJSONFile/apiJSONFile';
-import SpreadSheetData from './SpreadSheetData';
+import apiJSON from '@/plugins/apiJSON/apiJSON';
+// import SpreadSheetData from './SpreadSheetData';
 
 export default {
   name: 'SpreadSheetView',
@@ -70,8 +70,15 @@ export default {
   },
   data() {
     return {
-      ...SpreadSheetData,
+      // ...SpreadSheetData,
+      sheetSpace: {
+        row: 1000,
+        column: 50,
+      },
+      rows: {},
+      columns: {},
       cells: {},
+      styles: [],
       isShowDialog: false,
       isCellEditActive: false,
       cellEditGeometry: {
@@ -84,8 +91,8 @@ export default {
     };
   },
   computed: {
-    rows() { return JSON.parse(this.rowsJSON); },
-    columns() { return JSON.parse(this.columnsJSON); },
+    // rows() { return JSON.parse(this.rowsJSON); },
+    // columns() { return JSON.parse(this.columnsJSON); },
     // cells() { return JSON.parse(this.cellsJSON); },
     cellEditStyle() {
       return {
@@ -97,11 +104,13 @@ export default {
     },
   },
   created() {
-    this.cells = JSON.parse(this.cellsJSON);
+    const { cellsJSON } = {};
+    this.styles = [];
+    this.cells = JSON.parse(cellsJSON);
   },
   methods: {
     saveJSONFile() {
-      apiJSONFile.dowloadJSONFile(this.cells);
+      apiJSON.dowloadJSONFile(this.cells);
     },
     editingAccept(option) {
       if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});

@@ -59,6 +59,7 @@ export default {
     templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
     maxLevelGroupRow: { type: Number, default: 0 },
+    maxLevelGroupColumn: { type: Number, default: 0 },
     setExcludedCells: { type: Object, default() { return {}; } },
     setOpenGroupRows: { type: Array, default() { return []; } },
   },
@@ -86,7 +87,7 @@ export default {
       return width;
     },
     heightVirtualList() {
-      let heightBodyFixed = 202; //  поправить 202 высота
+      let heightBodyFixed = 156 + (this.maxLevelGroupColumn * (22 + 1)); //  поправить 202 высота
       for (let i = 0; i < this.rowsFixed.length; i += 1) {
         heightBodyFixed += this.rowsFixed[i].height;
       }
@@ -274,6 +275,8 @@ export default {
         }
         this.focusCell(geometryPreviousNode);
       } else {
+        // console.log(this.rows[this.rows.findIndex((row) => row.value === cellRow) - 1]);
+        if (!this.rows[this.rows.findIndex((row) => row.value === cellRow) - 1]) return false;
         cellRow = this.rows[this.rows.findIndex((row) => row.value === cellRow) - 1].value;
         cellNamePrevious = `${cellColumn}${cellRow}`;
         geometryPreviousNode = this.getCellNodeForName(cellNamePrevious);
