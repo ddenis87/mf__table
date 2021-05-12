@@ -175,8 +175,8 @@ export default {
 
     eventKeydown(evt) {
       evt.preventDefault();
-      if (evt.code === 'ArrowRight') this.moveCursorNext(evt.target);
-      if (evt.code === 'ArrowLeft') this.moveCursorPrevious(evt.target);
+      if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && evt.shiftKey === false)) this.moveCursorNext(evt.target);
+      if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey === true)) this.moveCursorPrevious(evt.target);
       if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
       if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
       if (evt.code.includes('Key') || evt.code.includes('Numpad') || evt.code.includes('Digit') || evt.code === 'Enter') {

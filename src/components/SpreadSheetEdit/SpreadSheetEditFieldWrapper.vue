@@ -3,6 +3,7 @@
     <component :is="componentField"
                :in-use="'spreadSheetEdit'"
                :is-hide-underline="true"
+               :is-required-off="true"
                :is-btn-clear="false"
                v-model="value"
                @event-keydown="eventKeydown"
@@ -34,7 +35,7 @@ export default {
   },
   methods: {
     eventKeydown(option) {
-      // console.log(option);
+      console.log(option);
       if (option.event.key === 'Escape') this.$emit('event-keydown-escape', { ...option });
       if (option.event.key === 'Enter') this.$emit('event-keydown-enter', { ...option });
       if (option.event.key === 'Tab') this.$emit('event-keydown-tab', { ...option });
@@ -42,11 +43,12 @@ export default {
       this.$emit('event-keydown', { ...option });
     },
     eventBlur(option) {
+      // console.log(option);
       this.$emit('input', this.value);
       this.$emit('event-blur', { ...option });
     },
     getToUpperFirstChar(value) {
-      console.log(value[0].toUpperCase() + value.slice(1));
+      // console.log(value[0].toUpperCase() + value.slice(1));
       return value[0].toUpperCase() + value.slice(1);
     },
   },

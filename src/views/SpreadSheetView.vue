@@ -5,39 +5,49 @@
                        :style="cellEditStyle"
                        v-bind="cellEditProps"
                        @editing-accept="editingAccept"
+                       @editing-cancel="editBlur"
                        @edit-blur="editingAccept"></spread-sheet-edit>
     <div class="spread-sheet-view__control-top">
-      <div class="item">
-        <v-text-field label="Столбцы" v-model="countColumn"></v-text-field>
+      <!-- <div class="item">
+        <v-text-field label="Столбцы" v-model="columnCount"></v-text-field>
       </div>
       <div class="item">
-        <v-text-field label="Строки" v-model="countRow"></v-text-field>
+        <v-text-field label="Строки" v-model="rowCount"></v-text-field>
       </div>
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" width="80" @click="commitSpace">Commit</v-btn>
       </div>
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" width="80" @click="() => isShowDialog = true">Setting</v-btn>
-      </div>
-      <div class="item item_btn">
+      </div> -->
+      <!-- <div class="item item_btn">
         <v-btn small dark color="blue darken-3" width="80" @click="movePrintPage">Print</v-btn>
+      </div> -->
+      <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" @click="newDocument">
+          <v-icon small left>mdi-file-table-outline</v-icon>Новый документ</v-btn>
+      </div>
+      <div class="item item_btn item_file">
+        <v-file-input dense
+                      label="Открыть документ"
+                      v-model="openFile"
+                      @change="openJSONFile">
+        </v-file-input>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" width="80" @click="saveJSONFile">
-          <v-icon small left>mdi-cloud-download-outline</v-icon>Save</v-btn>
-      </div>
-      <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" width="80">
-          <v-icon small left>mdi-file-upload-outline</v-icon>Open</v-btn>
+        <v-btn small dark color="blue darken-3" @click="saveJSONFile">
+          <v-icon small left>mdi-cloud-download-outline</v-icon>Сохранить документ</v-btn>
       </div>
     </div>
     <div class="spread-sheet-view__table">
-      <spread-sheet :columns="columns"
-                    :columnsCount="sheetSpace.column"
+      <spread-sheet :rowsCount="rowCount"
+                    :columnsCount="columnCount"
                     :rows="rows"
-                    :rowsCount="sheetSpace.row"
+                    :columns="columns"
                     :cells="cells"
                     :styles="styles"
+                    :cell-width="cellWidth"
+                    :cell-height="cellHeight"
                     @edit-cell="editCell"></spread-sheet>
     </div>
     <dialog-bar-right is-dialog-name="Setting" class="dialog"
@@ -45,9 +55,9 @@
                       width="700"
                       @close-dialog="isShowDialog = false">
       <v-card class="dialog__item" >
-        <v-textarea rows="7" label="Columns" v-model="columnsJSON"></v-textarea>
+        <!-- <v-textarea rows="7" label="Columns" v-model="columnsJSON"></v-textarea>
         <v-textarea rows="7" label="Rows" v-model="rowsJSON"></v-textarea>
-        <v-textarea rows="7" label="Cells" v-model="cellsJSON"></v-textarea>
+        <v-textarea rows="7" label="Cells" v-model="cellsJSON"></v-textarea> -->
       </v-card>
     </dialog-bar-right>
   </div>
@@ -71,14 +81,19 @@ export default {
   data() {
     return {
       // ...SpreadSheetData,
-      sheetSpace: {
-        row: 1000,
-        column: 50,
-      },
+      // sheetSpace: {
+      //   row: 1000,
+      //   column: 50,
+      // },
+      openFile: null,
+      rowCount: undefined,
+      columnCount: undefined,
       rows: {},
       columns: {},
       cells: {},
       styles: [],
+      cellWidth: undefined,
+      cellHeight: undefined,
       isShowDialog: false,
       isCellEditActive: false,
       cellEditGeometry: {
@@ -91,9 +106,6 @@ export default {
     };
   },
   computed: {
-    // rows() { return JSON.parse(this.rowsJSON); },
-    // columns() { return JSON.parse(this.columnsJSON); },
-    // cells() { return JSON.parse(this.cellsJSON); },
     cellEditStyle() {
       return {
         width: `${this.cellEditGeometry.width}px`,
@@ -103,20 +115,35 @@ export default {
       };
     },
   },
-  created() {
-    const { cellsJSON } = {};
-    this.styles = [];
-    this.cells = JSON.parse(cellsJSON);
-  },
   methods: {
+    newDocument() {
+      this.columns = {};
+      this.rows = {};
+      this.cells = {};
+      this.styles = [];
+      this.openFile = null;
+    },
     saveJSONFile() {
-      apiJSON.dowloadJSONFile(this.cells);
+      apiJSON.dowloadJSONFile({
+        rows: this.rows,
+        columns: this.columns,
+        cells: this.cells,
+        styles: this.styles,
+      });
+    },
+    openJSONFile(file) {
+      if (!file) return;
+      apiJSON.uploadJSONFile(file).then((data) => {
+        if (Object.keys(data).includes('columns')) this.columns = data.columns;
+        if (Object.keys(data).includes('rows')) this.rows = data.rows;
+        if (Object.keys(data).includes('cells')) this.cells = data.cells;
+        if (Object.keys(data).includes('styles')) this.styles = data.styles;
+      });
     },
     editingAccept(option) {
       if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});
       this.cells[option.cellName].value = option.value;
       this.editBlur();
-      // console.log(option);
     },
     editCell(cellProps) {
       console.log(cellProps);
@@ -129,7 +156,7 @@ export default {
       this.cellEditProps.cellType = cellProps.type;
       this.cellEditProps.cellValue = (this.cells[cellProps.name] && this.cells[cellProps.name].value) ? this.cells[cellProps.name].value : '';
       this.isCellEditActive = true;
-      setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 50);
+      setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 80);
     },
     editBlur() {
       this.isCellEditActive = false;
@@ -168,16 +195,23 @@ export default {
     justify-content: flex-start;
     align-items: flex-start;
     padding: 5px;
+    padding-left: 18px;
     .item {
-      width: 100px;
+      // width: 100px;
       padding-right: 20px;
       &_btn {
         align-self: center;
+      }
+      &_file {
+        width: 240px;
+        padding-top: 10px;
+        // align-self: flex-end;
       }
     }
     // border: thin solid green;
   }
   &__table {
+    position: relative;
     grid-area: table;
     padding: 5px;
     width: calc(100vw - 0px);

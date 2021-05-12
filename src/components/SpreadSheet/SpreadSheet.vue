@@ -39,8 +39,7 @@
                           :set-open-group-rows="setOpenGroupRows"
                           @edit-cell="editCell"
                           @toggle-row-group="toggleRowGroup"
-                          @scroll-body-x="scrollBodyX"
-                          @touchmove="touchMove"></spread-sheet-body>
+                          @scroll-body-x="scrollBodyX"></spread-sheet-body>
       </div>
     </div>
   </div>
@@ -67,12 +66,15 @@ export default {
     SpreadSheetBodyStatic,
   },
   props: {
-    columns: { type: Object, default() { return {}; } },
-    columnsCount: { type: Number, default: 20 },
+    rowsCount: { type: Number, default: 1000 },
+    columnsCount: { type: Number, default: 50 },
     rows: { type: Object, default() { return {}; } },
-    rowsCount: { type: Number, default: 100 },
+    columns: { type: Object, default() { return {}; } },
     cells: { type: Object, default() { return {}; } },
     styles: { type: Array, default() { return []; } },
+
+    cellWidth: { type: Number, default: CELL_WIDTH },
+    cellHeight: { type: Number, default: CELL_HEIGHT },
     printMode: { type: Boolean, default: false },
   },
   data() {
@@ -110,7 +112,7 @@ export default {
           value: i,
           name: columnName,
           display_name: columnName.toUpperCase(),
-          width: CELL_WIDTH,
+          width: this.cellWidth,
           columnLevel: this.getColumnLevel(columnName),
         };
         if (columnsKeys.includes(columnName)) {
@@ -147,7 +149,7 @@ export default {
           value: i,
           name: i,
           display_name: i,
-          height: CELL_HEIGHT,
+          height: this.cellHeight,
           rowLevel: this.getRowLevel(`${i}`),
         };
         if (rowsKeys.includes(`${i}`)) {
@@ -200,7 +202,7 @@ export default {
           prepareCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + 1;
         }
 
-        let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || CELL_HEIGHT : CELL_HEIGHT;
+        let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || this.cellHeight : this.cellHeight;
         if (cellValueKeys.includes('rowspan')) {
           if (!Object.keys(this.setExcludedCells).includes(cellName)) this.setExcludedCells[cellName] = [];
           for (let i = 1; i < cellValue.rowspan; i += 1) {
@@ -212,7 +214,7 @@ export default {
                 this.setExcludedCells[cellName].push(`${cellNameColumnNext}${cellNameRow + i}`);
               }
             }
-            cellHeight += (this.rows[`${cellNameRow + i}`]) ? this.rows[`${cellNameRow + i}`].height || CELL_HEIGHT : CELL_HEIGHT;
+            cellHeight += (this.rows[`${cellNameRow + i}`]) ? this.rows[`${cellNameRow + i}`].height || this.cellHeight : this.cellHeight;
           }
         }
         prepareCells[cellName].height = cellHeight;
@@ -223,7 +225,7 @@ export default {
     templateSheet() {
       return {
         'grid-template-columns': `${(CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE}px 1fr`,
-        'grid-template-rows': `${(CELL_HEIGHT * this.maxLevelGroupColumn) + CELL_HEIGHT}px 1fr`,
+        'grid-template-rows': `${(this.cellHeight * this.maxLevelGroupColumn) + this.cellHeight}px 1fr`,
       };
     },
     templateTableWidth() {
@@ -238,18 +240,24 @@ export default {
       for (let i = 0; i < this.tableColumns.length; i += 1) {
         templateColumnWidth += `${this.tableColumns[i].width}px `;
       }
-      console.log(templateColumnWidth);
       return templateColumnWidth;
     },
   },
-  created() {
-    this.addingDocumentStyles();
+  watch: {
+    cells() {
+      this.setExcludedCells = {};
+    },
+    styles() {
+      const styles = document.querySelector('head').lastChild;
+      if (styles.getAttribute('data-style')) styles.remove();
+      this.addingDocumentStyles();
+    },
+  },
+  beforeDestroy() {
+    const styles = document.querySelector('head').lastChild;
+    if (styles.getAttribute('data-style')) styles.remove();
   },
   methods: {
-    touchMove(evt) {
-      console.log(evt);
-    },
-
     editCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
       const cellGeometry = evt.target.getBoundingClientRect();
@@ -257,11 +265,13 @@ export default {
         name: cellName,
         target: evt.target,
         type: this.getCellType(cellName),
-        top: cellGeometry.top - ((this.maxLevelGroupColumn * CELL_HEIGHT) + CELL_HEIGHT),
+        // top: cellGeometry.top - ((this.maxLevelGroupColumn * this.cellHeight) + this.cellHeight),
+        top: cellGeometry.top - ((2 * this.cellHeight) + this.cellHeight),
         left: cellGeometry.left,
         width: cellGeometry.width,
         height: cellGeometry.height,
       };
+      this.currentEditCell = cellName;
       this.$emit('edit-cell', cellProps);
     },
 
@@ -380,6 +390,7 @@ export default {
       const elementDOMStyle = document.createElement('style');
       let stylesString = '';
       elementDOMStyle.setAttribute('type', 'text/css');
+      elementDOMStyle.setAttribute('data-style', 'style-cell');
       this.styles.forEach((element) => {
         const stylesObject = {};
         Object.entries(element.list).forEach((item) => {

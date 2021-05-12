@@ -6,6 +6,8 @@
                                      :cell-type="cellType"
                                      v-model="value"
                                      @event-keydown-enter="editingAccept"
+                                     @event-keydown-escape="editBlur"
+                                     @event-keydown-tab="editBlur"
                                      @event-blur="editBlur"></spread-sheet-edit-field-wrapper>
   </div>
 </template>
@@ -33,15 +35,21 @@ export default {
   },
   methods: {
     editingAccept(option) {
-      console.log(option);
+      // console.log(option);
       this.$emit('editing-accept', { ...option, cellName: this.cellName });
     },
+    editingCancel() {
+      // console.log('editing-cancel');
+      this.$emit('editing-cancel');
+    },
     focusSpreadSheetEdit() {
+      this.$nextTick();
       setTimeout(() => {
         this.$refs.SpreadSheetEditWrapper.$el.querySelector('.v-text-field__slot input').focus();
       }, 80);
     },
     editBlur(option) {
+      console.log('edit-blur');
       this.$emit('edit-blur', { ...option, cellName: this.cellName });
       // }
     },
@@ -67,5 +75,6 @@ export default {
   color: grey;
   z-index: 200;
   overflow: hidden;
+  outline: none;
 }
 </style>

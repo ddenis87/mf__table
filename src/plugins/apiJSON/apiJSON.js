@@ -16,4 +16,12 @@ export default {
     link.click();
     link.remove();
   },
+  uploadJSONFile: (file) => {
+    const fileJSONRead = new FileReader();
+    return new Promise((resolve, reject) => {
+      fileJSONRead.onload = () => resolve(JSON.parse(fileJSONRead.result));
+      fileJSONRead.onerror = (err) => reject(err);
+      fileJSONRead.readAsText(file);
+    });
+  },
 };
