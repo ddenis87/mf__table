@@ -106,6 +106,14 @@ export default {
       };
     },
   },
+  watch: {
+    // cells() {
+    //   if (this.currentSelectedCellName) {
+    //     const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
+    //     this.focusCell(cellSelectedNode);
+    //   }
+    // },
+  },
   mounted() {
     if ('ontouchstart' in window) { console.log('touch screen'); }
     this.sheetBodyGeometry = this.$refs.SheetBody.$el.getBoundingClientRect();

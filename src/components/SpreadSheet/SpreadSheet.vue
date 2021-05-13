@@ -27,19 +27,20 @@
                                   :setExcludedCells="setExcludedCells"
                                   :print-mode="printMode"></spread-sheet-body-static>
         <spread-sheet-body v-show="!printMode"
-                          :rows="tableRows"
-                          :rows-fixed="tableRowsFixed"
-                          :columns="tableColumns"
-                          :cells="tableCells"
-                          :template-column-width="templateColumnWidth"
-                          :max-level-group-row="maxLevelGroupRow"
-                          :max-level-group-column="maxLevelGroupColumn"
-                          :set-excluded-cells="setExcludedCells"
-                          :template-table-width="templateTableWidth"
-                          :set-open-group-rows="setOpenGroupRows"
-                          @edit-cell="editCell"
-                          @toggle-row-group="toggleRowGroup"
-                          @scroll-body-x="scrollBodyX"></spread-sheet-body>
+                           ref="SheetBody"
+                           :rows="tableRows"
+                           :rows-fixed="tableRowsFixed"
+                           :columns="tableColumns"
+                           :cells="tableCells"
+                           :template-column-width="templateColumnWidth"
+                           :max-level-group-row="maxLevelGroupRow"
+                           :max-level-group-column="maxLevelGroupColumn"
+                           :set-excluded-cells="setExcludedCells"
+                           :template-table-width="templateTableWidth"
+                           :set-open-group-rows="setOpenGroupRows"
+                           @edit-cell="editCell"
+                           @toggle-row-group="toggleRowGroup"
+                           @scroll-body-x="scrollBodyX"></spread-sheet-body>
       </div>
     </div>
   </div>
@@ -245,7 +246,9 @@ export default {
   },
   watch: {
     cells() {
-      this.setExcludedCells = {};
+      console.log('clear excluded cell');
+      this.setExcludedCells = {}; // не по этому собитию, -- срабатывает при обновлении/редактировании
+      // вынести в публичный метод влючив очистку всей data
     },
     styles() {
       const styles = document.querySelector('head [data-style="style-cell"]');
@@ -260,7 +263,8 @@ export default {
   },
   mounted() {
     const styles = document.querySelector('head [data-style="style-cell"]');
-    if (!styles) this.addingDocumentStyles();
+    if (styles) styles.remove();
+    this.addingDocumentStyles();
   },
   beforeDestroy() {
     // console.log(document.querySelector('head [data-style="style-cell"]'));

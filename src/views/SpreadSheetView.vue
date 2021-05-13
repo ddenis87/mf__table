@@ -29,7 +29,8 @@
       </div>
     </div>
     <div class="spread-sheet-view__table">
-      <spread-sheet :rowsCount="rowCount"
+      <spread-sheet ref="SpreadSheet"
+                    :rowsCount="rowCount"
                     :columnsCount="columnCount"
                     :rows="rows"
                     :columns="columns"
@@ -89,12 +90,52 @@ export default {
     },
   },
   methods: {
-    newDocument() {
+    editingAccept(option) {
+      console.log(option);
+      if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});
+      this.cells[option.cellName].value = option.value;
+      this.editBlur(option);
+    },
+    async editCell(cellProps) {
+      console.log(cellProps);
+      this.cellEditGeometry.width = cellProps.width + 1;
+      this.cellEditGeometry.height = cellProps.height + 1;
+      this.cellEditGeometry.left = cellProps.left - 1;
+      this.cellEditGeometry.top = cellProps.top + 1;
+
+      this.cellEditProps.cellName = cellProps.name;
+      this.cellEditProps.cellType = cellProps.type;
+      this.cellEditProps.cellValue = (this.cells[cellProps.name] && this.cells[cellProps.name].value) ? this.cells[cellProps.name].value : '';
+      this.isCellEditActive = true;
+      await this.$nextTick().then(() => {
+        setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 100);
+      });
+    },
+    editBlur(option) {
+      this.isCellEditActive = false;
+      this.clearPropsSpreadSheetEdit();
+      this.$refs.SpreadSheet.edititnComplete(option);
+    },
+    clearPropsSpreadSheetEdit() {
+      this.cellEditGeometry.width = 0;
+      this.cellEditGeometry.height = 0;
+      this.cellEditGeometry.left = 0;
+      this.cellEditGeometry.top = 0;
+      this.cellEditProps.cellName = undefined;
+      this.cellEditProps.cellType = undefined;
+      this.cellEditProps.cellValue = undefined;
+    },
+    clearPropsSpreadSheet() {
       this.columns = {};
       this.rows = {};
       this.cells = {};
       this.styles = [];
       this.openFile = null;
+    },
+
+    newDocument() {
+      this.clearPropsSpreadSheet();
+      // методы SpreadSheet на новый документ
     },
     saveJSONFile() {
       apiJSON.dowloadJSONFile({
@@ -113,48 +154,8 @@ export default {
         if (Object.keys(data).includes('styles')) this.styles = data.styles;
       });
     },
-    editingAccept(option) {
-      if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});
-      this.cells[option.cellName].value = option.value;
-      this.editBlur();
-    },
-    async editCell(cellProps) {
-      console.log(cellProps);
-      this.cellEditGeometry.width = cellProps.width + 1;
-      this.cellEditGeometry.height = cellProps.height + 1;
-      this.cellEditGeometry.left = cellProps.left - 1;
-      this.cellEditGeometry.top = cellProps.top + 1;
-
-      this.cellEditProps.cellName = cellProps.name;
-      this.cellEditProps.cellType = cellProps.type;
-      this.cellEditProps.cellValue = (this.cells[cellProps.name] && this.cells[cellProps.name].value) ? this.cells[cellProps.name].value : '';
-      this.isCellEditActive = true;
-      await this.$nextTick().then(() => {
-        setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 100);
-      });
-    },
-    editBlur() {
-      this.isCellEditActive = false;
-      this.cellEditGeometry.width = 0;
-      this.cellEditGeometry.height = 0;
-      this.cellEditGeometry.left = 0;
-      this.cellEditGeometry.top = 0;
-      this.cellEditProps.cellName = undefined;
-      this.cellEditProps.cellType = undefined;
-      this.cellEditProps.cellValue = undefined;
-    },
     movePrintPage() {
       this.printMode = !this.printMode;
-      // const pagePrint = this.$router.resolve({
-      //   name: 'SpreadSheetPrint',
-      //   params: {
-      //     columns: this.columns,
-      //     rows: this.rows,
-      //     cells: this.cells,
-      //     styles: this.styles,
-      //   },
-      // });
-      // window.open(pagePrint.href, '_blank');
     },
   },
 };
