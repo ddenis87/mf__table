@@ -14,15 +14,19 @@
           ]"
           :style="[getCellGeometry(source, column, columnIndex)]"
           :data-name="`${column.name}${source.name}`"
-          :tabindex="columnIndex">
-        {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }}
+          :tabindex="columnIndex"
+          v-html="formattedData(column.name, source)">
+        <!-- {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }} -->
       </div>
     </template>
   </div>
 </template>
 
 <script>
-// import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
+import formattedData from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+import {
+  CELL_TYPE_DEFAULT,
+} from '../SpreadSheetConst';
 
 export default {
   name: 'SpreadSheetBodyPrintItem',
@@ -40,14 +44,39 @@ export default {
 
     printMode: { type: Boolean, default: false },
   },
-  data() {
-    return {
-      shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
-    };
-  },
+  // data() {
+  //   return {
+  //     shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
+  //   };
+  // },
   computed: {
   },
   methods: {
+    formattedData(columnName) {
+      if (!this.cells[`${columnName}${this.source.value}`]) return '';
+      const formattedOption = {};
+      const cell = this.cells[`${columnName}${this.source.value}`];
+      const cellValue = cell.value;
+      const cellType = this.getCellType(cell, columnName);
+      formattedOption.valueType = cellType;
+      const cellFormatString = this.getCellFormatString(cell, columnName);
+      if (cellFormatString) formattedOption.formatString = cellFormatString;
+      return formattedData(cellValue, formattedOption);
+    },
+    getCellType(cell, columnName) {
+      const cellType = cell.type
+        || this.source.type
+        || this.columns.find((column) => column.name === columnName).type
+        || CELL_TYPE_DEFAULT;
+      return cellType;
+    },
+    getCellFormatString(cell, columnName) {
+      const cellFormatString = cell.formatString
+        || this.source.formatString
+        || this.columns.find((column) => column.name === columnName).formatString
+        || null;
+      return cellFormatString;
+    },
     getCellGeometry(row, column, columnIndex) {
       const cellGeometry = {};
       const cellName = `${column.name}${row.value}`;

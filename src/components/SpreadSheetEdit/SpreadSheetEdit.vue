@@ -42,11 +42,12 @@ export default {
       // console.log('editing-cancel');
       this.$emit('editing-cancel');
     },
-    focusSpreadSheetEdit() {
-      this.$nextTick();
-      setTimeout(() => {
-        this.$refs.SpreadSheetEditWrapper.$el.querySelector('.v-text-field__slot input').focus();
-      }, 80);
+    async focusSpreadSheetEdit() {
+      await this.$nextTick().then(() => {
+        setTimeout(() => {
+          this.$refs.SpreadSheetEditWrapper.$el.querySelector('.v-text-field__slot input').focus();
+        }, 100);
+      });
     },
     editBlur(option) {
       console.log('edit-blur');

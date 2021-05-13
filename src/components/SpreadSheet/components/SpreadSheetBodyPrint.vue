@@ -2,7 +2,7 @@
   <div class="spread-sheet-body-print">
     <div ref="SheetBodyPrint"
          class="sheet-body-print">
-      <div class="sheet-body-print__item" v-for="(row, rowIndex) in rows"
+      <div class="sheet-body-print__item" v-for="(row, rowIndex) in prepareRows"
            :style="{width: `${templateTableWidth}px`, position: 'relative'}" :key="rowIndex">
         <spread-sheet-body-print-item :source="row"
                                       :columns="columns"
@@ -27,7 +27,6 @@ export default {
   },
   props: {
     rows: { type: Array },
-    // rowsFixed: { type: Array },
     columns: { type: Array },
     cells: { type: Object },
     templateColumnWidth: { type: String, default: '' },
@@ -37,8 +36,20 @@ export default {
 
     printMode: { type: Boolean, default: false },
   },
+  data() {
+    return {
+      setExcludedCellsArray: [].concat(...Object.values(this.setExcludedCells)),
+    };
+  },
   computed: {
-    setExcludedCellsArray() { return [].concat(...Object.values(this.setExcludedCells)); },
+    prepareRows() {
+      const rowsNumber = [];
+      Object.keys(this.cells).forEach((item) => {
+        rowsNumber.push(+item.replace(/[A-z]/g, ''));
+      });
+      const rowsCount = Math.max(...rowsNumber);
+      return this.rows.slice(0, rowsCount);
+    },
   },
 };
 </script>

@@ -8,21 +8,6 @@
                        @editing-cancel="editBlur"
                        @edit-blur="editingAccept"></spread-sheet-edit>
     <div class="spread-sheet-view__control-top">
-      <!-- <div class="item">
-        <v-text-field label="Столбцы" v-model="columnCount"></v-text-field>
-      </div>
-      <div class="item">
-        <v-text-field label="Строки" v-model="rowCount"></v-text-field>
-      </div>
-      <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" width="80" @click="commitSpace">Commit</v-btn>
-      </div>
-      <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" width="80" @click="() => isShowDialog = true">Setting</v-btn>
-      </div> -->
-      <!-- <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" width="80" @click="movePrintPage">Print</v-btn>
-      </div> -->
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="newDocument">
           <v-icon small left>mdi-file-table-outline</v-icon>Новый документ</v-btn>
@@ -38,6 +23,10 @@
         <v-btn small dark color="blue darken-3" @click="saveJSONFile">
           <v-icon small left>mdi-cloud-download-outline</v-icon>Сохранить документ</v-btn>
       </div>
+      <div class="item item_btn">
+        <v-btn small dark :color="(printMode) ? 'blue darken-1' : 'blue darken-3'" @click="movePrintPage">
+          <v-icon small left>mdi-cloud-print-outline</v-icon>{{ (printMode) ? 'Редактирование' : 'Печать'}}</v-btn>
+      </div>
     </div>
     <div class="spread-sheet-view__table">
       <spread-sheet :rowsCount="rowCount"
@@ -48,43 +37,26 @@
                     :styles="styles"
                     :cell-width="cellWidth"
                     :cell-height="cellHeight"
+                    :print-mode="printMode"
                     @edit-cell="editCell"></spread-sheet>
     </div>
-    <dialog-bar-right is-dialog-name="Setting" class="dialog"
-                      :is-dialog-show="isShowDialog"
-                      width="700"
-                      @close-dialog="isShowDialog = false">
-      <v-card class="dialog__item" >
-        <!-- <v-textarea rows="7" label="Columns" v-model="columnsJSON"></v-textarea>
-        <v-textarea rows="7" label="Rows" v-model="rowsJSON"></v-textarea>
-        <v-textarea rows="7" label="Cells" v-model="cellsJSON"></v-textarea> -->
-      </v-card>
-    </dialog-bar-right>
   </div>
 </template>
 
 <script>
 import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
-import DialogBarRight from '@/components/Dialogs/DialogBarRight.vue';
 
 import apiJSON from '@/plugins/apiJSON/apiJSON';
-// import SpreadSheetData from './SpreadSheetData';
 
 export default {
   name: 'SpreadSheetView',
   components: {
     SpreadSheet,
     SpreadSheetEdit,
-    DialogBarRight,
   },
   data() {
     return {
-      // ...SpreadSheetData,
-      // sheetSpace: {
-      //   row: 1000,
-      //   column: 50,
-      // },
       openFile: null,
       rowCount: undefined,
       columnCount: undefined,
@@ -103,6 +75,7 @@ export default {
         top: 0,
       },
       cellEditProps: {},
+      printMode: false,
     };
   },
   computed: {
@@ -145,7 +118,7 @@ export default {
       this.cells[option.cellName].value = option.value;
       this.editBlur();
     },
-    editCell(cellProps) {
+    async editCell(cellProps) {
       console.log(cellProps);
       this.cellEditGeometry.width = cellProps.width + 1;
       this.cellEditGeometry.height = cellProps.height + 1;
@@ -156,7 +129,9 @@ export default {
       this.cellEditProps.cellType = cellProps.type;
       this.cellEditProps.cellValue = (this.cells[cellProps.name] && this.cells[cellProps.name].value) ? this.cells[cellProps.name].value : '';
       this.isCellEditActive = true;
-      setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 80);
+      await this.$nextTick().then(() => {
+        setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 100);
+      });
     },
     editBlur() {
       this.isCellEditActive = false;
@@ -168,12 +143,18 @@ export default {
       this.cellEditProps.cellType = undefined;
       this.cellEditProps.cellValue = undefined;
     },
-    commitSpace() {
-      this.sheetSpace.column = +this.countColumn;
-      this.sheetSpace.row = +this.countRow;
-    },
     movePrintPage() {
-      this.$router.push('/SpreadSheetPrint');
+      this.printMode = !this.printMode;
+      // const pagePrint = this.$router.resolve({
+      //   name: 'SpreadSheetPrint',
+      //   params: {
+      //     columns: this.columns,
+      //     rows: this.rows,
+      //     cells: this.cells,
+      //     styles: this.styles,
+      //   },
+      // });
+      // window.open(pagePrint.href, '_blank');
     },
   },
 };
@@ -225,6 +206,16 @@ export default {
     &__item {
       padding: 20px;
       height: calc(100vh - 65px);
+    }
+  }
+}
+
+@media print {
+  .spread-sheet-view {
+    grid-template-areas: "table";
+    grid-template-rows: 1fr;
+    &__control-top {
+      display: none;
     }
   }
 }

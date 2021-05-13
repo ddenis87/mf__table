@@ -26,7 +26,7 @@
                                   :maxLevelGroupRow="maxLevelGroupRow"
                                   :setExcludedCells="setExcludedCells"
                                   :print-mode="printMode"></spread-sheet-body-static>
-        <spread-sheet-body v-if="!printMode"
+        <spread-sheet-body v-show="!printMode"
                           :rows="tableRows"
                           :rows-fixed="tableRowsFixed"
                           :columns="tableColumns"
@@ -248,14 +248,24 @@ export default {
       this.setExcludedCells = {};
     },
     styles() {
-      const styles = document.querySelector('head').lastChild;
-      if (styles.getAttribute('data-style')) styles.remove();
+      const styles = document.querySelector('head [data-style="style-cell"]');
+      if (styles) styles.remove();
+      this.addingDocumentStyles();
+    },
+    printMode() {
+      const styles = document.querySelector('head [data-style="style-cell"]');
+      if (styles) styles.remove();
       this.addingDocumentStyles();
     },
   },
+  mounted() {
+    const styles = document.querySelector('head [data-style="style-cell"]');
+    if (!styles) this.addingDocumentStyles();
+  },
   beforeDestroy() {
-    const styles = document.querySelector('head').lastChild;
-    if (styles.getAttribute('data-style')) styles.remove();
+    // console.log(document.querySelector('head [data-style="style-cell"]'));
+    const styles = document.querySelector('head [data-style="style-cell"]');
+    if (styles) styles.remove();
   },
   methods: {
     editCell(evt) {

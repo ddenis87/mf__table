@@ -12,6 +12,10 @@
 </template>
 
 <script>
+import ElFieldString from '@/components/Elements/ElFields/ElFieldString.vue';
+import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber.vue';
+import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate.vue';
+
 export default {
   name: 'SpreadSheetEditFieldWrapper',
   model: {
@@ -24,13 +28,19 @@ export default {
   },
   data() {
     return {
+      componentsField: {
+        string: ElFieldString,
+        number: ElFieldNumber,
+        date: ElFieldDate,
+      },
       value: this.cellValue,
     };
   },
   computed: {
     componentField() {
       // eslint-disable-next-line prefer-template
-      return () => import('@/components/Elements/ElFields/ElField' + this.getToUpperFirstChar(this.cellType) + '.vue');
+      return this.componentsField[this.cellType];
+      // return () => import('@/components/Elements/ElFields/ElField' + this.getToUpperFirstChar(this.cellType) + '.vue');
     },
   },
   methods: {

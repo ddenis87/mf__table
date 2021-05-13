@@ -1,9 +1,7 @@
 <template>
   <div class="spread-sheet-print">
     <spread-sheet :columns="columns"
-                  :columnsCount="sheetSpace.column"
                   :rows="rows"
-                  :rowsCount="sheetSpace.row"
                   :cells="cells"
                   :styles="styles"
                   :print-mode="true"></spread-sheet>
@@ -12,22 +10,22 @@
 
 <script>
 import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
-import SpreadSheetData from './SpreadSheetData';
 
 export default {
   name: 'SpreadSheetPrint',
   components: {
     SpreadSheet,
   },
-  data() {
-    return {
-      ...SpreadSheetData,
-    };
+  props: {
+    rows: { type: Object, default() { return {}; } },
+    columns: { type: Object, default() { return {}; } },
+    cells: { type: Object, default() { return {}; } },
+    rowsCount: { type: Number, default: 1000 },
+    columnsCount: { type: Number, default: 50 },
+    styles: { type: Array, default() { return []; } },
   },
-  computed: {
-    columns() { return JSON.parse(this.columnsJSON); },
-    rows() { return JSON.parse(this.rowsJSON); },
-    cells() { return JSON.parse(this.cellsJSON); },
+  mounted() {
+    console.log(this.cells);
   },
 };
 </script>

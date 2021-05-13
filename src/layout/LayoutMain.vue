@@ -58,5 +58,16 @@ export default {
     // border: thin solid red;
   }
 }
-
+@media print {
+  .layout-main {
+    grid-template-areas: "layout-main__content";
+    grid-template-rows: 1fr;
+    &__bar {
+      display: none;
+    }
+    &__bar-nav {
+      display: none;
+    }
+  }
+}
 </style>
