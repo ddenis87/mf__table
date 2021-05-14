@@ -135,7 +135,7 @@ export default {
           prepareColumns.push(columnItem);
         }
       }
-      // console.log(columnsTable);
+      // console.log(prepareColumns);
       return prepareColumns;
     },
     tableRows() {
@@ -172,6 +172,7 @@ export default {
           prepareRows.push(rowItem);
         }
       }
+      // console.log(prepareRows);
       return prepareRows;
     },
     tableRowsFixed() {
