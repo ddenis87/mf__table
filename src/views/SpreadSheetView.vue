@@ -27,6 +27,11 @@
         <v-btn small dark :color="(printMode) ? 'blue darken-1' : 'blue darken-3'" @click="movePrintPage">
           <v-icon small left>mdi-cloud-print-outline</v-icon>{{ (printMode) ? 'Редактирование' : 'Печать'}}</v-btn>
       </div>
+      <div class="item item_btn">
+        <v-checkbox label="Сетка"
+                    v-model="isGridOff"
+                    @input="isGridOff = !isGridOff"></v-checkbox>
+      </div>
     </div>
     <div class="spread-sheet-view__table">
       <spread-sheet ref="SpreadSheet"
@@ -39,6 +44,7 @@
                     :cell-width="cellWidth"
                     :cell-height="cellHeight"
                     :print-mode="printMode"
+                    :is-grid-off="!isGridOff"
                     @edit-cell="editCell"></spread-sheet>
     </div>
   </div>
@@ -77,6 +83,7 @@ export default {
       },
       cellEditProps: {},
       printMode: false,
+      isGridOff: true,
     };
   },
   computed: {
@@ -135,6 +142,7 @@ export default {
 
     newDocument() {
       this.clearPropsSpreadSheet();
+      this.isGridOff = true;
       // методы SpreadSheet на новый документ
     },
     saveJSONFile() {
@@ -153,6 +161,7 @@ export default {
         if (Object.keys(data).includes('cells')) this.cells = data.cells;
         if (Object.keys(data).includes('styles')) this.styles = data.styles;
       });
+      this.isGridOff = false;
     },
     movePrintPage() {
       this.printMode = !this.printMode;

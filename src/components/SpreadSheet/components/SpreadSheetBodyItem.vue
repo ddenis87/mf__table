@@ -30,6 +30,7 @@
           :class="[
             (cells[`${column.name}${source.value}`])
               ? cells[`${column.name}${source.value}`].style : '',
+            (isGridOff) ? 'column-body_grid-off' : '',
           ]"
           :style="[getCellGeometry(source, column, columnIndex), fixedCell(column, columnIndex)]"
           :data-name="`${column.name}${source.name}`"
@@ -63,6 +64,7 @@ export default {
     templateColumnWidth: { type: String, default: '' },
     setOpenGroupRows: { type: Array, default() { return []; } },
     printMode: { type: Boolean, default: false },
+    isGridOff: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -157,7 +159,7 @@ export default {
   .column {
     position: relative;
     display: inline-flex;
-    align-items: center;
+    align-items: flex-end;
     background-color: white;
     &-stop {
       position: sticky;
@@ -167,7 +169,6 @@ export default {
       position: sticky;
       background-color: #dadce0;
       justify-content: center;
-
       font-size: 0.75em;
       font-weight: bold;
       color: rgba(0, 0, 0, 0.6);
@@ -195,10 +196,16 @@ export default {
       border-right: thin solid grey;
       border-bottom: thin solid grey;
       box-sizing: border-box;
+      line-height: 1.3;
+      letter-spacing: 0.15px;
       white-space: nowrap;
       overflow: hidden;
       outline: none;
       cursor: cell;
+      &_grid-off {
+        border-right: thin solid rgba(255,255,255, 0);
+        border-bottom: thin solid rgba(255,255,255, 0);;
+      }
     }
   }
   .line-start {

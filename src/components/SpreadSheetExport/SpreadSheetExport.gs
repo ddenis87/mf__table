@@ -1,6 +1,16 @@
 
 const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
+const FONT_FAMILY = ['Arial', 'arial,sans,sans-serif'];
+const FONTS_FAMILY = { 'Times New Roman': "'Times New Roman, Times, sans-serif'" }
+const FONT_SIZE = 0;
+const FONT_WEIGHT = 'normal';
+const FONT_STYLE = 'normal';
+const FONT_COLOR = '#000000';
+
+const ALIGNMENT_H = { left: 'flex-start', center: 'center', right: 'flex-end', defaultValue: () => 'general' };
+const ALIGNMENT_V = { top: 'flex-start', middle: 'center', bottom: 'flex-end', defaultValue: () => 'bottom' };
+
 function onOpen() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var menuEntries = [
@@ -12,22 +22,110 @@ function onOpen() {
 }
 
 function openDialog(e) {
-  var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var range = sheet.getRange(7, 11);
+  Logger.log( range.getTextRotation().getDegrees());
 
-  var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  // var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
+  // var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
   // var activeSheet = SpreadsheetApp.getActiveSheet();
   // var name = activeSheet.getName();
 
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var range = sheet.getRange("D5");
+  // var data = Sheets.Spreadsheets.get(currSsId, {
+  //     ranges: ["F23"],
+  //     fields: fieldsBorders
+  // });
+  
+  // Logger.log(data);
+};
+
+function getBordersCell() {
+  var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
+  var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  var activeSheet = SpreadsheetApp.getActiveSheet();
+  var name = activeSheet.getName();
 
   var data = Sheets.Spreadsheets.get(currSsId, {
-      ranges: ["D8"],
+      ranges: name,
       fields: fieldsBorders
   });
+  var dataRowArray = data.sheets[0].data[0].rowData;
+  var dataBordersArray = [];
+  dataRowArray.forEach(item => {
+    dataBordersArray.push(item.values);
+  });
+  return dataBordersArray;
+};
 
-  Logger.log(data);
+function getBorderCell(borders) {
+  // if (/if (data.sheets[0].data[0].rowData) {
+    var styleCell = {
+      list: {},
+    };
+    var dataBorder = borders.userEnteredFormat.borders;
+    var colorBorder = {};
+    if (dataBorder.top) {
+      colorBorder = dataBorder.top.colorStyle.rgbColor;
+      styleCell.list.borderTop
+        = `${dataBorder.top.width - 0.5}px ` +
+          `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
+          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    }
+    if (dataBorder.bottom) {
+      colorBorder = dataBorder.bottom.colorStyle.rgbColor;
+      styleCell.list.borderBottom
+        = `${dataBorder.bottom.width - 0.5}px ` +
+          `${dataBorder.bottom.style.split('_')[0].toLowerCase()} ` +
+          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    }
+    if (dataBorder.left) {
+      colorBorder = dataBorder.left.colorStyle.rgbColor;
+      styleCell.list.borderLeft
+        = `${dataBorder.left.width - 0.5}px ` +
+          `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
+          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    }
+    if (dataBorder.right) {
+      colorBorder = dataBorder.right.colorStyle.rgbColor;
+      styleCell.list.borderRight
+        = `${dataBorder.right.width - 0.5}px ` +
+          `${dataBorder.right.style.split('_')[0].toLowerCase()} ` +
+          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    }
+    return styleCell.list;
+  // }
+};
 
+function getStylesCell(cellNameA1, borderCell) {
+  var styleCell = {
+    name: cellNameA1.toLowerCase(),
+    list: {},
+  };
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var range = sheet.getRange(styleCell.name);
+
+  if (borderCell && borderCell.userEnteredFormat) {
+    // Logger.log(borderCell);
+    styleCell.list = getBorderCell(borderCell);
+  };
+  if (range.getFontFamily() && !FONT_FAMILY.includes(range.getFontFamily())) styleCell.list.fontFamily = `'${range.getFontFamily()}', sans-serif`;
+  if (range.getFontWeight() && range.getFontWeight() != FONT_WEIGHT) styleCell.list.fontWeight = range.getFontWeight();
+  if (range.getFontStyle() && range.getFontStyle() != FONT_STYLE) styleCell.list.fontStyle = range.getFontStyle();
+  if (range.getFontSize() && range.getFontSize() != FONT_SIZE) styleCell.list.fontSize = `${range.getFontSize() + 3}px`;
+  if (range.getFontColor() && range.getFontColor() != FONT_COLOR) styleCell.list.color = range.getFontColor();
+
+  if (range.getHorizontalAlignment() && range.getHorizontalAlignment() != ALIGNMENT_H.defaultValue()) {
+    styleCell.list.textAlign = range.getHorizontalAlignment();
+    styleCell.list.justifyContent = ALIGNMENT_H[range.getHorizontalAlignment()];
+  }
+  if (range.getVerticalAlignment() && range.getVerticalAlignment() != ALIGNMENT_V.defaultValue()) styleCell.list.alignItems = ALIGNMENT_V[range.getVerticalAlignment()];
+  
+  if (range.getWrap() == true && range.getWrapStrategy() == 'WRAP') { styleCell.list.wordWrap = 'break-word'; styleCell.list.whiteSpace = 'unset'; }; 
+
+  if (range.getTextRotation().getDegrees() == 90) { styleCell.list.writingMode = 'tb-rl'; styleCell.list.transform = 'rotate(180deg)'; };
+
+  if (Object.keys(styleCell.list).length) return styleCell;
+  return null;
 };
 
 function exportJSON() {
@@ -40,7 +138,7 @@ function exportJSON() {
     rows: {},
     columns: {},
     cells: {},
-    cellsMerge: [],
+    styles: [],
   };
   // rowsFixed
   for (var i = 0; i < sheet.getFrozenRows(); i++) {
@@ -72,11 +170,20 @@ function exportJSON() {
       objectToJSON.columns[getColumnNameForNumber(i + 1)].parent = getColumnNameForNumber(sheet.getColumnGroup(i + 1, sheet.getColumnGroupDepth(i + 1)).getControlIndex());
     }
   }
+  // get all borders
+  var bordersCells = getBordersCell();
 
-  // cells
+  // cells, styles
   for (var i = 0; i < values.length; i++) {
     for (var j = 0; j < values[i].length; j++) {
-      if (values[i][j] != "") objectToJSON.cells[`${getColumnNameForNumber(j + 1)}${i + 1}`] = {value: values[i][j]};
+      var cellName = range.getCell(i + 1, j + 1).getA1Notation();
+      
+      var styleCell = getStylesCell(cellName, (bordersCells[i]) ? bordersCells[i][j] : null);
+      if (values[i][j] != "" || styleCell) objectToJSON.cells[cellName.toLowerCase()] = {value: values[i][j]};
+      if (styleCell) {
+        objectToJSON.cells[cellName.toLowerCase()].style = cellName.toLowerCase();
+        objectToJSON.styles.push(styleCell);
+      }
     }
   }
   
@@ -90,22 +197,18 @@ function exportJSON() {
     var cellNameEndRow = +cellNameEnd.replace(/[A-z]/g, '');
     var cellNameEndColumn = +getColumnNumberForName(cellNameEnd.replace(/[0-9]/g, '').toLowerCase());
 
+    if (((cellNameEndRow - cellNameStartRow) > 0 || (cellNameEndColumn - cellNameStartColumn) > 0)
+      && !objectToJSON.cells[cellNameStart.toLowerCase()]) objectToJSON.cells[cellNameStart.toLowerCase()] = {};
     if ((cellNameEndRow - cellNameStartRow) > 0) objectToJSON.cells[cellNameStart.toLowerCase()].rowspan = (cellNameEndRow - cellNameStartRow) + 1;
     if ((cellNameEndColumn - cellNameStartColumn) > 0) objectToJSON.cells[cellNameStart.toLowerCase()].colspan = (cellNameEndColumn - cellNameStartColumn) + 1;
   }
-
-  // var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
-
-  // var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
-  // var activeSheet = SpreadsheetApp.getActiveSheet();
-  // var name = activeSheet.getName();
 
   displayText_(buildJson(objectToJSON));
 };
 
 function displayText_(text) {
   var output = HtmlService.createHtmlOutput("<textarea style='width:100%;' rows='20'>" + text + "</textarea>");
-  output.setWidth(600)
+  output.setWidth(1000)
   output.setHeight(500);
   SpreadsheetApp.getUi()
       .showModalDialog(output, 'Exported JSON');

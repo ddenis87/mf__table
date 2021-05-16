@@ -62,6 +62,7 @@ export default {
     maxLevelGroupColumn: { type: Number, default: 0 },
     setExcludedCells: { type: Object, default() { return {}; } },
     setOpenGroupRows: { type: Array, default() { return []; } },
+    isGridOff: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -103,6 +104,7 @@ export default {
         setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
         maxLevelGroupRow: this.maxLevelGroupRow,
         setOpenGroupRows: this.setOpenGroupRows,
+        isGridOff: this.isGridOff,
       };
     },
   },

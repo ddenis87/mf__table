@@ -38,6 +38,7 @@
                            :set-excluded-cells="setExcludedCells"
                            :template-table-width="templateTableWidth"
                            :set-open-group-rows="setOpenGroupRows"
+                           :is-grid-off="isGridOff"
                            @edit-cell="editCell"
                            @toggle-row-group="toggleRowGroup"
                            @scroll-body-x="scrollBodyX"></spread-sheet-body>
@@ -77,6 +78,7 @@ export default {
     cellWidth: { type: Number, default: CELL_WIDTH },
     cellHeight: { type: Number, default: CELL_HEIGHT },
     printMode: { type: Boolean, default: false },
+    isGridOff: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -423,7 +425,7 @@ export default {
     },
 
     transformObjectToStringStyle(object) {
-      return JSON.stringify(object).replace(/,/g, ';').replace(/"/g, '').replace(/}/g, ';}');
+      return JSON.stringify(object).replace(/","/g, ';').replace(/"/g, '').replace(/}/g, ';}');
     },
   },
 };
