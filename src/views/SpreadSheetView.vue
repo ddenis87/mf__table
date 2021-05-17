@@ -4,6 +4,7 @@
                        v-if="isCellEditActive"
                        :style="cellEditStyle"
                        v-bind="cellEditProps"
+                       :is-shild="isCellEditShild"
                        @editing-accept="editingAccept"
                        @editing-cancel="editBlur"
                        @edit-blur="editingAccept"></spread-sheet-edit>
@@ -74,6 +75,7 @@ export default {
       cellHeight: undefined,
       isShowDialog: false,
       isCellEditActive: false,
+      isCellEditShild: false,
       cellEditGeometry: {
         width: 0,
         height: 0,
@@ -101,13 +103,14 @@ export default {
         const cellEdit = this.$refs.SpreadSheet.$el.querySelector(`[data-name="${this.cellEditProps.cellName}"]`);
         if (!cellEdit) return;
         const cellEditGeometry = cellEdit.getBoundingClientRect();
+        console.log(this.cellEditGeometry.top, ' < ', cellEditGeometry.top - 65);
         if ((this.cellEditGeometry.left > cellEditGeometry.left + 10
           || this.cellEditGeometry.left < cellEditGeometry.left - 10)
-          || (this.cellEditGeometry.top > cellEditGeometry.top + 10
-          || this.cellEditGeometry.top < cellEditGeometry.top - 10)) {
-          console.log('shild');
+          || (this.cellEditGeometry.top > cellEditGeometry.top - 65
+          || this.cellEditGeometry.top < cellEditGeometry.top - 65)) {
+          this.isCellEditShild = true;
         } else {
-          console.log('no shild');
+          this.isCellEditShild = false;
         }
         // console.log(this.$refs.SpreadSheet.$el.querySelector(`[data-name="${this.cellEditProps.cellName}"]`));
       }
@@ -133,10 +136,10 @@ export default {
         setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 100);
       });
     },
-    editBlur(option) {
+    editBlur() {
       this.isCellEditActive = false;
       this.clearPropsSpreadSheetEdit();
-      this.$refs.SpreadSheet.edititnComplete(option);
+      // this.$refs.SpreadSheet.edititnComplete(option);
     },
     clearPropsSpreadSheetEdit() {
       this.cellEditGeometry.width = 0;
@@ -146,6 +149,7 @@ export default {
       this.cellEditProps.cellName = undefined;
       this.cellEditProps.cellType = undefined;
       this.cellEditProps.cellValue = undefined;
+      this.isCellEditShild = false;
     },
     clearPropsSpreadSheet() {
       this.columns = {};
