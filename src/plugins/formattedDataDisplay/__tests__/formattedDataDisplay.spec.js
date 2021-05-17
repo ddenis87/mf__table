@@ -2,9 +2,10 @@ import formattedDataDisplay from '@/plugins/formattedDataDisplay/formattedDataDi
 
 describe('FormattedDataDisplay', () => {
   describe('Type String (default)', () => {
-    it('Value     - text -> text', () => expect(formattedDataDisplay('text')).toBe('text'));
-    it('Prefix    - text -> ~text', () => expect(formattedDataDisplay('text', { valuePrefix: '~' })).toBe('~text'));
-    it('Suffix    - text -> text*', () => expect(formattedDataDisplay('text', { valueSuffix: '*' })).toBe('text*'));
+    it('Value      - text -> text', () => expect(formattedDataDisplay('text')).toBe('text'));
+    it('Prefix     - text -> ~text', () => expect(formattedDataDisplay('text', { valuePrefix: '~' })).toBe('~text'));
+    it('Suffix     - text -> text*', () => expect(formattedDataDisplay('text', { valueSuffix: '*' })).toBe('text*'));
+    it('Line break - Hello \n world -> Hello <br/> world', () => expect(formattedDataDisplay('Hello \n world')).toBe('Hello <br/> world'));
   })
   describe('Type Number', () => {
     const type = { valueType: 'number' };
@@ -21,12 +22,15 @@ describe('FormattedDataDisplay', () => {
       const formatString_3 = { formatString: 'group=false' };
       const formatString_4 = { formatString: 'type=currency$currency=RUB' };
       const formatString_5 = { formatString: 'type=currency$currency=RUB$currencyView=code' };
+      const formatString_6 = { formatString: 'color=true' };
       it('"positive=true"                                - 35   -> +35', () => expect(formattedDataDisplay('35', { ...type, ...formatString_1 })).toBe('+35'));
       it('"positive=true$minFD=2"                        - 35   -> +35,00', () => expect(formattedDataDisplay(35, { ...type, ...formatString_2 })).toBe('+35,00'));
       it('"positive=true$minFD=2"                        - 3500 -> +3 500,00', () => expect(formattedDataDisplay('3500', { ...type, ...formatString_2 })).toBe(`+3\xa0500,00`));
       it('"group=false"                                  - 3500 -> 3500', () => expect(formattedDataDisplay('3500', { ...type, ...formatString_3 })).toBe(`3500`));
       it('"type=currency$currency=RUB"                   - 35   -> 35,00 ₽', () => expect(formattedDataDisplay('35', { ...type, ...formatString_4 })).toBe('35,00\xa0₽'));
       it('"type=currency$currency=RUB$currencyView=code" - 35   -> 35,00 RUB', () => expect(formattedDataDisplay('35', { ...type, ...formatString_5 })).toBe('35,00\xa0RUB'));    
+      it('"color=true" positive                          - 35   -> <span style="color: green">35</span>', () => expect(formattedDataDisplay('35', { ...type, ...formatString_6 })).toBe('<span style="color: green">35</span>'));
+      it('"color=true" minus                             - -35   -> <span style="color: red">-35</span>', () => expect(formattedDataDisplay('-35', { ...type, ...formatString_6 })).toBe('<span style="color: red">-35</span>'));    
     });
   });
   
