@@ -87,13 +87,13 @@ function getBorderCell(borders) {
     };
     var dataBorder = borders.userEnteredFormat.borders;
     var colorBorder = {};
-    if (!dataBorder.bottom && dataBorder.top) {
-      colorBorder = dataBorder.top.colorStyle.rgbColor;
-      styleCell.list.borderTop
-        = `${dataBorder.top.width}px ` +
-          `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
-          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
-    }
+    // if (!dataBorder.bottom && dataBorder.top) {
+    //   colorBorder = dataBorder.top.colorStyle.rgbColor;
+    //   styleCell.list.borderTop
+    //     = `${dataBorder.top.width}px ` +
+    //       `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
+    //       `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    // }
     if (dataBorder.bottom) {
       colorBorder = dataBorder.bottom.colorStyle.rgbColor;
       styleCell.list.borderBottom
@@ -101,13 +101,13 @@ function getBorderCell(borders) {
           `${dataBorder.bottom.style.split('_')[0].toLowerCase()} ` +
           `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
-    if (!dataBorder.right && dataBorder.left) {
-      colorBorder = dataBorder.left.colorStyle.rgbColor;
-      styleCell.list.borderLeft
-        = `${dataBorder.left.width}px ` +
-          `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
-          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
-    }
+    // if (!dataBorder.right && dataBorder.left) {
+    //   colorBorder = dataBorder.left.colorStyle.rgbColor;
+    //   styleCell.list.borderLeft
+    //     = `${dataBorder.left.width}px ` +
+    //       `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
+    //       `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    // }
     if (dataBorder.right) {
       colorBorder = dataBorder.right.colorStyle.rgbColor;
       styleCell.list.borderRight

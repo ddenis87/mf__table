@@ -198,7 +198,7 @@ export default {
       border-right: thin solid grey;
       border-bottom: thin solid grey;
       box-sizing: border-box;
-      line-height: 1.3;
+      line-height: 1.25;
       // letter-spacing: 0.4px;
       white-space: nowrap;
       overflow: hidden;
