@@ -17,7 +17,7 @@
                           @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
       </div>
       <div class="sheet__body">
-        <spread-sheet-body-static v-if="printMode"
+        <spread-sheet-body-print v-if="printMode"
                                   :rows="tableRows"
                                   :columns="tableColumns"
                                   :cells="tableCells"
@@ -25,7 +25,7 @@
                                   :templateColumnWidth="templateColumnWidth"
                                   :maxLevelGroupRow="maxLevelGroupRow"
                                   :setExcludedCells="setExcludedCells"
-                                  :print-mode="printMode"></spread-sheet-body-static>
+                                  :print-mode="printMode"></spread-sheet-body-print>
         <spread-sheet-body v-show="!printMode"
                            ref="SheetBody"
                            :rows="tableRows"
@@ -50,7 +50,7 @@
 <script>
 import SpreadSheetHead from './components/SpreadSheetHead.vue';
 import SpreadSheetBody from './components/SpreadSheetBody.vue';
-import SpreadSheetBodyStatic from './components/SpreadSheetBodyPrint.vue';
+import SpreadSheetBodyPrint from './components/SpreadSheetBodyPrint.vue';
 
 import {
   CELL_HEIGHT,
@@ -65,7 +65,7 @@ export default {
   components: {
     SpreadSheetHead,
     SpreadSheetBody,
-    SpreadSheetBodyStatic,
+    SpreadSheetBodyPrint,
   },
   props: {
     rowsCount: { type: Number, default: 1000 },
@@ -248,31 +248,18 @@ export default {
     },
   },
   watch: {
-    cells() {
-      console.log('clear excluded cell');
-      this.setExcludedCells = {}; // не по этому собитию, -- срабатывает при обновлении/редактировании
-      // вынести в публичный метод влючив очистку всей data
-    },
     styles() {
-      const styles = document.querySelector('head [data-style="style-cell"]');
-      if (styles) styles.remove();
-      this.addingDocumentStyles();
+      this.updateDocumentStyles();
     },
-    printMode() {
-      const styles = document.querySelector('head [data-style="style-cell"]');
-      if (styles) styles.remove();
-      this.addingDocumentStyles();
+    printMode() { // убрать, печать на отдельной страницы
+      this.updateDocumentStyles();
     },
   },
   mounted() {
-    const styles = document.querySelector('head [data-style="style-cell"]');
-    if (styles) styles.remove();
-    this.addingDocumentStyles();
+    this.updateDocumentStyles();
   },
   beforeDestroy() {
-    // console.log(document.querySelector('head [data-style="style-cell"]'));
-    const styles = document.querySelector('head [data-style="style-cell"]');
-    if (styles) styles.remove();
+    this.updateDocumentStyles(false);
   },
   methods: {
     editCell(evt) {
@@ -282,7 +269,6 @@ export default {
         name: cellName,
         target: evt.target,
         type: this.getCellType(cellName),
-        // top: cellGeometry.top - ((this.maxLevelGroupColumn * this.cellHeight) + this.cellHeight),
         top: cellGeometry.top - ((2 * this.cellHeight) + this.cellHeight),
         left: cellGeometry.left,
         width: cellGeometry.width,
@@ -397,6 +383,11 @@ export default {
       };
     },
 
+    updateDocumentStyles(create = true) {
+      const styles = document.querySelector('head [data-style="style-cell"]');
+      if (styles) styles.remove();
+      if (create) this.addingDocumentStyles();
+    },
     addingDocumentStyles() {
       let stylesPath = '';
       stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
@@ -427,6 +418,14 @@ export default {
     transformObjectToStringStyle(object) {
       return JSON.stringify(object).replace(/","/g, ';').replace(/"/g, '').replace(/}/g, ';}');
     },
+
+    // public methods ---------
+    pDocumentNew() {
+      this.setOpenGroupColumns = [];
+      this.setOpenGroupRows = [];
+      this.setExcludedCells = {};
+    },
+    // ------ ------- ---------
   },
 };
 </script>

@@ -15,7 +15,6 @@
       <div class="item item_btn item_file">
         <v-file-input dense
                       label="Открыть документ"
-                      v-model="openFile"
                       @change="openJSONFile">
         </v-file-input>
       </div>
@@ -64,7 +63,6 @@ export default {
   },
   data() {
     return {
-      openFile: null,
       rowCount: undefined,
       columnCount: undefined,
       rows: {},
@@ -137,13 +135,12 @@ export default {
       this.rows = {};
       this.cells = {};
       this.styles = [];
-      this.openFile = null;
     },
 
     newDocument() {
       this.clearPropsSpreadSheet();
+      this.$refs.SpreadSheet.pDocumentNew();
       this.isGridOff = true;
-      // методы SpreadSheet на новый документ
     },
     saveJSONFile() {
       apiJSON.dowloadJSONFile({
@@ -155,6 +152,7 @@ export default {
     },
     openJSONFile(file) {
       if (!file) return;
+      this.newDocument();
       apiJSON.uploadJSONFile(file).then((data) => {
         if (Object.keys(data).includes('columns')) this.columns = data.columns;
         if (Object.keys(data).includes('rows')) this.rows = data.rows;
@@ -179,7 +177,6 @@ export default {
   grid-template-columns: 1fr;
   max-width: 100%;
 
-  // border: thin solid red;
   &__control-top {
     grid-area: control-top;
     display: flex;
@@ -188,7 +185,6 @@ export default {
     padding: 5px;
     padding-left: 18px;
     .item {
-      // width: 100px;
       padding-right: 20px;
       &_btn {
         align-self: center;
@@ -196,10 +192,8 @@ export default {
       &_file {
         width: 240px;
         padding-top: 10px;
-        // align-self: flex-end;
       }
     }
-    // border: thin solid green;
   }
   &__table {
     position: relative;
@@ -207,16 +201,6 @@ export default {
     padding: 5px;
     width: calc(100vw - 0px);
     height: calc(100vh - 126px);
-    // border: thin solid black;
-  }
-
-  .dialog {
-    height: calc(100vh - 65px);
-    z-index: 9999;
-    &__item {
-      padding: 20px;
-      height: calc(100vh - 65px);
-    }
   }
 }
 
