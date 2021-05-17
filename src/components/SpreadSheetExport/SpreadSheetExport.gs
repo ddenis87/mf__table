@@ -23,9 +23,20 @@ function onOpen() {
 
 function openDialog(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var range = sheet.getRange(7, 11);
-  Logger.log( range.getTextRotation().getDegrees());
-
+  var range = sheet.getRange(20, 5);
+  Logger.log(`E20 - ${range.getNumberFormat()}`);
+  var range = sheet.getRange(21, 5);
+  Logger.log(`E21 - ${range.getNumberFormat()}`);
+  var range = sheet.getRange(22, 5);
+  Logger.log(`E22 - ${range.getNumberFormat()}`);
+  range = sheet.getRange(5, 10);
+  Logger.log(`J5 - ${range.getNumberFormat()}`);
+  range = sheet.getRange(2, 1);
+  Logger.log(`A2 - ${range.getValue()}`);
+  range = sheet.getRange(1, 1);
+  Logger.log(`A1 - ${range.getNumberFormat()}`);
+  range = sheet.getRange(7, 10);
+  Logger.log(`J7 - ${range.getNumberFormat()}`);
   // var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
   // var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
   // var activeSheet = SpreadsheetApp.getActiveSheet();
@@ -37,6 +48,19 @@ function openDialog(e) {
   // });
   
   // Logger.log(data);
+};
+
+function getTypeCell(cellNameA1) {
+  var cellName = cellNameA1.toLowerCase();
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var range = sheet.getRange(cellName);
+  var formatCell = range.getNumberFormat();
+  if (formatCell === '#,##0.00' || formatCell.includes('#,##0.00')) {
+    var format = `minFD=${formatCell.split('.')[formatCell.split('.').length - 1].length}`;
+    return {type: 'number', format: format};
+  }
+  if (formatCell.includes('dd.MM.yyyy')) { return { type: 'date' }; };
+  return null;
 };
 
 function getBordersCell() {
@@ -58,7 +82,6 @@ function getBordersCell() {
 };
 
 function getBorderCell(borders) {
-  // if (/if (data.sheets[0].data[0].rowData) {
     var styleCell = {
       list: {},
     };
@@ -67,33 +90,32 @@ function getBorderCell(borders) {
     if (dataBorder.top) {
       colorBorder = dataBorder.top.colorStyle.rgbColor;
       styleCell.list.borderTop
-        = `${dataBorder.top.width - 0.5}px ` +
+        = `${dataBorder.top.width}px ` +
           `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
           `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
     if (dataBorder.bottom) {
       colorBorder = dataBorder.bottom.colorStyle.rgbColor;
       styleCell.list.borderBottom
-        = `${dataBorder.bottom.width - 0.5}px ` +
+        = `${dataBorder.bottom.width}px ` +
           `${dataBorder.bottom.style.split('_')[0].toLowerCase()} ` +
           `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
     if (dataBorder.left) {
       colorBorder = dataBorder.left.colorStyle.rgbColor;
       styleCell.list.borderLeft
-        = `${dataBorder.left.width - 0.5}px ` +
+        = `${dataBorder.left.width}px ` +
           `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
           `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
     if (dataBorder.right) {
       colorBorder = dataBorder.right.colorStyle.rgbColor;
       styleCell.list.borderRight
-        = `${dataBorder.right.width - 0.5}px ` +
+        = `${dataBorder.right.width}px ` +
           `${dataBorder.right.style.split('_')[0].toLowerCase()} ` +
           `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
     return styleCell.list;
-  // }
 };
 
 function getStylesCell(cellNameA1, borderCell) {
@@ -179,10 +201,16 @@ function exportJSON() {
       var cellName = range.getCell(i + 1, j + 1).getA1Notation();
       
       var styleCell = getStylesCell(cellName, (bordersCells[i]) ? bordersCells[i][j] : null);
-      if (values[i][j] != "" || styleCell) objectToJSON.cells[cellName.toLowerCase()] = {value: values[i][j]};
+      var typeCell = getTypeCell(cellName);
+      if (values[i][j] != "" || styleCell || typeCell) objectToJSON.cells[cellName.toLowerCase()] = {value: values[i][j] };
       if (styleCell) {
         objectToJSON.cells[cellName.toLowerCase()].style = cellName.toLowerCase();
         objectToJSON.styles.push(styleCell);
+      }
+      if (typeCell)  {
+        if (typeCell.type) objectToJSON.cells[cellName.toLowerCase()].type = typeCell.type;
+        if (typeCell.format) objectToJSON.cells[cellName.toLowerCase()].formatString = typeCell.format;
+        // objectToJSON.cells[cellName.toLowerCase()].type = typeCell;
       }
     }
   }

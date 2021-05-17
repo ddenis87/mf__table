@@ -44,7 +44,8 @@
                     :cell-height="cellHeight"
                     :print-mode="printMode"
                     :is-grid-off="!isGridOff"
-                    @edit-cell="editCell"></spread-sheet>
+                    @edit:cell="editCell"
+                    @scroll:body="ssScrollBody"></spread-sheet>
     </div>
   </div>
 </template>
@@ -95,6 +96,22 @@ export default {
     },
   },
   methods: {
+    ssScrollBody() {
+      if (this.cellEditProps.cellName) {
+        const cellEdit = this.$refs.SpreadSheet.$el.querySelector(`[data-name="${this.cellEditProps.cellName}"]`);
+        if (!cellEdit) return;
+        const cellEditGeometry = cellEdit.getBoundingClientRect();
+        if ((this.cellEditGeometry.left > cellEditGeometry.left + 10
+          || this.cellEditGeometry.left < cellEditGeometry.left - 10)
+          || (this.cellEditGeometry.top > cellEditGeometry.top + 10
+          || this.cellEditGeometry.top < cellEditGeometry.top - 10)) {
+          console.log('shild');
+        } else {
+          console.log('no shild');
+        }
+        // console.log(this.$refs.SpreadSheet.$el.querySelector(`[data-name="${this.cellEditProps.cellName}"]`));
+      }
+    },
     editingAccept(option) {
       console.log(option);
       if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});

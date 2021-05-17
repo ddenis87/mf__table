@@ -5,7 +5,8 @@
        @dblclick="eventDblClickBody"
        @keydown="eventKeydown">
     <div ref="SheetBodyFixed"
-         class="sheet-body-fixed">
+         class="sheet-body-fixed"
+         :class="{'sheet-body-fixed_grid-off': (isGridOff && rowsFixed.length)}">
       <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
            class="sheet-body-fixed__item"
            :key="rowFixedIndex"
@@ -15,7 +16,8 @@
                                 :cells="cells"
                                 :set-excluded-cell="setExcludedCellsArray"
                                 :max-level-group-row="maxLevelGroupRow"
-                                :template-column-width="templateColumnWidth"></spread-sheet-body-item>
+                                :template-column-width="templateColumnWidth"
+                                :is-grid-off="isGridOff"></spread-sheet-body-item>
         <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
       </div>
     </div>
@@ -88,7 +90,7 @@ export default {
       return width;
     },
     heightVirtualList() {
-      let heightBodyFixed = 156 + (this.maxLevelGroupColumn * (22 + 1)); //  поправить 202 высота
+      let heightBodyFixed = 156 + (this.maxLevelGroupColumn * (22 + 1));
       for (let i = 0; i < this.rowsFixed.length; i += 1) {
         heightBodyFixed += this.rowsFixed[i].height;
       }
@@ -107,14 +109,6 @@ export default {
         isGridOff: this.isGridOff,
       };
     },
-  },
-  watch: {
-    // cells() {
-    //   if (this.currentSelectedCellName) {
-    //     const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
-    //     this.focusCell(cellSelectedNode);
-    //   }
-    // },
   },
   mounted() {
     if ('ontouchstart' in window) { console.log('touch screen'); }
@@ -398,7 +392,9 @@ export default {
     position: relative;
     width: calc(100vw - 10px);
     overflow: hidden;
-    // overflow-y: auto;
+    &_grid-off {
+      border-bottom: 2px solid rgba(0, 0, 0, .3);
+    }
     &__item {
       display: flex;
       &_end {
@@ -410,18 +406,6 @@ export default {
       display: none;
     }
   }
-  // .sheet-body {
-    // &::-webkit-scrollbar {
-    //   display: block;
-    //   width: $scrollWidth;
-    //   height: $scrollHeight;
-    //   border-radius: $scrollBorderRadius;
-    //   &-thumb {
-    //     border-radius: $scrollThumbBorderRadius;
-    //     background-color: $scrollThumbBackgroundColor;
-    //   }
-    // }
-  // }
 }
 
 </style>

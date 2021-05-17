@@ -14,6 +14,7 @@
                           :template-table-width="templateTableWidth"
                           :max-level-group-column="maxLevelGroupColumn"
                           :set-open-group-column="setOpenGroupColumns"
+                          :is-grid-off="isGridOff"
                           @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
       </div>
       <div class="sheet__body">
@@ -275,7 +276,7 @@ export default {
         height: cellGeometry.height,
       };
       this.currentEditCell = cellName;
-      this.$emit('edit-cell', cellProps);
+      this.$emit('edit:cell', cellProps);
     },
 
     getCellType(cellName) {
@@ -289,6 +290,7 @@ export default {
 
     scrollBodyX(scrollLeft) {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
+      this.$emit('scroll:body');
     },
 
     toggleRowGroup(rowGroup) {

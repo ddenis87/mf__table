@@ -122,6 +122,8 @@ export default {
           fixed.left += this.columns[i].width;
         }
         fixed.left += 'px';
+        // if (!this.columns[columnIndex + 1].fixed) fixed['border-right'] = '3px solid rgba(0, 0, 0, .3)';
+        if (!this.columns[columnIndex + 1].fixed && this.isGridOff) fixed['box-shadow'] = '2px 0px 0px rgba(0, 0, 0, .2)';
       }
       return fixed;
     },

@@ -8,11 +8,11 @@
           <div :key="`head-group-${column.value}`"
                class="column column-group"
                :class="{
-                 'line-start': (column.openGroup === true && column.columnLevel === level - 1),
+                 'line-start': (setOpenGroupColumn.includes(column.name) && column.columnLevel === level - 1),
                  'line': (column.parent && level <= column.columnLevel),
-                 'line-end': (column.columnGroupEnd),
+                 'line-end': (false),
                }"
-               :style="getStyleCellFixed(column)">
+               :style="getStyleCellFixed(column, index, level)">
             <spread-sheet-btn-group v-if="isColumnGroup(column, level)"
                              :data-column-index="index"
                              :data-column-parent="column.value"
@@ -57,6 +57,7 @@ export default {
     templateTableWidth: { type: Number, default: 0 },
     maxLevelGroupColumn: { type: Number, default: 0 },
     setOpenGroupColumn: { type: Array, default() { return []; } },
+    isGridOff: { type: Boolean, default: false },
   },
   computed: {
     templateColumnHeight() {
@@ -68,7 +69,7 @@ export default {
     },
   },
   methods: {
-    getStyleCellFixed(column, columnIndex) {
+    getStyleCellFixed(column, columnIndex, level = -1) {
       const fixed = {};
       if (column.fixed) {
         fixed.position = 'sticky';
@@ -79,6 +80,8 @@ export default {
           fixed.left += this.columns[i].width;
         }
         fixed.left += 'px';
+        if (!this.columns[columnIndex + 1]?.fixed && this.isGridOff) fixed['box-shadow'] = '2px 0px 0px rgba(0, 0, 0, .2)';
+        if (!this.columns[columnIndex + 1]?.fixed && this.isGridOff && level === 1) fixed['box-shadow'] = 'inset 0px 1px 0px grey, 2px 0px 0px rgba(0, 0, 0, .2)';
       }
       return fixed;
     },
