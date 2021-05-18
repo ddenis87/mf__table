@@ -87,13 +87,13 @@ function getBorderCell(borders) {
     };
     var dataBorder = borders.userEnteredFormat.borders;
     var colorBorder = {};
-    if (dataBorder.top) {
-      colorBorder = dataBorder.top.colorStyle.rgbColor;
-      styleCell.list.borderTop
-        = `${dataBorder.top.width}px ` +
-          `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
-          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
-    }
+    // if (!dataBorder.bottom && dataBorder.top) {
+    //   colorBorder = dataBorder.top.colorStyle.rgbColor;
+    //   styleCell.list.borderTop
+    //     = `${dataBorder.top.width}px ` +
+    //       `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
+    //       `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    // }
     if (dataBorder.bottom) {
       colorBorder = dataBorder.bottom.colorStyle.rgbColor;
       styleCell.list.borderBottom
@@ -101,13 +101,13 @@ function getBorderCell(borders) {
           `${dataBorder.bottom.style.split('_')[0].toLowerCase()} ` +
           `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
-    if (dataBorder.left) {
-      colorBorder = dataBorder.left.colorStyle.rgbColor;
-      styleCell.list.borderLeft
-        = `${dataBorder.left.width}px ` +
-          `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
-          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
-    }
+    // if (!dataBorder.right && dataBorder.left) {
+    //   colorBorder = dataBorder.left.colorStyle.rgbColor;
+    //   styleCell.list.borderLeft
+    //     = `${dataBorder.left.width}px ` +
+    //       `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
+    //       `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    // }
     if (dataBorder.right) {
       colorBorder = dataBorder.right.colorStyle.rgbColor;
       styleCell.list.borderRight
@@ -133,7 +133,7 @@ function getStylesCell(cellNameA1, borderCell) {
   if (range.getFontFamily() && !FONT_FAMILY.includes(range.getFontFamily())) styleCell.list.fontFamily = `'${range.getFontFamily()}', sans-serif`;
   if (range.getFontWeight() && range.getFontWeight() != FONT_WEIGHT) styleCell.list.fontWeight = range.getFontWeight();
   if (range.getFontStyle() && range.getFontStyle() != FONT_STYLE) styleCell.list.fontStyle = range.getFontStyle();
-  if (range.getFontSize() && range.getFontSize() != FONT_SIZE) styleCell.list.fontSize = `${range.getFontSize() + 3}px`;
+  if (range.getFontSize() && range.getFontSize() != FONT_SIZE) styleCell.list.fontSize = `${range.getFontSize()}pt`;
   if (range.getFontColor() && range.getFontColor() != FONT_COLOR) styleCell.list.color = range.getFontColor();
 
   if (range.getHorizontalAlignment() && range.getHorizontalAlignment() != ALIGNMENT_H.defaultValue()) {
