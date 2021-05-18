@@ -179,7 +179,23 @@ export default {
       this.isGridOff = false;
     },
     movePrintPage() {
-      this.printMode = !this.printMode;
+      this.$router.push({
+        name: 'SpreadSheetPrint',
+        params: {
+          columns: this.columns,
+          rows: this.rows,
+          cells: this.cells,
+          styles: this.styles,
+        },
+      });
+      
+      // const pagePrint = this.$router.resolve({
+      //   name: 'SpreadSheetPrint',
+      //   params: {
+      //     columns: this.columns,
+      //   },
+      // });
+      // window.open(pagePrint.href, '_blank');
     },
   },
 };

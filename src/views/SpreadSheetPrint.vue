@@ -25,7 +25,7 @@ export default {
     styles: { type: Array, default() { return []; } },
   },
   mounted() {
-    console.log(this.cells);
+    console.log(this.columns);
   },
 };
 </script>
