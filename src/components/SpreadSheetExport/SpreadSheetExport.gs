@@ -11,6 +11,21 @@ const FONT_COLOR = '#000000';
 const ALIGNMENT_H = { left: 'flex-start', center: 'center', right: 'flex-end', defaultValue: () => 'general' };
 const ALIGNMENT_V = { top: 'flex-start', middle: 'center', bottom: 'flex-end', defaultValue: () => 'bottom' };
 
+const FORMAT_NUMBER = ['#,##0.00','#,##0.0'];
+const FORMAT_DATE_STRING = ['dd.MM.yyyy','dd"."mm"."yy','dd"."mm','d" "mmm" "yyyy" г."','dd" "mmm" "yyyy" г."','dd" "mmmm" "yyyy" г."','d" "mmmm" "yyyy" г."'];
+const FORMAT_DATE = {
+  d: 'numeric',
+  dd: '2-digit',
+  m: 'numeric',
+  mm: '2-digit',
+  mmm: 'short',
+  mmmm: 'long',
+  y: '2-digit',
+  yy: '2-digit',
+  yyy: 'numeric',
+  yyyy: 'numeric'
+};
+
 function onOpen() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var menuEntries = [
@@ -22,32 +37,41 @@ function onOpen() {
 }
 
 function openDialog(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var range = sheet.getRange(20, 5);
-  Logger.log(`E20 - ${range.getNumberFormat()}`);
-  var range = sheet.getRange(21, 5);
-  Logger.log(`E21 - ${range.getNumberFormat()}`);
-  var range = sheet.getRange(22, 5);
-  Logger.log(`E22 - ${range.getNumberFormat()}`);
-  range = sheet.getRange(5, 10);
-  Logger.log(`J5 - ${range.getNumberFormat()}`);
-  range = sheet.getRange(2, 1);
-  Logger.log(`A2 - ${range.getValue()}`);
-  range = sheet.getRange(1, 1);
-  Logger.log(`A1 - ${range.getNumberFormat()}`);
-  range = sheet.getRange(7, 10);
-  Logger.log(`J7 - ${range.getNumberFormat()}`);
-  // var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
-  // var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
-  // var activeSheet = SpreadsheetApp.getActiveSheet();
-  // var name = activeSheet.getName();
+  // var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  // var range = sheet.getRange(1, 1);
+  // Logger.log(`E22 - ${range.getValue()}`);
+  // // var range = sheet.getRange(21, 5);
+  // Logger.log(`E22 - ${range.getNumberFormat().replace(/ /g,'.').replace(/"/g,'')}`);
+  // var range = sheet.getRange(22, 5);
+  // Logger.log(`E22 - ${range.getNumberFormat()}`);
+  // range = sheet.getRange(5, 10);
+  // Logger.log(`J5 - ${range.getNumberFormat()}`);
+  // range = sheet.getRange(2, 1);
+  // Logger.log(`A2 - ${range.getValue()}`);
+  // range = sheet.getRange(1, 1);
+  // Logger.log(`A1 - ${range.getNumberFormat()}`);
+  // range = sheet.getRange(7, 10);
+  // Logger.log(`J7 - ${range.getNumberFormat()}`);
+  var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
+  var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  var activeSheet = SpreadsheetApp.getActiveSheet();
+  var name = activeSheet.getName();
 
-  // var data = Sheets.Spreadsheets.get(currSsId, {
-  //     ranges: ["F23"],
-  //     fields: fieldsBorders
-  // });
-  
-  // Logger.log(data);
+  var data = Sheets.Spreadsheets.get(currSsId, {
+      ranges: ["E19"],
+      fields: fieldsBorders
+  });
+  Logger.log(data);
+  var data = Sheets.Spreadsheets.get(currSsId, {
+      ranges: ["E20"],
+      fields: fieldsBorders
+  });
+  Logger.log(data);
+  var data = Sheets.Spreadsheets.get(currSsId, {
+      ranges: ["E21"],
+      fields: fieldsBorders
+  });
+  Logger.log(data);
 };
 
 function getTypeCell(cellNameA1) {
@@ -55,11 +79,15 @@ function getTypeCell(cellNameA1) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var range = sheet.getRange(cellName);
   var formatCell = range.getNumberFormat();
-  if (formatCell === '#,##0.00' || formatCell.includes('#,##0.00')) {
+  if (FORMAT_NUMBER.includes(formatCell)) {
     var format = `minFD=${formatCell.split('.')[formatCell.split('.').length - 1].length}`;
     return {type: 'number', format: format};
   }
-  if (formatCell.includes('dd.MM.yyyy')) { return { type: 'date' }; };
+  if (FORMAT_DATE_STRING.includes(formatCell)) {
+    var [ day, month, year ] = formatCell.replace(/ /g,'.').replace(/"/g,'').split('.');
+    var format = `d=${FORMAT_DATE[day]}$m=${FORMAT_DATE[month]}$y=${FORMAT_DATE[year]}`;
+    return { type: 'date', format: format };
+  };
   return null;
 };
 
@@ -202,16 +230,40 @@ function exportJSON() {
       
       var styleCell = getStylesCell(cellName, (bordersCells[i]) ? bordersCells[i][j] : null);
       var typeCell = getTypeCell(cellName);
-      if (values[i][j] != "" || styleCell || typeCell) objectToJSON.cells[cellName.toLowerCase()] = {value: values[i][j] };
+      if (values[i][j] != "" || styleCell || typeCell) objectToJSON.cells[cellName.toLowerCase()] = {value: values[i][j]};
       if (styleCell) {
         objectToJSON.cells[cellName.toLowerCase()].style = cellName.toLowerCase();
         objectToJSON.styles.push(styleCell);
       }
       if (typeCell)  {
-        if (typeCell.type) objectToJSON.cells[cellName.toLowerCase()].type = typeCell.type;
+        if (typeCell.type) {
+          objectToJSON.cells[cellName.toLowerCase()].type = typeCell.type;
+          if (typeCell.type === 'date' && values[i][j] != "") {
+            let dateNow = new Date(values[i][j]);
+            let dd = (+dateNow.getDate() < 10) ? '0' + dateNow.getDate() : dateNow.getDate();
+            let mm = (+dateNow.getMonth() < 9) ? '0' + (+dateNow.getMonth() + 1) : +dateNow.getMonth() + 1;
+            let yyyy = dateNow.getFullYear();
+            objectToJSON.cells[cellName.toLowerCase()].value = yyyy + '-' + mm + '-' + dd;
+          //   Logger.log(values[i][j]);
+          //   objectToJSON.cells[cellName.toLowerCase()].value = values[i][j].split('.').reverse().join('-');
+          }
+        }
         if (typeCell.format) objectToJSON.cells[cellName.toLowerCase()].formatString = typeCell.format;
         // objectToJSON.cells[cellName.toLowerCase()].type = typeCell;
       }
+      // if (values[i][j] != "") {
+      //   if (typeCell) {
+      //     if (typeCell.type && typeCell.type === 'date' && typeCell.format) {
+      //       const formatOption = getFormatOptionDate(typeCell.format);
+      //       const formatter = new Intl.DateTimeFormat("ru-RU", formatOption);
+      //       objectToJSON.cells[cellName.toLowerCase()].value = formatter.format(values[i][j]);
+      //     } else {
+      //       objectToJSON.cells[cellName.toLowerCase()].value = values[i][j];
+      //     }
+      //   } else {
+      //     objectToJSON.cells[cellName.toLowerCase()].value = values[i][j];
+      //   }
+      // }
     }
   }
   
@@ -244,6 +296,15 @@ function displayText_(text) {
 
 function buildJson(object) {
   return Utilities.jsonStringify(object);
+};
+
+function getFormatOptionDate(formatString) {
+  const [ day, month, year ] = formatString.split('.');
+  return {
+    day: FORMAT_DATE[day],
+    month: FORMAT_DATE[month],
+    year: FORMAT_DATE[year],
+  }
 };
 
 function getColumnNameForNumber(columnNumber) {

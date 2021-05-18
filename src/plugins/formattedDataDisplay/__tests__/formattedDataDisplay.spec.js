@@ -1,6 +1,9 @@
 import formattedDataDisplay from '@/plugins/formattedDataDisplay/formattedDataDisplay';
 
 describe('FormattedDataDisplay', () => {
+  describe('Value', () => {
+    it('Value null', () => expect(formattedDataDisplay()).toBe(''));
+  });
   describe('Type String (default)', () => {
     it('Value      - text -> text', () => expect(formattedDataDisplay('text')).toBe('text'));
     it('Prefix     - text -> ~text', () => expect(formattedDataDisplay('text', { valuePrefix: '~' })).toBe('~text'));
@@ -9,8 +12,6 @@ describe('FormattedDataDisplay', () => {
   })
   describe('Type Number', () => {
     const type = { valueType: 'number' };
-    const prefix = { valuePrefix: '~' };
-    const suffix = { valueSuffix: '*' };
     it('Value 1   - 35  -> 35', () => expect(formattedDataDisplay('35', { ...type })).toBe('35'));
     it('Value 2   - -35 -> -35', () => expect(formattedDataDisplay('-35', { ...type })).toBe('-35'));
     it('Value 3   - ""  -> 0', () => expect(formattedDataDisplay('', { ...type })).toBe('0'));

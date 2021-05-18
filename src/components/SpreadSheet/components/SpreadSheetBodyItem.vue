@@ -187,6 +187,7 @@ export default {
     }
 
     &-title {
+      align-items: center;
       border: thin solid grey;
       border-top: 0px;
       width: 60px;
