@@ -9,7 +9,7 @@
           :class="{
             'line-start': (source.openGroup === true && source.rowLevel === level - 1),
             'line': (source.parent && level <= source.rowLevel),
-            'line-end': (source.rowGroupEnd && source.rowLevel === level),
+            'line-end': (getEndGroup(index, level) && level <= source.rowLevel),
           }"
           :style="getStyleGroup(level)">
           <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
@@ -57,6 +57,7 @@ export default {
   props: {
     index: { type: Number }, // ????
     source: { type: Object, default() { return {}; } },
+    rows: Array,
     columns: Array,
     cells: { type: Object, default() { return {}; } },
     setExcludedCell: { type: Array },
@@ -126,6 +127,14 @@ export default {
         if (!this.columns[columnIndex + 1].fixed && this.isGridOff) fixed['box-shadow'] = '2px 0px 0px rgba(0, 0, 0, .2)';
       }
       return fixed;
+    },
+    getEndGroup(indexRow, currentLevel) {
+      if (this.rows[indexRow].parent
+        && !this.rows[indexRow].rowLevel <= currentLevel
+        && (!this.rows[indexRow + 1]?.parent
+          || this.rows[indexRow + 1]?.parent !== this.rows[indexRow].parent)
+        && this.rows[indexRow + 1].rowLevel <= currentLevel - 1) return true;
+      return false;
     },
     getStyleGroup(level) {
       return {

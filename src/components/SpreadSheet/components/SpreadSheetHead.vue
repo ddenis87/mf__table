@@ -10,7 +10,7 @@
                :class="{
                  'line-start': (setOpenGroupColumn.includes(column.name) && column.columnLevel === level - 1),
                  'line': (column.parent && level <= column.columnLevel),
-                 'line-end': (false),
+                 'line-end': (getEndGroup(index, level) && level <= column.columnLevel),
                }"
                :style="getStyleCellFixed(column, index, level)">
             <spread-sheet-btn-group v-if="isColumnGroup(column, level)"
@@ -69,6 +69,14 @@ export default {
     },
   },
   methods: {
+    getEndGroup(indexColumn, currentLevel) {
+      if (this.columns[indexColumn].parent
+        && !this.columns[indexColumn].columnLevel <= currentLevel
+        && (!this.columns[indexColumn + 1]?.parent
+          || this.columns[indexColumn + 1]?.parent !== this.columns[indexColumn].parent)
+        && this.columns[indexColumn + 1].columnLevel <= currentLevel - 1) return true;
+      return false;
+    },
     getStyleCellFixed(column, columnIndex, level = -1) {
       const fixed = {};
       if (column.fixed) {

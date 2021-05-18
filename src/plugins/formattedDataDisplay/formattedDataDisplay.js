@@ -16,6 +16,7 @@ function formattedDataDisplay(
   const FORMAT_STRING_MAP_KEYS = Object.keys(FORMAT_STRING_MAP);
   const TYPES = {
     string: () => {
+      if (value === undefined) return '';
       const newValue = `${value}`.replace(/\n/g, '<br/>');
       return newValue;
     },

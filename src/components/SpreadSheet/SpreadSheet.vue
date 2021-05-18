@@ -124,16 +124,16 @@ export default {
           if (Object.keys(this.columns[columnName]).includes('columnGroup')) {
             columnItem.openGroup = false;
           }
-          if (Object.keys(this.columns[columnName]).includes('parent')) {
-            const columnNumberParent = this.getColumnNumberForName(this.columns[columnName].parent);
-            const columnParentGroupCount = +this.columns[this.columns[columnName].parent].columnGroup - 1;
-            if (i === (columnNumberParent + columnParentGroupCount)) {
-              columnItem.columnGroupEnd = true;
-            }
-            prepareColumns.push(columnItem);
-          } else {
-            prepareColumns.push(columnItem);
-          }
+          // if (Object.keys(this.columns[columnName]).includes('parent')) {
+          //   const columnNumberParent = this.getColumnNumberForName(this.columns[columnName].parent);
+          //   const columnParentGroupCount = +this.columns[this.columns[columnName].parent].columnGroup - 1;
+          //   if (i === (columnNumberParent + columnParentGroupCount)) {
+          //     columnItem.columnGroupEnd = true;
+          //   }
+          //   prepareColumns.push(columnItem);
+          // } else {
+          prepareColumns.push(columnItem);
+          // }
         } else {
           prepareColumns.push(columnItem);
         }
@@ -161,16 +161,16 @@ export default {
           if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
             rowItem.openGroup = false;
           }
-          if (Object.keys(this.rows[`${i}`]).includes('parent')) {
-            const rowNumberParent = +this.rows[`${i}`].parent;
-            const rowParentGroupCount = +this.rows[this.rows[`${i}`].parent].rowGroup - 1;
-            if (i === (rowNumberParent + rowParentGroupCount)) {
-              rowItem.rowGroupEnd = true;
-            }
-            prepareRows.push(rowItem);
-          } else {
-            prepareRows.push(rowItem);
-          }
+          // if (Object.keys(this.rows[`${i}`]).includes('parent')) {
+          //   const rowNumberParent = +this.rows[`${i}`].parent;
+          //   const rowParentGroupCount = +this.rows[this.rows[`${i}`].parent].rowGroup - 1;
+          //   if (i === (rowNumberParent + rowParentGroupCount)) {
+          //     rowItem.rowGroupEnd = true;
+          //   }
+          //   prepareRows.push(rowItem);
+          // } else {
+          prepareRows.push(rowItem);
+          // }
         } else {
           prepareRows.push(rowItem);
         }

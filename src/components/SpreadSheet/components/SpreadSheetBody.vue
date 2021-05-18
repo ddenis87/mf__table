@@ -11,7 +11,9 @@
            class="sheet-body-fixed__item"
            :key="rowFixedIndex"
            :style="{width: `${templateTableWidth}px`, position: 'relative'}">
-        <spread-sheet-body-item :source="rowFixed"
+        <spread-sheet-body-item :index="rowFixedIndex"
+                                :source="rowFixed"
+                                :rows="rows"
                                 :columns="columns"
                                 :cells="cells"
                                 :set-excluded-cell="setExcludedCellsArray"
@@ -100,6 +102,7 @@ export default {
     },
     extraPropsComponent() {
       return {
+        rows: this.rows,
         columns: this.columns,
         cells: this.cells,
         templateColumnWidth: this.templateColumnWidth,
