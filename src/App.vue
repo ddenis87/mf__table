@@ -48,9 +48,10 @@ html, body {
   height: 100%;
   box-sizing: border-box;
   font-size: 16px;
+  overflow: auto;
   a { text-decoration: none; }
   &::-webkit-scrollbar {
-    display: none;
+    display: block;
     width: $scrollWidth;
     height: $scrollHeight;
     border-radius: $scrollBorderRadius;

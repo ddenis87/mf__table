@@ -24,7 +24,7 @@
           <v-icon small left>mdi-cloud-download-outline</v-icon>Сохранить документ</v-btn>
       </div>
       <div class="item item_btn">
-        <v-btn small dark :color="(printMode) ? 'blue darken-1' : 'blue darken-3'" @click="movePrintPage">
+        <v-btn small dark :color="(printMode) ? 'blue darken-1' : 'blue darken-3'" @click="openPagePrint">
           <v-icon small left>mdi-cloud-print-outline</v-icon>{{ (printMode) ? 'Редактирование' : 'Печать'}}</v-btn>
       </div>
       <div class="item item_btn">
@@ -112,7 +112,6 @@ export default {
         } else {
           this.isCellEditShild = false;
         }
-        // console.log(this.$refs.SpreadSheet.$el.querySelector(`[data-name="${this.cellEditProps.cellName}"]`));
       }
     },
     editingAccept(option) {
@@ -182,24 +181,18 @@ export default {
       });
       this.isGridOff = false;
     },
-    movePrintPage() {
-      this.$router.push({
+    openPagePrint() {
+      const dataPrint = {
+        rows: this.rows,
+        columns: this.columns,
+        cells: this.cells,
+        styles: this.styles,
+      };
+      localStorage.setItem('dataPrint', JSON.stringify(dataPrint));
+      const pagePrint = this.$router.resolve({
         name: 'SpreadSheetPrint',
-        params: {
-          columns: this.columns,
-          rows: this.rows,
-          cells: this.cells,
-          styles: this.styles,
-        },
       });
-      
-      // const pagePrint = this.$router.resolve({
-      //   name: 'SpreadSheetPrint',
-      //   params: {
-      //     columns: this.columns,
-      //   },
-      // });
-      // window.open(pagePrint.href, '_blank');
+      window.open(pagePrint.href, '_blank');
     },
   },
 };
