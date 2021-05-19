@@ -37,33 +37,52 @@ function onOpen() {
 }
 
 function openDialog(e) {
-  // var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var imen = sheet.getNamedRanges();
+  Logger.log(imen.length);
+  var name = '';
+  for (let i = 0; i < imen.length; i++) {
+    name = imen[i].getName();
+    Logger.log(name);
+    Logger.log(imen[i].getRange().getA1Notation());
+  }
+  
   // var range = sheet.getRange(1, 2);
   // var mergedRanges = range.getMergedRanges();
   // for (var i = 0; i < mergedRanges.length; i++) {
   //   Logger.log(mergedRanges[i].getA1Notation());
   //   // Logger.log(mergedRanges[i].getDisplayValue());
   // }
-  var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
-  var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
-  var activeSheet = SpreadsheetApp.getActiveSheet();
-  // var name = activeSheet.getName();
+  // var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
+  // var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  // var activeSheet = SpreadsheetApp.getActiveSheet();
+  // // var name = activeSheet.getName();
 
-  var data = Sheets.Spreadsheets.get(currSsId, {
-      ranges: ["A20"],
-      fields: fieldsBorders
-  });
-  Logger.log('A20 - ' + data);
-  var data = Sheets.Spreadsheets.get(currSsId, {
-      ranges: ["B25"],
-      fields: fieldsBorders
-  });
-  Logger.log('B25 - ' + data);
-  var data = Sheets.Spreadsheets.get(currSsId, {
-      ranges: ["A26"],
-      fields: fieldsBorders
-  });
-  Logger.log('A26 - ' + data);
+  // var data = Sheets.Spreadsheets.get(currSsId, {
+  //     ranges: ["A20"],
+  //     fields: fieldsBorders
+  // });
+  // Logger.log('A20 - ' + data);
+  // var data = Sheets.Spreadsheets.get(currSsId, {
+  //     ranges: ["B25"],
+  //     fields: fieldsBorders
+  // });
+  // Logger.log('B25 - ' + data);
+  // var data = Sheets.Spreadsheets.get(currSsId, {
+  //     ranges: ["A26"],
+  //     fields: fieldsBorders
+  // });
+  // Logger.log('A26 - ' + data);
+};
+
+function getNamedRanges() {
+  var namedRanges = {};
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var imen = sheet.getNamedRanges();
+  for (let i = 0; i < imen.length; i++) {
+    namedRanges[imen[i].getName()] = imen[i].getRange().getA1Notation();
+  }
+  return namedRanges;
 };
 
 function getTypeCell(cellNameA1) {
@@ -242,6 +261,7 @@ function exportJSON() {
     columns: {},
     cells: {},
     styles: [],
+    namedRanges: {},
   };
   // rowsFixed
   for (var i = 0; i < sheet.getFrozenRows(); i++) {
@@ -356,6 +376,8 @@ function exportJSON() {
     if ((cellNameEndColumn - cellNameStartColumn) > 0) objectToJSON.cells[cellNameStart.toLowerCase()].colspan = (cellNameEndColumn - cellNameStartColumn) + 1;
   }
 
+  // getNamedRanges
+  objectToJSON.namedRanges = getNamedRanges();
   displayText_(buildJson(objectToJSON));
 };
 
