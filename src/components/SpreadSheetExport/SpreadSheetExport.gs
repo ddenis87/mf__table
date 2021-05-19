@@ -38,40 +38,32 @@ function onOpen() {
 
 function openDialog(e) {
   // var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  // var range = sheet.getRange(1, 1);
-  // Logger.log(`E22 - ${range.getValue()}`);
-  // // var range = sheet.getRange(21, 5);
-  // Logger.log(`E22 - ${range.getNumberFormat().replace(/ /g,'.').replace(/"/g,'')}`);
-  // var range = sheet.getRange(22, 5);
-  // Logger.log(`E22 - ${range.getNumberFormat()}`);
-  // range = sheet.getRange(5, 10);
-  // Logger.log(`J5 - ${range.getNumberFormat()}`);
-  // range = sheet.getRange(2, 1);
-  // Logger.log(`A2 - ${range.getValue()}`);
-  // range = sheet.getRange(1, 1);
-  // Logger.log(`A1 - ${range.getNumberFormat()}`);
-  // range = sheet.getRange(7, 10);
-  // Logger.log(`J7 - ${range.getNumberFormat()}`);
+  // var range = sheet.getRange(1, 2);
+  // var mergedRanges = range.getMergedRanges();
+  // for (var i = 0; i < mergedRanges.length; i++) {
+  //   Logger.log(mergedRanges[i].getA1Notation());
+  //   // Logger.log(mergedRanges[i].getDisplayValue());
+  // }
   var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
   var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
   var activeSheet = SpreadsheetApp.getActiveSheet();
-  var name = activeSheet.getName();
+  // var name = activeSheet.getName();
 
   var data = Sheets.Spreadsheets.get(currSsId, {
-      ranges: ["E19"],
+      ranges: ["A20"],
       fields: fieldsBorders
   });
-  Logger.log(data);
+  Logger.log('A20 - ' + data);
   var data = Sheets.Spreadsheets.get(currSsId, {
-      ranges: ["E20"],
+      ranges: ["B25"],
       fields: fieldsBorders
   });
-  Logger.log(data);
+  Logger.log('B25 - ' + data);
   var data = Sheets.Spreadsheets.get(currSsId, {
-      ranges: ["E21"],
+      ranges: ["A26"],
       fields: fieldsBorders
   });
-  Logger.log(data);
+  Logger.log('A26 - ' + data);
 };
 
 function getTypeCell(cellNameA1) {
@@ -109,44 +101,91 @@ function getBordersCell() {
   return dataBordersArray;
 };
 
-function getBorderCell(borders) {
-    var styleCell = {
-      list: {},
-    };
-    var dataBorder = borders.userEnteredFormat.borders;
-    var colorBorder = {};
-    // if (!dataBorder.bottom && dataBorder.top) {
-    //   colorBorder = dataBorder.top.colorStyle.rgbColor;
-    //   styleCell.list.borderTop
-    //     = `${dataBorder.top.width}px ` +
-    //       `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
-    //       `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
-    // }
-    if (dataBorder.bottom) {
-      colorBorder = dataBorder.bottom.colorStyle.rgbColor;
-      styleCell.list.borderBottom
-        = `${dataBorder.bottom.width}px ` +
-          `${dataBorder.bottom.style.split('_')[0].toLowerCase()} ` +
-          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+function getBorderCell(borders, cellNameA1, borderCellTop, borderCellLeft) {
+  var cellRow = +cellNameA1.replace(/[A-z]/g, '');
+  var cellColumn = cellNameA1.replace(/[0-9]/g, '');
+  var styleCell = {
+    list: {},
+  };
+  var dataBorder = borders.userEnteredFormat.borders;
+  var colorBorder = {};
+  
+  // if top cell
+  if (cellRow === 1) {
+    if (dataBorder.top) {
+      colorBorder = dataBorder.top.colorStyle.rgbColor;
+      styleCell.list.borderTop
+        = `${dataBorder.top.width}px ` +
+        `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
+        `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
-    // if (!dataBorder.right && dataBorder.left) {
-    //   colorBorder = dataBorder.left.colorStyle.rgbColor;
-    //   styleCell.list.borderLeft
-    //     = `${dataBorder.left.width}px ` +
-    //       `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
-    //       `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
-    // }
-    if (dataBorder.right) {
-      colorBorder = dataBorder.right.colorStyle.rgbColor;
-      styleCell.list.borderRight
-        = `${dataBorder.right.width}px ` +
-          `${dataBorder.right.style.split('_')[0].toLowerCase()} ` +
-          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+  }
+  // if left cell
+  if (cellColumn === 'A') {
+    if (dataBorder.left) {
+      colorBorder = dataBorder.left.colorStyle.rgbColor;
+      styleCell.list.borderLeft
+        = `${dataBorder.left.width}px ` +
+        `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
+        `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
-    return styleCell.list;
+  }
+
+  // border left & bottom  
+  if (dataBorder.bottom) {
+    colorBorder = dataBorder.bottom.colorStyle.rgbColor;
+    styleCell.list.borderBottom
+      = `${dataBorder.bottom.width}px ` +
+        `${dataBorder.bottom.style.split('_')[0].toLowerCase()} ` +
+        `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+  }
+  if (dataBorder.right) {
+    colorBorder = dataBorder.right.colorStyle.rgbColor;
+    styleCell.list.borderRight
+      = `${dataBorder.right.width}px ` +
+        `${dataBorder.right.style.split('_')[0].toLowerCase()} ` +
+        `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+  }
+
+  if (dataBorder.top) {
+    colorBorder = dataBorder.top.colorStyle.rgbColor;
+    // Logger.log(cellNameA1 + ' - ' + borderCellTop);
+    if (!borderCellTop) {
+      styleCell.list.borderTop
+        = `${dataBorder.top.width}px ` +
+          `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
+          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    } else {
+      if (!borderCellTop.userEnteredFormat && !borderCellTop.userEnteredFormat.borders.bottom) {
+        styleCell.list.borderTop
+          = `${dataBorder.top.width}px ` +
+            `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
+            `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+      }
+    }
+    
+    if (dataBorder.left) {
+      colorBorder = dataBorder.left.colorStyle.rgbColor;
+      // Logger.log(cellNameA1 + ' - ' + borderCellLeft);
+      if (!borderCellLeft) {
+        styleCell.list.borderLeft
+          = `${dataBorder.left.width}px ` +
+            `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
+            `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+      } else {
+        if (!borderCellLeft.userEnteredFormat && !borderCellLeft.userEnteredFormat.borders.right) {
+          styleCell.list.borderLeft
+            = `${dataBorder.left.width}px ` +
+              `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
+              `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+        }
+      }
+    }
+  }
+  return styleCell.list;
 };
 
-function getStylesCell(cellNameA1, borderCell) {
+function getStylesCell(cellNameA1, borderCell, borderCellTop, borderCellLeft) {
   var styleCell = {
     name: cellNameA1.toLowerCase(),
     list: {},
@@ -156,7 +195,7 @@ function getStylesCell(cellNameA1, borderCell) {
 
   if (borderCell && borderCell.userEnteredFormat) {
     // Logger.log(borderCell);
-    styleCell.list = getBorderCell(borderCell);
+    styleCell.list = getBorderCell(borderCell, cellNameA1, borderCellTop, borderCellLeft);
   };
   if (range.getFontFamily() && !FONT_FAMILY.includes(range.getFontFamily())) styleCell.list.fontFamily = `'${range.getFontFamily()}', sans-serif`;
   if (range.getFontWeight() && range.getFontWeight() != FONT_WEIGHT) styleCell.list.fontWeight = range.getFontWeight();
@@ -172,7 +211,21 @@ function getStylesCell(cellNameA1, borderCell) {
   
   if (range.getWrap() == true && range.getWrapStrategy() == 'WRAP') { styleCell.list.wordWrap = 'break-word'; styleCell.list.whiteSpace = 'unset'; }; 
 
-  if (range.getTextRotation().getDegrees() == 90) { styleCell.list.writingMode = 'tb-rl'; styleCell.list.transform = 'rotate(180deg)'; };
+  // if (range.getTextRotation().getDegrees() == 90) { styleCell.list.writingMode = 'tb-rl'; styleCell.list.transform = 'rotate(180deg)'; };
+  if (range.getTextRotation().getDegrees() == 90) {
+    styleCell.list.writingMode = 'vertical-rl';
+    styleCell.list.transform = 'rotate(180deg)';
+    var tbBottom = '';
+    // var tbTop = '';
+    var tbRight = '';
+    // var tbLeft = '';
+    if (styleCell.list.borderBottom) { tbBottom = styleCell.list.borderBottom; delete styleCell.list.borderBottom; }
+    if (styleCell.list.borderRight) { tbRight = styleCell.list.borderRight; delete styleCell.list.borderRight; }
+    if (styleCell.list.borderTop) { styleCell.list.borderBottom = styleCell.list.borderTop; }
+    if (styleCell.list.borderLeft) { styleCell.list.borderRight = styleCell.list.borderLeft; }
+    if (tbBottom != '') styleCell.list.borderTop = tbBottom;
+    if (tbRight != '') styleCell.list.borderLeft = tbRight;
+  };
 
   if (Object.keys(styleCell.list).length) return styleCell;
   return null;
@@ -222,13 +275,33 @@ function exportJSON() {
   }
   // get all borders
   var bordersCells = getBordersCell();
-
+  // Logger.log(bordersCells);
   // cells, styles
   for (var i = 0; i < values.length; i++) {
     for (var j = 0; j < values[i].length; j++) {
       var cellName = range.getCell(i + 1, j + 1).getA1Notation();
-      
-      var styleCell = getStylesCell(cellName, (bordersCells[i]) ? bordersCells[i][j] : null);
+      var cellNameTop = null;
+      var borderCellTop = null;
+      var cellNameLeft = null;
+      var borderCellLeft = null;
+      if (i > 0) {
+        cellNameTop = (range.getCell(i, j + 1).getMergedRanges().length) ? range.getCell(i, j + 1).getMergedRanges()[0].getA1Notation().split(":")[0] : range.getCell(i, j + 1).getA1Notation();
+        var cellNameTopRow = +cellNameTop.replace(/[A-z]/g, '');
+        var cellNameTopColumn = +getColumnNumberForName(cellNameTop.replace(/[0-9]/g, '').toLowerCase());
+        borderCellTop = (bordersCells[cellNameTopRow - 1]) ? bordersCells[cellNameTopRow - 1][cellNameTopColumn - 1] : null;
+      }
+      if (j > 0) {
+        cellNameLeft = (range.getCell(i + 1, j).getMergedRanges().length) ? range.getCell(i + 1, j).getMergedRanges()[0].getA1Notation().split(":")[0] : range.getCell(i + 1, j).getA1Notation();
+        var cellNameLeftRow = +cellNameLeft.replace(/[A-z]/g, '');
+        var cellNameLeftColumn = +getColumnNumberForName(cellNameLeft.replace(/[0-9]/g, '').toLowerCase());
+        borderCellLeft = (bordersCells[cellNameLeftRow - 1]) ? bordersCells[cellNameLeftRow - 1][cellNameLeftColumn - 1] : null;
+      }
+
+      var styleCell = getStylesCell(
+        cellName,
+        (bordersCells[i]) ? bordersCells[i][j] : null,
+        borderCellTop,
+        borderCellLeft);
       var typeCell = getTypeCell(cellName);
       if (values[i][j] != "" || styleCell || typeCell) objectToJSON.cells[cellName.toLowerCase()] = {value: values[i][j]};
       if (styleCell) {

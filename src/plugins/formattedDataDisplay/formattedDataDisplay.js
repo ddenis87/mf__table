@@ -48,6 +48,7 @@ function formattedDataDisplay(
       return newValue;
     },
     date: () => {
+      if (!value) return '';
       const prepareValue = value.split('.').reverse().join('-');
       const formattedOption = {};
       const formattedOptionKey = {
