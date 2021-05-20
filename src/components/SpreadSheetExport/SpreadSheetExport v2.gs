@@ -37,15 +37,15 @@ function onOpen() {
 }
 
 function openDialog(e) {
-  // var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  // var imen = sheet.getNamedRanges();
-  // Logger.log(imen.length);
-  // var name = '';
-  // for (let i = 0; i < imen.length; i++) {
-  //   name = imen[i].getName();
-  //   Logger.log(name);
-  //   Logger.log(imen[i].getRange().getA1Notation());
-  // }
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var imen = sheet.getNamedRanges();
+  Logger.log(imen.length);
+  var name = '';
+  for (let i = 0; i < imen.length; i++) {
+    name = imen[i].getName();
+    Logger.log(name);
+    Logger.log(imen[i].getRange().getA1Notation());
+  }
   
   // var range = sheet.getRange(1, 2);
   // var mergedRanges = range.getMergedRanges();
@@ -53,16 +53,16 @@ function openDialog(e) {
   //   Logger.log(mergedRanges[i].getA1Notation());
   //   // Logger.log(mergedRanges[i].getDisplayValue());
   // }
-  var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
-  var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  // var fieldsBorders = 'sheets(data(rowData/values/userEnteredFormat/borders))'
+  // var currSsId = SpreadsheetApp.getActiveSpreadsheet().getId();
   // var activeSheet = SpreadsheetApp.getActiveSheet();
   // // var name = activeSheet.getName();
 
-  var data = Sheets.Spreadsheets.get(currSsId, {
-      ranges: ["J19"],
-      fields: fieldsBorders
-  });
-  Logger.log('J19 - ' + data);
+  // var data = Sheets.Spreadsheets.get(currSsId, {
+  //     ranges: ["A20"],
+  //     fields: fieldsBorders
+  // });
+  // Logger.log('A20 - ' + data);
   // var data = Sheets.Spreadsheets.get(currSsId, {
   //     ranges: ["B25"],
   //     fields: fieldsBorders
@@ -168,7 +168,7 @@ function getBorderCell(borders, cellNameA1, borderCellTop, borderCellLeft) {
 
   if (dataBorder.top) {
     colorBorder = dataBorder.top.colorStyle.rgbColor;
-    Logger.log(cellNameA1 + ' - ' + borderCellTop);
+    // Logger.log(cellNameA1 + ' - ' + borderCellTop);
     if (!borderCellTop) {
       styleCell.list.borderTop
         = `${dataBorder.top.width}px ` +
@@ -189,11 +189,18 @@ function getBorderCell(borders, cellNameA1, borderCellTop, borderCellLeft) {
         }
       }
     }
-    
-    if (dataBorder.left) {
-      colorBorder = dataBorder.left.colorStyle.rgbColor;
-      // Logger.log(cellNameA1 + ' - ' + borderCellLeft);
-      if (!borderCellLeft) {
+  }
+
+  if (dataBorder.left) {
+    colorBorder = dataBorder.left.colorStyle.rgbColor;
+    // Logger.log(cellNameA1 + ' - ' + borderCellLeft);
+    if (!borderCellLeft) {
+      styleCell.list.borderLeft
+        = `${dataBorder.left.width}px ` +
+          `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
+          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    } else {
+      if (!Object.keys(borderCellLeft).length) {
         styleCell.list.borderLeft
           = `${dataBorder.left.width}px ` +
             `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
@@ -219,10 +226,10 @@ function getStylesCell(cellNameA1, borderCell, borderCellTop, borderCellLeft) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var range = sheet.getRange(styleCell.name);
 
-  if (borderCell && borderCell.userEnteredFormat) {
-    // Logger.log(borderCell);
-    styleCell.list = getBorderCell(borderCell, cellNameA1, borderCellTop, borderCellLeft);
-  };
+  // if (borderCell && borderCell.userEnteredFormat) {
+  //   // Logger.log(borderCell);
+  //   styleCell.list = getBorderCell(borderCell, cellNameA1, borderCellTop, borderCellLeft);
+  // };
   if (range.getFontFamily() && !FONT_FAMILY.includes(range.getFontFamily())) styleCell.list.fontFamily = `'${range.getFontFamily()}', sans-serif`;
   if (range.getFontWeight() && range.getFontWeight() != FONT_WEIGHT) styleCell.list.fontWeight = range.getFontWeight();
   if (range.getFontStyle() && range.getFontStyle() != FONT_STYLE) styleCell.list.fontStyle = range.getFontStyle();
@@ -351,6 +358,12 @@ function exportJSON() {
         if (typeCell.format) objectToJSON.cells[cellName.toLowerCase()].formatString = typeCell.format;
         // objectToJSON.cells[cellName.toLowerCase()].type = typeCell;
       }
+
+      if (bordersCells[i] && bordersCells[i][j].userEnteredFormat) {
+        // Logger.log(borderCell);
+        styleCell.list = get(bordersCells[i][j], cellNameA1, borderCellTop, borderCellLeft);
+      };
+
       // if (values[i][j] != "") {
       //   if (typeCell) {
       //     if (typeCell.type && typeCell.type === 'date' && typeCell.format) {
