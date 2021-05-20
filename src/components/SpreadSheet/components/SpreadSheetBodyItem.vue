@@ -163,26 +163,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../SpreadSheet.scss';
+
 .sheet-body__row {
   position: relative;
   display: grid;
-  grid-auto-rows: minmax(22px, 22px);
+  grid-auto-rows: $bodyGridAutoRow;
   .column {
     position: relative;
     display: inline-flex;
     align-items: flex-end;
-    background-color: white;
+    background-color: $backgroundColorbody;
     &-stop {
       position: sticky;
       top: 0px;
     }
     &-group, &-title {
       position: sticky;
-      background-color: #dadce0;
+      background-color: $backgroundColorTitle;
       justify-content: center;
       font-size: 0.75em;
       font-weight: bold;
-      color: rgba(0, 0, 0, 0.6);
+      color: $bodyFontColorTitle;
       cursor: default;
     }
 
@@ -205,18 +207,18 @@ export default {
     &-body {
       padding: 0px 2px;
       width: 100%;
-      border-right: thin solid grey;
-      border-bottom: thin solid grey;
+      border-right: $bodyGridColor;
+      border-bottom: $bodyGridColor;
       box-sizing: border-box;
-      line-height: 1.25;
+      line-height: $bodyLineHeight;
       // letter-spacing: 0.4px;
       white-space: nowrap;
       overflow: hidden;
       outline: none;
       cursor: cell;
       &_grid-off {
-        border-right: thin solid rgba(255,255,255, 0);
-        border-bottom: thin solid rgba(255,255,255, 0);;
+        border-right: $bodyGridColorOff;
+        border-bottom: $bodyGridColorOff;
       }
     }
   }

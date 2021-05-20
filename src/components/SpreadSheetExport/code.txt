@@ -1,0 +1,68 @@
+<html>
+  <head></head>
+  <body>
+    <div class="table">
+      <div class="row">
+        <div class="table__item item11">1</div>
+        <div class="table__item item12">2</div>
+      </div>
+      <div class="row">
+        <div class="table__item item21">1</div>
+        <div class="table__item item22">2</div>
+      </div>
+    </div>
+  </body> 
+</html>
+
+.table {
+  display: block;
+  padding: 5px;
+  width: 800px;
+  height: 300px;
+  border: thin solid green;
+}
+.row {
+  display: flex;
+}
+.table__item {
+  position: relative;
+  width: 50px;
+  height: 22px;
+/*   border-bottom: thin solid grey;
+  border-right: thin solid grey; */
+  text-align: center;
+}
+
+/* .item11 { border-bottom: thin solid grey; } */
+.item11:after {
+  content: '';
+  position: absolute;
+  border-top: 1px solid blue;
+  border-bottom: 1px solid blue;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: -0px;
+}
+.item12 { border-bottom: thin solid grey; border-right: thin solid grey; }
+
+.item21:after {
+  content: '';
+  position: absolute;
+  border-top: 1px solid blue;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+
+.item22:after {
+  content: '';
+  position: absolute;
+  border-bottom: thin solid grey; 
+  border-right: thin solid grey;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+}

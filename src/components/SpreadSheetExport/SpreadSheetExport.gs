@@ -175,18 +175,32 @@ function getBorderCell(borders, cellNameA1, borderCellTop, borderCellLeft) {
           `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
           `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     } else {
-      if (!borderCellTop.userEnteredFormat && !borderCellTop.userEnteredFormat.borders.bottom) {
+      if (!Object.keys(borderCellTop).length) {
         styleCell.list.borderTop
-          = `${dataBorder.top.width}px ` +
-            `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
-            `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+            = `${dataBorder.top.width}px ` +
+              `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
+              `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+      } else {
+        if (!borderCellTop.userEnteredFormat && !borderCellTop.userEnteredFormat.borders.bottom) {
+          styleCell.list.borderTop
+            = `${dataBorder.top.width}px ` +
+              `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
+              `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+        }
       }
     }
-    
-    if (dataBorder.left) {
-      colorBorder = dataBorder.left.colorStyle.rgbColor;
-      // Logger.log(cellNameA1 + ' - ' + borderCellLeft);
-      if (!borderCellLeft) {
+  }
+
+  if (dataBorder.left) {
+    colorBorder = dataBorder.left.colorStyle.rgbColor;
+    // Logger.log(cellNameA1 + ' - ' + borderCellLeft);
+    if (!borderCellLeft) {
+      styleCell.list.borderLeft
+        = `${dataBorder.left.width}px ` +
+          `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
+          `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
+    } else {
+      if (!Object.keys(borderCellLeft).length) {
         styleCell.list.borderLeft
           = `${dataBorder.left.width}px ` +
             `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +

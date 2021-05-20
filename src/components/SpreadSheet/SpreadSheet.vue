@@ -450,7 +450,7 @@ export default {
     &__angle {
       grid-area: angle;
       border: thin solid grey;
-      background-color: #dadce0;
+      background-color: $backgroundColorTitle;
       box-sizing: border-box;
     }
     &__head {

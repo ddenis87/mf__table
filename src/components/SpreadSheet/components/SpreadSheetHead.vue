@@ -136,7 +136,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: $backgroundColor;
+      background-color: $backgroundColorTitle;
       &-group {
         &:last-child {
           border-right: $borderStyle;

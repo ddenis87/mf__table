@@ -30,8 +30,7 @@
                     {'overflow-y': 'auto', 'width': 'calc(100vw - 10px)', 'position': 'relative',}
                   ]"
                   :wrap-style="{width: `${templateTableWidth}px`, position: 'relative'}"
-                  :keeps="70"
-                  :estimate-size="22"
+                  :keeps="120"
                   :data-key="'value'"
                   :data-sources="rows"
                   :data-component="sheetBodyItem"
