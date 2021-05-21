@@ -130,7 +130,7 @@ function getBorderCell(borders, cellNameA1, borderCellTop, borderCellLeft) {
   var colorBorder = {};
   
   // if top cell
-  if (cellRow === 1) {
+  // if (cellRow === 1) {
     if (dataBorder.top) {
       colorBorder = dataBorder.top.colorStyle.rgbColor;
       styleCell.list.borderTop
@@ -138,9 +138,9 @@ function getBorderCell(borders, cellNameA1, borderCellTop, borderCellLeft) {
         `${dataBorder.top.style.split('_')[0].toLowerCase()} ` +
         `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
-  }
+  // }
   // if left cell
-  if (cellColumn === 'A') {
+  // if (cellColumn === 'A') {
     if (dataBorder.left) {
       colorBorder = dataBorder.left.colorStyle.rgbColor;
       styleCell.list.borderLeft
@@ -148,9 +148,9 @@ function getBorderCell(borders, cellNameA1, borderCellTop, borderCellLeft) {
         `${dataBorder.left.style.split('_')[0].toLowerCase()} ` +
         `rgba(${(colorBorder.red || 0) * 100}%, ${(colorBorder.green || 0) * 100}%, ${(colorBorder.blue || 0) * 100}%)`;
     }
-  }
+  // }
 
-  // border left & bottom  
+  // border right & bottom  
   if (dataBorder.bottom) {
     colorBorder = dataBorder.bottom.colorStyle.rgbColor;
     styleCell.list.borderBottom
@@ -226,10 +226,10 @@ function getStylesCell(cellNameA1, borderCell, borderCellTop, borderCellLeft) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var range = sheet.getRange(styleCell.name);
 
-  // if (borderCell && borderCell.userEnteredFormat) {
-  //   // Logger.log(borderCell);
-  //   styleCell.list = getBorderCell(borderCell, cellNameA1, borderCellTop, borderCellLeft);
-  // };
+  if (borderCell && borderCell.userEnteredFormat) {
+    // Logger.log(borderCell);
+    styleCell.list = getBorderCell(borderCell, cellNameA1, borderCellTop, borderCellLeft);
+  };
   if (range.getFontFamily() && !FONT_FAMILY.includes(range.getFontFamily())) styleCell.list.fontFamily = `'${range.getFontFamily()}', sans-serif`;
   if (range.getFontWeight() && range.getFontWeight() != FONT_WEIGHT) styleCell.list.fontWeight = range.getFontWeight();
   if (range.getFontStyle() && range.getFontStyle() != FONT_STYLE) styleCell.list.fontStyle = range.getFontStyle();
@@ -359,10 +359,11 @@ function exportJSON() {
         // objectToJSON.cells[cellName.toLowerCase()].type = typeCell;
       }
 
-      if (bordersCells[i] && bordersCells[i][j].userEnteredFormat) {
-        // Logger.log(borderCell);
-        styleCell.list = get(bordersCells[i][j], cellNameA1, borderCellTop, borderCellLeft);
-      };
+      // if (bordersCells[i] && bordersCells[i][j].userEnteredFormat) {
+      //   // Logger.log(borderCell);
+      //   var pseudoBorder = 
+      //   styleCell.list = get(bordersCells[i][j], cellNameA1, borderCellTop, borderCellLeft);
+      // };
 
       // if (values[i][j] != "") {
       //   if (typeCell) {

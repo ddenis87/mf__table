@@ -21,7 +21,7 @@
           </spread-sheet-btn-group>
       </div>
       <div class="column column-title"
-          :style="shiftTitle">{{ source.value }}</div>
+          :style="shiftTitle"><div class="content">{{ source.value }}</div></div>
     </template>
     <template v-for="(column, columnIndex) in columns">
       <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
@@ -34,8 +34,8 @@
           ]"
           :style="[getCellGeometry(source, column, columnIndex), fixedCell(column, columnIndex)]"
           :data-name="`${column.name}${source.name}`"
-          :tabindex="columnIndex"
-          v-html="formattedData(column.name, source)">
+          :tabindex="columnIndex">
+        <div class="content" v-html="formattedData(column.name, source)"></div>
       </div>
     </template>
   </div>
@@ -151,7 +151,7 @@ export default {
         cellGeometry['grid-column-start'] = this.cells[cellName]['grid-column-start'] + columnIndex;
         cellGeometry['grid-column-end'] = this.cells[cellName]['grid-column-end'] + columnIndex;
         cellGeometry.height = `${this.cells[cellName].height}px`;
-        cellGeometry['z-index'] = 1;
+        // cellGeometry['z-index'] = 1;
       } else {
         cellGeometry['grid-column-start'] = columnIndex + (this.printMode) ? 0 : (this.maxLevelGroupRow + 2);
         cellGeometry['grid-column-end'] = (columnIndex + ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2))) + 1;
@@ -173,14 +173,14 @@ export default {
     position: relative;
     display: inline-flex;
     align-items: flex-end;
-    background-color: $backgroundColorbody;
+    // background-color: $backgroundColorbody;
     &-stop {
       position: sticky;
       top: 0px;
     }
     &-group, &-title {
       position: sticky;
-      background-color: $backgroundColorTitle;
+      // background-color: $backgroundColorTitle;
       justify-content: center;
       font-size: 0.75em;
       font-weight: bold;
@@ -191,6 +191,7 @@ export default {
     &-group {
       left: 0px;
       width: 20px;
+      background-color: $backgroundColorTitle;
       z-index: 500;
       &:first-child {
         box-shadow:  inset 1px 0px 0px grey;
@@ -198,27 +199,87 @@ export default {
     }
 
     &-title {
-      align-items: center;
-      border: thin solid grey;
-      border-top: 0px;
+      // align-items: center;
+      // border: thin solid grey;
+      // border-top: 0px;
+      padding-top: 1px;
       width: 60px;
       z-index: 400;
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        bottom: -1px;
+        border-left: thin solid grey;
+        border-right: thin solid grey;
+        border-bottom: thin solid grey;
+        z-index: 401;
+      }
+      .content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        // width: 100%;
+        height: 100%;
+        width: 100%;
+        // align-items: inherit;
+        box-sizing: border-box;
+        background-color: $backgroundColorTitle;
+        overflow: hidden;
+
+      }
     }
     &-body {
-      padding: 0px 2px;
+      // padding: 0px 2px;
       width: 100%;
-      border-right: $bodyGridColor;
-      border-bottom: $bodyGridColor;
+      // border-right: $bodyGridColor;
+      // border-bottom: $bodyGridColor;
       box-sizing: border-box;
       line-height: $bodyLineHeight;
       // letter-spacing: 0.4px;
       white-space: nowrap;
-      overflow: hidden;
+      // overflow: hidden;
       outline: none;
       cursor: cell;
+      background-color: $backgroundColorbody;
+      
+      .content {
+        display: flex;
+        justify-content: inherit;
+        align-items: inherit;
+        height: 100%;
+        width: 100%;
+        padding: 0px 2px;
+        // background-color: $backgroundColorbody;
+        overflow: hidden;
+      }
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: -1px;
+        bottom: -1px;
+        border-right: $bodyGridColor;
+        border-bottom: $bodyGridColor;
+        z-index: 80;
+      }
       &_grid-off {
-        border-right: $bodyGridColorOff;
-        border-bottom: $bodyGridColorOff;
+        // border-right: $bodyGridColorOff;
+        // border-bottom: $bodyGridColorOff;
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          right: 0px;
+          bottom: -1px;
+          border-right: $bodyGridColorOff;
+          border-bottom: $bodyGridColorOff;
+          z-index: 80;
+        }
       }
     }
   }
@@ -257,15 +318,15 @@ export default {
     }
   }
   .selected {
-    &::after {
+    &::before {
       content: '';
       position: absolute;
       top: 0px;
-      bottom: 0px;
+      bottom: -1px;
       left: 0px;
-      right: 0px;
+      right: -1px;
       border: 1px solid #1a73e8;
-      z-index: 90;
+      z-index: 199;
     }
   }
 }

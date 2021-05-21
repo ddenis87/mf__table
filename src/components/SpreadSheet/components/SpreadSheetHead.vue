@@ -32,9 +32,13 @@
       <template v-for="(column, columnIndex) in columns">
         <div :key="`head-title-${column.value}`"
              class="column column-title"
-             :style="getStyleCellFixed(column, columnIndex)">{{ column.display_name }}</div>
+             :style="getStyleCellFixed(column, columnIndex)">
+          <div class="content">{{ column.display_name }}</div>
+        </div>
       </template>
-      <div class="column column-title column-end"></div>
+      <div class="column column-title column-end">
+        <div class="content"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -136,23 +140,53 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: $backgroundColorTitle;
+      // background-color: $backgroundColorTitle;
       &-group {
+        background-color: $backgroundColorTitle;
         &:last-child {
-          border-right: $borderStyle;
+          // border-right: $borderStyle;
         }
       }
       &-title {
-        border: $borderStyle;
-        border-left: 0px;
+        padding: 0px 1px;
+        // border: $borderStyle;
+        // border-left: 0px;
         cursor: default;
+        .content {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+          background-color: $backgroundColorTitle;
+        }
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          right: -1px;
+          bottom: 0px;
+          border: $borderStyle;
+          border-left: 0px;
+          // z-index: 80;
+        }
         &:first-child {
           border-left: 0px;
         }
       }
       &-end {
         min-width: 17px;
-        border-right: $borderStyle;
+        // border-right: $borderStyle;
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          right: 0px;
+          bottom: 0px;
+          border-right: $borderStyle;
+        }
       }
     }
     .line-start {

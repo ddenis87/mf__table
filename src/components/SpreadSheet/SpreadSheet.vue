@@ -312,9 +312,11 @@ export default {
     },
 
     toggleColumnGroup(columnGroup) {
+      console.log(columnGroup);
+      console.log(this.setOpenGroupColumns);
       if (this.setOpenGroupColumns.includes(columnGroup.name)) {
-        this.recursiveClosingColumnGroup(columnGroup.name);
         this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnGroup.name), 1);
+        this.recursiveClosingColumnGroup(columnGroup.name);
       } else {
         this.setOpenGroupColumns.push(columnGroup.name);
       }
@@ -390,8 +392,32 @@ export default {
       if (styles) styles.remove();
       if (create) this.addingDocumentStyles();
     },
+    // addingDocumentStyles() {
+    //   let stylesPath = '';
+    //   stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
+    //   if (this.printMode) {
+    //     stylesPath = ' .spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
+    //   }
+    //   // const stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
+    //   const elementDOMStyle = document.createElement('style');
+    //   let stylesString = '';
+    //   elementDOMStyle.setAttribute('type', 'text/css');
+    //   elementDOMStyle.setAttribute('data-style', 'style-cell');
+    //   this.styles.forEach((element) => {
+    //     const stylesObject = {};
+    //     Object.entries(element.list).forEach((item) => {
+    //       const [styleName, styleValue] = [...item];
+    //       stylesObject[this.transformStringToKebabCase(styleName)] = styleValue;
+    //     });
+    //     stylesString += `${stylesPath} .${element.name} ${this.transformObjectToStringStyle(stylesObject)}`;
+    //   });
+    //   elementDOMStyle.innerText = `${stylesString}`;
+    //   document.querySelector('head').append(elementDOMStyle);
+    // },
+
     addingDocumentStyles() {
       let stylesPath = '';
+      const prepareStyles = [];
       stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
       if (this.printMode) {
         stylesPath = ' .spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
@@ -401,7 +427,16 @@ export default {
       let stylesString = '';
       elementDOMStyle.setAttribute('type', 'text/css');
       elementDOMStyle.setAttribute('data-style', 'style-cell');
+
       this.styles.forEach((element) => {
+        const listKeys = Object.keys(element.list);
+        if (listKeys.includes('borderBottom') || listKeys.includes('borderRight')) {
+          prepareStyles.push(this.getPseudoBorder(element));
+        }
+        prepareStyles.push(this.getStyleCell(element));
+      });
+      console.log(prepareStyles);
+      prepareStyles.forEach((element) => {
         const stylesObject = {};
         Object.entries(element.list).forEach((item) => {
           const [styleName, styleValue] = [...item];
@@ -411,6 +446,41 @@ export default {
       });
       elementDOMStyle.innerText = `${stylesString}`;
       document.querySelector('head').append(elementDOMStyle);
+    },
+
+    getPseudoBorder(style) {
+      const pseudoBorder = {
+        name: `${style.name}::after`,
+        list: {
+          content: "''",
+          position: 'absolute',
+          left: '0px',
+          top: '0px',
+          right: '-1px',
+          bottom: '-1px',
+          'z-index': '80',
+        },
+      };
+      const listKeys = Object.keys(style.list);
+      if (listKeys.includes('borderRight')) {
+        pseudoBorder.list.borderRight = style.list.borderRight;
+        pseudoBorder.list.right = `-${(1 * +style.list.borderRight[0])}px`;
+      }
+      if (listKeys.includes('borderBottom')) {
+        pseudoBorder.list.borderBottom = style.list.borderBottom;
+        pseudoBorder.list.bottom = `-${(1 * +style.list.borderBottom[0])}px`;
+      }
+      return pseudoBorder;
+    },
+
+    getStyleCell(style) {
+      const styleCell = {
+        name: style.name,
+        list: style.list,
+      };
+      if (Object.keys(styleCell.list).includes('borderRight')) delete styleCell.list.borderRight;
+      if (Object.keys(styleCell.list).includes('borderBottom')) delete styleCell.list.borderBottom;
+      return styleCell;
     },
 
     transformStringToKebabCase(styleName) {
