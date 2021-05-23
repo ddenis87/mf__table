@@ -120,13 +120,6 @@ export default {
     scrollBody(evt) {
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       this.$emit('scroll-body-x', evt.target.scrollLeft);
-      // const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
-      // if (!this.currentSelectedCellName || !cellSelectedNode) return;
-      // const cellSelectedGeometry = cellSelectedNode.getBoundingClientRect();
-      // if (cellSelectedGeometry.top > this.sheetBodyGeometry.top - 10
-      //   && cellSelectedGeometry.bottom < this.sheetBodyGeometry.bottom) {
-      //   this.focusCell(cellSelectedNode);
-      // }
     },
     eventResized() {
       if (!this.currentSelectedCellName) return;

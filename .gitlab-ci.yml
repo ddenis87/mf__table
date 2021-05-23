@@ -1,0 +1,47 @@
+image: node:latest
+stages:
+    - install
+    - test
+    - build
+    - deploy
+
+step-install:
+    stage: install
+    cache:
+        paths:
+            - node_modules/
+    script:
+        - npm install -g @vue/cli@latest
+        - npm install
+        # - npm run build
+    tags:
+        - install
+
+step-test:
+    script:
+        - npm run test
+    tags:
+        - test
+
+step-build:
+    script:
+        - npm run build
+    tags:
+        - build
+
+pages: # задание должно быть именованными страницами
+  image: node:latest
+  stage: deploy
+  script:
+    - npm ci
+    - npm run build
+    - mv public public-vue # GitLab Pages хук для каталога public
+    - mv dist public # переименование каталога dist (результат команды npm run build)
+  tags:
+    - deploy
+  artifacts:
+    paths:
+      - public # путь к артефакту должен быть /public для GitLab Pages
+  only:
+    - main
+

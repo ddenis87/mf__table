@@ -7,7 +7,7 @@
           :key="`${source.value}-${level}`"
           class="column column-group"
           :class="{
-            'line-start': (source.openGroup === true && source.rowLevel === level - 1),
+            'line-start': (setOpenGroupRows.includes(source.value) && source.rowLevel === level - 1),
             'line': (source.parent && level <= source.rowLevel),
             'line-end': (getEndGroup(index, level) && level <= source.rowLevel),
           }"
@@ -151,7 +151,6 @@ export default {
         cellGeometry['grid-column-start'] = this.cells[cellName]['grid-column-start'] + columnIndex;
         cellGeometry['grid-column-end'] = this.cells[cellName]['grid-column-end'] + columnIndex;
         cellGeometry.height = `${this.cells[cellName].height}px`;
-        // cellGeometry['z-index'] = 1;
       } else {
         cellGeometry['grid-column-start'] = columnIndex + (this.printMode) ? 0 : (this.maxLevelGroupRow + 2);
         cellGeometry['grid-column-end'] = (columnIndex + ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2))) + 1;
@@ -173,14 +172,12 @@ export default {
     position: relative;
     display: inline-flex;
     align-items: flex-end;
-    // background-color: $backgroundColorbody;
     &-stop {
       position: sticky;
       top: 0px;
     }
     &-group, &-title {
       position: sticky;
-      // background-color: $backgroundColorTitle;
       justify-content: center;
       font-size: 0.75em;
       font-weight: bold;
@@ -189,6 +186,10 @@ export default {
     }
 
     &-group {
+      padding-top: 2px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       left: 0px;
       width: 20px;
       background-color: $backgroundColorTitle;
@@ -199,9 +200,6 @@ export default {
     }
 
     &-title {
-      // align-items: center;
-      // border: thin solid grey;
-      // border-top: 0px;
       padding-top: 1px;
       width: 60px;
       z-index: 400;
@@ -221,30 +219,22 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        // width: 100%;
         height: 100%;
         width: 100%;
-        // align-items: inherit;
         box-sizing: border-box;
         background-color: $backgroundColorTitle;
         overflow: hidden;
-
       }
     }
     &-body {
-      // padding: 0px 2px;
       width: 100%;
-      // border-right: $bodyGridColor;
-      // border-bottom: $bodyGridColor;
       box-sizing: border-box;
       line-height: $bodyLineHeight;
-      // letter-spacing: 0.4px;
       white-space: nowrap;
-      // overflow: hidden;
       outline: none;
       cursor: cell;
       background-color: $backgroundColorbody;
-      
+
       .content {
         display: flex;
         justify-content: inherit;
@@ -252,7 +242,6 @@ export default {
         height: 100%;
         width: 100%;
         padding: 0px 2px;
-        // background-color: $backgroundColorbody;
         overflow: hidden;
       }
       &::after {
@@ -267,8 +256,6 @@ export default {
         z-index: 80;
       }
       &_grid-off {
-        // border-right: $bodyGridColorOff;
-        // border-bottom: $bodyGridColorOff;
         &::after {
           content: '';
           position: absolute;
@@ -287,11 +274,9 @@ export default {
     &::before {
       content: '';
       position: absolute;
-      top: calc(50% + 5px);
-      width: 0px;
+      top: calc(50% + 6px);
       height: 50%;
-      border-left: thin solid #3F3F3F;
-      background-color: #3F3F3F;
+      border-left: 1px solid #3F3F3F;
     }
   }
   .line {
@@ -299,10 +284,9 @@ export default {
       content: '';
       position: absolute;
       top: 0px;
-      width: 0px;
+      width: 1px;
       height: 100%;
-      border-left: thin solid #3F3F3F;
-      background-color: #3F3F3F;
+      border-left: 1px solid #3F3F3F;
     }
   }
   .line-end {
@@ -310,11 +294,14 @@ export default {
       content: '';
       position: absolute;
       left: 9.5px;
-      bottom: 0px;
+      bottom: -1px;
+      top: 0px;
       width: 8px;
+      height: 100%;
       border-left: 1px solid #3F3F3F;
       border-bottom: 1px solid #3F3F3F;
       background-color: unset;
+      z-index: 9999;
     }
   }
   .selected {

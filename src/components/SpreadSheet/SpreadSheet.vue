@@ -124,16 +124,7 @@ export default {
           if (Object.keys(this.columns[columnName]).includes('columnGroup')) {
             columnItem.openGroup = false;
           }
-          // if (Object.keys(this.columns[columnName]).includes('parent')) {
-          //   const columnNumberParent = this.getColumnNumberForName(this.columns[columnName].parent);
-          //   const columnParentGroupCount = +this.columns[this.columns[columnName].parent].columnGroup - 1;
-          //   if (i === (columnNumberParent + columnParentGroupCount)) {
-          //     columnItem.columnGroupEnd = true;
-          //   }
-          //   prepareColumns.push(columnItem);
-          // } else {
           prepareColumns.push(columnItem);
-          // }
         } else {
           prepareColumns.push(columnItem);
         }
@@ -161,16 +152,7 @@ export default {
           if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
             rowItem.openGroup = false;
           }
-          // if (Object.keys(this.rows[`${i}`]).includes('parent')) {
-          //   const rowNumberParent = +this.rows[`${i}`].parent;
-          //   const rowParentGroupCount = +this.rows[this.rows[`${i}`].parent].rowGroup - 1;
-          //   if (i === (rowNumberParent + rowParentGroupCount)) {
-          //     rowItem.rowGroupEnd = true;
-          //   }
-          //   prepareRows.push(rowItem);
-          // } else {
           prepareRows.push(rowItem);
-          // }
         } else {
           prepareRows.push(rowItem);
         }
@@ -327,8 +309,9 @@ export default {
         if (this.setOpenGroupColumns.findIndex((element) => element === item.name) > -1) {
           this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((element) => element === item.name), 1);
         }
-        this.recursiveClosingRowGroup(item.name);
+        this.recursiveClosingColumnGroup(item.name);
       });
+      // console.log(this.setOpenGroupColumns);
     },
 
     getColumnNameForNumber(columnNumber) {
@@ -392,28 +375,6 @@ export default {
       if (styles) styles.remove();
       if (create) this.addingDocumentStyles();
     },
-    // addingDocumentStyles() {
-    //   let stylesPath = '';
-    //   stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
-    //   if (this.printMode) {
-    //     stylesPath = ' .spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
-    //   }
-    //   // const stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
-    //   const elementDOMStyle = document.createElement('style');
-    //   let stylesString = '';
-    //   elementDOMStyle.setAttribute('type', 'text/css');
-    //   elementDOMStyle.setAttribute('data-style', 'style-cell');
-    //   this.styles.forEach((element) => {
-    //     const stylesObject = {};
-    //     Object.entries(element.list).forEach((item) => {
-    //       const [styleName, styleValue] = [...item];
-    //       stylesObject[this.transformStringToKebabCase(styleName)] = styleValue;
-    //     });
-    //     stylesString += `${stylesPath} .${element.name} ${this.transformObjectToStringStyle(stylesObject)}`;
-    //   });
-    //   elementDOMStyle.innerText = `${stylesString}`;
-    //   document.querySelector('head').append(elementDOMStyle);
-    // },
 
     addingDocumentStyles() {
       let stylesPath = '';
@@ -422,7 +383,6 @@ export default {
       if (this.printMode) {
         stylesPath = ' .spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
       }
-      // const stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
       const elementDOMStyle = document.createElement('style');
       let stylesString = '';
       elementDOMStyle.setAttribute('type', 'text/css');
@@ -469,6 +429,9 @@ export default {
       if (listKeys.includes('borderBottom')) {
         pseudoBorder.list.borderBottom = style.list.borderBottom;
         pseudoBorder.list.bottom = `-${(1 * +style.list.borderBottom[0])}px`;
+      }
+      if (listKeys.includes('borderLeft')) {
+        pseudoBorder.list.left = `-${(1 * +style.list.borderLeft[0])}px`;
       }
       return pseudoBorder;
     },
