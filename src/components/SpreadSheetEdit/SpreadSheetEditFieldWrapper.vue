@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import ElFieldString from '@/components/Elements/ElFields/ElFieldString.vue';
+import ElFieldString from '@/components/Elements/ElFields/ElFieldStringArea.vue';
 import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber.vue';
 import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate.vue';
 

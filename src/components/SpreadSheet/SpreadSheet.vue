@@ -28,7 +28,7 @@
                                   :setExcludedCells="setExcludedCells"
                                   :print-mode="printMode"></spread-sheet-body-print>
         <spread-sheet-body v-show="!printMode"
-                           ref="SheetBody"
+                           ref="SpreadSheetBody"
                            :rows="tableRows"
                            :rows-fixed="tableRowsFixed"
                            :columns="tableColumns"
@@ -250,6 +250,7 @@ export default {
       const cellGeometry = evt.target.getBoundingClientRect();
       const cellProps = {
         name: cellName,
+        evt,
         target: evt.target,
         type: this.getCellType(cellName),
         top: cellGeometry.top - ((2 * this.cellHeight) + this.cellHeight),
@@ -395,7 +396,7 @@ export default {
         }
         prepareStyles.push(this.getStyleCell(element));
       });
-      console.log(prepareStyles);
+      // console.log(prepareStyles);
       prepareStyles.forEach((element) => {
         const stylesObject = {};
         Object.entries(element.list).forEach((item) => {
@@ -459,6 +460,11 @@ export default {
       this.setOpenGroupColumns = [];
       this.setOpenGroupRows = [];
       this.setExcludedCells = {};
+    },
+    pFocusCellByCellName(option) {
+      if (Object.keys(option).includes('cellName')) {
+        this.$refs.SpreadSheetBody.focusCellByCellName(option.cellName);
+      }
     },
     // ------ ------- ---------
   },

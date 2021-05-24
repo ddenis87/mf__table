@@ -6,7 +6,6 @@
                        v-bind="cellEditProps"
                        :is-shild="isCellEditShild"
                        @editing-accept="editingAccept"
-                       @editing-cancel="editBlur"
                        @edit-blur="editingAccept"></spread-sheet-edit>
     <div class="spread-sheet-view__control-top">
       <div class="item item_btn">
@@ -115,13 +114,21 @@ export default {
       }
     },
     editingAccept(option) {
-      console.log(option);
+      // console.log(option);
       if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});
-      this.cells[option.cellName].value = option.value;
+      if (!this.cells[option.cellName].value) {
+        this.$set(this.cells[option.cellName], 'value', option.value);
+      } else {
+        this.cells[option.cellName].value = option.value;
+      }
       this.editBlur(option);
     },
+
     async editCell(cellProps) {
-      console.log(cellProps);
+      // console.log(cellProps);
+      if (cellProps.evt.type === 'keydown') {
+        this.editCellBefore(cellProps);
+      }
       this.cellEditGeometry.width = cellProps.width + 1;
       this.cellEditGeometry.height = cellProps.height + 1;
       this.cellEditGeometry.left = cellProps.left - 1;
@@ -135,10 +142,28 @@ export default {
         setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 100);
       });
     },
-    editBlur() {
+    editCellBefore(cellProps) {
+      // if (cellProps.evt.type === 'keydown') {
+      if (cellProps.evt.code === 'Delete') {
+        if (this.cells[cellProps.name] && this.cells[cellProps.name].value) this.cells[cellProps.name].value = '';
+      }
+      if (cellProps.evt.code.includes('Key')
+        || cellProps.evt.code.includes('Numpad')
+        || cellProps.evt.code.includes('Digit')) {
+        if (!this.cells[cellProps.name]) this.$set(this.cells, cellProps.name, {});
+        if (!this.cells[cellProps.name].value) this.$set(this.cells[cellProps.name], 'value', cellProps.evt.key);
+        // this.cells[cellProps.name].value = cellProps.evt.key;
+      }
+      // }
+    },
+
+    editBlur(option) {
+      // console.log(option);
       this.isCellEditActive = false;
+      if (option.event.code === 'Escape') {
+        this.$refs.SpreadSheet.pFocusCellByCellName({ cellName: this.cellEditProps.cellName });
+      }
       this.clearPropsSpreadSheetEdit();
-      // this.$refs.SpreadSheet.edititnComplete(option);
     },
     clearPropsSpreadSheetEdit() {
       this.cellEditGeometry.width = 0;

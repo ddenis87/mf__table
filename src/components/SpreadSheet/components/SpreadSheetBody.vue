@@ -133,7 +133,10 @@ export default {
     },
     clickBody(evt) {
       if (evt.target.closest('button')) this.toggleRowGroup(evt.target.closest('button'));
-      if (evt.target.closest('.column-body')) this.selectedCell(evt.target.closest('.column-body').getAttribute('data-name'));
+      if (evt.target.closest('.column-body')) {
+        const cellName = evt.target.closest('.column-body').getAttribute('data-name');
+        this.focusCell(this.getCellNodeForName(cellName));
+      }
     },
     focusCell(target) {
       if (target.getBoundingClientRect().left < this.widthFixedColumn) {
@@ -149,6 +152,10 @@ export default {
       target.focus();
       this.selectedCell(target.getAttribute('data-name'));
     },
+    focusCellByCellName(cellName) {
+      this.focusCell(this.getCellNodeForName(cellName));
+    },
+
     selectedCell(cellName) {
       const cellNode = this.getCellNodeForName(cellName);
       if (cellName === this.currentSelectedCellName) {
@@ -178,7 +185,11 @@ export default {
       if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey === true)) this.moveCursorPrevious(evt.target);
       if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
       if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
-      if (evt.code.includes('Key') || evt.code.includes('Numpad') || evt.code.includes('Digit') || evt.code === 'Enter') {
+      if (evt.code.includes('Key')
+        || evt.code.includes('Numpad')
+        || evt.code.includes('Digit')
+        || evt.code === 'Enter'
+        || evt.code === 'Delete') {
         if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
       }
     },

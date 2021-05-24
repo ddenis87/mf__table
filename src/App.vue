@@ -45,10 +45,8 @@ $scrollThumbBorderRadius: 3px;
 $scrollThumbBackgroundColor: rgba(0,0,0,0.2);
 
 html, body {
-  height: 100%;
   box-sizing: border-box;
   font-size: 16px;
-  overflow: auto;
   a { text-decoration: none; }
   &::-webkit-scrollbar {
     display: block;
@@ -85,5 +83,13 @@ html, body {
     justify-content: center;
     // text-align: center;
     // font-size: 1.2em;
+  }
+
+  @media print {
+    html, body {
+      // min-width: 100% !important;
+      // max-width: 100% !important;
+      overflow: auto !important;
+    }
   }
 </style>
