@@ -32,7 +32,10 @@
               ? cells[`${column.name}${source.value}`].style : '',
             (isGridOff) ? 'column-body_grid-off' : '',
           ]"
-          :style="[getCellGeometry(source, column, columnIndex), fixedCell(column, columnIndex)]"
+          :style="[
+            getCellGeometry(source, column, columnIndex),
+            fixedCell(column, columnIndex)
+          ]"
           :data-name="`${column.name}${source.name}`"
           :tabindex="columnIndex">
         <div class="content" v-html="formattedData(column.name, source)"></div>

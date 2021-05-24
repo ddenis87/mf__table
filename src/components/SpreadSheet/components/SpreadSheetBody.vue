@@ -170,14 +170,14 @@ export default {
       this.currentSelectedCellName = cellName;
     },
 
-    setCurrentCursorPosition(target) {
-      const cellName = target.getAttribute('data-name');
-      this.currentCursorPosition = {
-        cellName,
-        cellRowPrevious: this.currentCursorPosition.cellRow,
-        ...this.parseCellName(cellName),
-      };
-    },
+    // setCurrentCursorPosition(target) {
+    //   const cellName = target.getAttribute('data-name');
+    //   this.currentCursorPosition = {
+    //     cellName,
+    //     cellRowPrevious: this.currentCursorPosition.cellRow,
+    //     ...this.parseCellName(cellName),
+    //   };
+    // },
 
     eventKeydown(evt) {
       evt.preventDefault();
@@ -193,75 +193,115 @@ export default {
         if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
       }
     },
+    // moveCursorNext(target) {
+    //   if (!target.nextSibling) return false;
+    //   // const { nextElementSibling } = target;
+    //   if (target.nextElementSibling.nodeName === 'DIV') {
+    //     this.focusCell(target.nextSibling);
+    //     return true;
+    //   }
+    //   if (target.nextSibling.nodeName === '#comment') {
+    //     console.log(target.nextSibling.nodeName);
+    //     this.focusCell(this.getCellNodeForName(this.getMergedCellName(target, 'next')));
+    //     return true;
+    //   }
+    //   return false;
+    // },
+
+    getMergedCellName(target, direction) {
+      const mergedCellName = Object.entries(this.setExcludedCells)
+        .find((item) => item[1].includes(this.getExpectedCellName(target, direction)))[0];
+      console.log(mergedCellName);
+      return mergedCellName;
+    },
+    getExpectedCellName(target, direction) {
+      const currentCellName = target.getAttribute('data-name');
+      const { cellRow, cellColumn } = this.parseCellName(currentCellName);
+      let column = cellColumn;
+      let row = cellRow;
+      if (direction === 'next') {
+        column = this.columns[this.columns.findIndex((item) => item.name === cellColumn) + 1].name;
+      }
+      if (direction === 'previous') {
+        column = this.columns[this.columns.findIndex((item) => item.name === cellColumn) - 1].name;
+      }
+      if (direction === 'up') row += 1;
+      if (direction === 'down') row -= 1;
+
+      return `${column}${row}`;
+    },
     moveCursorNext(target) {
-      if (!target.nextSibling) return false;
+      if (!this.hasElement(target, 'next')) return false;
       if (target.nextSibling.nodeName === 'DIV') {
         this.focusCell(target.nextSibling);
         return true;
       }
-      if (!target.nextElementSibling) return false;
       const currentCellName = target.getAttribute('data-name');
       if (this.setExcludedCells[currentCellName]) {
         this.focusCell(target.nextElementSibling);
         return true;
       }
-      const { cellRow, cellColumn } = this.parseCellName(currentCellName);
-      const cellColumnNext = this.columns[this.columns.findIndex((item) => item.name === cellColumn) + 1].name;
-      const mergedCell = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnNext}${cellRow}`))[0];
-      this.focusCell(this.getCellNodeForName(mergedCell));
+      this.focusCell(this.getCellNodeForName(this.getMergedCellName(target, 'next')));
       return true;
     },
+
     moveCursorPrevious(target) {
-      if (!target.previousSibling) return false;
+      if (!this.hasElement(target, 'previous')) return false;
       if (target.previousSibling.nodeName === 'DIV' && target.previousSibling.closest('.column-body')) {
         this.focusCell(target.previousSibling);
         return true;
       }
-      if (target.previousSibling.nodeName === 'DIV' && target.previousSibling.closest('.column-title')) return false;
-      console.log(target.previousSibling.nodeName);
-      const currentCellName = target.getAttribute('data-name');
-      const { cellRow, cellColumn } = this.parseCellName(currentCellName);
-      const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
-      const cellColumnPrevious = this.columns.find((column) => column.value === cellColumnNumber - 1).name;
-      const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnPrevious}${cellRow}`))[0];
-      this.focusCell(this.getCellNodeForName(cellNameJoin));
+      this.focusCell(this.getCellNodeForName(this.getMergedCellName(target, 'previous')));
       return true;
     },
-    moveCursorPreviousOld(target) {
-      const elementPreviousDOM = target.previousSibling;
-      console.log(elementPreviousDOM);
-      if (!elementPreviousDOM || elementPreviousDOM.closest('.column-title')) return false;
-      if (elementPreviousDOM.classList) {
-        this.focusCell(elementPreviousDOM);
-        return true;
-      }
-      const elementPrevious = target.previousElementSibling;
-      if (Object.keys(this.setExcludedCells).includes(this.currentCursorPosition.cellName)) {
-        this.focusCell(elementPrevious);
-        return true;
-      }
-      const cellName = target.getAttribute('data-name');
-      const { cellRow, cellColumn } = this.parseCellName(cellName);
-      const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
-      const cellColumnPrevious = this.columns.find((column) => column.value === cellColumnNumber - 1).name;
-      const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnPrevious}${cellRow}`))[0];
-      this.focusCell(this.getCellNodeForName(cellNameJoin));
-      return true;
-    },
-    moveCursorUpOld(target) {
-      const rowPrevious = target.closest('.sheet-body__row').parentElement.previousElementSibling;
-      if (!rowPrevious && this.rowsFixed.length === 0) return;
-      if (target.closest('.sheet-body-fixed') && !rowPrevious) return;
 
-      const cellName = target.getAttribute('data-name');
-      const { cellColumn, cellRow } = this.parseCellName(cellName);
-      const cellPreviousName = `${cellColumn}${cellRow - 1}`;
-      const cellPreviousDOM = this.getCellNodeForName(cellPreviousName);
-      this.focusCell(cellPreviousDOM);
-      console.log(target);
+    hasElement(target, direction) {
+      if (direction === 'previous') {
+        if (!target.previousSibling) return false;
+        if (target.previousSibling.nodeName === 'DIV'
+          && target.previousSibling.closest('.column-title')) return false;
+      }
+      if (direction === 'next') {
+        if (!target.nextSibling) return false;
+        if (!target.nextElementSibling) return false;
+      }
+      return true;
     },
-    getExpectedDOMNodeCell() {
-    },
+
+    // moveCursorPreviousOld(target) {
+    //   const elementPreviousDOM = target.previousSibling;
+    //   console.log(elementPreviousDOM);
+    //   if (!elementPreviousDOM || elementPreviousDOM.closest('.column-title')) return false;
+    //   if (elementPreviousDOM.classList) {
+    //     this.focusCell(elementPreviousDOM);
+    //     return true;
+    //   }
+    //   const elementPrevious = target.previousElementSibling;
+    //   if (Object.keys(this.setExcludedCells).includes(this.currentCursorPosition.cellName)) {
+    //     this.focusCell(elementPrevious);
+    //     return true;
+    //   }
+    //   const cellName = target.getAttribute('data-name');
+    //   const { cellRow, cellColumn } = this.parseCellName(cellName);
+    //   const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
+    //   const cellColumnPrevious = this.columns.find((column) => column.value === cellColumnNumber - 1).name;
+    //   const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnPrevious}${cellRow}`))[0];
+    //   this.focusCell(this.getCellNodeForName(cellNameJoin));
+    //   return true;
+    // },
+    // moveCursorUpOld(target) {
+    //   const rowPrevious = target.closest('.sheet-body__row').parentElement.previousElementSibling;
+    //   if (!rowPrevious && this.rowsFixed.length === 0) return;
+    //   if (target.closest('.sheet-body-fixed') && !rowPrevious) return;
+
+    //   const cellName = target.getAttribute('data-name');
+    //   const { cellColumn, cellRow } = this.parseCellName(cellName);
+    //   const cellPreviousName = `${cellColumn}${cellRow - 1}`;
+    //   const cellPreviousDOM = this.getCellNodeForName(cellPreviousName);
+    //   this.focusCell(cellPreviousDOM);
+    //   console.log(target);
+    // },
+
     moveCursorUp(target) {
       if (!target.parentElement.parentElement.previousElementSibling) {
         if (!target.closest('.sheet-body') || !target.closest('.sheet-body').previousElementSibling) return false;
@@ -270,6 +310,7 @@ export default {
       const { cellColumn } = this.parseCellName(cellName);
       let { cellRow } = this.parseCellName(cellName);
       let cellNamePrevious = `${cellColumn}${cellRow - 1}`;
+      // let cellNamePrevious = this.getExpectedCellName(target, 'up');
 
       let geometryBody = target.closest('.spread-sheet-body').getBoundingClientRect();
       if (!geometryBody) {
