@@ -440,8 +440,13 @@ export default {
     getStyleCell(style) {
       const styleCell = {
         name: style.name,
-        list: style.list,
+        // list: style.list,
+        list: {},
       };
+      Object.entries(style.list).forEach((element) => {
+        const [key, value] = element;
+        styleCell.list[key] = value;
+      });
       if (Object.keys(styleCell.list).includes('borderRight')) delete styleCell.list.borderRight;
       if (Object.keys(styleCell.list).includes('borderBottom')) delete styleCell.list.borderBottom;
       return styleCell;

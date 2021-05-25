@@ -14,8 +14,14 @@
       </div>
       <div class="item item_btn item_file">
         <v-file-input dense
-                      label="Открыть документ"
-                      @change="openJSONFile">
+                      label="Открыть шаблон"
+                      @change="openJSONFileTemplate">
+        </v-file-input>
+      </div>
+      <div class="item item_btn item_file">
+        <v-file-input dense
+                      label="Открыть данные"
+                      @change="openJSONFileData">
         </v-file-input>
       </div>
       <div class="item item_btn">
@@ -45,7 +51,7 @@
                     :print-mode="printMode"
                     :is-grid-off="!isGridOff"
                     @edit:cell="editCell"
-                    @scroll:body="ssScrollBody"></spread-sheet>
+                    @scroll:body="scrollBody"></spread-sheet>
     </div>
   </div>
 </template>
@@ -97,12 +103,12 @@ export default {
     },
   },
   methods: {
-    ssScrollBody() {
+    scrollBody() {
       if (this.cellEditProps.cellName) {
         const cellEdit = this.$refs.SpreadSheet.$el.querySelector(`[data-name="${this.cellEditProps.cellName}"]`);
         if (!cellEdit) return;
         const cellEditGeometry = cellEdit.getBoundingClientRect();
-        console.log(this.cellEditGeometry.top, ' < ', cellEditGeometry.top - 65);
+        // console.log(this.cellEditGeometry.top, ' < ', cellEditGeometry.top - 65);
         if ((this.cellEditGeometry.left > cellEditGeometry.left + 10
           || this.cellEditGeometry.left < cellEditGeometry.left - 10)
           || (this.cellEditGeometry.top > cellEditGeometry.top - 65
@@ -142,7 +148,7 @@ export default {
         setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 100);
       });
     },
-    editCellBefore(cellProps) {
+    editCellBefore(cellProps) { // !!!!!Не верно, убрать в компонент редактирования
       // if (cellProps.evt.type === 'keydown') {
       if (cellProps.evt.code === 'Delete') {
         if (this.cells[cellProps.name] && this.cells[cellProps.name].value) this.cells[cellProps.name].value = '';
@@ -195,7 +201,7 @@ export default {
         styles: this.styles,
       });
     },
-    openJSONFile(file) {
+    openJSONFileTemplate(file) {
       if (!file) return;
       this.newDocument();
       apiJSON.uploadJSONFile(file).then((data) => {
@@ -203,8 +209,15 @@ export default {
         if (Object.keys(data).includes('rows')) this.rows = data.rows;
         if (Object.keys(data).includes('cells')) this.cells = data.cells;
         if (Object.keys(data).includes('styles')) this.styles = data.styles;
+        if (Object.keys(data).includes('namedRanges')) console.log(data.namedRanges);
       });
       this.isGridOff = false;
+    },
+    openJSONFileData(file) {
+      if (!file) return;
+      apiJSON.uploadJSONFile(file).then((data) => {
+        console.log(data);
+      });
     },
     openPagePrint() {
       const dataPrint = {

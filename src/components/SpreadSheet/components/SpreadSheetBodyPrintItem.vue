@@ -14,9 +14,8 @@
           ]"
           :style="[getCellGeometry(source, column, columnIndex)]"
           :data-name="`${column.name}${source.name}`"
-          :tabindex="columnIndex"
-          v-html="formattedData(column.name, source)">
-        <!-- {{ (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].value : '' }} -->
+          :tabindex="columnIndex">
+        <div class="content" v-html="formattedData(column.name, source)"></div>
       </div>
     </template>
   </div>
@@ -84,7 +83,7 @@ export default {
         cellGeometry['grid-column-start'] = this.cells[cellName]['grid-column-start'] + columnIndex;
         cellGeometry['grid-column-end'] = this.cells[cellName]['grid-column-end'] + columnIndex;
         cellGeometry.height = `${this.cells[cellName].height}px`;
-        cellGeometry['z-index'] = 1;
+        // cellGeometry['z-index'] = 1;
       } else {
         cellGeometry['grid-column-start'] = columnIndex + (this.printMode) ? 0 : (this.maxLevelGroupRow + 2);
         cellGeometry['grid-column-end'] = (columnIndex + ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2))) + 1;
@@ -96,23 +95,45 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../SpreadSheet.scss';
+
 .sheet-body__row {
   position: relative;
   display: grid;
-  grid-auto-rows: minmax(22px, 22px);
+  grid-auto-rows: $bodyGridAutoRow;
   .column {
     position: relative;
     display: inline-flex;
     align-items: center;
-    background-color: white;
     &-body {
-      padding: 0px 2px;
       width: 100%;
       box-sizing: border-box;
+      line-height: $bodyLineHeight;
       white-space: nowrap;
-      overflow: hidden;
       outline: none;
       cursor: cell;
+      background-color: $backgroundColorbody;
+
+      .content {
+        display: flex;
+        justify-content: inherit;
+        align-items: inherit;
+        height: 100%;
+        width: 100%;
+        padding: 0px 2px;
+        overflow: hidden;
+      }
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: -1px;
+        bottom: -1px;
+        // border-right: $bodyGridColor;
+        // border-bottom: $bodyGridColor;
+        z-index: 80;
+      }
     }
   }
 }

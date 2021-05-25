@@ -422,7 +422,7 @@ export default {
     parseCellName(cellName) {
       return {
         cellColumn: cellName.replace(/[0-9]/g, ''),
-        cellRow: +cellName.replace(/[a-z]/g, ''),
+        cellRow: +cellName.replace(/[A-z]/g, ''),
       };
     },
   },
