@@ -2,7 +2,11 @@ const CELL_WIDTH = 94;
 const CELL_HEIGHT = 22;
 
 class TEMPLATE_AREAS {
-  getArea(nameArea) {};
+  constructor() {};
+  namedRanges = [];
+  getArea(nameArea) {
+
+  };
 };
 
 class TABLE_DOCUMENT {
@@ -26,12 +30,12 @@ class TABLE_DOCUMENT {
   styles = []; // ?
   namedRanges = {}; // ? []
 
-  getTemplateAreas = (direction) => {
-    const templatesAreas = template.namedRanges.filter((item) => {
+  getTemplateAreas(direction) {
+    const templateAreas = template.namedRanges.filter((item) => {
       const [ v1, v2 ] = item.range.split(':');
       return (item.name.includes((direction === 'horizontal') ? 'row' : 'column') && v1 === v2);
     });
-
+    return new TEMPLATE_AREAS();
   };
 
 };
