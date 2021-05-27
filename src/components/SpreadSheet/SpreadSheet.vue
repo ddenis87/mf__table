@@ -69,8 +69,8 @@ export default {
     SpreadSheetBodyPrint,
   },
   props: {
-    rowsCount: { type: Number, default: 1000 },
-    columnsCount: { type: Number, default: 50 },
+    rowCount: { type: Number, default: 1000 },
+    columnCount: { type: Number, default: 50 },
     rows: { type: Object, default() { return {}; } },
     columns: { type: Object, default() { return {}; } },
     cells: { type: Object, default() { return {}; } },
@@ -110,7 +110,7 @@ export default {
     prepareColumns() {
       const prepareColumns = [];
       const columnsKeys = Object.keys(this.columns);
-      for (let i = 1; i < this.columnsCount + 1; i += 1) {
+      for (let i = 1; i < this.columnCount + 1; i += 1) {
         const columnName = this.getColumnNameForNumber(i);
         const columnItem = {
           value: i,
@@ -139,7 +139,7 @@ export default {
     prepareRows() {
       const prepareRows = [];
       const rowsKeys = Object.keys(this.rows);
-      for (let i = 1; i < this.rowsCount + 1; i += 1) {
+      for (let i = 1; i < this.rowCount + 1; i += 1) {
         const rowItem = {
           value: i,
           name: i,

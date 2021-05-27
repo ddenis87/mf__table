@@ -39,7 +39,7 @@
       </div>
     </div>
     <div class="spread-sheet-view__table">
-      <spread-sheet ref="SpreadSheet"
+      <!-- <spread-sheet ref="SpreadSheet"
                     :rowsCount="rowCount"
                     :columnsCount="columnCount"
                     :rows="rows"
@@ -48,6 +48,12 @@
                     :styles="styles"
                     :cell-width="cellWidth"
                     :cell-height="cellHeight"
+                    :print-mode="printMode"
+                    :is-grid-off="!isGridOff"
+                    @edit:cell="editCell"
+                    @scroll:body="scrollBody"></spread-sheet> -->
+      <spread-sheet ref="SpreadSheet"
+                    v-bind="tableDocument"
                     :print-mode="printMode"
                     :is-grid-off="!isGridOff"
                     @edit:cell="editCell"
@@ -61,6 +67,7 @@ import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
 
 import apiJSON from '@/plugins/apiJSON/apiJSON';
+import TABLE_DOCUMENT from '@/structures/SpreadSheet';
 
 export default {
   name: 'SpreadSheetView',
@@ -70,14 +77,15 @@ export default {
   },
   data() {
     return {
-      rowCount: undefined,
-      columnCount: undefined,
-      rows: {},
-      columns: {},
-      cells: {},
-      styles: [],
-      cellWidth: undefined,
-      cellHeight: undefined,
+      tableDocument: {},
+      // rowCount: undefined,
+      // columnCount: undefined,
+      // rows: {},
+      // columns: {},
+      // cells: {},
+      // styles: [],
+      // cellWidth: undefined,
+      // cellHeight: undefined,
       isShowDialog: false,
       isCellEditActive: false,
       isCellEditShild: false,
@@ -181,15 +189,16 @@ export default {
       this.cellEditProps.cellValue = undefined;
       this.isCellEditShild = false;
     },
-    clearPropsSpreadSheet() {
-      this.columns = {};
-      this.rows = {};
-      this.cells = {};
-      this.styles = [];
-    },
+    // clearPropsSpreadSheet() {
+    //   this.columns = {};
+    //   this.rows = {};
+    //   this.cells = {};
+    //   this.styles = [];
+    // },
 
     newDocument() {
-      this.clearPropsSpreadSheet();
+      // this.clearPropsSpreadSheet();
+      this.tableDocument = new TABLE_DOCUMENT({});
       this.$refs.SpreadSheet.pDocumentNew();
       this.isGridOff = true;
     },
@@ -205,13 +214,18 @@ export default {
       if (!file) return;
       this.newDocument();
       apiJSON.uploadJSONFile(file).then((data) => {
-        if (Object.keys(data).includes('columns')) this.columns = data.columns;
-        if (Object.keys(data).includes('rows')) this.rows = data.rows;
-        if (Object.keys(data).includes('cells')) this.cells = data.cells;
-        if (Object.keys(data).includes('styles')) this.styles = data.styles;
-        if (Object.keys(data).includes('namedRanges')) console.log(data.namedRanges);
+        const tableDocument = new TABLE_DOCUMENT({ ...data });
+        // if (Object.keys(data).includes('columns')) this.columns = data.columns;
+        // if (Object.keys(data).includes('rows')) this.rows = data.rows;
+        // if (Object.keys(data).includes('cells')) this.cells = data.cells;
+        // if (Object.keys(data).includes('styles')) this.styles = data.styles;
+        // if (Object.keys(data).includes('namedRanges')) console.log(data.namedRanges);
+        console.log(tableDocument);
+        setTimeout(() => {
+          console.log(tableDocument.getAreaByName('string1'));
+        }, 2000);
       });
-      this.isGridOff = false;
+      // this.isGridOff = false;
     },
     openJSONFileData(file) {
       if (!file) return;
