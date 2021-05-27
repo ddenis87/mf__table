@@ -177,7 +177,7 @@ export default {
     async editCell(cellProps) {
       // console.log(cellProps);
       if (cellProps.evt.type === 'keydown') {
-        this.editCellBefore(cellProps);
+        this.editCellBefore(cellProps); // !!!!!Не верно, убрать в компонент редактирования
       }
       this.cellEditGeometry.width = cellProps.width + 1;
       this.cellEditGeometry.height = cellProps.height + 1;
@@ -292,7 +292,7 @@ export default {
         // console.log(data);
         data.forEach((element) => {
           const [areaName, areaValue] = Object.entries(element)[0];
-          const namedArea = this.tableDocumentTemplate.getAreaByName(areaName);
+          const namedArea = this.tableDocumentTemplate.getNamedAreaByName(areaName);
           areaValue.forEach((value) => {
             this.tableDocument.insertNamedArea(namedArea, value);
           });

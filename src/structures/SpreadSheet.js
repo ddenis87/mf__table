@@ -28,27 +28,7 @@ class TABLE_DOCUMENT {
     this.cellHeight = cellHeight;
   }
 
-  template = null;
-
-  rows = {};
-
-  rowCount = null;
-
-  columns = {};
-
-  columnCount = null;
-
-  cells = {};
-
-  styles = [];
-
-  namedAreas = [];
-
-  cellWidth = null;
-
-  cellHeight = null;
-
-  getAreaByName(areaName) {
+  getNamedAreaByName(areaName) {
     if (!areaName) return null;
     const namedArea = this.namedAreas.find((item) => item.name === areaName);
     if (!namedArea) return null;
@@ -110,7 +90,10 @@ class TABLE_DOCUMENT {
     const cellsTemp = {};
     Object.keys(area.cells).forEach((cellName) => {
       if (area.namedAreas.findIndex((item) => item.range.split(':')[0] === cellName) > -1) {
-        cellsTemp[`${cellName.replace(/[0-9]/g, currentRow)}`] = { ...area.cells[cellName], value: value[area.namedAreas.find((item) => item.range.split(':')[0] === cellName).name] };
+        cellsTemp[`${cellName.replace(/[0-9]/g, currentRow)}`] = {
+          ...area.cells[cellName],
+          value: value[area.namedAreas.find((item) => item.range.split(':')[0] === cellName).name],
+        };
       }
     });
     this.cells = { ...this.cells, ...cellsTemp };
