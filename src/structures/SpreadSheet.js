@@ -125,30 +125,30 @@ class TABLE_DOCUMENT {
     this.columnCount = Object.keys(this.columns).length;
   }
 
-  setValueNamedArea(areaData) {
-    if (!areaData.length) return null;
+  // setValueNamedArea(areaData) {
+  //   if (!areaData.length) return null;
 
-    const [v1, v2] = this.namedAreas[0].range.split(':');
-    const namedAreaRange = (+v2) - (+v1) + 1;
-    // const cellsTemp = this.cells;
-    this.cells = {};
-    for (let i = 0; i < areaData.length - 1; i += 1) {
-      if (i > 0) { // копируем строки области
-        for (let j = 0; j < namedAreaRange; j += 1) {
-          this.rows[(i + namedAreaRange) + j] = { ...this.rows[(i - namedAreaRange) + j] };
-        }
-      }
+  //   const [v1, v2] = this.namedAreas[0].range.split(':');
+  //   const namedAreaRange = (+v2) - (+v1) + 1;
+  //   // const cellsTemp = this.cells;
+  //   this.cells = {};
+  //   for (let i = 0; i < areaData.length - 1; i += 1) {
+  //     if (i > 0) { // копируем строки области
+  //       for (let j = 0; j < namedAreaRange; j += 1) {
+  //         this.rows[(i + namedAreaRange) + j] = { ...this.rows[(i - namedAreaRange) + j] };
+  //       }
+  //     }
 
-      // for (let [areaName, areaValue] of Object.entries(areaData[i])) {
-      //   const namedArea = this.namedAreas.find((item) => item.name === areaName);
-      //   const [nameCellTemp] = namedArea.range.split(':');
-      //   this.cells[`${nameCellTemp.replace(/[0-9]/g, '')}${i}`] = cellsTemp[nameCellTemp];
+  //     // for (let [areaName, areaValue] of Object.entries(areaData[i])) {
+  //     //   const namedArea = this.namedAreas.find((item) => item.name === areaName);
+  //     //   const [nameCellTemp] = namedArea.range.split(':');
+  //     //   this.cells[`${nameCellTemp.replace(/[0-9]/g, '')}${i}`] = cellsTemp[nameCellTemp];
 
-      // }
-    }
+  //     // }
+  //   }
 
-    return this.rows;
-  }
+  //   return this.rows;
+  // }
 }
 
 export default TABLE_DOCUMENT;
