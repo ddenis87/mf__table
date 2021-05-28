@@ -41,7 +41,7 @@
                     v-model="isGridOff"
                     @input="isGridOff = !isGridOff"></v-checkbox>
       </div>
-      <dialog-modal :is-dialog-show="isDialogShow"
+      <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
         <v-card>
           <v-card-text>Файл не является шаблоном или в шаблоне ошибка</v-card-text>
@@ -49,19 +49,6 @@
       </dialog-modal>
     </div>
     <div class="spread-sheet-view__table">
-      <!-- <spread-sheet ref="SpreadSheet"
-                    :rowsCount="rowCount"
-                    :columnsCount="columnCount"
-                    :rows="rows"
-                    :columns="columns"
-                    :cells="cells"
-                    :styles="styles"
-                    :cell-width="cellWidth"
-                    :cell-height="cellHeight"
-                    :print-mode="printMode"
-                    :is-grid-off="!isGridOff"
-                    @edit:cell="editCell"
-                    @scroll:body="scrollBody"></spread-sheet> -->
       <spread-sheet ref="SpreadSheet"
                     v-bind="tableDocument"
                     :print-mode="printMode"
@@ -91,35 +78,9 @@ export default {
     return {
       tableDocument: new TABLE_DOCUMENT({}),
       tableDocumentTemplate: {},
-      tableDocumentData: {},
-      // namedArea: {},
-      // tableDocumentData: [
-      //   {
-      //     string1: [
-      //       {
-      //         indicatorName: 'На предоставление субсидий федеральным государственным учреждениям на финансовое обеспечение государственного задания на оказание государственных услуг (выполнение работ), всего', 'analyticalCode': '-', 'volume21': '29365.9', 'volume22': '29056.3', 'volume23': '28884.2',
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     string2: [
-      //       {
-      //         indicatorName: 'в том числе: \n на оплату труда и начисления на выплаты по оплате труда', analyticalCode: '100', volume21: '7041.4', volume22: '7041.4', volume23: '7041.4',
-      //       },
-      //     ],
-      //   },
-      // ],
       fileTemplate: [],
       fileData: [],
-      // rowCount: undefined,
-      // columnCount: undefined,
-      // rows: {},
-      // columns: {},
-      // cells: {},
-      // styles: [],
-      // cellWidth: undefined,
-      // cellHeight: undefined,
-      // isShowDialog: false,
+
       isCellEditActive: false,
       isCellEditShild: false,
       cellEditGeometry: {
@@ -133,7 +94,7 @@ export default {
       isGridOff: true,
       isFileDataDisabled: true,
       isFileTemplateDisabled: false,
-      isDialogShow: false,
+      isShowDialog: false,
     };
   },
   computed: {
@@ -152,7 +113,6 @@ export default {
         const cellEdit = this.$refs.SpreadSheet.$el.querySelector(`[data-name="${this.cellEditProps.cellName}"]`);
         if (!cellEdit) return;
         const cellEditGeometry = cellEdit.getBoundingClientRect();
-        // console.log(this.cellEditGeometry.top, ' < ', cellEditGeometry.top - 65);
         if ((this.cellEditGeometry.left > cellEditGeometry.left + 10
           || this.cellEditGeometry.left < cellEditGeometry.left - 10)
           || (this.cellEditGeometry.top > cellEditGeometry.top - 65
@@ -225,16 +185,10 @@ export default {
       this.cellEditProps.cellValue = undefined;
       this.isCellEditShild = false;
     },
-    // clearPropsSpreadSheet() {
-    //   this.columns = {};
-    //   this.rows = {};
-    //   this.cells = {};
-    //   this.styles = [];
-    // },
 
     newDocument() {
-      // this.clearPropsSpreadSheet();
       this.tableDocument = new TABLE_DOCUMENT({});
+      this.tableDocumentTemplate = {};
       this.$refs.SpreadSheet.pDocumentNew();
       this.isGridOff = true;
 
@@ -254,53 +208,35 @@ export default {
     },
     openJSONFileTemplate(file) {
       if (!file) return;
-      // this.newDocument();
       apiJSON.uploadJSONFile(file).then((data) => {
         if (!Object.keys(data).includes('template')
           || data.template === false) {
-          this.isDialogShow = true;
+          this.isShowDialog = true;
           setTimeout(() => {
-            this.isDialogShow = false;
+            this.isShowDialog = false;
             this.fileTemplate = [];
           }, 2000);
           return;
         }
         this.tableDocumentTemplate = new TABLE_DOCUMENT({ ...data });
-        // if (Object.keys(data).includes('columns')) this.columns = data.columns;
-        // if (Object.keys(data).includes('rows')) this.rows = data.rows;
-        // if (Object.keys(data).includes('cells')) this.cells = data.cells;
-        // if (Object.keys(data).includes('styles')) this.styles = data.styles;
-        // if (Object.keys(data).includes('namedRanges')) console.log(data.namedRanges);
-        // console.log(this.tableDocumentTemplate);
-
-        // setTimeout(() => {
-        //   const namedArea = this.tableDocumentTemplate.getAreaByName('string1');
-        //   console.log(namedArea);
-        //   setTimeout(() => {
-        //     this.tableDocument.insertNamedArea(namedArea, this.tableDocumentData[0].string1[0]);
-        //     console.log(this.tableDocument);
-        //   }, 2000);
-        // }, 2000);
         this.isFileTemplateDisabled = true;
         this.isFileDataDisabled = false;
       });
-      // this.isGridOff = false;
     },
     openJSONFileData(file) {
       if (!file) return;
       apiJSON.uploadJSONFile(file).then((data) => {
-        // console.log(data);
         data.forEach((element) => {
           const [areaName, areaValue] = Object.entries(element)[0];
           const namedArea = this.tableDocumentTemplate.getNamedAreaByName(areaName);
           areaValue.forEach((value) => {
+            console.log(namedArea);
             this.tableDocument.insertNamedArea(namedArea, value);
           });
-          // console.log(areaName);
-          // console.log(areaValue);
         });
         console.log(this.tableDocument);
         this.isFileDataDisabled = true;
+        this.isGridOff = false;
       });
     },
     openPagePrint() {

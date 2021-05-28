@@ -39,9 +39,12 @@ class TABLE_DOCUMENT {
     const namedAreas = [];
     const [rangeFrom, rangeTo] = namedArea.range.split(':');
     let rowNumber = 1;
-    for (let i = rangeFrom; i <= rangeTo; i += 1) {
+
+    for (let i = +rangeFrom; i <= +rangeTo; i += 1) {
       rows[rowNumber] = this.rows[i];
-      Object.keys(this.cells).filter((cellName) => cellName.replace(/[A-z]/g, '') === i).forEach((cellName) => {
+      const cellsKeys = Object.keys(this.cells).filter((cellName) => +cellName.replace(/[A-z]/g, '') === i);
+
+      cellsKeys.forEach((cellName) => {
         cells[`${cellName.replace(/[0-9]/g, rowNumber)}`] = this.cells[cellName];
 
         const columnName = cellName.replace(/[0-9]/g, '');
@@ -51,17 +54,17 @@ class TABLE_DOCUMENT {
           styles.push(this.styles.find((item) => item.name === cellName));
         }
 
-        if (this.namedAreas.findIndex((item) => item.range.split(':')[0].includes(cellName.toUpperCase())) > -1) {
-          const namedAreaShift = this.namedAreas.find((item) => item.range.split(':')[0].includes(cellName.toUpperCase()));
-          const [rangeShiftFrom, rangeShiftTo] = namedAreaShift.range.split(':');
-          let range = rangeShiftFrom.replace(/[0-9]/g, rowNumber);
-          if (rangeShiftTo) {
-            range += `:${rangeShiftTo.replace(/[0-9]/g, (this.cells[cellName].rowspan)
-              ? rowNumber + (this.cells[cellName].rowspan - 1) : rowNumber)}`;
-          }
-          namedAreaShift.range = range.toLowerCase();
-          namedAreas.push(namedAreaShift);
+        if (this.namedAreas.findIndex((item) => item.range.split(':')[0].includes(cellName.toUpperCase())) === -1) return;
+
+        const namedAreaShift = this.namedAreas.find((item) => item.range.split(':')[0].includes(cellName.toUpperCase()));
+        const [rangeShiftFrom, rangeShiftTo] = namedAreaShift.range.split(':');
+        let range = rangeShiftFrom.replace(/[0-9]/g, rowNumber);
+        if (rangeShiftTo) {
+          range += `:${rangeShiftTo.replace(/[0-9]/g, (this.cells[cellName].rowspan)
+            ? rowNumber + (this.cells[cellName].rowspan - 1) : rowNumber)}`;
         }
+        namedAreaShift.range = range.toLowerCase();
+        namedAreas.push(namedAreaShift);
       });
       rowNumber += 1;
     }
@@ -81,27 +84,32 @@ class TABLE_DOCUMENT {
   insertNamedArea(area, value) {
     console.log(area);
     const currentRow = Object.keys(this.rows).length + 1;
-    Object.keys(area.rows).forEach((rowNumber) => {
-      this.rows[currentRow] = { ...area.rows[rowNumber] };
-    });
-    Object.keys(area.columns).forEach((columnName) => {
-      this.columns[columnName] = { ...area.columns[columnName] };
-    });
     const cellsTemp = {};
-    Object.keys(area.cells).forEach((cellName) => {
-      if (area.namedAreas.findIndex((item) => item.range.split(':')[0] === cellName) > -1) {
-        cellsTemp[`${cellName.replace(/[0-9]/g, currentRow)}`] = {
-          ...area.cells[cellName],
-          value: value[area.namedAreas.find((item) => item.range.split(':')[0] === cellName).name],
-        };
-      }
+    Object.keys(area.rows).forEach((rowNumber, index) => {
+      this.rows[currentRow + index] = { ...area.rows[rowNumber] };
+
+      Object.keys(area.cells).forEach((cellName) => {
+        if (area.namedAreas.findIndex((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1)) > -1) {
+          cellsTemp[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
+            ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
+            value: value[area.namedAreas.find((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1)).name],
+          };
+        } else {
+          cellsTemp[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
+            ...area.cells[cellName],
+          };
+        }
+      });
     });
     this.cells = { ...this.cells, ...cellsTemp };
 
+    Object.keys(area.columns).forEach((columnName) => {
+      this.columns[columnName] = { ...area.columns[columnName] };
+    });
+
     area.styles.forEach((style) => {
-      if (this.styles.findIndex((item) => item.name === style.name) === -1) {
-        this.styles.push(style);
-      }
+      if (this.styles.findIndex((item) => item.name === style.name) > -1) return;
+      this.styles.push(style);
     });
 
     this.rowCount = Object.keys(this.rows).length;
@@ -110,7 +118,6 @@ class TABLE_DOCUMENT {
 
   // setValueNamedArea(areaData) {
   //   if (!areaData.length) return null;
-
   //   const [v1, v2] = this.namedAreas[0].range.split(':');
   //   const namedAreaRange = (+v2) - (+v1) + 1;
   //   // const cellsTemp = this.cells;
@@ -121,15 +128,12 @@ class TABLE_DOCUMENT {
   //         this.rows[(i + namedAreaRange) + j] = { ...this.rows[(i - namedAreaRange) + j] };
   //       }
   //     }
-
   //     // for (let [areaName, areaValue] of Object.entries(areaData[i])) {
   //     //   const namedArea = this.namedAreas.find((item) => item.name === areaName);
   //     //   const [nameCellTemp] = namedArea.range.split(':');
   //     //   this.cells[`${nameCellTemp.replace(/[0-9]/g, '')}${i}`] = cellsTemp[nameCellTemp];
-
   //     // }
   //   }
-
   //   return this.rows;
   // }
 }

@@ -14,14 +14,6 @@ export default {
   components: {
     SpreadSheet,
   },
-  props: {
-    // rows: { type: Object, default() { return {}; } },
-    // columns: { type: Object, default() { return {}; } },
-    // cells: { type: Object, default() { return {}; } },
-    // rowsCount: { type: Number, default: 1000 },
-    // columnsCount: { type: Number, default: 50 },
-    // styles: { type: Array, default() { return []; } },
-  },
   data() {
     return {
       columns: {},
