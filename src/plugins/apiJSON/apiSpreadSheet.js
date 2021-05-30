@@ -19,7 +19,7 @@ export default {
   uploadJSONFile: (file) => {
     const fileJSONRead = new FileReader();
     return new Promise((resolve, reject) => {
-      fileJSONRead.onload = () => resolve(JSON.parse(fileJSONRead.result));
+      fileJSONRead.onload = () => resolve(fileJSONRead.result);
       fileJSONRead.onerror = (err) => reject(err);
       fileJSONRead.readAsText(file);
     });

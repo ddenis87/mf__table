@@ -3,7 +3,7 @@
                 :rows="rows"
                 :cells="cells"
                 :styles="styles"
-                :print-mode="true"></spread-sheet>
+                :is-print-mode="true"></spread-sheet>
 </template>
 
 <script>
@@ -16,8 +16,10 @@ export default {
   },
   data() {
     return {
-      columns: {},
       rows: {},
+      rowCount: 0,
+      columns: {},
+      columnCount: 0,
       cells: {},
       styles: [],
     };
@@ -29,12 +31,16 @@ export default {
     },
   },
   created() {
-    const dataPrint = JSON.parse(localStorage.getItem('dataPrint'));
-    if (!dataPrint) return;
-    this.rows = dataPrint.rows;
-    this.columns = dataPrint.columns;
-    this.cells = dataPrint.cells;
-    this.styles = dataPrint.styles;
+    const tableDocument = JSON.parse(localStorage.getItem('SpreadSheetTableDocument'));
+    if (!tableDocument) return;
+    ({
+      rows: this.rows = {},
+      rowColumn: this.rowColumn = 0,
+      columns: this.columns = {},
+      columnCount: this.columnCount = 0,
+      cells: this.cells = {},
+      styles: this.styles = [],
+    } = tableDocument);
   },
   beforeDestroy() {
     localStorage.removeItem('dataPrint');

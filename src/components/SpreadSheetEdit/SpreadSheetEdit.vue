@@ -1,16 +1,18 @@
 <template>
-  <div class="spread-sheet-edit"
+  <div v-show="editableCellElement"
+       class="spread-sheet-edit"
+       :style="blockPosition"
        tabindex="0"
        @focus="focusSpreadSheetEdit">
-    <div class="shild" v-if="isShild">{{ cellName.toUpperCase() }}</div>
+    <div class="label" v-if="isEditableCellLabel">{{ cellName.toUpperCase() }}</div>
     <div class="input">
       <spread-sheet-edit-field-wrapper ref="SpreadSheetEditWrapper"
                                        :cell-type="cellType"
                                        v-model="value"
-                                       @event-keydown-enter="editingAccept"
-                                       @event-keydown-escape="editBlur"
-                                       @event-keydown-tab="editBlur"
-                                       @event-blur="editBlur"></spread-sheet-edit-field-wrapper>
+                                       @event-keydown-enter="evtEditAccept"
+                                       @event-keydown-escape="evtEditCancel"
+                                       @event-keydown-tab="evtEditAccept"
+                                       @event-blur="evtEditAccept"></spread-sheet-edit-field-wrapper>
     </div>
   </div>
 </template>
@@ -24,23 +26,57 @@ export default {
     SpreadSheetEditFieldWrapper,
   },
   props: {
-    cellName: { type: String, defaul: '' },
-    cellType: { type: String, default: 'string' },
-    cellValue: { type: [String, Number, Date, Object] },
-    isCellNameShow: { type: Boolean, default: false },
-    isShild: { type: Boolean, default: false },
+    editableCell: { type: Object, default() {} },
+    editableCellEvent: { type: Event, default: null },
+    editableCellElement: { type: HTMLDivElement, default: null },
+    isEditableCellLabel: { type: Boolean, default: false },
   },
   data() {
     return {
-      value: this.cellValue,
+      value: this.editableCell?.value,
     };
   },
-  methods: {
-    editingAccept(option) {
-      this.$emit('editing-accept', { ...option, cellName: this.cellName });
+  computed: {
+    blockPosition() {
+      if (!this.editableCellElement) return {};
+      const geometry = this.editableCellElement.getBoundingClientRect();
+      return {
+        width: `${geometry.width + 1}px`,
+        height: `${geometry.height + 1}px`,
+        left: `${geometry.left}px`,
+        top: `${geometry.top - 124}px`,
+      };
     },
-    editingCancel() {
-      this.$emit('editing-cancel');
+    cellName() {
+      if (!this.editableCellElement) return '';
+      return this.editableCellElement.getAttribute('data-name');
+    },
+    cellType() {
+      return this.editableCell?.type || 'string';
+    },
+  },
+  watch: {
+    editableCell() {
+      if (this.editableCellEvent && this.editableCellEvent.type === 'keydown') {
+        console.log(this.editableCellEvent);
+        if (this.editableCellEvent.code === 'Delete') this.value = '';
+        if (this.editableCellEvent.code.includes('Key')
+          || this.editableCellEvent.code.includes('Numpad')
+          || this.editableCellEvent.code.includes('Digit')) {
+          this.value = this.editableCellEvent.key;
+          console.log(this.value);
+        }
+      } else {
+        this.value = this.editableCell?.value || '';
+      }
+    },
+  },
+  methods: {
+    evtEditAccept(option) {
+      this.$emit('editing:accept', { ...option, cellName: this.cellName });
+    },
+    evtEditCancel(option) {
+      this.$emit('editing:cancel', option);
     },
     async focusSpreadSheetEdit() {
       await this.$nextTick().then(() => {
@@ -48,11 +84,6 @@ export default {
           this.$refs.SpreadSheetEditWrapper.$el.querySelector('.v-text-field__slot input').focus();
         }, 100);
       });
-    },
-    editBlur(option) {
-      console.log('edit-blur');
-      this.$emit('edit-blur', { ...option, cellName: this.cellName });
-      // }
     },
   },
 };
@@ -81,7 +112,7 @@ export default {
     overflow: hidden;
     outline: none;
   }
-  .shild {
+  .label {
     position: absolute;
     display: inline-flex;
     left: -2px;

@@ -1,9 +1,17 @@
 const CELL_WIDTH = 94;
 const CELL_HEIGHT = 22;
+const CELL_TYPE_DEFAULT = 'string';
 const ROW_COUNT = 1000;
 const COLUMNS_COUNT = 26;
 
-class TABLE_DOCUMENT {
+function parseCellName(cellName) {
+  return {
+    cellColumn: cellName.replace(/[0-9]/g, ''),
+    cellRow: +cellName.replace(/[A-z]/g, ''),
+  };
+}
+
+class TableDocument {
   constructor({
     template = false,
     rows = {},
@@ -15,7 +23,24 @@ class TABLE_DOCUMENT {
     namedAreas = [],
     cellWidth = CELL_WIDTH,
     cellHeight = CELL_HEIGHT,
-  }) {
+    JSONString = null,
+  } = {}) {
+    if (JSONString) {
+      const JSONStringParse = JSON.parse(JSONString);
+      ({
+        template: this.template = false,
+        rows: this.rows = {},
+        rowCount: this.rowCount = ROW_COUNT,
+        columns: this.columns = {},
+        columnCount: this.columnCount = COLUMNS_COUNT,
+        cells: this.cells = {},
+        styles: this.styles = [],
+        namedAreas: this.namedAreas = [],
+        cellWidth: this.cellWidth = CELL_WIDTH,
+        cellHeight: this.cellHeight = CELL_HEIGHT,
+      } = JSONStringParse);
+      return;
+    }
     this.template = template;
     this.rows = rows;
     this.rowCount = rowCount;
@@ -26,6 +51,53 @@ class TABLE_DOCUMENT {
     this.namedAreas = namedAreas;
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
+  }
+
+  buildDocument(documentTemplate, documentData) {
+    const data = (typeof documentData === 'string') ? JSON.parse(documentData) : documentData;
+    const areaHeader = documentTemplate.getNamedAreaByName('header');
+    this.insertNamedArea(areaHeader, []);
+    data.forEach((element) => {
+      const [areaName, areaValue] = Object.entries(element)[0];
+      const namedArea = documentTemplate.getNamedAreaByName(areaName);
+      // console.log(namedArea);
+      areaValue.forEach((value) => {
+        this.insertNamedArea(namedArea, value);
+      });
+    });
+  }
+
+  getCellByName(cellName) {
+    let cell = {};
+    if (Object.keys(this.cells).includes(cellName)) {
+      cell = this.cells[cellName];
+    }
+    if (!Object.keys(cell).includes('type')) {
+      const { cellColumn, cellRow } = parseCellName(cellName);
+      const cellType = this.rows[cellRow]?.type
+        || this.columns[cellColumn]?.type
+        || CELL_TYPE_DEFAULT;
+      cell.type = cellType;
+    }
+    console.log(cell);
+    return cell;
+  }
+
+  getDocument(JSONFormat = false) {
+    const document = {
+      rows: this.rows,
+      rowCount: this.rowCount,
+      columns: this.columns,
+      columnCount: this.columnCount,
+      cells: this.cells,
+      styles: this.styles,
+    };
+    return (JSONFormat) ? JSON.stringify(document) : document;
+  }
+
+  getDocumentData() {
+    console.log(this.cells);
+    console.log(this.namedAreas);
   }
 
   getNamedAreaByName(areaName) {
@@ -68,7 +140,7 @@ class TABLE_DOCUMENT {
       });
       rowNumber += 1;
     }
-    return new TABLE_DOCUMENT({
+    return new TableDocument({
       rows,
       rowCount: Object.keys(rows).length,
       columns,
@@ -81,12 +153,13 @@ class TABLE_DOCUMENT {
     });
   }
 
-  insertNamedArea(area, value) {
-    console.log(area);
+  insertNamedArea(area, value) { // добавить именованные области
+    // console.log(area);
     const currentRow = Object.keys(this.rows).length + 1;
+    const rowsTemp = {};
     const cellsTemp = {};
     Object.keys(area.rows).forEach((rowNumber, index) => {
-      this.rows[currentRow + index] = { ...area.rows[rowNumber] };
+      rowsTemp[currentRow + index] = { ...area.rows[rowNumber] };
 
       Object.keys(area.cells).forEach((cellName) => {
         if (area.namedAreas.findIndex((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1)) > -1) {
@@ -96,18 +169,21 @@ class TABLE_DOCUMENT {
           };
         } else {
           cellsTemp[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
-            ...area.cells[cellName],
+            ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
           };
         }
       });
     });
+    this.rows = { ...this.rows, ...rowsTemp };
     this.cells = { ...this.cells, ...cellsTemp };
 
+    const columnTemp = {};
     Object.keys(area.columns).forEach((columnName) => {
-      this.columns[columnName] = { ...area.columns[columnName] };
+      columnTemp[columnName] = { ...area.columns[columnName] };
     });
+    this.columns = { ...this.columns, ...columnTemp };
 
-    area.styles.forEach((style) => {
+    area.styles.forEach((style) => { // проверить реактивность
       if (this.styles.findIndex((item) => item.name === style.name) > -1) return;
       this.styles.push(style);
     });
@@ -116,26 +192,22 @@ class TABLE_DOCUMENT {
     this.columnCount = Object.keys(this.columns).length;
   }
 
-  // setValueNamedArea(areaData) {
-  //   if (!areaData.length) return null;
-  //   const [v1, v2] = this.namedAreas[0].range.split(':');
-  //   const namedAreaRange = (+v2) - (+v1) + 1;
-  //   // const cellsTemp = this.cells;
-  //   this.cells = {};
-  //   for (let i = 0; i < areaData.length - 1; i += 1) {
-  //     if (i > 0) { // копируем строки области
-  //       for (let j = 0; j < namedAreaRange; j += 1) {
-  //         this.rows[(i + namedAreaRange) + j] = { ...this.rows[(i - namedAreaRange) + j] };
-  //       }
-  //     }
-  //     // for (let [areaName, areaValue] of Object.entries(areaData[i])) {
-  //     //   const namedArea = this.namedAreas.find((item) => item.name === areaName);
-  //     //   const [nameCellTemp] = namedArea.range.split(':');
-  //     //   this.cells[`${nameCellTemp.replace(/[0-9]/g, '')}${i}`] = cellsTemp[nameCellTemp];
-  //     // }
-  //   }
-  //   return this.rows;
+  // addingRow(rowName = Math.max(...Object.keys(this.rows)) + 1, rowValue = { height: CELL_HEIGHT }) {
+  //   const row = {};
+  //   row[rowName] = rowValue;
+  //   this.rows = { ...this.rows, ...row };
+  //   this.rowCount = +rowName;
   // }
+
+  editingCell(cellName, cellValue) { // проверять существует строка/столбец
+    // получать максимальный из имеющихся, сравнивать
+    // если значение пустое и нет других данных в ячейке, удалять ???
+    const cells = {};
+    cells[cellName] = {};
+    if (Object.keys(this.cells).includes(cellName)) cells[cellName] = this.cells[cellName];
+    cells[cellName].value = cellValue;
+    this.cells = { ...this.cells, ...cells };
+  }
 }
 
-export default TABLE_DOCUMENT;
+export default TableDocument;

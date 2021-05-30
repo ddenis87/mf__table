@@ -1,14 +1,14 @@
 <template>
   <div :class="{
-    'spread-sheet': !printMode,
-    'spread-sheet-print': printMode,
+    'spread-sheet': !isPrintMode,
+    'spread-sheet-print': isPrintMode,
   }">
     <div class="sheet"
         :style="templateSheet">
       <div class="sheet__angle"></div>
       <div class="sheet__head">
         <spread-sheet-head ref="SheetHead"
-                          v-if="!printMode"
+                          v-if="!isPrintMode"
                           :columns="tableColumns"
                           :template-column-width="templateColumnWidth"
                           :template-table-width="templateTableWidth"
@@ -18,7 +18,7 @@
                           @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
       </div>
       <div class="sheet__body">
-        <spread-sheet-body-print v-if="printMode"
+        <spread-sheet-body-print v-if="isPrintMode"
                                   :rows="tableRows"
                                   :columns="tableColumns"
                                   :cells="tableCells"
@@ -26,8 +26,8 @@
                                   :templateColumnWidth="templateColumnWidth"
                                   :maxLevelGroupRow="maxLevelGroupRow"
                                   :setExcludedCells="setExcludedCells"
-                                  :print-mode="printMode"></spread-sheet-body-print>
-        <spread-sheet-body v-show="!printMode"
+                                  :print-mode="isPrintMode"></spread-sheet-body-print>
+        <spread-sheet-body v-show="!isPrintMode"
                            ref="SpreadSheetBody"
                            :rows="tableRows"
                            :rows-fixed="tableRowsFixed"
@@ -40,7 +40,9 @@
                            :template-table-width="templateTableWidth"
                            :set-open-group-rows="setOpenGroupRows"
                            :is-grid-off="isGridOff"
-                           @edit-cell="editCell"
+                           @click:cell="evtClickCell"
+                           @dblclick:cell="evtDblclickCell"
+                           @keydown:cell="evtKeydownCell"
                            @toggle-row-group="toggleRowGroup"
                            @scroll-body-x="scrollBodyX"></spread-sheet-body>
       </div>
@@ -58,7 +60,7 @@ import {
   CELL_WIDTH,
   CELL_WIDTH_LEFT_TITLE,
   CELL_WIDTH_LEFT_GROUP,
-  CELL_TYPE_DEFAULT,
+  // CELL_TYPE_DEFAULT,
 } from './SpreadSheetConst';
 
 export default {
@@ -69,16 +71,16 @@ export default {
     SpreadSheetBodyPrint,
   },
   props: {
-    rowCount: { type: Number, default: 1000 },
-    columnCount: { type: Number, default: 50 },
     rows: { type: Object, default() { return {}; } },
+    rowCount: { type: Number, default: 1000 },
     columns: { type: Object, default() { return {}; } },
+    columnCount: { type: Number, default: 50 },
     cells: { type: Object, default() { return {}; } },
     styles: { type: Array, default() { return []; } },
 
     cellWidth: { type: Number, default: CELL_WIDTH },
     cellHeight: { type: Number, default: CELL_HEIGHT },
-    printMode: { type: Boolean, default: false },
+    isPrintMode: { type: Boolean, default: false },
     isGridOff: { type: Boolean, default: false },
   },
   data() {
@@ -188,11 +190,11 @@ export default {
             const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + i);
             this.setExcludedCells[cellName].push(`${columnNameNext}${cellNameRow}`);
           }
-          prepareCells[cellName]['grid-column-start'] = (this.printMode) ? 1 : (this.maxLevelGroupRow + 2);
-          prepareCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + colspan;
+          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxLevelGroupRow + 2);
+          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (this.maxLevelGroupRow + 2)) + colspan;
         } else {
-          prepareCells[cellName]['grid-column-start'] = (this.printMode) ? 1 : (this.maxLevelGroupRow + 2);
-          prepareCells[cellName]['grid-column-end'] = ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2)) + 1;
+          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxLevelGroupRow + 2);
+          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (this.maxLevelGroupRow + 2)) + 1;
         }
 
         let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || this.cellHeight : this.cellHeight;
@@ -240,9 +242,6 @@ export default {
     styles() {
       this.updateDocumentStyles();
     },
-    printMode() { // убрать, печать на отдельной страницы
-      this.updateDocumentStyles();
-    },
   },
   mounted() {
     this.updateDocumentStyles();
@@ -251,30 +250,12 @@ export default {
     this.updateDocumentStyles(false);
   },
   methods: {
-    editCell(evt) {
-      const cellName = evt.target.getAttribute('data-name');
-      const cellGeometry = evt.target.getBoundingClientRect();
-      const cellProps = {
-        name: cellName,
-        evt,
-        target: evt.target,
-        type: this.getCellType(cellName),
-        top: cellGeometry.top - ((2 * this.cellHeight) + this.cellHeight),
-        left: cellGeometry.left,
-        width: cellGeometry.width,
-        height: cellGeometry.height,
-      };
-      this.currentEditCell = cellName;
-      this.$emit('edit:cell', cellProps);
+    evtClickCell() {},
+    evtDblclickCell(evt) {
+      this.$emit('dblclick:cell', evt);
     },
-
-    getCellType(cellName) {
-      const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
-      const cellType = this.tableCells[cellName]?.type
-        || this.tableRows.find((row) => row.name === cellNameRow).type
-        || this.tableColumns.find((column) => column.name === cellNameColumn).type
-        || CELL_TYPE_DEFAULT;
-      return cellType;
+    evtKeydownCell(evt) {
+      this.$emit('keydown:cell', evt);
     },
 
     scrollBodyX(scrollLeft) {
@@ -318,7 +299,6 @@ export default {
         }
         this.recursiveClosingColumnGroup(item.name);
       });
-      // console.log(this.setOpenGroupColumns);
     },
 
     getColumnNameForNumber(columnNumber) {
@@ -387,7 +367,7 @@ export default {
       let stylesPath = '';
       const prepareStyles = [];
       stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
-      if (this.printMode) {
+      if (this.isPrintMode) {
         stylesPath = ' .spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
       }
       const elementDOMStyle = document.createElement('style');
@@ -446,7 +426,6 @@ export default {
     getStyleCell(style) {
       const styleCell = {
         name: style.name,
-        // list: style.list,
         list: {},
       };
       Object.entries(style.list).forEach((element) => {
@@ -467,7 +446,7 @@ export default {
     },
 
     // public methods ---------
-    pDocumentNew() {
+    createNewDocument() {
       this.setOpenGroupColumns = [];
       this.setOpenGroupRows = [];
       this.setExcludedCells = {};

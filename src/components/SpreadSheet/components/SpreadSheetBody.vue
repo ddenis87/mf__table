@@ -1,9 +1,9 @@
 <template>
   <div ref="TableBody"
        class="spread-sheet-body"
-       @click="clickBody"
-       @dblclick="eventDblClickBody"
-       @keydown="eventKeydown">
+       @click="evtClickBody"
+       @dblclick="evtDblClickBody"
+       @keydown="evtKeydownBody">
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed"
          :class="{'sheet-body-fixed_grid-off': (isGridOff && rowsFixed.length)}">
@@ -35,8 +35,8 @@
                   :data-sources="rows"
                   :data-component="sheetBodyItem"
                   :extra-props="extraPropsComponent"
-                  @scroll="scrollBody"
-                  @resized="eventResized">
+                  @scroll="evtScrollList"
+                  @resized="evtResizedList">
     </virtual-list>
   </div>
 </template>
@@ -117,11 +117,36 @@ export default {
     this.sheetBodyGeometry = this.$refs.SheetBody.$el.getBoundingClientRect();
   },
   methods: {
-    scrollBody(evt) {
+    evtDblClickBody(evt) {
+      if (evt.target.hasAttribute('data-name')) this.$emit('dblclick:cell', evt);
+    },
+    evtClickBody(evt) {
+      if (evt.target.hasAttribute('data-name')) this.$emit('click:cell', evt);
+      if (evt.target.closest('button')) this.toggleRowGroup(evt.target.closest('button'));
+      if (evt.target.closest('.column-body')) {
+        const cellName = evt.target.closest('.column-body').getAttribute('data-name');
+        this.focusCell(this.getCellNodeForName(cellName));
+      }
+    },
+    evtKeydownBody(evt) {
+      evt.preventDefault();
+      if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && evt.shiftKey === false)) this.moveCursorNext(evt.target);
+      if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey === true)) this.moveCursorPrevious(evt.target);
+      if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
+      if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
+      if (evt.code.includes('Key')
+        || evt.code.includes('Numpad')
+        || evt.code.includes('Digit')
+        || evt.code === 'Enter'
+        || evt.code === 'Delete') {
+        if (evt.target.hasAttribute('data-name')) this.$emit('keydown:cell', evt);
+      }
+    },
+    evtScrollList(evt) {
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
-    eventResized() {
+    evtResizedList() {
       if (!this.currentSelectedCellName) return;
       const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
       if (!cellSelectedNode) return;
@@ -131,13 +156,7 @@ export default {
         this.focusCell(cellSelectedNode);
       }
     },
-    clickBody(evt) {
-      if (evt.target.closest('button')) this.toggleRowGroup(evt.target.closest('button'));
-      if (evt.target.closest('.column-body')) {
-        const cellName = evt.target.closest('.column-body').getAttribute('data-name');
-        this.focusCell(this.getCellNodeForName(cellName));
-      }
-    },
+
     focusCell(target) {
       if (target.getBoundingClientRect().left < this.widthFixedColumn) {
         this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
@@ -178,21 +197,6 @@ export default {
     //     ...this.parseCellName(cellName),
     //   };
     // },
-
-    eventKeydown(evt) {
-      evt.preventDefault();
-      if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && evt.shiftKey === false)) this.moveCursorNext(evt.target);
-      if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey === true)) this.moveCursorPrevious(evt.target);
-      if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
-      if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
-      if (evt.code.includes('Key')
-        || evt.code.includes('Numpad')
-        || evt.code.includes('Digit')
-        || evt.code === 'Enter'
-        || evt.code === 'Delete') {
-        if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
-      }
-    },
     // moveCursorNext(target) {
     //   if (!target.nextSibling) return false;
     //   // const { nextElementSibling } = target;
@@ -400,10 +404,6 @@ export default {
         // console.log(cellNameNext);
       }
       return true;
-    },
-
-    eventDblClickBody(evt) {
-      if (evt.target.hasAttribute('data-name')) this.$emit('edit-cell', evt);
     },
 
     toggleRowGroup(target) {

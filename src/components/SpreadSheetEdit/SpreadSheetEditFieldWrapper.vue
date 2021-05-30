@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import ElFieldString from '@/components/Elements/ElFields/ElFieldStringArea.vue';
+import ElFieldString from '@/components/Elements/ElFields/ElFieldString.vue';
 import ElFieldNumber from '@/components/Elements/ElFields/ElFieldNumber.vue';
 import ElFieldDate from '@/components/Elements/ElFields/ElFieldDate.vue';
 
@@ -40,7 +40,11 @@ export default {
     componentField() {
       // eslint-disable-next-line prefer-template
       return this.componentsField[this.cellType];
-      // return () => import('@/components/Elements/ElFields/ElField' + this.getToUpperFirstChar(this.cellType) + '.vue');
+    },
+  },
+  watch: {
+    cellValue() {
+      this.value = this.cellValue;
     },
   },
   methods: {
@@ -51,15 +55,12 @@ export default {
       if (option.event.key === 'Tab') this.$emit('event-keydown-tab', { ...option });
       this.$emit('input', this.value);
       this.$emit('event-keydown', { ...option });
+      this.value = null;
     },
     eventBlur(option) {
-      // console.log(option);
       this.$emit('input', this.value);
       this.$emit('event-blur', { ...option });
-    },
-    getToUpperFirstChar(value) {
-      // console.log(value[0].toUpperCase() + value.slice(1));
-      return value[0].toUpperCase() + value.slice(1);
+      this.value = null;
     },
   },
 };
