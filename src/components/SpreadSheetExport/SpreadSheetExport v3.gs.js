@@ -1,4 +1,3 @@
-
 const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
 const FONT_FAMILY = ['Arial', 'arial,sans,sans-serif'];
@@ -8,7 +7,7 @@ const FONT_WEIGHT = 'normal';
 const FONT_STYLE = 'normal';
 const FONT_COLOR = '#000000';
 
-const CELL_BACKGROUND_COLOR = '#ffffff';
+const BACKGROUND_COLOR = '#ffffff';
 
 const ALIGNMENT_H = { left: 'flex-start', center: 'center', right: 'flex-end', defaultValue: () => 'general' };
 const ALIGNMENT_V = { top: 'flex-start', middle: 'center', bottom: 'flex-end', defaultValue: () => 'bottom' };
@@ -31,8 +30,8 @@ const FORMAT_DATE = {
 function onOpen() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var menuEntries = [
-    {name: "Export JSON Data Range - Document", functionName: "exportJSON"},
-    {name: "Export JSON Custom Range - Template", functionName: "openPromt"},
+    {name: "Export JSON Range Data", functionName: "exportJSON"},
+    {name: "Export JSON Range", functionName: "openPromt"},
     {name: "Test function", functionName: "testFunction"},
   ];
   ss.addMenu("Export JSON", menuEntries);
@@ -69,9 +68,7 @@ function testFunction(e) {
   // var ss = SpreadsheetApp.getActiveSpreadsheet();
   // var sheet = ss.getSheets()[0];
 
-  var cell = sheet.getRange("B7");
-  Logger.log(cell.getBackgroundObject().asRgbColor().asHexString());
-  var cell = sheet.getRange("C8");
+  var cell = sheet.getRange("B5");
   Logger.log(cell.getBackgroundObject().asRgbColor().asHexString());
 };
 
@@ -236,8 +233,6 @@ function getStylesCell(cellNameA1, borderCell, borderCellTop, borderCellLeft) {
   if (range.getFontStyle() && range.getFontStyle() != FONT_STYLE) styleCell.list.fontStyle = range.getFontStyle();
   if (range.getFontSize() && range.getFontSize() != FONT_SIZE) styleCell.list.fontSize = `${range.getFontSize()}pt`;
   if (range.getFontColor() && range.getFontColor() != FONT_COLOR) styleCell.list.color = range.getFontColor();
-
-  if (!range.getBackgroundObject().asRgbColor().asHexString().includes(CELL_BACKGROUND_COLOR)) styleCell.list.backgroundColor = range.getBackgroundObject().asRgbColor().asHexString();
 
   if (range.getHorizontalAlignment() && range.getHorizontalAlignment() != ALIGNMENT_H.defaultValue()) {
     styleCell.list.textAlign = range.getHorizontalAlignment();
@@ -463,4 +458,3 @@ function getColumnNumberForName(columnName) {
   const indexSecond = SET_COLUMN_NAME.findIndex((item) => item === columnName[1]) + 1;
   return (indexFirst * SET_COLUMN_NAME.length) + indexSecond;
 };
-
