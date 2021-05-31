@@ -2,12 +2,14 @@ const CELL_WIDTH = 94;
 const CELL_HEIGHT = 22;
 
 class TEMPLATE_AREAS {
-  constructor() {};
+  constructor() {}
+
   namedRanges = [];
+
   getArea(nameArea) {
 
-  };
-};
+  }
+}
 
 class TABLE_DOCUMENT {
   constructor({
@@ -22,23 +24,26 @@ class TABLE_DOCUMENT {
     this.cells = cells;
     this.styles = styles;
     this.namedRanges = namedRanges;
-  };
+  }
 
   rows = {};
+
   columns = {};
+
   cells = {};
+
   styles = []; // ?
+
   namedRanges = {}; // ? []
 
   getTemplateAreas(direction) {
     const templateAreas = template.namedRanges.filter((item) => {
-      const [ v1, v2 ] = item.range.split(':');
+      const [v1, v2] = item.range.split(':');
       return (item.name.includes((direction === 'horizontal') ? 'row' : 'column') && v1 === v2);
     });
     return new TEMPLATE_AREAS();
-  };
-
-};
+  }
+}
 
 function createNewDocument({
   rowCount = 1000,
@@ -47,40 +52,40 @@ function createNewDocument({
   cellHeight = CELL_HEIGHT,
 } = {}) {
   const newDocument = {
-    rowCount: rowCount,
+    rowCount,
     rows: {},
-    columnCount: columnCount,
+    columnCount,
     columns: {},
     cells: {},
     styles: [],
-    cellWidth: cellWidth,
-    cellHeight: cellHeight,
+    cellWidth,
+    cellHeight,
   };
   return newDocument;
-};
+}
 
 function hasTemplate(template) {
   return (Object.keys(template).includes('template')
     && template.template === true);
-};
+}
 
 function hasNamedRanges(template) {
   return (Object.keys(template).includes('namedRanges')
-    && Object.keys(template.namedRanges))
-};
+    && Object.keys(template.namedRanges));
+}
 
 function getAreasFromTemplate(jsonTemplate = null, direction = 'horizontal') {
   if (jsonTemplate === null) return null;
-  let template = JSON.parse(jsonTemplate);
+  const template = JSON.parse(jsonTemplate);
   if (!hasNamedRanges(template)) return null;
   const areas = template.namedRanges.filter((item) => {
-    const [ v1, v2 ] = item.range.split(':');
+    const [v1, v2] = item.range.split(':');
     return (item.name.includes((direction === 'horizontal') ? 'row' : 'column') && v1 === v2);
   });
   areas.forEach((element) => {
-    const [ indexBegin, indexEnd ] = element.range.split(':');
+    const [indexBegin, indexEnd] = element.range.split(':');
     element.parameters = template.namedRanges.filter((item) => {
-      const [ v1, v2 ] = item.range.split(':');
+      const [v1, v2] = item.range.split(':');
       return (indexBegin <= v1.replace((direction === 'horizontal') ? /[A-z]/g : /[0-9]/g, '') <= indexEnd
         && v1 !== v2);
     });

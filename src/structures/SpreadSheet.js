@@ -53,6 +53,8 @@ class TableDocument {
     this.cellHeight = cellHeight;
   }
 
+  dataMap = [];
+
   buildDocument(documentTemplate, documentData) {
     const data = (typeof documentData === 'string') ? JSON.parse(documentData) : documentData;
     const areaHeader = documentTemplate.getNamedAreaByName('header');
@@ -65,6 +67,8 @@ class TableDocument {
         this.insertNamedArea(namedArea, value);
       });
     });
+    const areaFooter = documentTemplate.getNamedAreaByName('footer');
+    this.insertNamedArea(areaFooter, []);
   }
 
   getCellByName(cellName) {
@@ -97,7 +101,41 @@ class TableDocument {
 
   getDocumentData() {
     console.log(this.cells);
-    console.log(this.namedAreas);
+    console.log(this.rows);
+    const data = {};
+    Object.values(this.rows).forEach((rowValue) => {
+      if (!Object.keys(rowValue).includes('areaName')) return;
+      if (!Object.keys(data).includes(rowValue.areaName)) {
+        data[rowValue.areaName] = {};
+      }
+    });
+
+    // Object.entries(this.rows).forEach((row) => {
+    //   const [rowName, rowValue] = row;
+    //   this.getCellsInRow(row).forEach()
+    //   const dataString = {};
+    // });
+
+    // Object.entries(this.cells).forEach((cell) => {
+    //   const [cellName, cellValue] = cell;
+    //   if (!Object.keys(cellValue).includes('areaName')) return;
+    //   const parentAreaName = this.getParentCellAreaName(cellName);
+    //   data[parentAreaName[0]][cellName] = cellValue;
+    // });
+    return data;
+  }
+
+  getCellsInRow(row) {
+    const cellsKeysInRow = Object.keys(this.cells).filter((cellName) => +cellName.replace(/[A-z]/g, '') === +row);
+    return cellsKeysInRow;
+  }
+
+  getParentCellAreaName(cellName) {
+    const { cellRow, cellColumn } = parseCellName(cellName);
+    const areasNames = [];
+    areasNames.push(this.rows[cellRow]?.areaName);
+    areasNames.push(this.columns[cellColumn]?.areaName);
+    return areasNames;
   }
 
   getNamedAreaByName(areaName) {
@@ -108,7 +146,7 @@ class TableDocument {
     const columns = {};
     const cells = {};
     const styles = [];
-    const namedAreas = [];
+    const namedAreas = [namedArea];
     const [rangeFrom, rangeTo] = namedArea.range.split(':');
     let rowNumber = 1;
 
@@ -155,18 +193,31 @@ class TableDocument {
 
   insertNamedArea(area, value) { // добавить именованные области
     // console.log(area);
+    // console.log(value);
     const currentRow = Object.keys(this.rows).length + 1;
     const rowsTemp = {};
     const cellsTemp = {};
+    // const namedAreaTemp = [];
+    const namedAreaRow = area.namedAreas.find((item) => {
+      const [v1, v2] = item.range.split(':');
+      return (+v1 === +v2);
+    });
+    // const namedArea = {};
+    // if (namedAreaRow) {
+    //   namedArea.areaName = namedAreaRow.name;
+    // }
     Object.keys(area.rows).forEach((rowNumber, index) => {
       rowsTemp[currentRow + index] = { ...area.rows[rowNumber] };
 
       Object.keys(area.cells).forEach((cellName) => {
-        if (area.namedAreas.findIndex((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1)) > -1) {
+        const namedAreaCell = area.namedAreas.find((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1));
+        if (namedAreaCell) {
           cellsTemp[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
             ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
-            value: value[area.namedAreas.find((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1)).name],
+            value: value[namedAreaCell.name],
+            areaName: namedAreaCell.name,
           };
+          this.namedAreas.push({ name: namedAreaCell.name, range: cellName.replace(/[0-9]/g, currentRow + index) });
         } else {
           cellsTemp[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
             ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
@@ -176,6 +227,8 @@ class TableDocument {
     });
     this.rows = { ...this.rows, ...rowsTemp };
     this.cells = { ...this.cells, ...cellsTemp };
+    
+    this.dataMap.push({ name: namedAreaRow, range: cellsTemp });
 
     const columnTemp = {};
     Object.keys(area.columns).forEach((columnName) => {
@@ -193,7 +246,7 @@ class TableDocument {
   }
 
   // addingRow(rowName = Math.max(...Object.keys(this.rows)) + 1, rowValue = { height: CELL_HEIGHT }) {
-  //   const row = {};
+  //   const row = {}; // исправить на нормальный код
   //   row[rowName] = rowValue;
   //   this.rows = { ...this.rows, ...row };
   //   this.rowCount = +rowName;
@@ -202,7 +255,7 @@ class TableDocument {
   editingCell(cellName, cellValue) { // проверять существует строка/столбец
     // получать максимальный из имеющихся, сравнивать
     // если значение пустое и нет других данных в ячейке, удалять ???
-    const cells = {};
+    const cells = {}; // исправить на нормальный код
     cells[cellName] = {};
     if (Object.keys(this.cells).includes(cellName)) cells[cellName] = this.cells[cellName];
     cells[cellName].value = cellValue;
