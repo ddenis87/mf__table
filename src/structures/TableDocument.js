@@ -97,23 +97,6 @@ class TableDocument {
     return (JSONFormat) ? JSON.stringify(document) : document;
   }
 
-  // getDocumentData(JSONFormat = false) {
-  //   console.log(this.namedAreas);
-  //   const documentData = {};
-  //   this.namedAreas.forEach((namedArea) => {
-  //     if (!Object.keys(documentData).includes(namedArea.name)) documentData[namedArea.name] = [];
-  //     const [rangeFrom, rangeTo] = namedArea.range.split(':');
-  //     const valueArea = {};
-  //     for (let row = +rangeFrom; row <= +rangeTo; row += 1) {
-  //       Object.entries(this.getCellsInRow(row)).forEach((cell) => {
-  //         const [, cellValue] = cell;
-  //         valueArea[cellValue.areaName] = cellValue.value;
-  //       });
-  //     }
-  //     documentData[namedArea.name].push(valueArea);
-  //   });
-  //   return (JSONFormat) ? JSON.stringify(documentData) : documentData;
-  // }
   getDocumentData(JSONFormat = false) {
     console.log(this.namedAreas);
     const documentData = [];
@@ -142,14 +125,6 @@ class TableDocument {
     });
     return Object.fromEntries(cellKeys);
   }
-
-  // getParentCellAreaName(cellName) {
-  //   const { cellRow, cellColumn } = parseCellName(cellName);
-  //   const areasNames = [];
-  //   areasNames.push(this.rows[cellRow]?.areaName);
-  //   areasNames.push(this.columns[cellColumn]?.areaName);
-  //   return areasNames;
-  // }
 
   getNamedAreaByName(areaName) {
     if (!areaName) return null;

@@ -1,12 +1,5 @@
 <template>
   <div class="spread-sheet-view">
-    <!-- <spread-sheet-edit ref="SpreadSheetEditDOM"
-                       v-if="isCellEditActive"
-                       :style="cellEditStyle"
-                       v-bind="cellEditProps"
-                       :is-shild="isEditableCellLabel"
-                       @editing-accept="editingAccept"
-                       @edit-blur="editingAccept"></spread-sheet-edit> -->
     <div class="spread-sheet-view__control-top">
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="createNewDocument">
@@ -84,8 +77,8 @@ import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
 import DialogModal from '@/components/Dialogs/DialogModal.vue';
 
-import apiSpreadSheet from '@/plugins/apiJSON/apiSpreadSheet';
-import TableDocument from '@/structures/SpreadSheet';
+import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
+import TableDocument from '@/structures/TableDocument';
 
 export default {
   name: 'SpreadSheetView',
@@ -119,7 +112,6 @@ export default {
     saveDocument() { alert('save document'); },
     saveDocumentData() {
       const JSONFormat = true;
-      // console.log(this.tableDocument.getDocumentData(true));
       apiSpreadSheet.dowloadJSONFile(this.tableDocument.getDocumentData(JSONFormat), JSONFormat);
     },
     evtEditCell(evt) {
@@ -172,39 +164,6 @@ export default {
     //   this.editBlur(option);
     // },
 
-    // async editCell(cellProps) {
-    //   // console.log(cellProps);
-    //   if (cellProps.evt.type === 'keydown') {
-    //     this.editCellBefore(cellProps); // !!!!!Не верно, убрать в компонент редактирования
-    //   }
-    //   this.cellEditGeometry.width = cellProps.width + 1;
-    //   this.cellEditGeometry.height = cellProps.height + 1;
-    //   this.cellEditGeometry.left = cellProps.left - 1;
-    //   this.cellEditGeometry.top = cellProps.top + 1;
-
-    //   this.cellEditProps.cellName = cellProps.name;
-    //   this.cellEditProps.cellType = cellProps.type;
-    //   this.cellEditProps.cellValue = (this.cells[cellProps.name] && this.cells[cellProps.name].value) ? this.cells[cellProps.name].value : '';
-    //   this.isCellEditActive = true;
-    //   await this.$nextTick().then(() => {
-    //     setTimeout(() => this.$refs.SpreadSheetEditDOM.$el.focus(), 100);
-    //   });
-    // },
-    // editCellBefore(cellProps) { // !!!!!Не верно, убрать в компонент редактирования
-    //   // if (cellProps.evt.type === 'keydown') {
-    //   if (cellProps.evt.code === 'Delete') {
-    //     if (this.cells[cellProps.name] && this.cells[cellProps.name].value) this.cells[cellProps.name].value = '';
-    //   }
-    //   if (cellProps.evt.code.includes('Key')
-    //     || cellProps.evt.code.includes('Numpad')
-    //     || cellProps.evt.code.includes('Digit')) {
-    //     if (!this.cells[cellProps.name]) this.$set(this.cells, cellProps.name, {});
-    //     if (!this.cells[cellProps.name].value) this.$set(this.cells[cellProps.name], 'value', cellProps.evt.key);
-    //     // this.cells[cellProps.name].value = cellProps.evt.key;
-    //   }
-    //   // }
-    // },
-
     // editBlur(option) {
     //   // console.log(option);
     //   this.isCellEditActive = false;
@@ -212,16 +171,6 @@ export default {
     //     this.$refs.SpreadSheet.pFocusCellByCellName({ cellName: this.cellEditProps.cellName });
     //   }
     //   this.clearPropsSpreadSheetEdit();
-    // },
-    // clearPropsSpreadSheetEdit() {
-    //   this.cellEditGeometry.width = 0;
-    //   this.cellEditGeometry.height = 0;
-    //   this.cellEditGeometry.left = 0;
-    //   this.cellEditGeometry.top = 0;
-    //   this.cellEditProps.cellName = undefined;
-    //   this.cellEditProps.cellType = undefined;
-    //   this.cellEditProps.cellValue = undefined;
-    //   this.isEditableCellLabel = false;
     // },
 
     createNewDocument() {
@@ -236,14 +185,7 @@ export default {
       this.fileTemplate = [];
       this.fileData = [];
     },
-    // saveJSONFile() {
-    //   apiJSON.dowloadJSONFile({
-    //     rows: this.rows,
-    //     columns: this.columns,
-    //     cells: this.cells,
-    //     styles: this.styles,
-    //   });
-    // },
+
     openJSONFileTemplate(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONTemplate) => {
