@@ -53,8 +53,6 @@ class TableDocument {
     this.cellHeight = cellHeight;
   }
 
-  dataMap = [];
-
   buildDocument(documentTemplate, documentData) {
     const data = (typeof documentData === 'string') ? JSON.parse(documentData) : documentData;
     const areaHeader = documentTemplate.getNamedAreaByName('header');
@@ -99,44 +97,59 @@ class TableDocument {
     return (JSONFormat) ? JSON.stringify(document) : document;
   }
 
-  getDocumentData() {
-    console.log(this.cells);
-    console.log(this.rows);
-    const data = {};
-    Object.values(this.rows).forEach((rowValue) => {
-      if (!Object.keys(rowValue).includes('areaName')) return;
-      if (!Object.keys(data).includes(rowValue.areaName)) {
-        data[rowValue.areaName] = {};
+  // getDocumentData(JSONFormat = false) {
+  //   console.log(this.namedAreas);
+  //   const documentData = {};
+  //   this.namedAreas.forEach((namedArea) => {
+  //     if (!Object.keys(documentData).includes(namedArea.name)) documentData[namedArea.name] = [];
+  //     const [rangeFrom, rangeTo] = namedArea.range.split(':');
+  //     const valueArea = {};
+  //     for (let row = +rangeFrom; row <= +rangeTo; row += 1) {
+  //       Object.entries(this.getCellsInRow(row)).forEach((cell) => {
+  //         const [, cellValue] = cell;
+  //         valueArea[cellValue.areaName] = cellValue.value;
+  //       });
+  //     }
+  //     documentData[namedArea.name].push(valueArea);
+  //   });
+  //   return (JSONFormat) ? JSON.stringify(documentData) : documentData;
+  // }
+  getDocumentData(JSONFormat = false) {
+    console.log(this.namedAreas);
+    const documentData = [];
+    this.namedAreas.forEach((namedArea) => {
+      if (documentData.length === 0 || !Object.keys(documentData[documentData.length - 1]).includes(namedArea.name)) {
+        documentData.push({ [namedArea.name]: [] });
       }
+      const [rangeFrom, rangeTo] = namedArea.range.split(':');
+      const valueArea = {};
+      for (let row = +rangeFrom; row <= +rangeTo; row += 1) {
+        Object.entries(this.getCellsInRow(row)).forEach((cell) => {
+          const [, cellValue] = cell;
+          valueArea[cellValue.areaName] = cellValue.value;
+        });
+      }
+      documentData[documentData.length - 1][namedArea.name].push({ ...valueArea });
     });
-
-    // Object.entries(this.rows).forEach((row) => {
-    //   const [rowName, rowValue] = row;
-    //   this.getCellsInRow(row).forEach()
-    //   const dataString = {};
-    // });
-
-    // Object.entries(this.cells).forEach((cell) => {
-    //   const [cellName, cellValue] = cell;
-    //   if (!Object.keys(cellValue).includes('areaName')) return;
-    //   const parentAreaName = this.getParentCellAreaName(cellName);
-    //   data[parentAreaName[0]][cellName] = cellValue;
-    // });
-    return data;
+    return (JSONFormat) ? JSON.stringify(documentData) : documentData;
   }
 
   getCellsInRow(row) {
-    const cellsKeysInRow = Object.keys(this.cells).filter((cellName) => +cellName.replace(/[A-z]/g, '') === +row);
-    return cellsKeysInRow;
+    const cellKeys = Object.entries(this.cells).filter((cell) => {
+      const [cellName, cellValue] = cell;
+      return (+cellName.replace(/[A-z]/g, '') === +row
+        && Object.keys(cellValue).includes('areaName'));
+    });
+    return Object.fromEntries(cellKeys);
   }
 
-  getParentCellAreaName(cellName) {
-    const { cellRow, cellColumn } = parseCellName(cellName);
-    const areasNames = [];
-    areasNames.push(this.rows[cellRow]?.areaName);
-    areasNames.push(this.columns[cellColumn]?.areaName);
-    return areasNames;
-  }
+  // getParentCellAreaName(cellName) {
+  //   const { cellRow, cellColumn } = parseCellName(cellName);
+  //   const areasNames = [];
+  //   areasNames.push(this.rows[cellRow]?.areaName);
+  //   areasNames.push(this.columns[cellColumn]?.areaName);
+  //   return areasNames;
+  // }
 
   getNamedAreaByName(areaName) {
     if (!areaName) return null;
@@ -191,24 +204,23 @@ class TableDocument {
     });
   }
 
-  insertNamedArea(area, value) { // добавить именованные области
-    // console.log(area);
-    // console.log(value);
+  insertNamedArea(area, value) {
     const currentRow = Object.keys(this.rows).length + 1;
     const rowsTemp = {};
     const cellsTemp = {};
-    // const namedAreaTemp = [];
     const namedAreaRow = area.namedAreas.find((item) => {
       const [v1, v2] = item.range.split(':');
-      return (+v1 === +v2);
+      return (+v1 && +v2);
     });
-    // const namedArea = {};
-    // if (namedAreaRow) {
-    //   namedArea.areaName = namedAreaRow.name;
-    // }
+    if (namedAreaRow && !['header', 'footer'].includes(namedAreaRow.name)) {
+      this.namedAreas.push({
+        name: namedAreaRow.name,
+        range: `${currentRow}:${currentRow + Object.keys(area.rows).length - 1}`,
+      });
+    }
+
     Object.keys(area.rows).forEach((rowNumber, index) => {
       rowsTemp[currentRow + index] = { ...area.rows[rowNumber] };
-
       Object.keys(area.cells).forEach((cellName) => {
         const namedAreaCell = area.namedAreas.find((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1));
         if (namedAreaCell) {
@@ -217,7 +229,6 @@ class TableDocument {
             value: value[namedAreaCell.name],
             areaName: namedAreaCell.name,
           };
-          this.namedAreas.push({ name: namedAreaCell.name, range: cellName.replace(/[0-9]/g, currentRow + index) });
         } else {
           cellsTemp[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
             ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
@@ -227,16 +238,13 @@ class TableDocument {
     });
     this.rows = { ...this.rows, ...rowsTemp };
     this.cells = { ...this.cells, ...cellsTemp };
-    
-    this.dataMap.push({ name: namedAreaRow, range: cellsTemp });
-
     const columnTemp = {};
     Object.keys(area.columns).forEach((columnName) => {
       columnTemp[columnName] = { ...area.columns[columnName] };
     });
     this.columns = { ...this.columns, ...columnTemp };
 
-    area.styles.forEach((style) => { // проверить реактивность
+    area.styles.forEach((style) => {
       if (this.styles.findIndex((item) => item.name === style.name) > -1) return;
       this.styles.push(style);
     });

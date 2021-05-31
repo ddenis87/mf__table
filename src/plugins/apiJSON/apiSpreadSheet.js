@@ -1,10 +1,10 @@
 export default {
-  dowloadJSONFile: (data) => {
+  dowloadJSONFile: (data, JSONFormat = false) => {
     const file = new Blob(
-      [JSON.stringify(data)],
+      [(JSONFormat) ? data : JSON.stringify(data)],
       { type: 'application/json' },
     );
-    console.log(file);
+    // console.log(file);
     const link = document.createElement('a');
     link.setAttribute('href', URL.createObjectURL(file));
     link.setAttribute('style', 'display: none');

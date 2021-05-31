@@ -118,7 +118,9 @@ export default {
   methods: {
     saveDocument() { alert('save document'); },
     saveDocumentData() {
-      console.log(this.tableDocument.getDocumentData());
+      const JSONFormat = true;
+      // console.log(this.tableDocument.getDocumentData(true));
+      apiSpreadSheet.dowloadJSONFile(this.tableDocument.getDocumentData(JSONFormat), JSONFormat);
     },
     evtEditCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
