@@ -171,9 +171,9 @@ export default {
       target.focus();
       this.selectedCell(target.getAttribute('data-name'));
     },
-    focusCellByCellName(cellName) {
-      this.focusCell(this.getCellNodeForName(cellName));
-    },
+    // focusCellByCellName(cellName) {
+    //   this.focusCell(this.getCellNodeForName(cellName));
+    // },
 
     selectedCell(cellName) {
       const cellNode = this.getCellNodeForName(cellName);

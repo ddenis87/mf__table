@@ -227,6 +227,7 @@ export default {
         box-sizing: border-box;
         background-color: $backgroundColorTitle;
         overflow: hidden;
+        user-select: none;
       }
     }
     &-body {
@@ -246,6 +247,7 @@ export default {
         width: 100%;
         padding: 0px 2px;
         overflow: hidden;
+        user-select: none;
       }
       &::after {
         content: '';

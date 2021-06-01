@@ -450,12 +450,13 @@ export default {
       this.setOpenGroupColumns = [];
       this.setOpenGroupRows = [];
       this.setExcludedCells = {};
+      this.updateDocumentStyles(false);
     },
-    pFocusCellByCellName(option) {
-      if (Object.keys(option).includes('cellName')) {
-        this.$refs.SpreadSheetBody.focusCellByCellName(option.cellName);
-      }
-    },
+    // pFocusCellByCellName(option) {
+    //   if (Object.keys(option).includes('cellName')) {
+    //     this.$refs.SpreadSheetBody.focusCellByCellName(option.cellName);
+    //   }
+    // },
     // ------ ------- ---------
   },
 };

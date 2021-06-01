@@ -40,12 +40,15 @@
       </div>
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="openPrintPage">
-          <v-icon small left>mdi-cloud-print-outline</v-icon>{{ 'Печать' }}</v-btn>
+          <v-icon small left>mdi-cloud-print-outline</v-icon>Печать</v-btn>
       </div>
       <div class="item item_btn">
         <v-checkbox label="Сетка"
                     v-model="isGridOff"
                     @input="isGridOff = !isGridOff"></v-checkbox>
+      </div>
+      <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" @click="insertRow">Shift row</v-btn>
       </div>
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
@@ -116,6 +119,7 @@ export default {
     },
     evtEditCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
+      if (!this.tableDocument.checkEditAccess(cellName)) return;
       this.editableCell = this.tableDocument.getCellByName(cellName);
       this.editableCellEvent = evt;
       this.editableCellElement = evt.target;
@@ -125,6 +129,7 @@ export default {
       });
     },
     clearEditCell() {
+      this.editableCellElement.focus();
       this.editableCell = null;
       this.editableCellEvent = null;
       this.editableCellElement = null;
@@ -153,25 +158,9 @@ export default {
     cancelEditingCell() {
       this.clearEditCell();
     },
-    // editingAccept(option) {
-    //   // console.log(option);
-    //   if (!this.cells[option.cellName]) this.$set(this.cells, option.cellName, {});
-    //   if (!this.cells[option.cellName].value) {
-    //     this.$set(this.cells[option.cellName], 'value', option.value);
-    //   } else {
-    //     this.cells[option.cellName].value = option.value;
-    //   }
-    //   this.editBlur(option);
-    // },
-
-    // editBlur(option) {
-    //   // console.log(option);
-    //   this.isCellEditActive = false;
-    //   if (option.event.code === 'Escape') {
-    //     this.$refs.SpreadSheet.pFocusCellByCellName({ cellName: this.cellEditProps.cellName });
-    //   }
-    //   this.clearPropsSpreadSheetEdit();
-    // },
+    insertRow() {
+      this.tableDocument.shiftRows({ shiftStart: 6, shiftBefore: false, shiftStep: 1 });
+    },
 
     createNewDocument() {
       this.tableDocument = new TableDocument();

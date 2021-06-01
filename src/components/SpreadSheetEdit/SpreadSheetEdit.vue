@@ -58,14 +58,14 @@ export default {
   watch: {
     editableCell() {
       if (this.editableCellEvent && this.editableCellEvent.type === 'keydown') {
-        console.log(this.editableCellEvent);
+        console.log(this.editableCellEvent.code);
         if (this.editableCellEvent.code === 'Delete') this.value = '';
         if (this.editableCellEvent.code.includes('Key')
-          || this.editableCellEvent.code.includes('Numpad')
+          || (this.editableCellEvent.code.includes('Numpad') && !this.editableCellEvent.code.includes('NumpadEnter'))
           || this.editableCellEvent.code.includes('Digit')) {
           this.value = this.editableCellEvent.key;
-          console.log(this.value);
         }
+        if (this.editableCellEvent.code === 'Enter') this.value = this.editableCell?.value || '';
       } else {
         this.value = this.editableCell?.value || '';
       }

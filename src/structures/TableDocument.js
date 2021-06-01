@@ -1,15 +1,15 @@
 const CELL_WIDTH = 94;
 const CELL_HEIGHT = 22;
-const CELL_TYPE_DEFAULT = 'string';
+// const CELL_TYPE_DEFAULT = 'string';
 const ROW_COUNT = 1000;
 const COLUMNS_COUNT = 26;
 
-function parseCellName(cellName) {
-  return {
-    cellColumn: cellName.replace(/[0-9]/g, ''),
-    cellRow: +cellName.replace(/[A-z]/g, ''),
-  };
-}
+// function parseCellName(cellName) {
+//   return {
+//     cellColumn: cellName.replace(/[0-9]/g, ''),
+//     cellRow: +cellName.replace(/[A-z]/g, ''),
+//   };
+// }
 
 class TableDocument {
   constructor({
@@ -74,13 +74,13 @@ class TableDocument {
     if (Object.keys(this.cells).includes(cellName)) {
       cell = this.cells[cellName];
     }
-    if (!Object.keys(cell).includes('type')) {
-      const { cellColumn, cellRow } = parseCellName(cellName);
-      const cellType = this.rows[cellRow]?.type
-        || this.columns[cellColumn]?.type
-        || CELL_TYPE_DEFAULT;
-      cell.type = cellType;
-    }
+    // if (!Object.keys(cell).includes('type')) {
+    //   const { cellColumn, cellRow } = parseCellName(cellName);
+    //   const cellType = this.rows[cellRow]?.type
+    //     || this.columns[cellColumn]?.type
+    //     || CELL_TYPE_DEFAULT;
+    //   cell.type = cellType;
+    // }
     console.log(cell);
     return cell;
   }
@@ -108,8 +108,10 @@ class TableDocument {
       const valueArea = {};
       for (let row = +rangeFrom; row <= +rangeTo; row += 1) {
         Object.entries(this.getCellsInRow(row)).forEach((cell) => {
-          const [, cellValue] = cell;
-          valueArea[cellValue.areaName] = cellValue.value;
+          if (!Object.keys(cell).includes('areaName')) {
+            const [, cellValue] = cell;
+            valueArea[cellValue.areaName] = cellValue.value;
+          }
         });
       }
       documentData[documentData.length - 1][namedArea.name].push({ ...valueArea });
@@ -119,14 +121,14 @@ class TableDocument {
 
   getCellsInRow(row) {
     const cellKeys = Object.entries(this.cells).filter((cell) => {
-      const [cellName, cellValue] = cell;
-      return (+cellName.replace(/[A-z]/g, '') === +row
-        && Object.keys(cellValue).includes('areaName'));
+      const [cellName] = cell;
+      return (+cellName.replace(/[A-z]/g, '') === +row);
     });
     return Object.fromEntries(cellKeys);
   }
 
-  getNamedAreaByName(areaName) {
+  getNamedAreaByName(areaName) { // ошибка в регулярках при замене номера строки,
+    // при строке > 9 заменит 2 раза
     if (!areaName) return null;
     const namedArea = this.namedAreas.find((item) => item.name === areaName);
     if (!namedArea) return null;
@@ -179,10 +181,10 @@ class TableDocument {
     });
   }
 
-  insertNamedArea(area, value) {
+  insertNamedArea(area, value) { // таже беда что и при получении именованной области
     const currentRow = Object.keys(this.rows).length + 1;
-    const rowsTemp = {};
-    const cellsTemp = {};
+    const rows = {};
+    const cells = {};
     const namedAreaRow = area.namedAreas.find((item) => {
       const [v1, v2] = item.range.split(':');
       return (+v1 && +v2);
@@ -195,29 +197,29 @@ class TableDocument {
     }
 
     Object.keys(area.rows).forEach((rowNumber, index) => {
-      rowsTemp[currentRow + index] = { ...area.rows[rowNumber] };
+      rows[currentRow + index] = { ...area.rows[rowNumber] };
       Object.keys(area.cells).forEach((cellName) => {
         const namedAreaCell = area.namedAreas.find((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1));
         if (namedAreaCell) {
-          cellsTemp[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
+          cells[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
             ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
             value: value[namedAreaCell.name],
             areaName: namedAreaCell.name,
           };
         } else {
-          cellsTemp[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
+          cells[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
             ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
           };
         }
       });
     });
-    this.rows = { ...this.rows, ...rowsTemp };
-    this.cells = { ...this.cells, ...cellsTemp };
-    const columnTemp = {};
+    this.rows = { ...this.rows, ...rows };
+    this.cells = { ...this.cells, ...cells };
+    const columns = {};
     Object.keys(area.columns).forEach((columnName) => {
-      columnTemp[columnName] = { ...area.columns[columnName] };
+      columns[columnName] = { ...area.columns[columnName] };
     });
-    this.columns = { ...this.columns, ...columnTemp };
+    this.columns = { ...this.columns, ...columns };
 
     area.styles.forEach((style) => {
       if (this.styles.findIndex((item) => item.name === style.name) > -1) return;
@@ -234,15 +236,36 @@ class TableDocument {
   //   this.rows = { ...this.rows, ...row };
   //   this.rowCount = +rowName;
   // }
+  checkEditAccess(cellName) {
+    if (!Object.keys(this.cells).includes(cellName)) return true;
+    if (Object.keys(this.cells[cellName]).includes('areaName')) return true;
+    return false;
+  }
 
   editingCell(cellName, cellValue) { // проверять существует строка/столбец
     // получать максимальный из имеющихся, сравнивать
-    // если значение пустое и нет других данных в ячейке, удалять ???
-    const cells = {}; // исправить на нормальный код
-    cells[cellName] = {};
-    if (Object.keys(this.cells).includes(cellName)) cells[cellName] = this.cells[cellName];
-    cells[cellName].value = cellValue;
-    this.cells = { ...this.cells, ...cells };
+    const cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
+    cellValues.value = cellValue;
+    if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
+    this.cells = { ...this.cells, [cellName]: cellValues };
+  }
+
+  shiftRows({ shiftStart, shiftBefore = false, shiftStep = 1 }) {
+    console.log(shiftBefore);
+    const lastRow = Math.max(...Object.keys(this.rows));
+    for (let i = 0; i < lastRow - shiftStart; i += 1) {
+      console.log(lastRow - i, ' - ', this.rows[lastRow - i]);
+      this.rows[lastRow - i + shiftStep] = this.rows[lastRow - i];
+      delete this.rows[lastRow - i];
+
+      Object.entries(this.getCellsInRow(lastRow - i)).forEach((cell) => {
+        const [cellName, cellValue] = cell;
+        this.cells[`${cellName.replace(/[0-9]/g, '')}${lastRow - i + shiftStep}`] = cellValue;
+        delete this.cells[cellName];
+      });
+    }
+    this.rows[shiftStart + 1] = this.rows[shiftStart];
+    this.rowCount = Object.keys(this.rows).length;
   }
 }
 
