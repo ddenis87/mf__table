@@ -16,6 +16,45 @@ function replaceCellRow(cellName, newRow) {
   return `${cellColumn}${newRow}`;
 }
 
+// function getShiftCells(cells = [], shiftRow) {
+//   const shiftCells = {};
+//   cells.forEach((cell) => {
+//     const [cellName, cellValue] = cell;
+//     shiftCells[replaceCellRow(cellName, shiftRow)] = cellValue;
+//   });
+//   return shiftCells;
+// }
+function shiftRange(area = {}, fromPosition = 1, columnDirection = false) {
+  const { rows, cells, namedAreas } = area;
+  const shiftRows = {};
+  const shiftCells = {};
+  const shiftNamedAreas = [];
+  if (columnDirection) console.log('column shift');
+  for (let i = 0; i < Object.keys(rows).length; i += 1) {
+    const currentPosition = fromPosition + i;
+    shiftRows[currentPosition] = rows[i + 1];
+
+    const cellsRow = Object.entries(cells).filter((cell) => +cell[0].replace(/[A-z]/g, '') === i + 1);
+    cellsRow.forEach((cell) => {
+      const [cellName, cellValue] = cell;
+      shiftCells[replaceCellRow(cellName, currentPosition)] = cellValue;
+
+      if (namedAreas.findIndex((item) => item.range.split(':')[0].includes(cellName)) === -1) return;
+      const namedArea = { ...namedAreas.find((item) => item.range.split(':')[0].includes(cellName)) };
+      const [rangeShiftFrom, rangeShiftTo] = namedArea.range.split(':');
+      let range = replaceCellRow(rangeShiftFrom, currentPosition);
+      if (rangeShiftTo) {
+        range += `:${replaceCellRow(rangeShiftTo, (cells[cellName].rowspan)
+          ? currentPosition + (cells[cellName].rowspan - 1) : currentPosition)}`;
+      }
+      namedArea.range = range.toLowerCase();
+      shiftNamedAreas.push(namedArea);
+    });
+  }
+  console.log({ shiftRows, shiftCells, shiftNamedAreas });
+  return { shiftRows, shiftCells, shiftNamedAreas };
+}
+
 class TableDocument {
   constructor({
     template = false,
@@ -112,7 +151,8 @@ class TableDocument {
       const [rangeFrom, rangeTo] = namedArea.range.split(':');
       const valueArea = {};
       for (let row = +rangeFrom; row <= +rangeTo; row += 1) {
-        Object.entries(this.getCellsInRow(row)).forEach((cell) => {
+        // Object.entries(this.getCellsInRow(row)).forEach((cell) => {
+        this.getCellsInRow(row).forEach((cell) => {
           if (!Object.keys(cell).includes('areaName')) {
             const [, cellValue] = cell;
             valueArea[cellValue.areaName] = cellValue.value;
@@ -129,8 +169,9 @@ class TableDocument {
       const [cellName] = cell;
       return (+cellName.replace(/[A-z]/g, '') === +row);
     });
-    console.log(Object.fromEntries(cellsInRow));
-    return Object.fromEntries(cellsInRow);
+    // console.log(Object.fromEntries(cellsInRow));
+    // return Object.fromEntries(cellsInRow);
+    return cellsInRow;
   }
 
   getNamedAreaByName(areaName) {
@@ -147,9 +188,10 @@ class TableDocument {
 
     for (let i = +rangeFrom; i <= +rangeTo; i += 1) {
       rows[rowNumber] = this.rows[i];
-      const cellsKeys = Object.keys(this.cells).filter((cellName) => +cellName.replace(/[A-z]/g, '') === i);
+      // const cellsKeys = Object.keys(this.cells).filter((cellName) => +cellName.replace(/[A-z]/g, '') === i);
 
-      cellsKeys.forEach((cellName) => {
+      this.getCellsInRow(i).forEach((cell) => {
+        const [cellName] = cell;
         cells[replaceCellRow(cellName, rowNumber)] = this.cells[cellName];
 
         const columnName = replaceCellRow(cellName, '');
@@ -187,6 +229,7 @@ class TableDocument {
   }
 
   insertNamedArea(area, value) {
+    shiftRange(area, Object.keys(this.rows).length + 1);
     const currentRow = Object.keys(this.rows).length + 1;
     const rows = {};
     const cells = {};
@@ -220,6 +263,7 @@ class TableDocument {
     });
     this.rows = { ...this.rows, ...rows };
     this.cells = { ...this.cells, ...cells };
+    
     const columns = {};
     Object.keys(area.columns).forEach((columnName) => {
       columns[columnName] = { ...area.columns[columnName] };
