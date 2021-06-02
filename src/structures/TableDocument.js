@@ -30,6 +30,15 @@ function shiftRange(area = {}, fromPosition = 1, columnDirection = false) {
   const shiftCells = {};
   const shiftNamedAreas = [];
   if (columnDirection) console.log('column shift');
+  if (namedAreas.find((item) => {
+    const [v1, v2] = item.range.split(':');
+    return (+v1 && +v2);
+  })) {
+    shiftNamedAreas.push({
+      name: namedAreas[0].name,
+      range: `${fromPosition}:${fromPosition + Object.keys(rows).length - 1}`,
+    });
+  }
   for (let i = 0; i < Object.keys(rows).length; i += 1) {
     const currentPosition = fromPosition + i;
     shiftRows[currentPosition] = rows[i + 1];
@@ -51,7 +60,7 @@ function shiftRange(area = {}, fromPosition = 1, columnDirection = false) {
       shiftNamedAreas.push(namedArea);
     });
   }
-  console.log({ shiftRows, shiftCells, shiftNamedAreas });
+  // console.log({ shiftRows, shiftCells, shiftNamedAreas });
   return { shiftRows, shiftCells, shiftNamedAreas };
 }
 
@@ -229,40 +238,49 @@ class TableDocument {
   }
 
   insertNamedArea(area, value) {
-    shiftRange(area, Object.keys(this.rows).length + 1);
+    // shiftRange(area, Object.keys(this.rows).length + 1);
     const currentRow = Object.keys(this.rows).length + 1;
-    const rows = {};
-    const cells = {};
-    const namedAreaRow = area.namedAreas.find((item) => {
-      const [v1, v2] = item.range.split(':');
-      return (+v1 && +v2);
+    const { shiftRows, shiftCells, shiftNamedAreas } = shiftRange(area, currentRow);
+    Object.entries(shiftCells).forEach((cell) => {
+      const [cellName, cellValue] = cell;
+      const namedAreaCell = shiftNamedAreas.find((item) => item.range.split(':')[0] === cellName);
+      if (namedAreaCell) {
+        cellValue.value = value[namedAreaCell.name];
+        cellValue.areaName = namedAreaCell.name;
+      }
     });
-    if (namedAreaRow && !['header', 'footer'].includes(namedAreaRow.name)) {
-      this.namedAreas.push({
-        name: namedAreaRow.name,
-        range: `${currentRow}:${currentRow + Object.keys(area.rows).length - 1}`,
-      });
-    }
+    // const rows = {};
+    // const cells = {};
+    // const namedAreaRow = area.namedAreas.find((item) => {
+    //   const [v1, v2] = item.range.split(':');
+    //   return (+v1 && +v2);
+    // });
+    // if (namedAreaRow && !['header', 'footer'].includes(namedAreaRow.name)) {
+    //   this.namedAreas.push({
+    //     name: namedAreaRow.name,
+    //     range: `${currentRow}:${currentRow + Object.keys(area.rows).length - 1}`,
+    //   });
+    // }
 
-    Object.keys(area.rows).forEach((rowNumber, index) => {
-      rows[currentRow + index] = { ...area.rows[rowNumber] };
-      Object.keys(area.cells).forEach((cellName) => {
-        const namedAreaCell = area.namedAreas.find((item) => item.range.split(':')[0] === replaceCellRow(cellName, index + 1));
-        if (namedAreaCell) {
-          cells[replaceCellRow(cellName, currentRow + index)] = {
-            ...area.cells[replaceCellRow(cellName, index + 1)],
-            value: value[namedAreaCell.name],
-            areaName: namedAreaCell.name,
-          };
-        } else {
-          cells[replaceCellRow(cellName, currentRow + index)] = {
-            ...area.cells[replaceCellRow(cellName, index + 1)],
-          };
-        }
-      });
-    });
-    this.rows = { ...this.rows, ...rows };
-    this.cells = { ...this.cells, ...cells };
+    // Object.keys(area.rows).forEach((rowNumber, index) => {
+    //   rows[currentRow + index] = { ...area.rows[rowNumber] };
+    //   Object.keys(area.cells).forEach((cellName) => {
+    //     const namedAreaCell = area.namedAreas.find((item) => item.range.split(':')[0] === replaceCellRow(cellName, index + 1));
+    //     if (namedAreaCell) {
+    //       cells[replaceCellRow(cellName, currentRow + index)] = {
+    //         ...area.cells[replaceCellRow(cellName, index + 1)],
+    //         value: value[namedAreaCell.name],
+    //         areaName: namedAreaCell.name,
+    //       };
+    //     } else {
+    //       cells[replaceCellRow(cellName, currentRow + index)] = {
+    //         ...area.cells[replaceCellRow(cellName, index + 1)],
+    //       };
+    //     }
+    //   });
+    // });
+    this.rows = { ...this.rows, ...shiftRows };
+    this.cells = { ...this.cells, ...shiftCells };
     
     const columns = {};
     Object.keys(area.columns).forEach((columnName) => {
