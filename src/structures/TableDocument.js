@@ -3,6 +3,23 @@ const CELL_HEIGHT = 22;
 // const CELL_TYPE_DEFAULT = 'string';
 const ROW_COUNT = 1000;
 const COLUMNS_COUNT = 26;
+const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+
+function getColumnNumberForName(columnName) {
+  if (columnName.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === columnName) + 1;
+  const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === columnName[0]) + 1;
+  const indexSecond = SET_COLUMN_NAME.findIndex((item) => item === columnName[1]) + 1;
+  return (indexFirst * SET_COLUMN_NAME.length) + indexSecond;
+}
+
+function getRangeNamedArea(namedArea, columnDirection = false) {
+  let [rangeFrom, rangeTo] = namedArea.range.split(':');
+  if (columnDirection) {
+    rangeFrom = getColumnNumberForName(rangeFrom);
+    rangeTo = getColumnNumberForName(rangeTo);
+  }
+  return [rangeFrom, rangeTo];
+}
 
 function parseCellName(cellName) {
   return {
@@ -11,7 +28,7 @@ function parseCellName(cellName) {
   };
 }
 
-function replaceCellRow(cellName, newRow) {
+function replaceCellRow(cellName, newRow) { // заменить параметры на обьект ???
   const { cellColumn } = parseCellName(cellName);
   return `${cellColumn}${newRow}`;
 }
@@ -30,23 +47,23 @@ function shiftRange(area = {}, fromPosition = 1, columnDirection = false) {
   const shiftCells = {};
   const shiftNamedAreas = [];
   if (columnDirection) console.log('column shift');
-  if (namedAreas.find((item) => {
+  if (namedAreas.find((item) => { // переделать на использование столбцов
     const [v1, v2] = item.range.split(':');
     return (+v1 && +v2);
   })) {
     shiftNamedAreas.push({
-      name: namedAreas[0].name,
+      name: namedAreas[0].name, // убрать 0, find
       range: `${fromPosition}:${fromPosition + Object.keys(rows).length - 1}`,
     });
   }
-  for (let i = 0; i < Object.keys(rows).length; i += 1) {
+  for (let i = 0; i < Object.keys(rows).length; i += 1) { // переделать, начинать и заканчивать цикл с номером строки
     const currentPosition = fromPosition + i;
-    shiftRows[currentPosition] = rows[i + 1];
+    shiftRows[currentPosition] = { ...rows[i + 1] };
 
     const cellsRow = Object.entries(cells).filter((cell) => +cell[0].replace(/[A-z]/g, '') === i + 1);
-    cellsRow.forEach((cell) => {
+    cellsRow.forEach((cell) => { // вынести в фун-цию getNamedAreasCells
       const [cellName, cellValue] = cell;
-      shiftCells[replaceCellRow(cellName, currentPosition)] = cellValue;
+      shiftCells[replaceCellRow(cellName, currentPosition)] = { ...cellValue };
 
       if (namedAreas.findIndex((item) => item.range.split(':')[0].includes(cellName)) === -1) return;
       const namedArea = { ...namedAreas.find((item) => item.range.split(':')[0].includes(cellName)) };
@@ -60,7 +77,7 @@ function shiftRange(area = {}, fromPosition = 1, columnDirection = false) {
       shiftNamedAreas.push(namedArea);
     });
   }
-  // console.log({ shiftRows, shiftCells, shiftNamedAreas });
+  console.log({ shiftRows, shiftCells, shiftNamedAreas });
   return { shiftRows, shiftCells, shiftNamedAreas };
 }
 
@@ -192,18 +209,17 @@ class TableDocument {
     const cells = {};
     const styles = [];
     const namedAreas = [namedArea];
-    const [rangeFrom, rangeTo] = namedArea.range.split(':');
+    const [rangeFrom, rangeTo] = getRangeNamedArea(namedArea);
     let rowNumber = 1;
 
     for (let i = +rangeFrom; i <= +rangeTo; i += 1) {
       rows[rowNumber] = this.rows[i];
-      // const cellsKeys = Object.keys(this.cells).filter((cellName) => +cellName.replace(/[A-z]/g, '') === i);
 
-      this.getCellsInRow(i).forEach((cell) => {
+      this.getCellsInRow(i).forEach((cell) => { // изменить на универсальную для строк и столбцов getCellsInRange
         const [cellName] = cell;
         cells[replaceCellRow(cellName, rowNumber)] = this.cells[cellName];
 
-        const columnName = replaceCellRow(cellName, '');
+        const columnName = replaceCellRow(cellName, ''); // вынести за цикл, должы копироваться все столбцы
         if (!Object.keys(columns).includes(columnName)) columns[columnName] = this.columns[columnName];
 
         if (this.styles.findIndex((item) => item.name === cellName) > -1) {
@@ -238,7 +254,7 @@ class TableDocument {
   }
 
   insertNamedArea(area, value) {
-    // shiftRange(area, Object.keys(this.rows).length + 1);
+    console.log(area);
     const currentRow = Object.keys(this.rows).length + 1;
     const { shiftRows, shiftCells, shiftNamedAreas } = shiftRange(area, currentRow);
     Object.entries(shiftCells).forEach((cell) => {
@@ -281,7 +297,7 @@ class TableDocument {
     // });
     this.rows = { ...this.rows, ...shiftRows };
     this.cells = { ...this.cells, ...shiftCells };
-    
+
     const columns = {};
     Object.keys(area.columns).forEach((columnName) => {
       columns[columnName] = { ...area.columns[columnName] };
