@@ -4,12 +4,17 @@ const CELL_HEIGHT = 22;
 const ROW_COUNT = 1000;
 const COLUMNS_COUNT = 26;
 
-// function parseCellName(cellName) {
-//   return {
-//     cellColumn: cellName.replace(/[0-9]/g, ''),
-//     cellRow: +cellName.replace(/[A-z]/g, ''),
-//   };
-// }
+function parseCellName(cellName) {
+  return {
+    cellColumn: cellName.replace(/[0-9]/g, ''),
+    cellRow: +cellName.replace(/[A-z]/g, ''),
+  };
+}
+
+function replaceCellRow(cellName, newRow) {
+  const { cellColumn } = parseCellName(cellName);
+  return `${cellColumn}${newRow}`;
+}
 
 class TableDocument {
   constructor({
@@ -120,15 +125,15 @@ class TableDocument {
   }
 
   getCellsInRow(row) {
-    const cellKeys = Object.entries(this.cells).filter((cell) => {
+    const cellsInRow = Object.entries(this.cells).filter((cell) => {
       const [cellName] = cell;
       return (+cellName.replace(/[A-z]/g, '') === +row);
     });
-    return Object.fromEntries(cellKeys);
+    console.log(Object.fromEntries(cellsInRow));
+    return Object.fromEntries(cellsInRow);
   }
 
-  getNamedAreaByName(areaName) { // ошибка в регулярках при замене номера строки,
-    // при строке > 9 заменит 2 раза
+  getNamedAreaByName(areaName) {
     if (!areaName) return null;
     const namedArea = this.namedAreas.find((item) => item.name === areaName);
     if (!namedArea) return null;
@@ -145,9 +150,9 @@ class TableDocument {
       const cellsKeys = Object.keys(this.cells).filter((cellName) => +cellName.replace(/[A-z]/g, '') === i);
 
       cellsKeys.forEach((cellName) => {
-        cells[`${cellName.replace(/[0-9]/g, rowNumber)}`] = this.cells[cellName];
+        cells[replaceCellRow(cellName, rowNumber)] = this.cells[cellName];
 
-        const columnName = cellName.replace(/[0-9]/g, '');
+        const columnName = replaceCellRow(cellName, '');
         if (!Object.keys(columns).includes(columnName)) columns[columnName] = this.columns[columnName];
 
         if (this.styles.findIndex((item) => item.name === cellName) > -1) {
@@ -158,9 +163,9 @@ class TableDocument {
 
         const namedAreaShift = this.namedAreas.find((item) => item.range.split(':')[0].includes(cellName.toUpperCase()));
         const [rangeShiftFrom, rangeShiftTo] = namedAreaShift.range.split(':');
-        let range = rangeShiftFrom.replace(/[0-9]/g, rowNumber);
+        let range = replaceCellRow(rangeShiftFrom, rowNumber);
         if (rangeShiftTo) {
-          range += `:${rangeShiftTo.replace(/[0-9]/g, (this.cells[cellName].rowspan)
+          range += `:${replaceCellRow(rangeShiftTo, (this.cells[cellName].rowspan)
             ? rowNumber + (this.cells[cellName].rowspan - 1) : rowNumber)}`;
         }
         namedAreaShift.range = range.toLowerCase();
@@ -181,7 +186,7 @@ class TableDocument {
     });
   }
 
-  insertNamedArea(area, value) { // таже беда что и при получении именованной области
+  insertNamedArea(area, value) {
     const currentRow = Object.keys(this.rows).length + 1;
     const rows = {};
     const cells = {};
@@ -199,16 +204,16 @@ class TableDocument {
     Object.keys(area.rows).forEach((rowNumber, index) => {
       rows[currentRow + index] = { ...area.rows[rowNumber] };
       Object.keys(area.cells).forEach((cellName) => {
-        const namedAreaCell = area.namedAreas.find((item) => item.range.split(':')[0] === cellName.replace(/[0-9]/g, index + 1));
+        const namedAreaCell = area.namedAreas.find((item) => item.range.split(':')[0] === replaceCellRow(cellName, index + 1));
         if (namedAreaCell) {
-          cells[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
-            ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
+          cells[replaceCellRow(cellName, currentRow + index)] = {
+            ...area.cells[replaceCellRow(cellName, index + 1)],
             value: value[namedAreaCell.name],
             areaName: namedAreaCell.name,
           };
         } else {
-          cells[`${cellName.replace(/[0-9]/g, currentRow + index)}`] = {
-            ...area.cells[cellName.replace(/[0-9]/g, index + 1)],
+          cells[replaceCellRow(cellName, currentRow + index)] = {
+            ...area.cells[replaceCellRow(cellName, index + 1)],
           };
         }
       });
