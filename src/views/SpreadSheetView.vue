@@ -109,7 +109,8 @@ export default {
       isShowDialog: false,
     };
   },
-  computed: {
+  mounted() {
+    console.log(this.tableDocument);
   },
   methods: {
     saveDocument() { alert('save document'); },
