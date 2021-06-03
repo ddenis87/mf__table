@@ -1,0 +1,9 @@
+[
+  {
+    "columnB": [
+      {"year":"2021","indicator1": "123","indicator2": "234","indicator3": "345"},
+      {"year":"2022","indicator1": "9123","indicator2": "9234","indicator3": "9345"},
+      {"year":"2023","indicator1": "1230","indicator2": "2340","indicator3": "3450"}
+    ]
+  }
+]
