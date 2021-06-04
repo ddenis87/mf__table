@@ -1,0 +1,16 @@
+[
+  {
+    "column": [
+      {"columnYear":"2021"},
+      {"columnYear":"2022"},
+      {"columnYear":"2023"}
+    ]
+  },
+  {
+    "string": [
+      {"stringTitleIndicator":"Шарики"},
+      {"stringTitleIndicator":"Подшипники"},
+      {"stringTitleIndicator":"Пружины"}
+    ]
+  }
+]

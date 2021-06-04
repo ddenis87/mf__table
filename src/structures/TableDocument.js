@@ -23,7 +23,15 @@ function getColumnNameForNumber(columnNumber) {
   return columnName;
 }
 
+function getNamedAreaType(rangeFrom, rangeTo) {
+  if (rangeFrom && !rangeTo) return 'cell';
+  if (+rangeFrom && +rangeTo) return 'row|column';
+  return 'cell|range';
+  // console.log(rangeFrom, rangeTo);
+}
+
 function getColumnNumberForName(columnName) {
+  console.log(columnName);
   if (columnName.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === columnName) + 1;
   const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === columnName[0]) + 1;
   const indexSecond = SET_COLUMN_NAME.findIndex((item) => item === columnName[1]) + 1;
@@ -31,12 +39,23 @@ function getColumnNumberForName(columnName) {
 }
 
 function getRangeNamedArea(namedArea, direction = 'row') {
-  let [rangeFrom, rangeTo] = namedArea.range.toLowerCase().split(':');
-  if (direction === 'column') {
-    rangeFrom = getColumnNumberForName(rangeFrom);
-    rangeTo = getColumnNumberForName(rangeTo);
-  }
-  return [rangeFrom, rangeTo];
+  const [rangeFrom, rangeTo] = namedArea.range.toLowerCase().split(':');
+  const range = {
+    row: () => [rangeFrom, rangeTo],
+    column: () => [
+      getColumnNumberForName(rangeFrom),
+      getColumnNumberForName(rangeTo),
+    ],
+    join: () => [rangeFrom, rangeTo],
+  };
+  // let [rangeFrom, rangeTo] = namedArea.range.toLowerCase().split(':');
+  // console.log(rangeFrom, rangeTo);
+  // if (direction === 'column') {
+  //   rangeFrom = getColumnNumberForName(rangeFrom);
+  //   rangeTo = getColumnNumberForName(rangeTo);
+  // }
+  // return [rangeFrom, rangeTo];
+  return range[direction]();
 }
 
 function parseCellName(cellName) {
@@ -119,6 +138,7 @@ function getRangeShift(area = {}, fromPosition = 1, direction) {
 class TableDocument {
   constructor({
     template = false,
+    templateType = 'row',
     rows = {},
     rowCount = ROW_COUNT,
     columns = {},
@@ -134,6 +154,7 @@ class TableDocument {
       const JSONStringParse = JSON.parse(JSONString);
       ({
         template: this.template = false,
+        templateType: this.templateType = 'row',
         rows: this.rows = {},
         rowCount: this.rowCount = ROW_COUNT,
         columns: this.columns = {},
@@ -147,6 +168,7 @@ class TableDocument {
       return;
     }
     this.template = template;
+    this.templateType = templateType;
     this.rows = rows;
     this.rowCount = rowCount;
     this.columns = columns;
@@ -159,24 +181,51 @@ class TableDocument {
   }
 
   buildDocument(documentTemplate, documentData) {
-    console.log(this.rows);
     const data = (typeof documentData === 'string') ? JSON.parse(documentData) : documentData;
-    const areaHeader = documentTemplate.getNamedAreaByName('header', 'column');
-    // const areaHeader = documentTemplate.getNamedAreaByName('header');
-    // this.insertNamedArea(areaHeader, [], 'column');
-    this.insertNamedArea(areaHeader, []);
+    console.log(data);
+    const { templateType } = documentTemplate;
+    
+    const areaHeader = documentTemplate.getNamedAreaByName('header', templateType);
+    if (areaHeader) this.insertNamedArea(areaHeader, []);
+    if (templateType === 'join') {
+      this.buildDocumentJoin(documentTemplate, data);
+      return;
+    }
+    data.forEach((element) => {
+      const [areaName, areaValue] = Object.entries(element)[0];
+      const namedArea = documentTemplate.getNamedAreaByName(areaName, templateType);
+      areaValue.forEach((value) => {
+        this.insertNamedArea(namedArea, value, templateType);
+      });
+    });
+    const areaFooter = documentTemplate.getNamedAreaByName('footer', templateType);
+    if (areaFooter) this.insertNamedArea(areaFooter, []);
+  }
+
+  buildDocumentJoin(documentTemplate, data) {
+    // const { templateType } = documentTemplate;
+
+    // const areaHeader = documentTemplate.getNamedAreaByName('header', templateType);
+    // if (areaHeader) this.insertNamedArea(areaHeader, []);
+    data.forEach((element) => {
+      const [areaName, areaValue] = Object.entries(element)[0];
+      const namedArea = documentTemplate.getNamedAreaByName(areaName, 'row');
+      areaValue.forEach((value) => {
+        this.insertNamedArea(namedArea, value, 'row');
+      });
+    });
+
     data.forEach((element) => {
       const [areaName, areaValue] = Object.entries(element)[0];
       const namedArea = documentTemplate.getNamedAreaByName(areaName, 'column');
-      // const namedArea = documentTemplate.getNamedAreaByName(areaName);
-      console.log(namedArea);
       areaValue.forEach((value) => {
         this.insertNamedArea(namedArea, value, 'column');
-        // this.insertNamedArea(namedArea, value);
       });
     });
-    // const areaFooter = documentTemplate.getNamedAreaByName('footer');
-    // this.insertNamedArea(areaFooter, []);
+
+    // проверить кто является хедером, строка или столбец вызвать в соответствии
+    // вызвать для строк / столбцов
+    // вызвать для ячейки для построения матрицы в нутри строк/столбцов
   }
 
   getCellByName(cellName) {
@@ -221,22 +270,19 @@ class TableDocument {
     return (JSONFormat) ? JSON.stringify(documentData) : documentData;
   }
 
-  // getCellsInRow(row) {
-  //   const cellsInRow = Object.entries(this.cells).filter((cell) => {
-  //     const [cellName] = cell;
-  //     return (+cellName.replace(/[A-z]/g, '') === +row);
-  //   });
-  //   // console.log(Object.fromEntries(cellsInRow));
-  //   // return Object.fromEntries(cellsInRow);
-  //   return cellsInRow;
-  // }
-
   getCellsInRange(rangeNumber, direction = 'row') {
+    console.log(this.namedAreas);
     const range = (direction === 'column') ? getColumnNameForNumber(rangeNumber) : rangeNumber;
     const cellsInRange = Object.entries(this.cells).filter((cell) => {
       const [cellName] = cell;
       const { cellColumn, cellRow } = parseCellName(cellName);
-      return (direction === 'column') ? (cellColumn === range) : (+cellRow === +range);
+      const namedAreaRow = this.namedAreas.find((item) => +item.range.split(':')[0] === +cellRow);
+      const namedAreaColumn = this.namedAreas.find((item) => item.range.toLowerCase().split(':')[0] === cellColumn);
+      console.log(cellName);
+      console.log(namedAreaRow);
+      console.log(namedAreaColumn);
+      return ((direction === 'column') ? (cellColumn === range) : (+cellRow === +range))
+        && ((direction === 'column') ? !namedAreaRow : !namedAreaColumn);
     });
     return cellsInRange;
   }
@@ -262,41 +308,62 @@ class TableDocument {
     if (!areaName) return null;
     const namedArea = this.namedAreas.find((item) => item.name === areaName);
     if (!namedArea) return null;
-    let rows = {};
-    let columns = {};
+    const rows = {};
+    const columns = {};
     const cells = {};
     const styles = [];
     const namedAreas = [namedArea];
     const [rangeFrom, rangeTo] = getRangeNamedArea(namedArea, direction);
     let startPosition = 1;
-
-    for (let i = +rangeFrom; i <= +rangeTo; i += 1) {
-      if (direction === 'row') {
-        rows[startPosition] = this.rows[i]; // ???
-      }
-      if (direction === 'column') {
-        columns[getColumnNameForNumber(startPosition)] = this.columns[getColumnNameForNumber(i)];
-      }
-
-      this.getCellsInRange(i, direction).forEach((cell) => {
-        const [cellName] = cell;
-        cells[replaceCellName(cellName, startPosition, direction)] = this.cells[cellName];
-
-        const cellStyles = this.getCellStyles(cellName);
-        if (cellStyles) styles.push(cellStyles);
-
-        const cellNamedArea = this.getCellNamedArea(cellName, startPosition, direction);
-        if (cellNamedArea) namedAreas.push(cellNamedArea);
-      });
-
-      startPosition += 1;
+    // проверить чем является шапка, строками, столбцами, ячейкой или диапазоном
+    // if (areaName === 'header')
+    const namedAreaType = getNamedAreaType(rangeFrom, rangeTo);
+    console.log(namedAreaType);
+    if (areaName === 'header' && namedAreaType === 'cell') {
+      rows[replaceCellName(rangeFrom, '', 'column')] = this.rows[replaceCellName(rangeFrom, '', 'column')];
+      columns[replaceCellName(rangeFrom, '', 'row')] = this.columns[replaceCellName(rangeFrom, '', 'row')];
+      cells[rangeFrom] = this.cells[rangeFrom];
+      styles.push(this.styles.find((item) => item.name === rangeFrom));
+      namedAreas.push(this.namedAreas.find((item) => item.range.toLowerCase() === rangeFrom));
     }
+    if (namedAreaType === 'row|column') {
+      for (let i = +rangeFrom; i <= +rangeTo; i += 1) {
+        if (direction === 'row') {
+          rows[startPosition] = this.rows[i]; // ???
+        }
+        if (direction === 'column') {
+          columns[getColumnNameForNumber(startPosition)] = this.columns[getColumnNameForNumber(i)];
+        }
 
-    if (direction === 'row') {
-      columns = this.columns;
-    }
-    if (direction === 'column') {
-      rows = this.rows;
+        this.getCellsInRange(i, direction).forEach((cell) => {
+          const [cellName] = cell;
+          cells[replaceCellName(cellName, startPosition, direction)] = this.cells[cellName];
+
+          if (direction === 'row') {
+            const columnName = replaceCellName(cellName, '', direction);
+            if (!Object.keys(columns).includes(columnName)) columns[columnName] = this.columns[columnName];
+          }
+          if (direction === 'column') {
+            const rowName = replaceCellName(cellName, '', direction);
+            if (!Object.keys(rows).includes(rowName)) rows[rowName] = this.rows[rowName];
+          }
+
+          const cellStyles = this.getCellStyles(cellName);
+          if (cellStyles) styles.push(cellStyles);
+
+          const cellNamedArea = this.getCellNamedArea(cellName, startPosition, direction);
+          if (cellNamedArea) namedAreas.push(cellNamedArea);
+        });
+
+        startPosition += 1;
+      }
+
+      // if (direction === 'row') {
+      //   columns = this.columns;
+      // }
+      // if (direction === 'column') {
+      //   rows = this.rows;
+      // }
     }
 
     return new TableDocument({
@@ -321,7 +388,8 @@ class TableDocument {
       const [cellName, cellValue] = cell;
       const namedAreaCell = shiftNamedAreas.find((item) => item.range.split(':')[0] === cellName);
       if (namedAreaCell) {
-        cellValue.value = value[namedAreaCell.name];
+        if (value[namedAreaCell.name]) cellValue.value = value[namedAreaCell.name];
+        // cellValue.value = value[namedAreaCell.name];
         cellValue.areaName = namedAreaCell.name;
       }
     });
