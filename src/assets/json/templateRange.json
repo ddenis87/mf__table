@@ -1,0 +1,38 @@
+{
+  "template":true,
+  "direction":"row",
+  "cells":{
+    "d1":{"style":"d1"},
+    "c1":{"style":"c1"},
+    "d2":{"style":"d2"},
+    "d3":{"style":"d3"},
+    "b1":{"style":"b1"},
+    "c2":{"colspan":2,"style":"c2"},
+    "b2":{"style":"b2"},
+    "d4":{"value":2023,"style":"d4"},
+    "c3":{"style":"c3"},
+    "a1":{"style":"a1"},
+    "c4":{"value":2022,"style":"c4"},
+    "b3":{"style":"b3"},
+    "d5":{"style":"d5"},
+    "a2":{"colspan":2,"style":"a2","value":"Наименование ОПФР:"},
+    "b4":{"value":2021,"style":"b4"},
+    "c5":{"style":"c5"},
+    "a3":{"style":"a3"},
+    "a4":{"value":"Наименование","style":"a4"},
+    "b5":{"style":"b5"},
+    "a5":{"style":"a5"}},
+  "columns":{
+    "a":{"width":198},"b":{"width":100},"c":{"width":100},"d":{"width":100}},
+  "styles":[{"name":"a1","list":{"fontSize":"10pt"}},{"list":{"fontSize":"10pt"},"name":"b1"},{"name":"c1","list":{"fontSize":"10pt"}},{"list":{"fontSize":"10pt"},"name":"d1"},{"list":{"fontSize":"10pt","textAlign":"right","justifyContent":"flex-end"},"name":"a2"},{"name":"b2","list":{"fontSize":"10pt"}},{"list":{"borderBottom":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt"},"name":"c2"},{"list":{"fontSize":"10pt"},"name":"d2"},{"list":{"borderBottom":"2px solid rgba(0%, 0%, 0%)","fontSize":"10pt"},"name":"a3"},{"name":"b3","list":{"borderBottom":"2px solid rgba(0%, 0%, 0%)","fontSize":"10pt"}},{"name":"c3","list":{"borderBottom":"2px solid rgba(0%, 0%, 0%)","fontSize":"10pt"}},{"name":"d3","list":{"borderBottom":"2px solid rgba(0%, 0%, 0%)","fontSize":"10pt"}},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"general-left","borderRight":"1px solid rgba(0%, 0%, 0%)","justifyContent":null},"name":"a4"},{"name":"b4","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"general-right","borderRight":"1px solid rgba(0%, 0%, 0%)","justifyContent":null}},{"name":"c4","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"general-right","borderRight":"1px solid rgba(0%, 0%, 0%)","justifyContent":null}},{"name":"d4","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"general-right","justifyContent":null,"borderRight":"1px solid rgba(0%, 0%, 0%)"}},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderRight":"1px solid rgba(0%, 0%, 0%)"},"name":"a5"},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderRight":"1px solid rgba(0%, 0%, 0%)"},"name":"b5"},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","borderRight":"1px solid rgba(0%, 0%, 0%)"},"name":"c5"},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderRight":"1px solid rgba(0%, 0%, 0%)"},"name":"d5"}],
+  "rows":{"1":{"height":10},"2":{"height":21},"3":{"height":10},"4":{"height":22},"5":{"height":21}},
+  "namedAreas":[
+    {"name":"count2023","range":"D5"},
+    {"name":"string","range":"5:5"},
+    {"name":"title","range":"A5"},
+    {"name":"count2021","range":"B5"},
+    {"name":"nameOpfr","range":"C2:D2"},
+    {"name":"header","range":"A1:D4"},
+    {"name":"count2022","range":"C5"}
+  ]
+}

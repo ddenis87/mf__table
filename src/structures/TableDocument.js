@@ -7,19 +7,20 @@ const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 
 
 function getColumnNameForNumber(columnNumber) {
   if (columnNumber > 702) return 'Infinity';
-  if (columnNumber <= SET_COLUMN_NAME.length) {
+  const settLength = SET_COLUMN_NAME.length;
+  if (columnNumber <= settLength) {
     const columnName = SET_COLUMN_NAME[columnNumber - 1];
     return columnName;
   }
-  if ((columnNumber % SET_COLUMN_NAME.length) === 0) {
+  if ((columnNumber % settLength) === 0) {
     const columnName = `${SET_COLUMN_NAME[
-      ((columnNumber - SET_COLUMN_NAME.length) / SET_COLUMN_NAME.length) - 1
-    ]}${SET_COLUMN_NAME[SET_COLUMN_NAME.length - 1]}`;
+      ((columnNumber - settLength) / settLength) - 1
+    ]}${SET_COLUMN_NAME[settLength - 1]}`;
     return columnName;
   }
   const columnName = `${SET_COLUMN_NAME[
-    (Math.floor(columnNumber / SET_COLUMN_NAME.length)) - 1
-  ]}${SET_COLUMN_NAME[(columnNumber % SET_COLUMN_NAME.length) - 1]}`;
+    (Math.floor(columnNumber / settLength)) - 1
+  ]}${SET_COLUMN_NAME[(columnNumber % settLength) - 1]}`;
   return columnName;
 }
 
@@ -66,15 +67,49 @@ function getRangeSize(range) {
   return rangeSize[rangeType]();
 }
 
-function getCellShift(cellName, range, direction) {
-  if (direction === 'cell' || direction === 'range') return cellName;
+function getCellShift(cellName, range) {
+  const directionRange = getRangeType(range);
+  if (['cell', 'range'].includes(directionRange)) return cellName;
   const [rangeFrom] = getRangeSize(range);
   const { cellColumn, cellRow } = parseCellName(cellName);
-  if (direction === 'row') return `${cellColumn}${+cellRow - +rangeFrom + 1}`;
-  if (direction === 'column') return `${getColumnNameForNumber(+getColumnNumberForName(cellColumn) - +rangeFrom + 1)}${cellRow}`;
+  if (directionRange === 'row') return `${cellColumn}${+cellRow - +rangeFrom + 1}`;
+  if (directionRange === 'column') return `${getColumnNameForNumber(+getColumnNumberForName(cellColumn) - +rangeFrom + 1)}${cellRow}`;
   return cellName;
 }
 
+// function getRangeShift(area = {}, fromCellName) {
+//   const {
+//     rows, columns, cells, namedAreas,
+//   } = area;
+//   let shiftRows = {};
+//   let shiftColumns = {};
+//   let shiftCells = {};
+//   let shiftNamedAreas = [];
+//   console.log(rows);
+//   console.log(columns);
+//   console.log(cells);
+//   console.log(namedAreas);
+//   console.log(getRangeType(namedAreas[0].range));
+//   const rangeType = getRangeType(namedAreas[0].range);
+//   if (rangeType === 'cell') {
+//     const { cellColumn, cellRow } = parseCellName(fromCellName);
+//     shiftRows[position] = { ...rows[i + 1] };
+//     shiftColumns[getColumnNameForNumber(position)] = { ...columns[getColumnNameForNumber(i + 1)] };
+//     console.log(fromCellName);
+//   }
+//   if (rangeType === 'range') {
+//     shiftRows = { ...rows };
+//     shiftColumns = { ...columns };
+//     shiftCells = { ...cells };
+//     shiftNamedAreas = [...namedAreas];
+//     return {
+//       shiftRows, shiftColumns, shiftCells, shiftNamedAreas,
+//     };
+//   }
+//   return {
+//     shiftRows, shiftColumns, shiftCells, shiftNamedAreas,
+//   };
+// }
 // function getNamedAreaType(rangeFrom, rangeTo) {
 //   if (rangeFrom && !rangeTo) return 'cell';
 //   if (+rangeFrom && +rangeTo) return 'row|column';
@@ -113,29 +148,46 @@ function replaceCellName(cellName, position, direction = 'row') {
 //   });
 //   return shiftCells;
 // }
-function getRangeShift(area = {}, fromPosition = 1, direction) {
+function getRangeShift(area = {}, fromPosition = 1, direction) { // на переделку
   const {
     rows, columns, cells, namedAreas,
   } = area;
   let shiftRows = {};
   let shiftColumns = [];
-  const shiftCells = {};
-  const shiftNamedAreas = [];
+  let shiftCells = {};
+  let shiftNamedAreas = [];
   const rangeType = getRangeType(namedAreas[0].range);
-  shiftNamedAreas.push({
-    name: namedAreas[0].name,
-    range: `${fromPosition}:${fromPosition + Object.keys(rows).length - 1}`,
-  });
+  if (['range', 'cell'].includes(rangeType)) {
+    shiftRows = { ...rows };
+    shiftColumns = { ...columns };
+    shiftCells = { ...cells };
+    shiftNamedAreas = [...namedAreas];
+    return {
+      shiftRows, shiftColumns, shiftCells, shiftNamedAreas,
+    };
+  }
+  if (rangeType === 'row') {
+    shiftNamedAreas.push({
+      name: namedAreas[0].name,
+      range: `${fromPosition}:${fromPosition + Object.keys(rows).length - 1}`,
+    });
+  }
+  if (rangeType === 'column') {
+    shiftNamedAreas.push({
+      name: namedAreas[0].name,
+      range: `${getColumnNameForNumber(fromPosition)}:${getColumnNameForNumber(fromPosition + Object.keys(columns).length - 1)}`,
+    });
+  }
 
   const [rangeFrom, rangeTo] = getRangeSize(namedAreas[0].range);
   const rangeLength = +rangeTo - +rangeFrom + 1;
   console.log(rangeLength, namedAreas[0].range, rangeType);
   for (let i = 0; i < rangeLength; i += 1) {
     const position = fromPosition + i;
-    if (rangeType === 'cell') {
-      shiftRows[position] = { ...rows[i + 1] };
-      shiftColumns[getColumnNameForNumber(position)] = { ...columns[getColumnNameForNumber(i + 1)] };
-    }
+    // if (rangeType === 'cell') {
+    //   shiftRows[position] = { ...rows[i + 1] };
+    //   shiftColumns[getColumnNameForNumber(position)] = { ...columns[getColumnNameForNumber(i + 1)] };
+    // }
     if (rangeType === 'row') shiftRows[position] = { ...rows[i + 1] };
     if (rangeType === 'column') shiftColumns[getColumnNameForNumber(position)] = { ...columns[getColumnNameForNumber(i + 1)] };
 
@@ -213,14 +265,16 @@ class TableDocument {
   }
 
   buildDocument(documentTemplate, documentData) {
+    console.log(this.rows);
     const data = (typeof documentData === 'string') ? JSON.parse(documentData) : documentData;
     console.log(data);
     const { direction } = documentTemplate;
-    console.log('header');
+    console.log('getNamedArea header');
     const areaHeader = documentTemplate.getNamedArea('header', direction);
     console.log(areaHeader);
-    // const headerValue = data.find((item) => Object.keys(item).includes('header'));
-    if (areaHeader) this.insertNamedArea(areaHeader, [], direction);
+    const headerValue = data.find((item) => Object.keys(item).includes('header'))?.header[0] || {};
+    console.log(headerValue);
+    if (areaHeader) this.insertNamedArea(areaHeader, headerValue, direction);
 
     data.forEach((element) => {
       const [areaName, areaValue] = Object.entries(element)[0];
@@ -260,25 +314,35 @@ class TableDocument {
     return (JSONFormat) ? JSON.stringify(document) : document;
   }
 
-  getDocumentData(JSONFormat = false, direction = 'row') {
-    console.log(this.namedAreas);
-    const documentData = [];
-    this.namedAreas.forEach((namedArea) => {
+  getDocumentData(JSONFormat = false) {
+    let documentData = [];
+    const directionTemplate = this.direction;
+    let namedAreas = [];
+    if (directionTemplate === 'row') {
+      namedAreas = this.namedAreas.filter((namedArea) => getRangeType(namedArea.range) === 'row');
+    }
+    if (directionTemplate === 'column') {
+      namedAreas = this.namedAreas.filter((namedArea) => getRangeType(namedArea.range) === 'column');
+    }
+    console.log(namedAreas);
+    console.log(this);
+    namedAreas.forEach((namedArea) => {
       if (documentData.length === 0 || !Object.keys(documentData[documentData.length - 1]).includes(namedArea.name)) {
         documentData.push({ [namedArea.name]: [] });
       }
-      const [rangeFrom, rangeTo] = namedArea.range.split(':');
+      const { range } = namedArea;
       const valueArea = {};
-      for (let range = +rangeFrom; range <= +rangeTo; range += 1) {
-        this.getCellsInRange(range, direction).forEach((cell) => {
-          if (!Object.keys(cell).includes('areaName')) {
-            const [, cellValue] = cell;
-            valueArea[cellValue.areaName] = cellValue.value;
-          }
-        });
-      }
-      documentData[documentData.length - 1][namedArea.name].push({ ...valueArea });
+      console.log(this.getCellsInRange(range, directionTemplate));
+      this.getCellsInRange(range, directionTemplate).forEach((cell) => {
+        if (!Object.keys(cell).includes('areaName')) {
+          const [, cellValue] = cell;
+          if (cellValue.areaName) valueArea[cellValue.areaName] = cellValue.value;
+        }
+      });
+      if (Object.keys(valueArea).length) documentData[documentData.length - 1][namedArea.name].push({ ...valueArea });
     });
+    documentData = documentData.filter((item) => Object.entries(item)[0][1].length);
+    console.log(documentData);
     return (JSONFormat) ? JSON.stringify(documentData) : documentData;
   }
 
@@ -320,12 +384,15 @@ class TableDocument {
     }
     if (rangeType === 'range') {
       const setRange = [];
+      console.log(rangeType);
+      console.log(rangeFrom, rangeTo);
       for (let n = rangeFrom[0]; n <= rangeTo[0]; n += 1) setRange.push(n);
       for (let n = rangeFrom[1]; n <= rangeTo[1]; n += 1) setRange.push(getColumnNameForNumber(n));
+      console.log(setRange);
       return Object.entries(this.cells).filter((cell) => {
         const [cellName] = cell;
         const { cellColumn, cellRow } = parseCellName(cellName);
-        return (setRange.includes(cellRow) || setRange.includes(getColumnNumberForName(cellColumn)));
+        return (setRange.includes(cellRow) && setRange.includes(cellColumn));
       });
     }
     return Object.entries({});
@@ -348,54 +415,14 @@ class TableDocument {
     };
   }
 
-  getCellNamedAreaShift(currentCellName, positionCellName) {
-    const cellNamedArea = this.namedAreas.find((item) => (item.range.split(':')[0].toLowerCase().includes(currentCellName) && !item.name.includes('|')));
+  getCellNamedAreaShift(currentCellName, positionCellName, currentNamedArea) {
+    const cellNamedArea = this.namedAreas.find((item) => (item.range.split(':')[0].toLowerCase().includes(currentCellName) && ![currentNamedArea, '|'].includes(item.name)));
     if (!cellNamedArea) return null;
     return {
       name: cellNamedArea.name,
       range: positionCellName.toLowerCase(),
     };
   }
-
-  // getNamedAreaByNameJoin(areaName) {
-  //   const cells = {};
-  //   const styles = [];
-  //   const namedAreas = [];
-  //   const [areaColumn, areaRow] = areaName.split('|');
-  //   const rangeColumn = this.namedAreas.find((item) => item.name === areaColumn).range.toLowerCase();
-  //   const [c1, c2] = rangeColumn.split(':');
-  //   const rangeRow = this.namedAreas.find((item) => item.name === areaRow).range;
-  //   const [r1, r2] = rangeRow.split(':');
-  //   const range = `${c1}${r1}:${c2}${r2}`;
-  //   // получить кол-во строк/столбцов диапазона
-  //   const rowCount = +r2 - +r1 + 1;
-  //   const columnCount = +getColumnNumberForName(c2) - +getColumnNumberForName(c1) + 1;
-  //   // const startColumn = 1;
-  //   // const startRow = 1;
-  //   const currentColumn = getColumnNumberForName(c1);
-  //   const currentRow = +r1;
-  //   for (let row = 0; row < rowCount; row += 1) {
-  //     for (let column = 0; column < columnCount; column += 1) {
-  //       const cellNameCurrent = `${getColumnNameForNumber(currentColumn + column)}${currentRow + row}`;
-  //       // const cellNameShift = `${getColumnNameForNumber(startColumn + column)}${startRow + row}`;
-  //       cells[cellNameCurrent] = this.cells[cellNameCurrent];
-  //       styles.push(this.getCellStyles(cellNameCurrent));
-
-  //       const cellNamedArea = this.namedAreas.find((item) => item.range.split(':')[0].toLowerCase().includes(cellNameCurrent));
-  //       if (cellNamedArea) namedAreas.push(cellNamedArea);
-  //     }
-  //   }
-  //   console.log(range);
-  //   console.log(rowCount, columnCount);
-
-  //   return new TableDocument({
-  //     rowCount,
-  //     columnCount,
-  //     cells,
-  //     styles,
-  //     namedAreas,
-  //   });
-  // }
 
   insertNamedAreaJoin(area, value) {
     const cells = {};
@@ -502,34 +529,29 @@ class TableDocument {
     const columns = {};
     const cells = {};
     const styles = [];
-    const namedAreas = [namedArea];
+    const namedAreas = [{
+      name: namedArea.name,
+      range: namedArea.range.toLowerCase(),
+    }];
     const range = namedArea.range.toLowerCase();
-    const rangeType = getRangeType(range);
-    // const [rangeFrom, rangeTo] = getRangeSize(range);
-    // console.log(namedArea);
-    // console.log(namedAreas);
-    // console.log(range);
-    // console.log(rangeType);
-    // console.log(rangeFrom, rangeTo);
 
     this.getCellsInRange(range, direction).forEach((cell) => {
       const [cellName] = cell;
+      const cellNameShift = getCellShift(cellName, range);
       const { cellColumn, cellRow } = parseCellName(cellName);
       const {
         cellColumn: cellColumnShift,
         cellRow: cellRowShift,
-      } = parseCellName(getCellShift(cellName, range, rangeType));
-      cells[getCellShift(cellName, range, rangeType)] = this.cells[cellName];
+      } = parseCellName(cellNameShift);
+      cells[cellNameShift] = this.cells[cellName];
 
       columns[cellColumnShift] = this.columns[cellColumn];
       rows[cellRowShift] = this.rows[cellRow];
-      // if (!Object.keys(columns).includes(cellColumn)) columns[cellColumn] = this.columns[cellColumn];
-      // if (!Object.keys(rows).includes(cellRow)) rows[cellRow] = this.rows[cellRow];
-      // if (rangeType === 'row' && !Object.keys(columns).includes(cellColumn)) columns[cellColumn] = this.columns[cellColumn];
-      // if (rangeType === 'column' && !Object.keys(rows).includes(cellRow)) rows[cellRow] = this.rows[cellRow];
+
       const cellStyles = this.getCellStyles(cellName);
       if (cellStyles) styles.push(cellStyles);
-      const cellNamedArea = this.getCellNamedAreaShift(cellName, getCellShift(cellName, range, rangeType));
+
+      const cellNamedArea = this.getCellNamedAreaShift(cellName, cellNameShift, namedArea.name);
       if (cellNamedArea) namedAreas.push(cellNamedArea);
     });
 
@@ -545,12 +567,23 @@ class TableDocument {
     });
   }
 
+  insertNamedAreaQ(area, value, direction) {
+    console.log(this.namedAreas);
+    // console.log(area);
+    console.log(value);
+    console.log(direction);
+    const rangeType = getRangeType(area.namedAreas[0].range);
+    console.log(rangeType);
+  }
+
   insertNamedArea(area, value, direction) {
     const rangeType = getRangeType(area.namedAreas[0].range);
+    const namedArea = area.namedAreas[0];
     const position = {
       row: () => Object.keys(this.rows).length + 1,
       column: () => Object.keys(this.columns).length + 1,
       cell: () => 1, // ????
+      range: () => 1, // ????
     };
     const startPosition = position[rangeType]();
     console.log(rangeType, getRangeShift(area, startPosition, direction));
@@ -559,7 +592,7 @@ class TableDocument {
     } = getRangeShift(area, startPosition, direction);
     Object.entries(shiftCells).forEach((cell) => {
       const [cellName, cellValue] = cell;
-      const namedAreaCell = shiftNamedAreas.find((item) => item.range.split(':')[0] === cellName);
+      const namedAreaCell = shiftNamedAreas.find((item) => item.range.split(':')[0] === cellName && item.name !== namedArea.name);
       if (namedAreaCell) {
         if (value[namedAreaCell.name]) cellValue.value = value[namedAreaCell.name];
         // cellValue.value = value[namedAreaCell.name];
@@ -567,21 +600,22 @@ class TableDocument {
       }
     });
 
-    const namedAreaRow = area.namedAreas.find((item) => {
-      const [v1, v2] = item.range.split(':');
-      return (v1 === v2);
-    });
-    if (namedAreaRow && !['header', 'footer'].includes(namedAreaRow.name)) {
-      this.namedAreas.push({
-        name: namedAreaRow.name,
-        range: `${startPosition}:${startPosition + (direction === 'row') ? Object.keys(area.rows).length - 1
-          : Object.keys(area.columns).length - 1}`,
-      });
-    }
+    // const namedAreaRow = area.namedAreas.find((item) => {
+    //   const [v1, v2] = item.range.split(':');
+    //   return (v1 === v2);
+    // });
+    // if (namedAreaRow && !['header', 'footer'].includes(namedAreaRow.name)) {
+    //   this.namedAreas.push({
+    //     name: namedAreaRow.name,
+    //     range: `${startPosition}:${startPosition + (direction === 'row') ? Object.keys(area.rows).length - 1
+    //       : Object.keys(area.columns).length - 1}`,
+    //   });
+    // }
 
     this.rows = { ...this.rows, ...shiftRows };
     this.cells = { ...this.cells, ...shiftCells };
     this.columns = { ...this.columns, ...shiftColumns };
+    this.namedAreas = [...this.namedAreas, ...shiftNamedAreas];
 
     area.styles.forEach((style) => {
       if (this.styles.findIndex((item) => item.name === style.name) > -1) return;

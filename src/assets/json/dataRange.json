@@ -1,0 +1,14 @@
+[
+  {
+    "header": [
+      {"nameOpfr":"по Амурской области"}
+    ]
+  },
+  {
+    "string": [
+      {"title":"Client","count2021":"29","count2022":"23","count2023":"44"},
+      {"title":"Cryptoservice","count2021":"12","count2022":"34","count2023":"11"},
+      {"title":"CSP","count2021":"23","count2022":"56","count2023":"22"}
+    ]
+  }
+]

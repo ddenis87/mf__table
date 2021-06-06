@@ -180,8 +180,10 @@ export default {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONTemplate) => {
         this.tableDocumentTemplate = new TableDocument({ JSONString: JSONTemplate });
+        this.tableDocument.direction = this.tableDocumentTemplate.direction;
         this.isFileTemplateDisabled = true;
         this.isFileDataDisabled = false;
+        console.log(this.tableDocumentTemplate);
       });
     },
     openJSONFileData(file) {
