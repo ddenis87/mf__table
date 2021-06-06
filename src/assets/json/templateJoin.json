@@ -1,11 +1,11 @@
 {
   "template":true,
-  "templateType":"join",
+  "direction":"join",
   "cells":{
-    "b2":{"value":"\u003cЗначение\u003e","style":"b2"},
-    "a1":{"value":"\u003cНаименование\u003e","style":"a1"},
-    "a2":{"value":"\u003cНаименованияПараметра\u003e","style":"a2"},
-    "b1":{"value":"\u003cПараметрГод\u003e","style":"b1"}
+    "b2":{"style":"b2"},
+    "a1":{"value":"Наименование","style":"a1"},
+    "a2":{"style":"a2"},
+    "b1":{"style":"b1"}
   },
   "columns":{
     "a":{"width":222},
@@ -21,11 +21,13 @@
     "2":{"height":21}
   },
   "namedAreas":[
+    {"name":"column|string","range":"B2"},
     {"name":"indicator","range":"B2"},
     {"name":"column","range":"B:B"},
     {"name":"stringTitleIndicator","range":"A2"},
     {"name":"string","range":"2:2"},
     {"name":"header","range":"A1"},
+    {"name":"headerTitle","range":"A1"},
     {"name":"columnYear","range":"B1"}
   ]
 }

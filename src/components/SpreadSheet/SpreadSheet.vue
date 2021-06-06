@@ -107,11 +107,11 @@ export default {
       return Math.max(...maxLevelGroup);
     },
     tableColumns() {
-      console.log('table columns');
+      // console.log('table columns');
       return this.prepareColumns.filter((column) => this.setOpenGroupColumns.includes(column.parent) || !column.parent);
     },
     prepareColumns() {
-      console.log('prepare columns');
+      // console.log('prepare columns');
       const prepareColumns = [];
       const columnsKeys = Object.keys(this.columns);
       for (let i = 1; i < this.columnCount + 1; i += 1) {
@@ -137,12 +137,12 @@ export default {
       return prepareColumns;
     },
     tableRows() {
-      console.log('table rows');
+      // console.log('table rows');
       return this.prepareRows.filter((row) => ((this.setOpenGroupRows.includes(+row.parent)
         || !row.parent) && !row.fixed));
     },
     prepareRows() {
-      console.log('prepare rows');
+      // console.log('prepare rows');
       const prepareRows = [];
       const rowsKeys = Object.keys(this.rows);
       for (let i = 1; i < this.rowCount + 1; i += 1) {
@@ -170,11 +170,11 @@ export default {
       return this.prepareRows.filter((row) => row.fixed);
     },
     tableCells() {
-      console.log('table cells');
+      // console.log('table cells');
       return this.prepareCells;
     },
     prepareCells() {
-      console.log('prepare cells');
+      // console.log('prepare cells');
       const prepareCells = {};
       Object.entries(this.cells).forEach((item) => {
         const [cellName, cellValue] = item;

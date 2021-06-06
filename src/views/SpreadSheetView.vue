@@ -110,7 +110,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.tableDocument);
+    // console.log(this.tableDocument);
   },
   methods: {
     saveDocument() { alert('save document'); },

@@ -1,6 +1,6 @@
 {
   "template":true,
-  "templateType":"column",
+  "direction":"column",
   "cells":{
     "b2":{"value":2021,"style":"b2"},
     "a1":{"style":"a1"},
