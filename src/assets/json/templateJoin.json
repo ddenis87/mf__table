@@ -2,14 +2,22 @@
   "template":true,
   "direction":"join",
   "cells":{
-    "b2":{"style":"b2"},
     "a1":{"value":"Наименование","style":"a1"},
     "a2":{"style":"a2"},
-    "b1":{"style":"b1"}
+    "b2":{"style":"b2"},
+    "c2":{"style":"c2"},
+    "b3":{"style":"b3"},
+    "c3":{"style":"c3"},
+    "b4":{"style":"b4"},
+    "c4":{"style":"c4"},
+    "b5":{"style":"b5"},
+    "c5":{"style":"c5"}
   },
   "columns":{
     "a":{"width":222},
-    "b":{"width":215}},
+    "b":{"width":215},
+    "c":{"width":215}
+  },
   "styles":[
     {"name":"a1","list":{"fontSize":"10pt","borderBottom":"2px solid rgba(0%, 0%, 0%)","textAlign":"center","justifyContent":"center","borderRight":"2px solid rgba(0%, 0%, 0%)"}},
     {"name":"b1","list":{"fontSize":"10pt","borderBottom":"2px solid rgba(0%, 0%, 0%)","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},
@@ -18,11 +26,13 @@
   ],
   "rows":{
     "1":{"height":51},
-    "2":{"height":21}
+    "2":{"height":21},
+    "3":{"height":21},
+    "4":{"height":21},
+    "5":{"height":21}
   },
   "namedAreas":[
-    {"name":"column","range":"B:B"},
-    {"name":"string","range":"2:2"},
-    {"name":"header","range":"1:1"}
+    {"name":"column","range":"B:C"},
+    {"name":"string","range":"2:4"}
   ]
 }

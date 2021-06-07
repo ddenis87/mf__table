@@ -189,10 +189,11 @@ export default {
     openJSONFileData(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
+        // this.tableDocument.buildDocumentNew(this.tableDocumentTemplate);
         this.tableDocument.buildDocument(this.tableDocumentTemplate, JSONData);
-        this.isFileDataDisabled = true;
-        this.isGridOff = false;
-        console.log(this.tableDocument);
+        // this.isFileDataDisabled = true;
+        // this.isGridOff = false;
+        // console.log(this.tableDocument);
       });
     },
     openPrintPage() {
