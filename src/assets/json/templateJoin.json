@@ -21,13 +21,8 @@
     "2":{"height":21}
   },
   "namedAreas":[
-    {"name":"column|string","range":"B2"},
-    {"name":"indicator","range":"B2"},
     {"name":"column","range":"B:B"},
-    {"name":"stringTitleIndicator","range":"A2"},
     {"name":"string","range":"2:2"},
-    {"name":"header","range":"A1"},
-    {"name":"headerTitle","range":"A1"},
-    {"name":"columnYear","range":"B1"}
+    {"name":"header","range":"1:1"}
   ]
 }
