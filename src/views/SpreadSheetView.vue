@@ -183,7 +183,7 @@ export default {
         this.tableDocument.direction = this.tableDocumentTemplate.direction;
         this.isFileTemplateDisabled = true;
         this.isFileDataDisabled = false;
-        console.log(this.tableDocumentTemplate);
+        // console.log(this.tableDocumentTemplate);
       });
     },
     openJSONFileData(file) {
@@ -193,7 +193,7 @@ export default {
         this.tableDocument.buildDocument(this.tableDocumentTemplate, JSONData);
         // this.isFileDataDisabled = true;
         // this.isGridOff = false;
-        // console.log(this.tableDocument);
+        console.log(this.tableDocument);
       });
     },
     openPrintPage() {
