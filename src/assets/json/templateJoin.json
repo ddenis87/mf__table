@@ -1,38 +1,32 @@
 {
   "template":true,
-  "direction":"join",
   "cells":{
-    "a1":{"value":"Наименование","style":"a1"},
-    "a2":{"style":"a2"},
-    "b2":{"style":"b2"},
-    "c2":{"style":"c2"},
-    "b3":{"style":"b3"},
-    "c3":{"style":"c3"},
-    "b4":{"style":"b4"},
-    "c4":{"style":"c4"},
-    "b5":{"style":"b5"},
-    "c5":{"style":"c5"}
+    "b2":{"value":"\u003cЗначение\u003e","style":"b2"},
+    "a1":{"value":"\u003cНаименование\u003e","style":"a1"},
+    "a2":{"value":"\u003cНаименованияПараметра\u003e","style":"a2"},
+    "b1":{"value":"\u003cПараметрГод\u003e","style":"b1"}
   },
   "columns":{
     "a":{"width":222},
-    "b":{"width":215},
-    "c":{"width":215}
+    "b":{"width":215}
   },
   "styles":[
-    {"name":"a1","list":{"fontSize":"10pt","borderBottom":"2px solid rgba(0%, 0%, 0%)","textAlign":"center","justifyContent":"center","borderRight":"2px solid rgba(0%, 0%, 0%)"}},
-    {"name":"b1","list":{"fontSize":"10pt","borderBottom":"2px solid rgba(0%, 0%, 0%)","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},
-    {"list":{"fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","textAlign":"general-left","justifyContent":null,"borderRight":"2px solid rgba(0%, 0%, 0%)"},"name":"a2"},
-    {"name":"b2","list":{"fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","textAlign":"right","justifyContent":"flex-end","borderRight":"1px solid rgba(0%, 0%, 0%)"}}
+    {"list":{"fontSize":"10pt","borderBottom":"2px solid rgba(0%, 0%, 0%)","textAlign":"center","borderRight":"2px solid rgba(0%, 0%, 0%)","justifyContent":"center"},"name":"a1"},
+    {"name":"b1","list":{"fontSize":"10pt","textAlign":"center","borderBottom":"2px solid rgba(0%, 0%, 0%)","justifyContent":"center","borderRight":"1px solid rgba(0%, 0%, 0%)"}},
+    {"list":{"fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","textAlign":"general-left","borderRight":"2px solid rgba(0%, 0%, 0%)","justifyContent":null},"name":"a2"},
+    {"name":"b2","list":{"fontSize":"10pt","textAlign":"right","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-end","borderRight":"1px solid rgba(0%, 0%, 0%)"}}
   ],
   "rows":{
     "1":{"height":51},
-    "2":{"height":21},
-    "3":{"height":21},
-    "4":{"height":21},
-    "5":{"height":21}
+    "2":{"height":21}
   },
   "namedAreas":[
-    {"name":"column","range":"B:C"},
-    {"name":"string","range":"2:4"}
+    {"name":"column","range":"B:B"},
+    {"name":"header","range":"A1"},
+    {"name":"headerName","range":"A1"},
+    {"name":"stringTitleIndicator","range":"A2"},
+    {"name":"string","range":"2:2"},
+    {"name":"indicator","range":"B2"},
+    {"name":"columnYear","range":"B1"}
   ]
 }
