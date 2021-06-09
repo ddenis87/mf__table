@@ -1,0 +1,7 @@
+header - header|title - put - [ headerName - headerName ]
+
+year - column|header - join - [ columnYear - columnYear ]
+
+string - string|title - put []
+
+columns - columns|string

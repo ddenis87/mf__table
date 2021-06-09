@@ -1,0 +1,52 @@
+[
+  {
+    "header|title": [
+      {
+        "headerName":"hello"
+      }
+    ]
+  },
+  {
+    "column|header": [
+      {"columnYear":"2021"},
+      {"columnYear":"2022"},
+      {"columnYear":"2023"}
+    ]
+  },
+  {
+    "string|title": [
+      {"stringTitleIndicator":"Шарики"}
+    ]
+  },
+  {
+    "columns|string":[
+      {"indicator":"1"},
+      {"indicator":"2"},
+      {"indicator":"3"}
+    ]
+  },
+  {
+    "string|title": [
+      {"stringTitleIndicator":"Подшипники"}
+    ]
+  },
+  {
+    "columns|string":[
+      {"indicator":"4"},
+      {"indicator":"5"},
+      {"indicator":"6"}
+    ]
+  },
+  {
+    "string|title": [
+      {"stringTitleIndicator":"Пружины"}
+    ]
+  },
+  {
+    "columns|string":[
+      {"indicator":"7"},
+      {"indicator":"8"},
+      {"indicator":"9"}
+    ]
+  }
+]
