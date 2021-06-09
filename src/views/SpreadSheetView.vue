@@ -92,7 +92,7 @@ export default {
   },
   data() {
     return {
-      tableDocument: new TableDocument({}),
+      tableDocument: new TableDocument(),
       tableDocumentTemplate: {},
       fileTemplate: [],
       fileData: [],
@@ -189,10 +189,11 @@ export default {
     openJSONFileData(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
-        // this.tableDocument.buildDocumentNew(this.tableDocumentTemplate);
-        this.tableDocument.buildDocument(this.tableDocumentTemplate, JSONData);
-        // this.isFileDataDisabled = true;
-        // this.isGridOff = false;
+        const tableDocument = new TableDocument();
+        tableDocument.buildDocument(this.tableDocumentTemplate, JSONData);
+        this.tableDocument = tableDocument;
+        this.isFileDataDisabled = true;
+        this.isGridOff = false;
         console.log(this.tableDocument);
       });
     },

@@ -77,16 +77,16 @@ function getRangeSize(range) {
 //   // if (directionRange === 'range') return
 //   return cellName;
 // }
-function replaceCellName(cellName, position, direction = 'row') {
-  const { cellColumn, cellRow } = parseCellName(cellName);
-  const replaceFunctions = {
-    cell: () => cellName,
-    row: () => `${cellColumn}${position}`,
-    column: () => `${getColumnNameForNumber(position)}${cellRow}`,
-    range: () => cellName,
-  };
-  return replaceFunctions[direction]();
-}
+// function replaceCellName(cellName, position, direction = 'row') {
+//   const { cellColumn, cellRow } = parseCellName(cellName);
+//   const replaceFunctions = {
+//     cell: () => cellName,
+//     row: () => `${cellColumn}${position}`,
+//     column: () => `${getColumnNameForNumber(position)}${cellRow}`,
+//     range: () => cellName,
+//   };
+//   return replaceFunctions[direction]();
+// }
 
 function getCellNameShift(cellName, rangeCells, stepColumn = 1, stepRow = 1) {
   const [rangeRow, rangeColumn] = rangeCells;
@@ -273,7 +273,6 @@ function getRangeCells(cells) {
 class TableDocument {
   constructor({
     template = false,
-    // direction = 'row',
     rangeType = null,
     rows = {},
     rowCount = ROW_COUNT,
@@ -290,7 +289,6 @@ class TableDocument {
       const JSONStringParse = JSON.parse(JSONString);
       ({
         template: this.template = false,
-        // direction: this.direction = 'row',
         rangeType: this.rangeType = null,
         rows: this.rows = {},
         rowCount: this.rowCount = ROW_COUNT,
@@ -305,7 +303,6 @@ class TableDocument {
       return;
     }
     this.template = template;
-    // this.direction = direction;
     this.rangeType = rangeType;
     this.rows = rows;
     this.rowCount = rowCount;
@@ -321,10 +318,12 @@ class TableDocument {
   buildDocument(documentTemplate, documentData) {
     // console.log(this.rowCount);
     const data = (typeof documentData === 'string') ? JSON.parse(documentData) : documentData;
+    console.log(typeof documentTemplate);
     const areaHeader = documentTemplate.getNamedArea('header');
     console.log(areaHeader);
     const headerValue = data.find((item) => Object.keys(item).includes('header'))?.header[0] || {};
-    if (areaHeader) this.insertArea(areaHeader, headerValue);
+    if (areaHeader) this.putArea(headerValue, areaHeader);
+
     data.forEach((element) => {
       const [areaName, areaValue] = Object.entries(element)[0];
       if (['header', 'footer'].includes(areaName)) return;
@@ -332,7 +331,8 @@ class TableDocument {
       const area = documentTemplate.getNamedArea(areaName);
       console.log(area);
       areaValue.forEach((value) => {
-        this.put(area, value);
+        if (area.rangeType === 'row') this.putArea(value, area);
+        if (area.rangeType === 'column') this.joinArea(value, area);
       });
     });
   }
@@ -647,6 +647,18 @@ class TableDocument {
       range: cellNameShift,
     };
   }
+
+  getRangeCells() {
+    const rows = [];
+    const columns = [];
+    Object.entries(this.cells).forEach((cell) => {
+      const [cellName] = cell;
+      const { cellColumn, cellRow } = parseCellName(cellName);
+      rows.push(cellRow);
+      columns.push(getColumnNumberForName(cellColumn));
+    });
+    return [[Math.min(...rows), Math.max(...rows)], [Math.min(...columns), Math.max(...columns)]];
+  }
   // getCellNamedAreaShift(currentCellName, positionCellName, currentNamedArea) {
   //   const cellNamedArea = this.namedAreas.find((item) => (item.range.split(':')[0].toLowerCase().includes(currentCellName) && ![currentNamedArea, '|'].includes(item.name)));
   //   if (!cellNamedArea) return null;
@@ -656,47 +668,47 @@ class TableDocument {
   //   };
   // }
 
-  insertNamedAreaJoin(area, value) {
-    const cells = {};
-    const namedAreas = [];
-    const rowCount = value.length;
-    const columnCount = value[0].length;
-    console.log(area.namedAreas, value, rowCount, columnCount);
-    const rangeFrom = area.namedAreas[0].range.split(':')[0];
-    const { cellColumn: rangeFromColumn, cellRow: rangeFromRow } = parseCellName(rangeFrom);
-    const rangeTo = replaceCellName(replaceCellName(rangeFrom, +rangeFromRow + rowCount - 1, 'row'), +getColumnNumberForName(rangeFromColumn) + columnCount - 1, 'column');
-    namedAreas.push({
-      name: area.namedAreas[0].name,
-      range: `${rangeFrom}:${rangeTo}`,
-    });
-    for (let row = 0; row < rowCount; row += 1) {
-      for (let column = 0; column < columnCount; column += 1) {
-        Object.entries(value[row][column]).forEach((item) => {
-          const [areaName, areaValue] = item;
-          const namedArea = area.namedAreas.find((element) => element.name === areaName);
-          // console.log(namedArea, areaName, areaValue);
-          if (!namedArea) return;
-          const cellName = namedArea.range.toLowerCase().split(':')[0];
-          const { cellColumn, cellRow } = parseCellName(cellName);
-          const cellNameShift = replaceCellName(replaceCellName(cellName, +cellRow + row, 'row'), +getColumnNumberForName(cellColumn) + column, 'column');
-          // console.log(cellNameShift);
-          cells[cellNameShift] = { ...area.cells[cellName] };
-          cells[cellNameShift].value = areaValue;
-          cells[cellNameShift].areaName = areaName;
-          // namedAreas.push({
-          //   name: areaName,
-          //   range: `${cellNameShift}:${cellNameShift}`,
-          // });
-        });
-      }
-    }
-    area.styles.forEach((style) => {
-      if (this.styles.findIndex((item) => item.name === style.name) > -1) return;
-      this.styles.push(style);
-    });
-    this.cells = { ...this.cells, ...cells };
-    this.namedAreas = [...this.namedAreas, ...namedAreas];
-  }
+  // insertNamedAreaJoin(area, value) {
+  //   const cells = {};
+  //   const namedAreas = [];
+  //   const rowCount = value.length;
+  //   const columnCount = value[0].length;
+  //   console.log(area.namedAreas, value, rowCount, columnCount);
+  //   const rangeFrom = area.namedAreas[0].range.split(':')[0];
+  //   const { cellColumn: rangeFromColumn, cellRow: rangeFromRow } = parseCellName(rangeFrom);
+  //   const rangeTo = replaceCellName(replaceCellName(rangeFrom, +rangeFromRow + rowCount - 1, 'row'), +getColumnNumberForName(rangeFromColumn) + columnCount - 1, 'column');
+  //   namedAreas.push({
+  //     name: area.namedAreas[0].name,
+  //     range: `${rangeFrom}:${rangeTo}`,
+  //   });
+  //   for (let row = 0; row < rowCount; row += 1) {
+  //     for (let column = 0; column < columnCount; column += 1) {
+  //       Object.entries(value[row][column]).forEach((item) => {
+  //         const [areaName, areaValue] = item;
+  //         const namedArea = area.namedAreas.find((element) => element.name === areaName);
+  //         // console.log(namedArea, areaName, areaValue);
+  //         if (!namedArea) return;
+  //         const cellName = namedArea.range.toLowerCase().split(':')[0];
+  //         const { cellColumn, cellRow } = parseCellName(cellName);
+  //         const cellNameShift = replaceCellName(replaceCellName(cellName, +cellRow + row, 'row'), +getColumnNumberForName(cellColumn) + column, 'column');
+  //         // console.log(cellNameShift);
+  //         cells[cellNameShift] = { ...area.cells[cellName] };
+  //         cells[cellNameShift].value = areaValue;
+  //         cells[cellNameShift].areaName = areaName;
+  //         // namedAreas.push({
+  //         //   name: areaName,
+  //         //   range: `${cellNameShift}:${cellNameShift}`,
+  //         // });
+  //       });
+  //     }
+  //   }
+  //   area.styles.forEach((style) => {
+  //     if (this.styles.findIndex((item) => item.name === style.name) > -1) return;
+  //     this.styles.push(style);
+  //   });
+  //   this.cells = { ...this.cells, ...cells };
+  //   this.namedAreas = [...this.namedAreas, ...namedAreas];
+  // }
 
   // getNamedAreaByName(areaName, direction = 'row') {
   //   if (!areaName) return null;
@@ -807,7 +819,6 @@ class TableDocument {
       const cellStyles = this.getCellStyles(cellNameCurrent);
       if (cellStyles) styles.push(cellStyles);
 
-      // в namedArea добавляем параметры ячеек
       const cellNamedArea = this.getNamedAreaCellShift(cellNameCurrent, cellNameShift, areaName);
       if (cellNamedArea) namedAreas.push(cellNamedArea);
     });
@@ -867,41 +878,66 @@ class TableDocument {
   //     namedAreas,
   //   });
   // }
-  getNumberNewRowDocument() { return Object.keys(this.rows).length; }
+
+  getLastRow() {
+    const rows = [0];
+    Object.keys(this.rows).forEach((row) => rows.push(+row));
+    return Math.max(...rows);
+  }
+
+  getLastColumn() {
+    const columns = [0];
+    Object.keys(this.columns).forEach((column) => columns.push(+getColumnNumberForName(column)));
+    return Math.max(...columns);
+  }
 
   getAreaCopy() {
-    const rows = {};
-    const columns = {};
-    const cells = {};
-    const styles = [];
-    const namedAreas = [];
+    const {
+      rows, columns, cells, styles, namedAreas,
+    } = JSON.parse(JSON.stringify({
+      rows: this.rows,
+      columns: this.columns,
+      cells: this.cells,
+      styles: this.styles,
+      namedAreas: this.namedAreas,
+    }));
 
-    Object.keys(this.rows).forEach((rowName) => { rows[rowName] = { ...this.rows[rowName] }; });
-    Object.keys(this.columns).forEach((columnName) => { columns[columnName] = { ...this.columns[columnName] }; });
-    Object.keys(this.cells).forEach((cellName) => { cells[cellName] = { ...this.cells[cellName] }; });
-    this.styles.forEach((style) => {
-      const { name, list } = style;
-      styles.push({
-        name,
-        list,
-      });
-    });
-    this.namedAreas.forEach((namedArea) => {
-      const { name, range } = namedArea;
-      namedAreas.push({
-        name,
-        range,
-      });
-    });
     return new TableDocument({
       rangeType: this.rangeType,
       rows,
+      rowCount: this.rowCount,
       columns,
+      columnCount: this.columnCount,
       cells,
       styles,
       namedAreas,
     });
   }
+
+  // getAreaCopy() {
+  //   const rows = {};
+  //   const columns = {};
+  //   const cells = {};
+  //   const styles = [];
+  //   const namedAreas = [];
+
+  //   Object.keys(this.rows).forEach((rowName) => { rows[rowName] = { ...this.rows[rowName] }; });
+  //   Object.keys(this.columns).forEach((columnName) => { columns[columnName] = { ...this.columns[columnName] }; });
+  //   Object.keys(this.cells).forEach((cellName) => { cells[cellName] = { ...this.cells[cellName] }; });
+  //   this.styles.forEach((style) => { styles.push({ ...style }); });
+  //   this.namedAreas.forEach((namedArea) => { namedAreas.push({ ...namedArea }); });
+
+  //   return new TableDocument({
+  //     rangeType: this.rangeType,
+  //     rows,
+  //     rowCount: Object.keys(rows).length,
+  //     columns,
+  //     columnCount: Object.keys(columns).length,
+  //     cells,
+  //     styles,
+  //     namedAreas,
+  //   });
+  // }
 
   fillArea(dataArea) {
     Object.entries(this.cells).forEach((cell) => {
@@ -911,7 +947,6 @@ class TableDocument {
       const { name: parameterName } = parameter;
       cellValue.value = dataArea[parameterName];
       cellValue.parameter = parameterName;
-      // cellValue.parameter = parameterName;
     });
   }
 
@@ -925,13 +960,14 @@ class TableDocument {
     const positions = {
       row: () => [undefined, position],
       column: () => [position, undefined],
-      cell: () => [1, 1],
+      // cell: () => [1, 1],
+      // range: () => [1, 1],
     };
     const [positionColumn, positionRow] = positions[this.rangeType]();
     Object.entries(this.cells).forEach((cell) => {
       const [cellNameCurrent] = cell;
       const cellNameShift = getCellNameShift(cellNameCurrent, rangeCells, positionColumn, positionRow);
-      console.log(rangeCells, cellNameCurrent, cellNameShift, position);
+      // console.log(rangeCells, cellNameCurrent, cellNameShift, position);
       const { cellColumn: cellColumnCurrent, cellRow: cellRowCurrent } = parseCellName(cellNameCurrent);
       const { cellColumn: cellColumnShift, cellRow: cellRowShift } = parseCellName(cellNameShift);
       cells[cellNameShift] = this.cells[cellNameCurrent];
@@ -939,12 +975,9 @@ class TableDocument {
       columns[cellColumnShift] = this.columns[cellColumnCurrent];
       rows[cellRowShift] = this.rows[cellRowCurrent];
 
-      // const cellStyles = this.getCellStyles(cellNameCurrent);
-      // if (cellStyles) styles.push(cellStyles);
-
       // в namedArea добавляем параметры ячеек
-      const cellNamedArea = this.getNamedAreaCellShift(cellNameCurrent, cellNameShift, '');
-      if (cellNamedArea) namedAreas.push(cellNamedArea);
+      // const cellNamedArea = this.getNamedAreaCellShift(cellNameCurrent, cellNameShift, '');
+      // if (cellNamedArea) namedAreas.push(cellNamedArea);
     });
     this.styles.forEach((style) => {
       const { name, list } = style;
@@ -956,6 +989,7 @@ class TableDocument {
     return new TableDocument({
       rangeType: this.rangeType,
       rows,
+      rowCount: Object.keys(rows).length,
       columns,
       cells,
       styles,
@@ -963,26 +997,58 @@ class TableDocument {
     });
   }
 
-  insertArea(position, area) {
+  putArea(dataArea, area) {
+    const areaCopy = area.getAreaCopy();
+    const numberNewRow = this.getLastRow() + 1;
+    areaCopy.fillArea(dataArea);
+    this.insertArea(numberNewRow, areaCopy);
+  }
+
+  insertAreaV20(numberRow, area) {
+    console.log(area);
+    const {
+      rows: areaRow, columns: areaColumn, cells: areaCells, styles: areaStyle, namedAreas: areaNamedArea,
+    } = area;
+    // const rangeCells = getRangeCells(Object.entries(areaCells)); // ??????
+    const rangeCells = area.getRangeCells();
+
+    Object.entries(areaCells).forEach((cell) => {
+      const [cellNameCurrent] = cell;
+      const cellNameShift = getCellNameShift(cellNameCurrent, rangeCells, undefined, numberRow);
+      const { cellColumn: cellColumnCurrent, cellRow: cellRowCurrent } = parseCellName(cellNameCurrent);
+      const { cellColumn: cellColumnShift, cellRow: cellRowShift } = parseCellName(cellNameShift);
+
+      this.cells[cellNameShift] = areaCells[cellNameCurrent];
+
+      this.columns[cellColumnShift] = areaColumn[cellColumnCurrent];
+      this.rows[cellRowShift] = areaRow[cellRowCurrent];
+    });
+    this.styles = [...this.styles, ...areaStyle];
+    this.namedAreas = [...this.namedAreas, areaNamedArea];
+
+    this.rowCount = this.getLastRow();
+    this.columnCount = this.getLastColumn();
+  }
+
+  insertArea(area) {
+    console.log(area);
     this.cells = { ...this.cells, ...area.cells };
     this.rows = { ...this.rows, ...area.rows };
     this.columns = { ...this.columns, ...area.columns };
     this.styles = [...this.styles, ...area.styles];
+    
+    this.rowCount = Object.keys(this.rows).length;
+    this.columnCount = Object.keys(this.columns).length;
   }
 
-  put(area, dataArea) {
-    console.log(this.rowCount);
-    // if (area.rangeType !== 'row') return;
-    
+  joinArea(dataArea, area) {
+    const numberNewColumn = this.getLastColumn() + 1;
     const areaCopy = area.getAreaCopy();
     areaCopy.fillArea(dataArea);
-    const numberNewRowDocument = this.getNumberNewRowDocument() + 1;
-    const areaFill = areaCopy.getAreaCopy(); // ??
-    const areaShift = areaFill.shiftArea(numberNewRowDocument);
+    const areaShift = areaCopy.shiftArea(numberNewColumn);
     console.log(areaShift);
-    this.insert(areaShift);
+    this.insertArea(numberNewColumn, areaShift);
   }
-
   // insertNamedArea(area, value, direction) {
   //   const rangeType = getRangeType(area.namedAreas[0].range);
   //   const namedArea = area.namedAreas[0];
