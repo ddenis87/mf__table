@@ -83,6 +83,8 @@ import DialogModal from '@/components/Dialogs/DialogModal.vue';
 import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocument from '@/structures/TableDocument';
 
+import setting from '../structures/crossSetting';
+
 export default {
   name: 'SpreadSheetView',
   components: {
@@ -190,7 +192,7 @@ export default {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
         const tableDocument = new TableDocument();
-        tableDocument.buildDocumentSetting(JSONData, this.tableDocumentTemplate);
+        tableDocument.buildDocument(JSONData, this.tableDocumentTemplate, setting);
         this.tableDocument = tableDocument;
         this.isFileDataDisabled = true;
         this.isGridOff = false;
