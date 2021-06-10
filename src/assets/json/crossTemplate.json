@@ -1,0 +1,29 @@
+{
+  "template":true,
+  "cells":{
+    "b2":{"style":"b2","value":"\u003cЗначение\u003e","parameter":"indicator"},
+    "a1":{"value":"Наименование","parameter":"headerName","style":"a1"},
+    "a2":{"style":"a2","value":"\u003cНаименованияПараметра\u003e","parameter":"stringTitleIndicator"},
+    "b1":{"style":"b1","value":"\u003cПараметрГод\u003e","parameter":"columnYear"}
+  },
+  "columns":{
+    "a":{"width":222},
+    "b":{"width":215}
+  },
+  "styles":[
+    {"name":"a1","list":{"fontSize":"10pt","textAlign":"center","borderBottom":"2px solid rgba(0%, 0%, 0%)","justifyContent":"center","borderRight":"2px solid rgba(0%, 0%, 0%)"}},
+    {"name":"b1","list":{"fontSize":"10pt","textAlign":"center","borderBottom":"2px solid rgba(0%, 0%, 0%)","justifyContent":"center","borderRight":"1px solid rgba(0%, 0%, 0%)"}},
+    {"list":{"fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","textAlign":"general-left","justifyContent":null,"borderRight":"2px solid rgba(0%, 0%, 0%)"},"name":"a2"},
+    {"list":{"fontSize":"10pt","textAlign":"right","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-end","borderRight":"1px solid rgba(0%, 0%, 0%)"},"name":"b2"}
+  ],
+  "rows":{
+    "1":{"height":51},
+    "2":{"height":21}
+  },
+  "namedAreas":[
+    {"name":"header","range":"1:1"},
+    {"name":"string","range":"2:2"},
+    {"name":"column","range":"B:B"},
+    {"name":"title","range":"A:A"}
+  ]
+}

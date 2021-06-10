@@ -190,7 +190,7 @@ export default {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
         const tableDocument = new TableDocument();
-        tableDocument.buildDocument(this.tableDocumentTemplate, JSONData);
+        tableDocument.buildDocumentSetting(JSONData, this.tableDocumentTemplate);
         this.tableDocument = tableDocument;
         this.isFileDataDisabled = true;
         this.isGridOff = false;
