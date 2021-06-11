@@ -2,7 +2,7 @@ const JSONSetting = {
   header: {
     templateSectionName: 'title|header',
     methodName: 'put',
-    paremeters: {
+    parameters: {
       headerName: 'headerName',
     },
   },

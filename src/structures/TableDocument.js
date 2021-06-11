@@ -317,10 +317,10 @@ class TableDocument {
 
   buildDocument(data, template, settings) {
     const buldMethods = {
-      put: (buildData, buildArea) => { this.putArea(buildData, buildArea); },
-      row: (buildData, buildArea) => { this.putArea(buildData, buildArea); },
-      join: (buildData, buildArea) => { this.joinArea(buildData, buildArea); },
-      column: (buildData, buildArea) => { this.joinArea(buildData, buildArea); },
+      put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
+      row: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
+      join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
+      column: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
     };
     const documentData = (typeof data === 'string') ? JSON.parse(data) : data;
     const documentTemplate = (typeof template === 'string') ? JSON.parse(template) : template;
@@ -329,22 +329,31 @@ class TableDocument {
     documentData.forEach((item) => {
       const [itemDataKey, itemDataValue] = Object.entries(item)[0];
       const itemSetting = Object.entries(documentSetting).find((setting) => setting[0] === itemDataKey);
-      let buildMethodName = null;
       let area = null;
+      let buildMethodName = null;
+      let areaParameters = {};
 
       if (itemSetting) {
         const [, tagValue] = itemSetting;
-        const { templateSectionName, methodName } = tagValue;
+        const { templateSectionName, methodName, parameters } = tagValue;
 
         area = documentTemplate.getNamedArea(templateSectionName);
+        areaParameters = parameters;
         buildMethodName = methodName;
       } else {
         area = documentTemplate.getNamedArea(itemDataKey);
         buildMethodName = area.rangeType;
       }
-
+      if (!Array.isArray(itemDataValue)) {
+        const nestedData = [
+          { [itemDataKey]: [{ ...itemDataValue }] },
+        ];
+        this.buildDocument(nestedData, template, settings);
+        return;
+      }
       itemDataValue.forEach((itemData) => {
-        buldMethods[buildMethodName](itemData, area);
+        console.log(areaParameters);
+        buldMethods[buildMethodName](itemData, area, areaParameters);
 
         Object.keys(itemData).forEach((parameterKey) => {
           if (Array.isArray(itemData[parameterKey])) {
@@ -358,12 +367,15 @@ class TableDocument {
     });
   }
 
-  fillArea(dataArea) {
+  fillArea(dataArea, parameters) {
+    console.log(parameters);
     Object.entries(this.cells).forEach((cell) => {
       const [, cellValue] = cell;
       const parameterName = cellValue?.parameter || null;
-      if (!parameterName || !dataArea[parameterName]) return;
-      cellValue.value = dataArea[parameterName];
+      if (!parameterName) return;
+      const parameterNameData = parameters[parameterName] || parameterName;
+      if (!parameterName || !dataArea[parameterNameData]) return;
+      cellValue.value = dataArea[parameterNameData];
     });
   }
 
@@ -482,6 +494,7 @@ class TableDocument {
     });
     return new TableDocument({
       rangeType: getRangeType(range),
+      // insertMethodName: (getRangeType(range) === 'row') ? 'put' : 'join',
       rows,
       rowCount: Object.keys(rows).length,
       columns,
@@ -521,7 +534,11 @@ class TableDocument {
   insertArea(numberColumn, numberRow, area) {
     // console.log(area);
     const {
-      rows: areaRow, columns: areaColumn, cells: areaCells, styles: areaStyles, namedAreas: areaNamedArea,
+      rows: areaRow,
+      columns: areaColumn,
+      cells: areaCells,
+      styles: areaStyles,
+      namedAreas: areaNamedArea,
     } = area;
     const rangeCellArea = getRangeOfCellArea(areaCells);
 
@@ -546,18 +563,18 @@ class TableDocument {
     this.columnCount = this.getLastColumn();
   }
 
-  joinArea(dataArea, area) {
+  joinArea(dataArea, area, parameters) {
     const areaCopy = area.getAreaCopy();
     const numberLastRow = this.getLastRow();
     const numberNewColumn = this.getLastColumnInRow(numberLastRow) + 1;
-    areaCopy.fillArea(dataArea);
+    areaCopy.fillArea(dataArea, parameters);
     this.insertArea(numberNewColumn, numberLastRow, areaCopy);
   }
 
-  putArea(dataArea, area) {
+  putArea(dataArea, area, parameters) {
     const areaCopy = area.getAreaCopy();
     const numberNewRow = this.getLastRow() + 1;
-    areaCopy.fillArea(dataArea);
+    areaCopy.fillArea(dataArea, parameters);
     this.insertArea(1, numberNewRow, areaCopy);
   }
   // buildDocument(template, data) {
