@@ -3,7 +3,7 @@ const JSONSetting = {
     templateSectionName: 'title|header',
     methodName: 'put',
     parameters: {
-      headerName: 'headerName',
+      headerName: 'hName',
     },
   },
   year: {

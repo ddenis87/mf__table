@@ -4,6 +4,9 @@ const ROW_COUNT = 1000;
 const COLUMNS_COUNT = 26;
 const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
+const regAZaz = /[A-Z]/gi;
+const reg09 = /[0-9]/g;
+
 function getColumnNumberForName(columnName) {
   if (columnName.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === columnName) + 1;
   const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === columnName[0]) + 1;
@@ -32,8 +35,8 @@ function getColumnNameForNumber(columnNumber) {
 
 function parseCellName(cellName) {
   return {
-    cellColumn: cellName.replace(/[0-9]/g, ''),
-    cellRow: +cellName.replace(/[A-z]/g, ''),
+    cellColumn: cellName.replace(reg09, ''),
+    cellRow: +cellName.replace(regAZaz, ''),
   };
 }
 
@@ -49,8 +52,8 @@ function getRangeType(range) {
   const [v1, v2] = `${range}`.toLowerCase().split(':');
   if (!v2) return 'cell';
   if (+v1 && +v2) return 'row';
-  if (v1.match(/[0-9]/) && v1.match(/[A-z]/)
-    && v2.match(/[0-9]/) && v2.match(/[A-z]/)) return 'range';
+  if (v1.match(reg09) && v1.match(regAZaz)
+    && v2.match(reg09) && v2.match(regAZaz)) return 'range';
   if (getColumnNumberForName(v1) && getColumnNumberForName(v2)) return 'column';
   return 'RaN';
 }
@@ -87,10 +90,15 @@ function getRangeOfCellArea(cells) {
   return [[Math.min(...rows), Math.max(...rows)], [Math.min(...columns), Math.max(...columns)]];
 }
 
+function getRangeLength(range) {
+  return range[1] - range[0];
+}
+
 class TableDocument {
   constructor({
     template = false,
-    rangeType = null,
+    // rangeType = null,
+    methodName = null,
     rows = {},
     rowCount = ROW_COUNT,
     columns = {},
@@ -106,7 +114,8 @@ class TableDocument {
       const JSONStringParse = JSON.parse(JSONString);
       ({
         template: this.template = false,
-        rangeType: this.rangeType = null,
+        // rangeType: this.rangeType = null,
+        methodName: this.methodName = null,
         rows: this.rows = {},
         rowCount: this.rowCount = ROW_COUNT,
         columns: this.columns = {},
@@ -120,7 +129,8 @@ class TableDocument {
       return;
     }
     this.template = template;
-    this.rangeType = rangeType;
+    // this.rangeType = rangeType;
+    this.methodName = methodName;
     this.rows = rows;
     this.rowCount = rowCount;
     this.columns = columns;
@@ -135,17 +145,17 @@ class TableDocument {
   buildDocument(data, template, settings) {
     const buldMethods = {
       put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
-      row: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); }, // ????
       join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
-      column: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); }, // ????
     };
     const documentData = (typeof data === 'string') ? JSON.parse(data) : data;
     const documentTemplate = (typeof template === 'string') ? JSON.parse(template) : template;
-    const documentSetting = (typeof template === 'string') ? JSON.parse(settings) : settings;
+    const documentSettings = (typeof template === 'string') ? JSON.parse(settings) : settings;
+    this.documentTemplate = documentTemplate;
+    this.documentSettings = documentSettings;
 
     documentData.forEach((item) => {
       const [itemDataKey, itemDataValue] = Object.entries(item)[0];
-      const itemSetting = Object.entries(documentSetting).find((setting) => setting[0] === itemDataKey);
+      const itemSetting = Object.entries(documentSettings).find((setting) => setting[0] === itemDataKey);
       let area = null;
       let buildMethodName = null;
       let areaParameters = {};
@@ -159,7 +169,7 @@ class TableDocument {
         buildMethodName = methodName;
       } else {
         area = documentTemplate.getNamedArea(itemDataKey);
-        buildMethodName = area.rangeType;
+        buildMethodName = area.methodName;
       }
       if (!Array.isArray(itemDataValue)) {
         const nestedData = [
@@ -169,7 +179,7 @@ class TableDocument {
         return;
       }
       itemDataValue.forEach((itemData) => {
-        console.log(areaParameters);
+        // console.log(areaParameters);
         buldMethods[buildMethodName](itemData, area, areaParameters);
 
         Object.keys(itemData).forEach((parameterKey) => {
@@ -185,7 +195,7 @@ class TableDocument {
   }
 
   fillArea(dataArea, parameters) {
-    console.log(parameters);
+    // console.log(dataArea);
     Object.entries(this.cells).forEach((cell) => {
       const [, cellValue] = cell;
       const parameterName = cellValue?.parameter || null;
@@ -206,7 +216,6 @@ class TableDocument {
       styles: this.styles,
       namedAreas: this.namedAreas,
     }));
-
     return new TableDocument({
       rangeType: this.rangeType,
       rows,
@@ -279,19 +288,19 @@ class TableDocument {
   }
 
   getNamedArea(areaName) {
+    // console.log(areaName);
     const rows = {};
     const columns = {};
     const cells = {};
     const styles = [];
-    const namedAreas = []; // ???? добавлять саму именованную область
-    // const [rangeFrom, rangeTo] = range.split(':');
-    // const namedAreas = [{
-    //   name: areaName,
-    //   range: `1:${+rangeTo - +rangeFrom + 1}`,
-    // }];
     const range = this.getNamedAreaRange(areaName);
+    const namedAreas = [{
+      name: areaName,
+      range: null,
+    }];
+
     const cellsInRange = this.getCellsInRange(range);
-    const rangeCellArea = getRangeOfCellArea(cellsInRange); // ????
+    const rangeCellArea = getRangeOfCellArea(cellsInRange);
 
     cellsInRange.forEach((cell) => {
       const [cellNameCurrent] = cell;
@@ -305,13 +314,9 @@ class TableDocument {
 
       const cellStyles = this.getCellStyles(cellNameCurrent);
       if (cellStyles) styles.push(cellStyles);
-
-      // const cellNamedArea = this.getNamedAreaCellShift(cellNameCurrent, cellNameShift, areaName);
-      // if (cellNamedArea) namedAreas.push(cellNamedArea);
     });
     return new TableDocument({
-      rangeType: getRangeType(range),
-      // insertMethodName: (getRangeType(range) === 'row') ? 'put' : 'join',
+      methodName: (getRangeType(range) === 'row') ? 'put' : 'join',
       rows,
       rowCount: Object.keys(rows).length,
       columns,
@@ -358,7 +363,9 @@ class TableDocument {
       namedAreas: areaNamedArea,
     } = area;
     const rangeCellArea = getRangeOfCellArea(areaCells);
-
+    const areaNamedAreaFrom = `${getColumnNameForNumber(numberColumn)}${numberRow}`;
+    const areaNamedAreaTo = `${getColumnNameForNumber(numberColumn + getRangeLength(rangeCellArea[1]))}${numberRow + getRangeLength(rangeCellArea[0])}`;
+    areaNamedArea[0].range = `${areaNamedAreaFrom}:${areaNamedAreaTo}`;
     Object.entries(areaCells).forEach((cell) => {
       const [cellNameCurrent] = cell;
       const cellNameShift = getCellNameShift(cellNameCurrent, rangeCellArea, numberColumn, numberRow);
@@ -428,6 +435,43 @@ class TableDocument {
     this.cells = { ...this.cells, [cellName]: cellValues };
   }
 
+  getDocumentData(JSONFormat = false) {
+    const documentData = [];
+    this.namedAreas.forEach((namedArea) => {
+      const cells = this.getCellsInRange(namedArea.range);
+      const cellsValue = {};
+      console.log(cells);
+      const [sectionKey, sectionValue] = Object.entries(this.documentSettings)
+        .find((section) => section[1].templateSectionName === namedArea.name);
+      cells.forEach((cell) => {
+        const [, cellValue] = cell;
+        if (Object.keys(sectionValue.parameters).includes(cellValue.parameter)) {
+          cellsValue[sectionValue.parameters[cellValue.parameter]] = cellValue.value;
+        }
+      });
+      if (sectionValue.methodName === 'put') {
+        const itemSection = documentData.find((item) => Object.keys(item).includes(sectionKey));
+        if (!itemSection) {
+          documentData.push({ [sectionKey]: [{ ...cellsValue }] });
+        }
+        if (itemSection) {
+          itemSection[sectionKey].push({ ...cellsValue });
+        }
+      }
+      if (sectionValue.methodName === 'join') {
+        const [parentSection] = Object.entries(documentData[documentData.length - 1]);
+        const [, parentSectionValue] = parentSection;
+        if (Object.keys(parentSectionValue[parentSectionValue.length - 1]).includes(sectionKey)) {
+          parentSectionValue[parentSectionValue.length - 1][sectionKey].push({ ...cellsValue });
+        }
+        if (!Object.keys(parentSectionValue[parentSectionValue.length - 1]).includes(sectionKey)) {
+          parentSectionValue[parentSectionValue.length - 1][sectionKey] = [{ ...cellsValue }];
+        }
+      }
+    });
+    return (JSONFormat) ? JSON.stringify(documentData) : documentData;
+  }
+
   shiftRows({ shiftStart, shiftBefore = false, shiftStep = 1 }) {
     console.log(shiftBefore);
     const lastRow = Math.max(...Object.keys(this.rows));
@@ -438,7 +482,7 @@ class TableDocument {
 
       Object.entries(this.getCellsInRow(lastRow - i)).forEach((cell) => {
         const [cellName, cellValue] = cell;
-        this.cells[`${cellName.replace(/[0-9]/g, '')}${lastRow - i + shiftStep}`] = cellValue;
+        this.cells[`${cellName.replace(reg09, '')}${lastRow - i + shiftStep}`] = cellValue;
         delete this.cells[cellName];
       });
     }
