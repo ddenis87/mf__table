@@ -91,7 +91,7 @@ function getRangeOfCellArea(cells) {
 }
 
 function getRangeLength(range) {
-  return range[1] - range[0];
+  return range[1] - range[0] + 1;
 }
 
 class TableDocument {
@@ -441,21 +441,27 @@ class TableDocument {
     } = area;
     const rangeCellArea = getRangeOfCellArea(areaCells);
     const areaNamedAreaFrom = `${getColumnNameForNumber(numberColumn)}${numberRow}`;
-    const areaNamedAreaTo = `${getColumnNameForNumber(numberColumn + getRangeLength(rangeCellArea[1]))}${numberRow + getRangeLength(rangeCellArea[0])}`;
+    const areaNamedAreaTo = `${getColumnNameForNumber(numberColumn + (getRangeLength(rangeCellArea[1]) - 1))}${numberRow + (getRangeLength(rangeCellArea[0]) - 1)}`;
     if (areaNamedArea[0]) areaNamedArea[0].range = `${areaNamedAreaFrom}:${areaNamedAreaTo}`;
 
     const shiftInsert = {
       horizontal: () => {
+        console.log('shift columns', getRangeLength(rangeCellArea[1]), rangeCellArea[1]);
         this.shiftColumns({
-          shiftStart: numberRow,
+          shiftStart: numberColumn,
           shiftStep: getRangeLength(rangeCellArea[1]),
         });
       },
       vertical: () => {
+        console.log('shift rows', getRangeLength(rangeCellArea[0]), rangeCellArea[0]);
         this.shiftRows({
           shiftStart: numberRow,
           shiftStep: getRangeLength(rangeCellArea[0]),
         });
+        // this.shiftVertical({
+        //   shiftStart: numberRow,
+        //   shiftStep: getRangeLength(rangeCellArea[0]),
+        // });
       },
       null: () => {},
     };
@@ -530,6 +536,14 @@ class TableDocument {
     this.cells = { ...this.cells, [cellName]: cellValues };
   }
 
+  // shiftVertical({ shiftStart, shiftStep = 1 }) {
+  //   const rangeShiftArea = `a${shiftStart}:${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
+  //   // const shiftStartArea = `a${shiftStep}`;
+  //   const shiftArea = this.getAreaForRange(rangeShiftArea);
+  //   this.insertArea(1, shiftStart + shiftStep, shiftArea);
+  //   // console.log(rangeShiftArea);
+  // }
+
   shiftRows({ shiftStart, shiftStep = 1 }) {
     const cells = {};
     const lastRow = this.getLastRow();
@@ -570,7 +584,10 @@ class TableDocument {
     const columns = {};
     const cells = {};
     const styles = [];
-    const namedAreas = [];
+    const namedAreas = [{
+      name: 'insert',
+      range,
+    }];
     const cellsInRange = this.getCellsInRange(range);
     const rangeCellArea = getRangeOfCellArea(cellsInRange);
 
