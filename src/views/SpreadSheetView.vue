@@ -48,7 +48,10 @@
                     @input="isGridOff = !isGridOff"></v-checkbox>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="insertRow">Shift row</v-btn>
+        <v-btn small dark color="blue darken-3" @click="insertRow">Shift row, step 2</v-btn>
+      </div>
+      <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" @click="insertColumn">Shift column, step 1</v-btn>
       </div>
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
@@ -162,7 +165,12 @@ export default {
       this.clearEditCell();
     },
     insertRow() {
-      this.tableDocument.shiftRows({ shiftStart: 6, shiftBefore: false, shiftStep: 1 });
+      this.tableDocument.shiftRows({ shiftStart: 2, shiftBefore: false, shiftStep: 2 });
+      console.log(this.tableDocument);
+    },
+    insertColumn() {
+      this.tableDocument.shiftColumns({ shiftStart: 4, shiftBefore: false, shiftStep: 1 });
+      console.log(this.tableDocument);
     },
 
     createNewDocument() {

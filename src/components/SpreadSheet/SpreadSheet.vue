@@ -111,7 +111,7 @@ export default {
       return this.prepareColumns.filter((column) => this.setOpenGroupColumns.includes(column.parent) || !column.parent);
     },
     prepareColumns() {
-      // console.log('prepare columns');
+      console.log('prepare columns');
       const prepareColumns = [];
       const columnsKeys = Object.keys(this.columns);
       for (let i = 1; i < this.columnCount + 1; i += 1) {
@@ -142,7 +142,7 @@ export default {
         || !row.parent) && !row.fixed));
     },
     prepareRows() {
-      // console.log('prepare rows');
+      console.log('prepare rows');
       const prepareRows = [];
       const rowsKeys = Object.keys(this.rows);
       for (let i = 1; i < this.rowCount + 1; i += 1) {
@@ -174,7 +174,7 @@ export default {
       return this.prepareCells;
     },
     prepareCells() {
-      // console.log('prepare cells');
+      console.log('prepare cells');
       const prepareCells = {};
       Object.entries(this.cells).forEach((item) => {
         const [cellName, cellValue] = item;
