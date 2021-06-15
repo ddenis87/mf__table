@@ -431,7 +431,10 @@ class TableDocument {
   }
 
   insertArea(numberColumn, numberRow, area, shift = null) {
-    console.log(area);
+    // console.log(area);
+    const rows = {};
+    const columns = {};
+    const cells = {};
     const {
       rows: areaRow,
       columns: areaColumn,
@@ -446,22 +449,16 @@ class TableDocument {
 
     const shiftInsert = {
       horizontal: () => {
-        console.log('shift columns', getRangeLength(rangeCellArea[1]), rangeCellArea[1]);
-        this.shiftColumns({
+        this.shiftHorizontal({
           shiftStart: numberColumn,
           shiftStep: getRangeLength(rangeCellArea[1]),
         });
       },
       vertical: () => {
-        console.log('shift rows', getRangeLength(rangeCellArea[0]), rangeCellArea[0]);
-        this.shiftRows({
+        this.shiftVertical({
           shiftStart: numberRow,
           shiftStep: getRangeLength(rangeCellArea[0]),
         });
-        // this.shiftVertical({
-        //   shiftStart: numberRow,
-        //   shiftStep: getRangeLength(rangeCellArea[0]),
-        // });
       },
       null: () => {},
     };
@@ -473,9 +470,9 @@ class TableDocument {
       const { cellColumn: cellColumnCurrent, cellRow: cellRowCurrent } = parseCellName(cellNameCurrent);
       const { cellColumn: cellColumnShift, cellRow: cellRowShift } = parseCellName(cellNameShift);
 
-      this.cells[cellNameShift] = areaCells[cellNameCurrent];
-      this.columns[cellColumnShift] = areaColumn[cellColumnCurrent];
-      this.rows[cellRowShift] = areaRow[cellRowCurrent];
+      rows[cellRowShift] = areaRow[cellRowCurrent];
+      columns[cellColumnShift] = areaColumn[cellColumnCurrent];
+      cells[cellNameShift] = areaCells[cellNameCurrent];
     });
 
     areaStyles.forEach((itemAreaStyle) => {
@@ -483,6 +480,9 @@ class TableDocument {
       if (!style) this.styles.push(itemAreaStyle);
     });
 
+    this.rows = { ...this.rows, ...rows };
+    this.columns = { ...this.columns, ...columns };
+    this.cells = { ...this.cells, ...cells };
     this.namedAreas = [...this.namedAreas, ...areaNamedArea];
     this.rowCount = this.getLastRow();
     this.columnCount = this.getLastColumn();
@@ -536,48 +536,52 @@ class TableDocument {
     this.cells = { ...this.cells, [cellName]: cellValues };
   }
 
-  // shiftVertical({ shiftStart, shiftStep = 1 }) {
-  //   const rangeShiftArea = `a${shiftStart}:${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
-  //   // const shiftStartArea = `a${shiftStep}`;
-  //   const shiftArea = this.getAreaForRange(rangeShiftArea);
-  //   this.insertArea(1, shiftStart + shiftStep, shiftArea);
-  //   // console.log(rangeShiftArea);
+  shiftVertical({ shiftStart, shiftStep = 1 }) {
+    const rangeShiftArea = `a${shiftStart}:${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
+    const shiftArea = this.getAreaForRange(rangeShiftArea);
+    this.insertArea(1, shiftStart + shiftStep, shiftArea);
+  }
+
+  // shiftRows({ shiftStart, shiftStep = 1 }) {
+  //   const cells = {};
+  //   const lastRow = this.getLastRow();
+  //   for (let i = 0; i < lastRow - (shiftStart - 1); i += 1) {
+  //     const newRowName = lastRow - i + shiftStep;
+  //     this.rows[newRowName] = this.rows[lastRow - i];
+  //     Object.entries(this.getCellsInRow(lastRow - i)).forEach((cell) => {
+  //       const [cellName, cellValue] = cell;
+  //       cells[`${cellName.replace(REG_DIGITS, '')}${newRowName}`] = cellValue;
+  //       delete this.cells[cellName];
+  //     });
+  //   }
+  //   this.cells = { ...this.cells, ...cells };
+  //   this.rows[shiftStart + shiftStep] = this.rows[shiftStart];
+  //   this.rowCount = Object.keys(this.rows).length;
   // }
 
-  shiftRows({ shiftStart, shiftStep = 1 }) {
-    const cells = {};
-    const lastRow = this.getLastRow();
-    for (let i = 0; i < lastRow - (shiftStart - 1); i += 1) {
-      const newRowName = lastRow - i + shiftStep;
-      this.rows[newRowName] = this.rows[lastRow - i];
-      Object.entries(this.getCellsInRow(lastRow - i)).forEach((cell) => {
-        const [cellName, cellValue] = cell;
-        cells[`${cellName.replace(REG_DIGITS, '')}${newRowName}`] = cellValue;
-        delete this.cells[cellName];
-      });
-    }
-    this.cells = { ...this.cells, ...cells };
-    this.rows[shiftStart + shiftStep] = this.rows[shiftStart];
-    this.rowCount = Object.keys(this.rows).length;
+  shiftHorizontal({ shiftStart, shiftStep = 1 }) {
+    const rangeShiftArea = `${getColumnNameForNumber(shiftStart)}1:${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
+    const shiftArea = this.getAreaForRange(rangeShiftArea);
+    this.insertArea(shiftStart + shiftStep, 1, shiftArea);
   }
 
-  shiftColumns({ shiftStart, shiftStep = 1 }) {
-    const cells = {};
-    const lastColumn = this.getLastColumn();
-    for (let i = 0; i < lastColumn - (shiftStart - 1); i += 1) {
-      const newColumnName = getColumnNameForNumber(lastColumn - i + shiftStep);
-      this.columns[newColumnName] = this.columns[getColumnNameForNumber(lastColumn - i)];
-      Object.entries(this.getCellsInColumn(lastColumn - i)).forEach((cell) => {
-        const [cellName, cellValue] = cell;
-        const { cellRow } = parseCellName(cellName);
-        cells[`${newColumnName}${cellRow}`] = cellValue;
-        delete this.cells[cellName];
-      });
-    }
-    this.cells = { ...this.cells, ...cells };
-    this.columns[getColumnNameForNumber(shiftStart + shiftStep)] = this.columns[getColumnNameForNumber(shiftStart)];
-    this.columnCount = Object.keys(this.columns).length;
-  }
+  // shiftColumns({ shiftStart, shiftStep = 1 }) {
+  //   const cells = {};
+  //   const lastColumn = this.getLastColumn();
+  //   for (let i = 0; i < lastColumn - (shiftStart - 1); i += 1) {
+  //     const newColumnName = getColumnNameForNumber(lastColumn - i + shiftStep);
+  //     this.columns[newColumnName] = this.columns[getColumnNameForNumber(lastColumn - i)];
+  //     Object.entries(this.getCellsInColumn(lastColumn - i)).forEach((cell) => {
+  //       const [cellName, cellValue] = cell;
+  //       const { cellRow } = parseCellName(cellName);
+  //       cells[`${newColumnName}${cellRow}`] = cellValue;
+  //       delete this.cells[cellName];
+  //     });
+  //   }
+  //   this.cells = { ...this.cells, ...cells };
+  //   this.columns[getColumnNameForNumber(shiftStart + shiftStep)] = this.columns[getColumnNameForNumber(shiftStart)];
+  //   this.columnCount = Object.keys(this.columns).length;
+  // }
 
   getAreaForRange(range) {
     const rows = {};
