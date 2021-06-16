@@ -51,7 +51,17 @@
         <v-btn small dark color="blue darken-3" @click="insertRow">Shift row, step 1</v-btn>
       </div>
       <div class="item item_btn">
+        <v-btn small dark color="red darken-3" @click="deleteRow">
+          <v-icon>mdi-delete-empty-outline</v-icon>
+        </v-btn>
+      </div>
+      <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="insertColumn">Shift column, step 1</v-btn>
+      </div>
+      <div class="item item_btn">
+        <v-btn small dark color="red darken-3" @click="deleteColumn">
+          <v-icon>mdi-delete-empty-outline</v-icon>
+        </v-btn>
       </div>
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
@@ -173,6 +183,14 @@ export default {
     insertColumn() {
       this.tableDocument.insertArea(4, 1, this.tableDocument.getAreaForRange('c1:c5'), 'horizontal');
       // this.tableDocument.shiftColumns({ shiftStart: 4, shiftBefore: false, shiftStep: 1 });
+      console.log(this.tableDocument);
+    },
+    deleteRow() {
+      this.tableDocument.deleteRows('a2:d2');
+      console.log(this.tableDocument);
+    },
+    deleteColumn() {
+      this.tableDocument.deleteColumns('c1:c4');
       console.log(this.tableDocument);
     },
 
