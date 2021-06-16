@@ -81,6 +81,7 @@
       <spread-sheet ref="SpreadSheet"
                     v-bind="tableDocument"
                     :is-grid-off="!isGridOff"
+                    @click:cell="evtClickCell"
                     @dblclick:cell="evtEditCell"
                     @keydown:cell="evtEditCell"
                     @scroll:body="scrollBody"></spread-sheet>
@@ -133,6 +134,13 @@ export default {
       const JSONFormat = true;
       apiSpreadSheet.dowloadJSONFile(this.tableDocument.getDocumentData(JSONFormat), JSONFormat);
     },
+    evtClickCell(evt) {
+      const cellName = evt.target.getAttribute('data-name');
+      const selectedCell = this.tableDocument.getCellByName(cellName);
+      console.log(selectedCell);
+      if (!Object.keys(selectedCell).includes('script')) return;
+      eval(selectedCell.script); // eslint-disable-line no-eval
+    },
     evtEditCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
       if (!this.tableDocument.checkEditAccess(cellName)) return;
@@ -181,7 +189,7 @@ export default {
       console.log(this.tableDocument);
     },
     insertColumn() {
-      this.tableDocument.insertArea(4, 1, this.tableDocument.getAreaForRange('c1:c5'), 'horizontal');
+      this.tableDocument.insertArea(2, 1, this.tableDocument.getAreaForRange('b1:b4'), 'horizontal');
       // this.tableDocument.shiftColumns({ shiftStart: 4, shiftBefore: false, shiftStep: 1 });
       console.log(this.tableDocument);
     },
@@ -190,7 +198,7 @@ export default {
       console.log(this.tableDocument);
     },
     deleteColumn() {
-      this.tableDocument.deleteColumns('c1:c4');
+      this.tableDocument.deleteColumns('b1:b4');
       console.log(this.tableDocument);
     },
 

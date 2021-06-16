@@ -195,67 +195,83 @@ class TableDocument {
   }
 
   deleteRows(range) {
-    const cellsInRangeDelete = this.getCellsInRange(range);
-    const cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
-    const cells = Object.entries(this.cells).filter((cell) => {
+    let cellsInRangeDelete = this.getCellsInRange(range);
+    let cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
+    let cells = Object.entries(this.cells).filter((cell) => {
       const [cellName] = cell;
       return (!cellsInRangeDeleteKey.includes(cellName));
     });
-    const rangeAreaDelete = getRangeOfCellArea(cellsInRangeDelete);
     this.cells = Object.fromEntries(cells);
-    const [rangeDeleteFrom] = range.split(':');
 
+    const rangeAreaDelete = getRangeOfCellArea(cellsInRangeDelete);
+    const [rangeDeleteFrom] = range.split(':');
     const { cellColumn: rangeDeleteFromColumn, cellRow: rangeDeleteFromRow } = parseCellName(rangeDeleteFrom);
-    // const { rangeDeleteToColumn: cellColumn, rangeDeleteToRow: cellRow } = parseCellName(rangeDeleteTo);
     const areaDeleteHeigth = getRangeLength(rangeAreaDelete[0]);
     const rangeAreaShiftFrom = `${rangeDeleteFromColumn}${rangeDeleteFromRow + areaDeleteHeigth}`;
     const rangeAreaShiftTo = `${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
     const rangeAreaShift = `${rangeAreaShiftFrom}:${rangeAreaShiftTo}`;
     const areaShift = this.getAreaForRange(rangeAreaShift);
+    console.log(rangeAreaShift);
+    cellsInRangeDelete = this.getCellsInRange(rangeAreaShift);
+    cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
+    cells = Object.entries(this.cells).filter((cell) => {
+      const [cellName] = cell;
+      return (!cellsInRangeDeleteKey.includes(cellName));
+    });
+    this.cells = Object.fromEntries(cells);
     this.insertArea(getColumnNumberForName(rangeDeleteFromColumn), rangeDeleteFromRow, areaShift);
 
-    console.log(areaDeleteHeigth);
+    // console.log(areaDeleteHeigth);
     const lastRow = this.getLastRow();
     for (let i = 0; i < areaDeleteHeigth; i += 1) {
       const deleteRow = lastRow - i;
       delete this.rows[deleteRow];
-      this.cells = Object.fromEntries(Object.entries(this.cells).filter((cell) => {
-        const [cellName] = cell;
-        const { cellRow } = parseCellName(cellName);
-        return (cellRow !== deleteRow);
-      }));
+    //   this.cells = Object.fromEntries(Object.entries(this.cells).filter((cell) => {
+    //     const [cellName] = cell;
+    //     const { cellRow } = parseCellName(cellName);
+    //     return (cellRow !== deleteRow);
+    //   }));
     }
     this.rowCount = this.getLastRow();
   }
 
   deleteColumns(range) {
-    const cellsInRangeDelete = this.getCellsInRange(range);
-    const cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
-    const cells = Object.entries(this.cells).filter((cell) => {
+    let cellsInRangeDelete = this.getCellsInRange(range);
+    let cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
+    let cells = Object.entries(this.cells).filter((cell) => {
       const [cellName] = cell;
       return (!cellsInRangeDeleteKey.includes(cellName));
     });
-    const rangeAreaDelete = getRangeOfCellArea(cellsInRangeDelete);
     this.cells = Object.fromEntries(cells);
-    const [rangeDeleteFrom] = range.split(':');
 
+    const rangeAreaDelete = getRangeOfCellArea(cellsInRangeDelete);
+    const [rangeDeleteFrom] = range.split(':');
     const { cellColumn: rangeDeleteFromColumn, cellRow: rangeDeleteFromRow } = parseCellName(rangeDeleteFrom);
     const areaDeleteWidth = getRangeLength(rangeAreaDelete[1]);
     const rangeAreaShiftFrom = `${getColumnNameForNumber(getColumnNumberForName(rangeDeleteFromColumn) + areaDeleteWidth)}${rangeDeleteFromRow}`;
     const rangeAreaShiftTo = `${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
     const rangeAreaShift = `${rangeAreaShiftFrom}:${rangeAreaShiftTo}`;
     const areaShift = this.getAreaForRange(rangeAreaShift);
+    console.log(areaShift);
+    cellsInRangeDelete = this.getCellsInRange(rangeAreaShift);
+    console.log(cellsInRangeDelete);
+    cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
+    cells = Object.entries(this.cells).filter((cell) => {
+      const [cellName] = cell;
+      return (!cellsInRangeDeleteKey.includes(cellName));
+    });
+    this.cells = Object.fromEntries(cells);
     this.insertArea(getColumnNumberForName(rangeDeleteFromColumn), rangeDeleteFromRow, areaShift);
 
     const lastColumn = this.getLastColumn();
     for (let i = 0; i < areaDeleteWidth; i += 1) {
       const deleteColumn = lastColumn - i;
       delete this.columns[getColumnNameForNumber(deleteColumn)];
-      this.cells = Object.fromEntries(Object.entries(this.cells).filter((cell) => {
-        const [cellName] = cell;
-        const { cellColumn } = parseCellName(cellName);
-        return (cellColumn !== getColumnNameForNumber(deleteColumn));
-      }));
+    //   this.cells = Object.fromEntries(Object.entries(this.cells).filter((cell) => {
+    //     const [cellName] = cell;
+    //     const { cellColumn } = parseCellName(cellName);
+    //     return (cellColumn !== getColumnNameForNumber(deleteColumn));
+    //   }));
     }
     this.columnCount = this.getLastColumn();
   }
@@ -605,6 +621,15 @@ class TableDocument {
   shiftVertical({ shiftStart, shiftStep = 1 }) {
     const rangeShiftArea = `a${shiftStart}:${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
     const shiftArea = this.getAreaForRange(rangeShiftArea);
+
+    const cellsInRangeDelete = this.getCellsInRange(rangeShiftArea);
+    const cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
+    const cells = Object.entries(this.cells).filter((cell) => {
+      const [cellName] = cell;
+      return (!cellsInRangeDeleteKey.includes(cellName));
+    });
+    this.cells = Object.fromEntries(cells);
+
     this.insertArea(1, shiftStart + shiftStep, shiftArea);
   }
 

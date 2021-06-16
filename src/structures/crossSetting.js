@@ -27,6 +27,10 @@ const JSONSetting = {
       indicator: 'indicator',
     },
   },
+  actions: {
+    templateSectionName: 'columnAction|stringAction',
+    methodName: 'join',
+  },
 };
 
 export default JSONSetting;
