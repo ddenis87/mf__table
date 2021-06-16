@@ -29,7 +29,7 @@ const JSONSetting = {
   },
   actions: {
     templateSectionName: 'columnAction|string',
-    methodName: 'put',
+    methodName: 'join',
   },
 };
 

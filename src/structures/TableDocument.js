@@ -105,6 +105,7 @@ class TableDocument {
     columnCount = COLUMNS_COUNT,
     cells = {},
     styles = [],
+    scripts = {},
     namedAreas = [],
     cellWidth = CELL_WIDTH,
     cellHeight = CELL_HEIGHT,
@@ -122,6 +123,7 @@ class TableDocument {
         columnCount: this.columnCount = COLUMNS_COUNT,
         cells: this.cells = {},
         styles: this.styles = [],
+        scripts: this.scripts = {},
         namedAreas: this.namedAreas = [],
         cellWidth: this.cellWidth = CELL_WIDTH,
         cellHeight: this.cellHeight = CELL_HEIGHT,
@@ -137,9 +139,28 @@ class TableDocument {
     this.columnCount = columnCount;
     this.cells = cells;
     this.styles = styles;
+    this.scripts = scripts;
     this.namedAreas = namedAreas;
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
+  }
+
+  action(cellName) {
+    const actionName = this.cells[cellName].action;
+    const { script } = this.scripts[actionName];
+    const actionFunction = eval(script); // eslint-disable-line no-eval
+    console.log(actionFunction);
+    console.log(cellName);
+    console.log(this.cells[cellName]);
+    console.log(this);
+    // expressionFunction('Fack');
+    // this.executeScript(myFun);
+  }
+
+  executeScript(stringFunction) {
+    console.log(this.rowCount);
+    // console.log(stringFunction);
+    stringFunction('fack');
   }
 
   buildDocument(data, template, settings) {
@@ -290,12 +311,13 @@ class TableDocument {
 
   getAreaCopy() {
     const {
-      rows, columns, cells, styles, namedAreas,
+      rows, columns, cells, styles, scripts, namedAreas,
     } = JSON.parse(JSON.stringify({
       rows: this.rows,
       columns: this.columns,
       cells: this.cells,
       styles: this.styles,
+      scripts: this.scripts,
       namedAreas: this.namedAreas,
     }));
     return new TableDocument({
@@ -306,6 +328,7 @@ class TableDocument {
       columnCount: this.columnCount,
       cells,
       styles,
+      scripts,
       namedAreas,
     });
   }
@@ -452,6 +475,7 @@ class TableDocument {
     const columns = {};
     const cells = {};
     const styles = [];
+    const scripts = {};
     const range = this.getNamedAreaRange(areaName);
     const namedAreas = [{
       name: areaName,
@@ -462,7 +486,7 @@ class TableDocument {
     const rangeCellArea = getRangeOfCellArea(cellsInRange);
 
     cellsInRange.forEach((cell) => {
-      const [cellNameCurrent] = cell;
+      const [cellNameCurrent, cellValueCurrent] = cell;
       const cellNameShift = getCellNameShift(cellNameCurrent, rangeCellArea);
       const { cellColumn: cellColumnCurrent, cellRow: cellRowCurrent } = parseCellName(cellNameCurrent);
       const { cellColumn: cellColumnShift, cellRow: cellRowShift } = parseCellName(cellNameShift);
@@ -473,7 +497,18 @@ class TableDocument {
 
       const cellStyles = this.getCellStyles(cellNameCurrent);
       if (cellStyles) styles.push(cellStyles);
+
+      if (Object.keys(cellValueCurrent).includes('action')) {
+        const actionName = cellValueCurrent.action;
+        const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
+        // console.log(script);
+        if (script) {
+          scripts[actionName] = this.scripts[actionName];
+        }
+      }
+      // console.log(cellValueCurrent);
     });
+    // console.log(scripts);
     return new TableDocument({
       methodName: (getRangeType(range) === 'row') ? 'put' : 'join',
       rows,
@@ -482,6 +517,7 @@ class TableDocument {
       columnCount: Object.keys(columns).length,
       cells,
       styles,
+      scripts,
       namedAreas,
     });
   }
@@ -513,7 +549,7 @@ class TableDocument {
   }
 
   insertArea(numberColumn, numberRow, area, shift = null) {
-    // console.log(numberColumn);
+    // console.log(area);
     const rows = {};
     const columns = {};
     const cells = {};
@@ -522,6 +558,7 @@ class TableDocument {
       columns: areaColumn,
       cells: areaCells,
       styles: areaStyles,
+      scripts: areaScripts,
       namedAreas: areaNamedArea,
     } = area;
     const rangeCellArea = getRangeOfCellArea(areaCells);
@@ -565,6 +602,7 @@ class TableDocument {
     this.rows = { ...this.rows, ...rows };
     this.columns = { ...this.columns, ...columns };
     this.cells = { ...this.cells, ...cells };
+    this.scripts = { ...this.scripts, ...areaScripts };
     this.namedAreas = [...this.namedAreas, ...areaNamedArea];
     this.rowCount = this.getLastRow();
     this.columnCount = this.getLastColumn();

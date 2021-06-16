@@ -5,7 +5,7 @@
     "a1":{"value":"Наименование","parameter":"headerName","style":"a1"},
     "a2":{"style":"a2","value":"\u003cНаименованияПараметра\u003e","parameter":"stringTitleIndicator"},
     "b1":{"style":"b1","value":"\u003cПараметрГод\u003e","parameter":"columnYear"},
-    "c3":{"style":"c3","value":"<a href='#'>Нажми меня</a>","script":"alert('Knock knock, I`m trojan horse')"}
+    "c2":{"style":"c2","value":"<a href='#'>Нажми меня</a>","script":"alert('Knock knock, I`m trojan horse')"}
   },
   "columns":{
     "a":{"width":222},
@@ -21,15 +21,13 @@
   ],
   "rows":{
     "1":{"height":51},
-    "2":{"height":21},
-    "3":{"height":21}
+    "2":{"height":21}
   },
   "namedAreas":[
     {"name":"header","range":"1:1"},
     {"name":"string","range":"2:2"},
     {"name":"column","range":"B:B"},
     {"name":"columnAction","range":"C:C"},
-    {"name":"stringAction","range":"3:3"},
     {"name":"title","range":"A:A"}
   ]
 }

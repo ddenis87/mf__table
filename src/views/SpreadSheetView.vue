@@ -138,8 +138,9 @@ export default {
       const cellName = evt.target.getAttribute('data-name');
       const selectedCell = this.tableDocument.getCellByName(cellName);
       console.log(selectedCell);
-      if (!Object.keys(selectedCell).includes('script')) return;
-      eval(selectedCell.script); // eslint-disable-line no-eval
+      if (!Object.keys(selectedCell).includes('action')) return;
+      this.tableDocument.action(cellName);
+      // eval(selectedCell.script); // eslint-disable-line no-eval
     },
     evtEditCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
