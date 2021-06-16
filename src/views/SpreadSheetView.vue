@@ -51,7 +51,17 @@
         <v-btn small dark color="blue darken-3" @click="insertRow">Shift row, step 1</v-btn>
       </div>
       <div class="item item_btn">
+        <v-btn small dark color="red darken-3" @click="deleteRow">
+          <v-icon>mdi-delete-empty-outline</v-icon>
+        </v-btn>
+      </div>
+      <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="insertColumn">Shift column, step 1</v-btn>
+      </div>
+      <div class="item item_btn">
+        <v-btn small dark color="red darken-3" @click="deleteColumn">
+          <v-icon>mdi-delete-empty-outline</v-icon>
+        </v-btn>
       </div>
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
@@ -71,6 +81,7 @@
       <spread-sheet ref="SpreadSheet"
                     v-bind="tableDocument"
                     :is-grid-off="!isGridOff"
+                    @click:cell="evtClickCell"
                     @dblclick:cell="evtEditCell"
                     @keydown:cell="evtEditCell"
                     @scroll:body="scrollBody"></spread-sheet>
@@ -86,7 +97,7 @@ import DialogModal from '@/components/Dialogs/DialogModal.vue';
 import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocument from '@/structures/TableDocument';
 
-import setting from '../structures/crossSetting';
+import setting from '@/assets/json/crossSetting';
 
 export default {
   name: 'SpreadSheetView',
@@ -122,6 +133,13 @@ export default {
     saveDocumentData() {
       const JSONFormat = true;
       apiSpreadSheet.dowloadJSONFile(this.tableDocument.getDocumentData(JSONFormat), JSONFormat);
+    },
+    evtClickCell(evt) {
+      const cellName = evt.target.getAttribute('data-name');
+      const selectedCell = this.tableDocument.getCellByName(cellName);
+      console.log(selectedCell);
+      if (!Object.keys(selectedCell).includes('script')) return;
+      eval(selectedCell.script); // eslint-disable-line no-eval
     },
     evtEditCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
@@ -171,8 +189,16 @@ export default {
       console.log(this.tableDocument);
     },
     insertColumn() {
-      this.tableDocument.insertArea(4, 1, this.tableDocument.getAreaForRange('c1:c5'), 'horizontal');
+      this.tableDocument.insertArea(2, 1, this.tableDocument.getAreaForRange('b1:b4'), 'horizontal');
       // this.tableDocument.shiftColumns({ shiftStart: 4, shiftBefore: false, shiftStep: 1 });
+      console.log(this.tableDocument);
+    },
+    deleteRow() {
+      this.tableDocument.deleteRows('a2:d2');
+      console.log(this.tableDocument);
+    },
+    deleteColumn() {
+      this.tableDocument.deleteColumns('b1:b4');
       console.log(this.tableDocument);
     },
 

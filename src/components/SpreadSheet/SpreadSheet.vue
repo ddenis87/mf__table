@@ -250,7 +250,10 @@ export default {
     this.updateDocumentStyles(false);
   },
   methods: {
-    evtClickCell() {},
+    evtClickCell(evt) {
+      console.log(evt);
+      this.$emit('click:cell', evt);
+    },
     evtDblclickCell(evt) {
       this.$emit('dblclick:cell', evt);
     },
