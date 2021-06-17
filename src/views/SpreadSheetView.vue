@@ -47,7 +47,7 @@
                     v-model="isGridOff"
                     @input="isGridOff = !isGridOff"></v-checkbox>
       </div>
-      <div class="item item_btn">
+      <!-- <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="insertRow">Shift row, step 1</v-btn>
       </div>
       <div class="item item_btn">
@@ -62,7 +62,7 @@
         <v-btn small dark color="red darken-3" @click="deleteColumn">
           <v-icon>mdi-delete-empty-outline</v-icon>
         </v-btn>
-      </div>
+      </div> -->
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
         <v-card>

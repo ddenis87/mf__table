@@ -104,7 +104,7 @@ export default {
   .column {
     position: relative;
     display: inline-flex;
-    align-items: center;
+    align-items: flex-end;
     &-body {
       width: 100%;
       box-sizing: border-box;
@@ -122,6 +122,12 @@ export default {
         width: 100%;
         padding: 0px 2px;
         overflow: hidden;
+        .active-element {
+          display: none;
+        }
+      }
+      .active-element {
+        display: none;
       }
       &::after {
         content: '';

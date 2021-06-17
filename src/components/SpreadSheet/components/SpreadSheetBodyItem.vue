@@ -13,10 +13,10 @@
           }"
           :style="getStyleGroup(level)">
           <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
-                          :data-row-index="index"
-                          :data-row-parent="source.value"
-                          :data-row-count="source.rowGroup - 1"
-                          :data-row-status="source.openGroup">
+                                  :data-row-index="index"
+                                  :data-row-parent="source.value"
+                                  :data-row-count="source.rowGroup - 1"
+                                  :data-row-status="source.openGroup">
             {{ (setOpenGroupRows.includes(source.value)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
           </spread-sheet-btn-group>
       </div>

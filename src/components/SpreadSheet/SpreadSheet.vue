@@ -239,6 +239,9 @@ export default {
     },
   },
   watch: {
+    cells() {
+      this.setExcludedCells = {};
+    },
     styles() {
       this.updateDocumentStyles();
     },
@@ -371,7 +374,7 @@ export default {
       const prepareStyles = [];
       stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
       if (this.isPrintMode) {
-        stylesPath = ' .spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
+        stylesPath = '.spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
       }
       const elementDOMStyle = document.createElement('style');
       let stylesString = '';
@@ -394,7 +397,7 @@ export default {
         });
         stylesString += `${stylesPath} .${element.name} ${this.transformObjectToStringStyle(stylesObject)}`;
       });
-      elementDOMStyle.innerText = `${stylesString}`;
+      elementDOMStyle.innerText = `${stylesString} ${(this.isPrintMode) ? '.no-print {display: none !important}}' : ''}`;
       document.querySelector('head').append(elementDOMStyle);
     },
 

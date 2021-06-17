@@ -37,14 +37,14 @@
     "h2":{"style":"h2"},
     "h3":{"style":"h3"},
     "h4":{"style":"h4"},
-    "h5":{"value":"<a href='#'><svg width='20' height='21'><path stroke='null' fill='#ff0000' id='svg_1' d='m17,9.54625l-2.54625,-2.54625l-4.45375,4.45375l-4.45375,-4.45375l-2.54625,2.54625l4.45375,4.45375l-4.45375,4.45375l2.54625,2.54625l4.45375,-4.45375l4.45375,4.45375l2.54625,-2.54625l-4.45375,-4.45375l4.45375,-4.45375z'/></svg>&nbsp;Удалить</a>","style":"h5","action":"deleteRow"},
+    "h5":{"value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden'><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>","style":"h5","action":"deleteRowSection1","disabled":true, "noSelect":true},
     "d1":{"style":"d1"},
     "d2":{"style":"d2","value":"Аналитический код","rowspan":2},
-    "h6":{"value":"<a href='#'><svg width='20' height='21'><path stroke='null' fill='#ff0000' id='svg_1' d='m17,9.54625l-2.54625,-2.54625l-4.45375,4.45375l-4.45375,-4.45375l-2.54625,2.54625l4.45375,4.45375l-4.45375,4.45375l2.54625,2.54625l4.45375,-4.45375l4.45375,4.45375l2.54625,-2.54625l-4.45375,-4.45375l4.45375,-4.45375z'/></svg>&nbsp;Удалить</a>","style":"h6","action":"deleteRow"},
-    "h7":{"value":"<a href='#'><svg width='20' height='21'><path stroke='null' fill='#ff0000' id='svg_1' d='m17,9.54625l-2.54625,-2.54625l-4.45375,4.45375l-4.45375,-4.45375l-2.54625,2.54625l4.45375,4.45375l-4.45375,4.45375l2.54625,2.54625l4.45375,-4.45375l4.45375,4.45375l2.54625,-2.54625l-4.45375,-4.45375l4.45375,-4.45375z'/></svg>&nbsp;Удалить</a>","style":"h7","action":"deleteRow"},
+    "h6":{"value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>","style":"h6","action":"deleteRowSection2","disabled":true, "noSelect":true},
+    "h7":{"value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>","style":"h7","action":"deleteRowSection3","disabled":true, "noSelect":true},
     "d3":{"style":"d3"},
     "d4":{"value":"2","style":"d4"},
-    "h8":{"style":"h8"},
+    "h8":{"value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 90px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path fill='#5fbf00' stroke='null' id='svg_1' d='m16.6667,14l-5.00003,0l0,5.00003l-3.33335,0l0,-5.00003l-5.00003,0l0,-3.33335l5.00003,0l0,-5.00003l3.33335,0l0,5.00003l5.00003,0l0,3.33335z'/></svg></div><div>Добавить</div></div>","style":"h8","action":"addRowSection3","disabled":false, "noSelect":true},
     "d5":{"style":"d5","parameter":"st1AnalyticalCode"},
     "d6":{"style":"d6","parameter":"st2AnalyticalCode"},
     "d7":{"style":"d7","parameter":"st3AnalyticalCode"},
@@ -74,7 +74,7 @@
     "e":{"width":84},
     "f":{"width":83},
     "g":{"width":84},
-    "h":{"width":84}
+    "h":{"width":92}
   },
   "styles":[
     {"list":{"whiteSpace":"unset","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"flex-start","textAlign":"left","wordWrap":"break-word","fontSize":"11pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start","fontWeight":"bold"},"name":"a1"},
@@ -86,7 +86,7 @@
     {"name":"a6","list":{"fontSize":"10pt","textAlign":"left","justifyContent":"flex-start"}},{"name":"b6","list":{"whiteSpace":"unset","alignItems":"center","textAlign":"left","wordWrap":"break-word","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold"}},{"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"c6"},{"name":"d6","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold","justifyContent":"center"}},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"},"name":"e6"},{"name":"f6","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"},"name":"g6"},
     {"name":"h6","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start","cursor":"pointer"}},{"name":"a7","list":{"fontSize":"10pt"}},{"name":"b7","list":{"fontSize":"10pt","textAlign":"left","justifyContent":"flex-start"}},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","whiteSpace":"unset","alignItems":"center","textAlign":"left","borderRight":"1px solid rgba(0%, 0%, 0%)","wordWrap":"break-word","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start"},"name":"c7"},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","fontWeight":"bold"},"name":"d7"},{"name":"e7","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},{"name":"f7","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},{"name":"g7","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},
     {"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start","cursor":"pointer"},"name":"h7"},{"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"},"name":"a8"},{"name":"b8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"}},{"name":"c8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"}},{"name":"d8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"}},{"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"},"name":"e8"},{"name":"f8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"}},{"name":"g8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"}},
-    {"list":{"fontSize":"10pt","borderTop":"2px solid rgba(0%, 0%, 0%)"},"name":"h8"}
+    {"list":{"fontSize":"10pt","borderTop":"2px solid rgba(0%, 0%, 0%)","textAlign":"right","cursor":"pointer"},"name":"h8"}
   ],
   "rows":{
     "1":{"height":77},
@@ -96,7 +96,7 @@
     "5":{"height":47},
     "6":{"height":46},
     "7":{"height":54},
-    "8":{"height":21}
+    "8":{"height":32}
   },
   "namedAreas":[
     {"name":"string2","range":"6:6"},
@@ -106,9 +106,21 @@
     {"name":"footerR","range":"8:8"}
   ],
   "scripts":{
-    "deleteRow": {
+    "deleteRowSection1": {
       "template": "default",
-      "script": "(cellName) => { console.log(`cell name ${cellName}`); }"
+      "script": "(cellName) => { const areaName = 'string1'; const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === areaName); const { range: sectionRange } = namedArea; const sectionHeight = getRangeLength(sectionRange); const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName); const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`; this.deleteRows(rangeDelete);}"
+    },
+    "deleteRowSection2": {
+      "template": "default",
+      "script": "(cellName) => { const areaName = 'string2'; const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === areaName); const { range: sectionRange } = namedArea; const sectionHeight = getRangeLength(sectionRange); const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName); const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`; this.deleteRows(rangeDelete);}"
+    },
+    "deleteRowSection3": {
+      "template": "default",
+      "script": "(cellName) => { const areaName = 'string3'; const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === areaName); const { range: sectionRange } = namedArea; const sectionHeight = getRangeLength(sectionRange); const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName); const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`; this.deleteRows(rangeDelete);}"
+    },
+    "addRowSection3": {
+      "template": "default",
+      "script": "(cellName) => { const areaName = 'string3'; const area = this.documentTemplate.getNamedArea(areaName); const { cellRow } = parseCellName(cellName); this.insertArea(1, cellRow, area, SHIFT_VECTOR.vertical); }"
     }
   }
 }

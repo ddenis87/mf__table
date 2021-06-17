@@ -7,6 +7,11 @@ const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 
 const REG_SYMBOLS = /[A-Z]/gi;
 const REG_DIGITS = /[0-9]/g;
 
+const SHIFT_VECTOR = {
+  vertical: 'vertical',
+  horizontal: 'horizontal',
+};
+
 function getColumnNumberForName(columnName) {
   if (columnName.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === columnName) + 1;
   const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === columnName[0]) + 1;
@@ -91,7 +96,17 @@ function getRangeOfCellArea(cells) {
 }
 
 function getRangeLength(range) {
-  return range[1] - range[0] + 1;
+  if (Array.isArray(range)) return range[1] - range[0] + 1;
+  // if (typeof range === 'string') {
+  const rangeType = getRangeType(range);
+  const [v1, v2] = range.toLowerCase().split(':');
+  const rangeLength = {
+    cell: () => 1,
+    row: () => +v2 - +v1 + 1,
+    column: () => +getColumnNumberForName(v2) - +getColumnNumberForName(v1) + 1,
+  };
+  return rangeLength[rangeType]();
+  // }
 }
 
 class TableDocument {
@@ -146,21 +161,25 @@ class TableDocument {
   }
 
   action(cellName) {
+    // this.myFun(cellName);
     const actionName = this.cells[cellName].action;
     const { script } = this.scripts[actionName];
     const actionFunction = eval(script); // eslint-disable-line no-eval
-    console.log(actionFunction);
-    console.log(cellName);
-    console.log(this.cells[cellName]);
-    console.log(this);
-    // expressionFunction('Fack');
-    // this.executeScript(myFun);
+    actionFunction(cellName);
   }
 
-  executeScript(stringFunction) {
-    console.log(this.rowCount);
-    // console.log(stringFunction);
-    stringFunction('fack');
+  myFun(cellName) {
+    const areaName = 'string3';
+    const area = this.documentTemplate.getNamedArea(areaName);
+    const { cellRow } = parseCellName(cellName);
+    this.insertArea(1, cellRow, area, 'vertical');
+
+    // const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === sectionName);
+    // const { range: sectionRange } = namedArea;
+    // const sectionHeight = getRangeLength(sectionRange);
+    // const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName);
+    // const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`;
+    // this.deleteRows(rangeDelete);
   }
 
   buildDocument(data, template, settings) {
@@ -231,28 +250,34 @@ class TableDocument {
     const rangeAreaShiftFrom = `${rangeDeleteFromColumn}${rangeDeleteFromRow + areaDeleteHeigth}`;
     const rangeAreaShiftTo = `${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
     const rangeAreaShift = `${rangeAreaShiftFrom}:${rangeAreaShiftTo}`;
+    
     const areaShift = this.getAreaForRange(rangeAreaShift);
     console.log(rangeAreaShift);
     cellsInRangeDelete = this.getCellsInRange(rangeAreaShift);
     cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
     cells = Object.entries(this.cells).filter((cell) => {
       const [cellName] = cell;
+      if (cellsInRangeDeleteKey.includes(cellName)) {
+        const { cellRow } = parseCellName(cellName);
+        delete this.rows[cellRow];
+      }
       return (!cellsInRangeDeleteKey.includes(cellName));
     });
+    delete this.rows[this.getLastRow()];
     this.cells = Object.fromEntries(cells);
     this.insertArea(getColumnNumberForName(rangeDeleteFromColumn), rangeDeleteFromRow, areaShift);
 
-    // console.log(areaDeleteHeigth);
-    const lastRow = this.getLastRow();
-    for (let i = 0; i < areaDeleteHeigth; i += 1) {
-      const deleteRow = lastRow - i;
-      delete this.rows[deleteRow];
+    console.log(this);
+    // const lastRow = this.getLastRow();
+    // for (let i = 0; i < areaDeleteHeigth; i += 1) {
+    //   const deleteRow = lastRow - i;
+    //   delete this.rows[deleteRow];
     //   this.cells = Object.fromEntries(Object.entries(this.cells).filter((cell) => {
     //     const [cellName] = cell;
     //     const { cellRow } = parseCellName(cellName);
     //     return (cellRow !== deleteRow);
     //   }));
-    }
+    // }
     this.rowCount = this.getLastRow();
   }
 
@@ -549,7 +574,7 @@ class TableDocument {
   }
 
   insertArea(numberColumn, numberRow, area, shift = null) {
-    // console.log(area);
+    console.log(area);
     const rows = {};
     const columns = {};
     const cells = {};
@@ -567,13 +592,14 @@ class TableDocument {
     const areaNamedAreaTo = `${getColumnNameForNumber(numberColumn + (getRangeLength(rangeCellArea[1]) - 1))}${numberRow + (getRangeLength(rangeCellArea[0]) - 1)}`;
     if (areaNamedArea[0]) areaNamedArea[0].range = `${areaNamedAreaFrom}:${areaNamedAreaTo}`;
     const shiftInsert = {
-      horizontal: () => {
+      [SHIFT_VECTOR.horizontal]: () => {
         this.shiftHorizontal({
           shiftStart: numberColumn,
           shiftStep: getRangeLength(rangeCellArea[1]),
         });
       },
-      vertical: () => {
+      [SHIFT_VECTOR.vertical]: () => {
+        console.log('shift');
         this.shiftVertical({
           shiftStart: numberRow,
           shiftStep: getRangeLength(rangeCellArea[0]),
@@ -642,6 +668,7 @@ class TableDocument {
   }
 
   checkEditAccess(cellName) {
+    if (Object.keys(this.cells).includes(cellName) && this.cells[cellName]?.disabled === false) return false;
     if (!Object.keys(this.cells).includes(cellName)) return true;
     if (Object.keys(this.cells[cellName]).includes('areaName')) return true;
     return true;
