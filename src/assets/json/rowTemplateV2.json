@@ -37,14 +37,38 @@
     "h2":{"style":"h2"},
     "h3":{"style":"h3"},
     "h4":{"style":"h4"},
-    "h5":{"value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden'><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>","style":"h5","action":"deleteRowSection1","disabled":true, "noSelect":true},
+    "h5":{
+      "value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden'><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>",
+      "style":"h5",
+      "action":"deleteRowSection1",
+      "disabled":true,
+      "noSelect":true
+    },
     "d1":{"style":"d1"},
     "d2":{"style":"d2","value":"Аналитический код","rowspan":2},
-    "h6":{"value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>","style":"h6","action":"deleteRowSection2","disabled":true, "noSelect":true},
-    "h7":{"value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>","style":"h7","action":"deleteRowSection3","disabled":true, "noSelect":true},
+    "h6":{
+      "value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>",
+      "style":"h6",
+      "action":"deleteRowSection2",
+      "disabled":true,
+      "noSelect":true
+    },
+    "h7":{
+      "value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 80px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path stroke='null' d='m16.83335,6.65226l-2.48563,-2.48563l-4.34772,4.34772l-4.34772,-4.34772l-2.48563,2.48563l4.34772,4.34772l-4.34772,4.34772l2.48563,2.48563l4.34772,-4.34772l4.34772,4.34772l2.48563,-2.48563l-4.34772,-4.34772l4.34772,-4.34772z' id='svg_1' fill='#ff0000'/></svg></div><div>Удалить</div></div>",
+      "style":"h7",
+      "action":"deleteRowSection3",
+      "disabled":true,
+      "noSelect":true
+    },
     "d3":{"style":"d3"},
     "d4":{"value":"2","style":"d4"},
-    "h8":{"value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 90px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path fill='#5fbf00' stroke='null' id='svg_1' d='m16.6667,14l-5.00003,0l0,5.00003l-3.33335,0l0,-5.00003l-5.00003,0l0,-3.33335l5.00003,0l0,-5.00003l3.33335,0l0,5.00003l5.00003,0l0,3.33335z'/></svg></div><div>Добавить</div></div>","style":"h8","action":"addRowSection3","disabled":false, "noSelect":true},
+    "h8":{
+      "value":"<div class='no-print' style='display: flex; gap: 3px; padding-right: 5px; margin: 2px 1px; justify-content: center; align-items: center; background-color: lightgray; border-color: black; box-shadow: 0px 0px 2px black; width: 90px; height: 22px; color: #1E88E5; border-radius: 3px; overflow: hidden''><div><svg width='20' height='20'><path fill='#5fbf00' stroke='null' id='svg_1' d='m16.6667,14l-5.00003,0l0,5.00003l-3.33335,0l0,-5.00003l-5.00003,0l0,-3.33335l5.00003,0l0,-5.00003l3.33335,0l0,5.00003l5.00003,0l0,3.33335z'/></svg></div><div>Добавить</div></div>",
+      "style":"h8",
+      "action":"addRowSection3",
+      "disabled":false,
+      "noSelect":true
+    },
     "d5":{"style":"d5","parameter":"st1AnalyticalCode"},
     "d6":{"style":"d6","parameter":"st2AnalyticalCode"},
     "d7":{"style":"d7","parameter":"st3AnalyticalCode"},
@@ -60,7 +84,10 @@
     "e7":{"style":"e7","parameter":"st3Volume21"},
     "a3":{"style":"a3"},
     "a4":{"colspan":3,"style":"a4","value":"1"},
-    "e8":{"style":"e8"},
+    "e8":{
+      "style":"e8",
+      "formula":"$e5 + $e6 + $e7 + $e8 + $e9 + $e10 + $e11 + $e12 + $e13"
+    },
     "a5":{"colspan":3,"style":"a5","parameter":"st1IndicatorName"},
     "a6":{"style":"a6"},
     "a7":{"style":"a7"},
@@ -120,7 +147,7 @@
     },
     "addRowSection3": {
       "template": "default",
-      "script": "(cellName) => { const areaName = 'string3'; const area = this.documentTemplate.getNamedArea(areaName); const { cellRow } = parseCellName(cellName); this.insertArea(1, cellRow, area, SHIFT_VECTOR.vertical); }"
+      "script": "(cellName) => { const areaName = 'string3'; const area = this.documentTemplate.getNamedArea(areaName); const { cellRow } = parseCellName(cellName); this.insertArea(1, cellRow, area, SHIFT_TYPE.vertical); }"
     }
   }
 }

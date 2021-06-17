@@ -47,10 +47,10 @@
                     v-model="isGridOff"
                     @input="isGridOff = !isGridOff"></v-checkbox>
       </div>
-      <!-- <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="insertRow">Shift row, step 1</v-btn>
-      </div>
       <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" @click="computedCell">Computed formula</v-btn>
+      </div>
+      <!-- <div class="item item_btn">
         <v-btn small dark color="red darken-3" @click="deleteRow">
           <v-icon>mdi-delete-empty-outline</v-icon>
         </v-btn>
@@ -129,6 +129,13 @@ export default {
     // console.log(this.tableDocument);
   },
   methods: {
+    computedCell() {
+      const formula = '$e5 + $e6 + $e7 + $e8 + $e9 + $e10 + $e11 + $e12 + $e13';
+      // const form = { ab: 5, bc: 10, zx: 2 };
+      console.log(formula);
+      // const rezult = math.eval('ab + bc / 2', form);
+      // console.log(rezult);
+    },
     saveDocument() { alert('save document'); },
     saveDocumentData() {
       const JSONFormat = true;

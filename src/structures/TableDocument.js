@@ -7,7 +7,7 @@ const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 
 const REG_SYMBOLS = /[A-Z]/gi;
 const REG_DIGITS = /[0-9]/g;
 
-const SHIFT_VECTOR = {
+const SHIFT_TYPE = {
   vertical: 'vertical',
   horizontal: 'horizontal',
 };
@@ -168,19 +168,19 @@ class TableDocument {
     actionFunction(cellName);
   }
 
-  myFun(cellName) {
-    const areaName = 'string3';
-    const area = this.documentTemplate.getNamedArea(areaName);
-    const { cellRow } = parseCellName(cellName);
-    this.insertArea(1, cellRow, area, 'vertical');
+  // myFun() {
+  //   const areaName = 'string3';
+  //   const area = this.documentTemplate.getNamedArea(areaName);
+  //   const { cellRow } = parseCellName(cellName);
+  //   this.insertArea(1, cellRow, area, 'vertical');
 
-    // const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === sectionName);
-    // const { range: sectionRange } = namedArea;
-    // const sectionHeight = getRangeLength(sectionRange);
-    // const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName);
-    // const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`;
-    // this.deleteRows(rangeDelete);
-  }
+  //   const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === sectionName);
+  //   const { range: sectionRange } = namedArea;
+  //   const sectionHeight = getRangeLength(sectionRange);
+  //   const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName);
+  //   const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`;
+  //   this.deleteRows(rangeDelete);
+  // }
 
   buildDocument(data, template, settings) {
     const buldMethods = {
@@ -234,6 +234,10 @@ class TableDocument {
     });
   }
 
+  // computedFormula() {
+  //   const formula = '$e5 + $e6 + $e7 + $e8 + $e9 + $e10 + $e11 + $e12 + $e13';
+  // }
+
   deleteRows(range) {
     let cellsInRangeDelete = this.getCellsInRange(range);
     let cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
@@ -250,7 +254,7 @@ class TableDocument {
     const rangeAreaShiftFrom = `${rangeDeleteFromColumn}${rangeDeleteFromRow + areaDeleteHeigth}`;
     const rangeAreaShiftTo = `${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
     const rangeAreaShift = `${rangeAreaShiftFrom}:${rangeAreaShiftTo}`;
-    
+
     const areaShift = this.getAreaForRange(rangeAreaShift);
     console.log(rangeAreaShift);
     cellsInRangeDelete = this.getCellsInRange(rangeAreaShift);
@@ -592,13 +596,13 @@ class TableDocument {
     const areaNamedAreaTo = `${getColumnNameForNumber(numberColumn + (getRangeLength(rangeCellArea[1]) - 1))}${numberRow + (getRangeLength(rangeCellArea[0]) - 1)}`;
     if (areaNamedArea[0]) areaNamedArea[0].range = `${areaNamedAreaFrom}:${areaNamedAreaTo}`;
     const shiftInsert = {
-      [SHIFT_VECTOR.horizontal]: () => {
+      [SHIFT_TYPE.horizontal]: () => {
         this.shiftHorizontal({
           shiftStart: numberColumn,
           shiftStep: getRangeLength(rangeCellArea[1]),
         });
       },
-      [SHIFT_VECTOR.vertical]: () => {
+      [SHIFT_TYPE.vertical]: () => {
         console.log('shift');
         this.shiftVertical({
           shiftStart: numberRow,
