@@ -21,6 +21,8 @@ function formattedDataDisplay(
       return newValue;
     },
     number: () => {
+      let fValue = value;
+      if (fValue === undefined) fValue = 0;
       const formattedOption = {};
       const formattedOptionKey = {
         type: 'style',
@@ -38,12 +40,12 @@ function formattedDataDisplay(
         }
       });
       const formatted = new Intl.NumberFormat('ru-RU', formattedOption);
-      let newValue = formatted.format(value);
+      let newValue = formatted.format(fValue);
       if (FORMAT_STRING_MAP_KEYS.includes('positive')
         && FORMAT_STRING_MAP.positive === 'true'
-        && value > 0) newValue = `+${newValue}`;
+        && fValue > 0) newValue = `+${newValue}`;
       if (FORMAT_STRING_MAP_KEYS.includes('color')) {
-        newValue = `<span style="color: ${(value < 0) ? 'red' : 'green'}">${newValue}</span>`;
+        newValue = `<span style="color: ${(fValue < 0) ? 'red' : 'green'}">${newValue}</span>`;
       }
       return newValue;
     },

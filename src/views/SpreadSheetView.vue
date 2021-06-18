@@ -48,7 +48,7 @@
                     @input="isGridOff = !isGridOff"></v-checkbox>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="computedCell">Computed formula</v-btn>
+        <v-btn small dark color="blue darken-3" @click="computeFormula">Computed formula</v-btn>
       </div>
       <!-- <div class="item item_btn">
         <v-btn small dark color="red darken-3" @click="deleteRow">
@@ -129,12 +129,29 @@ export default {
     // console.log(this.tableDocument);
   },
   methods: {
-    computedCell() {
+    getCellValue(cellName) {
+      if (!this.tableDocument.cells[cellName]) return null;
+      return this.tableDocument.cells[cellName].value || '';
+    },
+
+    computeFormula() {
+      // this.tableDocument.computeFormula();
+      // console.log(this.rowCount);
       const formula = '$e5 + $e6 + $e7 + $e8 + $e9 + $e10 + $e11 + $e12 + $e13';
-      // const form = { ab: 5, bc: 10, zx: 2 };
-      console.log(formula);
-      // const rezult = math.eval('ab + bc / 2', form);
-      // console.log(rezult);
+      const operands = formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
+      const operandsValues = {};
+      operands.forEach((operand) => {
+        const operandValue = this.getCellValue(operand);
+        operandsValues[operand] = operandValue;
+      });
+      let formulaFill = formula;
+      Object.entries(operandsValues).forEach((operand) => {
+        const [operandName, operandValue] = operand;
+        formulaFill = formulaFill.replace(`$${operandName}`, operandValue);
+      });
+      this.tableDocument.editingCell('e14', eval(formulaFill)); // eslint-disable-line no-eval
+      // console.log(formulaFill);
+      console.log(this.tableDocument);
     },
     saveDocument() { alert('save document'); },
     saveDocumentData() {
@@ -144,9 +161,9 @@ export default {
     evtClickCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
       const selectedCell = this.tableDocument.getCellByName(cellName);
-      console.log(selectedCell);
-      if (!Object.keys(selectedCell).includes('action')) return;
-      this.tableDocument.action(cellName);
+      // console.log(selectedCell);
+      if (Object.keys(selectedCell).includes('action')) this.tableDocument.action(cellName);
+      if (Object.keys(selectedCell).includes('formula')) this.tableDocument.computeFormula(cellName);
       // eval(selectedCell.script); // eslint-disable-line no-eval
     },
     evtEditCell(evt) {
@@ -241,7 +258,7 @@ export default {
         this.tableDocument = tableDocument;
         this.isFileDataDisabled = true;
         this.isGridOff = false;
-        console.log(this.tableDocument);
+        // console.log(this.tableDocument);
       });
     },
     openPrintPage() {

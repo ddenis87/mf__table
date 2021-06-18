@@ -254,7 +254,7 @@ export default {
   },
   methods: {
     evtClickCell(evt) {
-      console.log(evt);
+      // console.log(evt);
       this.$emit('click:cell', evt);
     },
     evtDblclickCell(evt) {

@@ -12,6 +12,7 @@ describe('FormattedDataDisplay', () => {
   });
   describe('Type Number', () => {
     const type = { valueType: 'number' };
+    it('Value 0   -     -> 0', () => expect(formattedDataDisplay('', { ...type })).toBe('0'));
     it('Value 1   - 35  -> 35', () => expect(formattedDataDisplay('35', { ...type })).toBe('35'));
     it('Value 2   - -35 -> -35', () => expect(formattedDataDisplay('-35', { ...type })).toBe('-35'));
     it('Value 3   - ""  -> 0', () => expect(formattedDataDisplay('', { ...type })).toBe('0'));
