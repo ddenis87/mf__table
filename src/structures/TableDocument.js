@@ -7,6 +7,10 @@ const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 
 const REG_SYMBOLS = /[A-Z]/gi;
 const REG_DIGITS = /[0-9]/g;
 
+const CELL_ATTRIBUTES = {
+  VALUE: 'value',
+  FORMULA: 'formula',
+};
 // const TYPES = {
 //   STRING: 'string',
 //   NUMBER: 'number',
@@ -17,18 +21,18 @@ const SHIFT_TYPE = {
   horizontal: 'horizontal',
 };
 
-function getOperandsOfFormula(formula) {
-  return formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
-}
+// function getOperandsOfFormula(formula) {
+//   return formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
+// }
 
-function fillFormula(operandsValues, formula) {
-  let formulaFill = formula;
-  Object.entries(operandsValues).forEach((operand) => {
-    const [operandName, operandValue] = operand;
-    formulaFill = formulaFill.replace(`$${operandName}`, operandValue);
-  });
-  return formulaFill;
-}
+// function fillFormula(operandsValues, formula) {
+//   let formulaFill = formula;
+//   Object.entries(operandsValues).forEach((operand) => {
+//     const [operandName, operandValue] = operand;
+//     formulaFill = formulaFill.replace(`$${operandName}`, operandValue);
+//   });
+//   return formulaFill;
+// }
 
 function getColumnNumberForName(name) {
   const nameLowerCase = name.toLowerCase();
@@ -189,11 +193,7 @@ class TableDocument {
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
   }
-
-  static getFormulaOperansSet(formula) {
-    return formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
-  }
-
+  
   action(cellName) {
     // this.myFun(cellName);
     const actionName = this.cells[cellName].action;
@@ -268,32 +268,57 @@ class TableDocument {
     });
   }
 
-  computeFormula(cellName) {
-    const formula = this.getCellFormula(cellName);
-    const formulaFill = this.getFormulaFill(formula);
-    this.editingCell(cellName, eval(formulaFill)); // eslint-disable-line no-eval
+  static getOperandsSetFormula(formula) {
+    return formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
   }
 
-  getFormulaFill(formula) {
-    const operands = getOperandsOfFormula(formula);
-    const operandsValues = this.getOperandsValue(operands);
-    return fillFormula(operandsValues, formula);
+  calculateCellValue(cellName) {
+    const cellFormula = this.getCellFormula(cellName);
+    // check formula
+    // const operandsSet = this.getOperandsSetFormula(cellFormula);
+    console.log(cellFormula);
   }
 
-  getOperandsValue(operands) {
+  getOperandsValues(formula) {
     const operandsValues = {};
-    operands.forEach((operand) => {
-      const operandValue = this.getCellValue(operand);
-      if (operandValue) {
-        operandsValues[operand] = operandValue;
-      }
-      const operandFormula = this.getCellFormula(operand);
-      if (operandFormula) {
-        operandsValues[operand] = `(${this.getFormulaFill(operandFormula)})`;
-      }
+    const operandsSet = this.getOperandsSetFormula(formula);
+    operandsSet.forEach((operand) => {
+      const cellValue = this.getCellParameter(operand, CELL_ATTRIBUTES.VALUE);
+      if (cellValue) { operandsValues[operand] = cellValue; return; }
+      const cellFormula = this.getCellParameter(operand, CELL_ATTRIBUTES.FORMULA);
+      if (cellFormula) { operandsValues[operand] = `(${this.getOperandsValues(cellFormula)})`; }
     });
-    return operandsValues;
   }
+
+  getCellParameter(cellName, parametarCell) {
+    return this.cells[cellName][parametarCell] || null;
+  }
+  // computeFormula(cellName) {
+  //   const formula = this.getCellFormula(cellName);
+  //   const formulaFill = this.getFormulaFill(formula);
+  //   this.editingCell(cellName, eval(formulaFill)); // eslint-disable-line no-eval
+  // }
+
+  // getFormulaFill(formula) {
+  //   const operands = getOperandsOfFormula(formula);
+  //   const operandsValues = this.getOperandsValue(operands);
+  //   return fillFormula(operandsValues, formula);
+  // }
+
+  // getOperandsValue(operands) {
+  //   const operandsValues = {};
+  //   operands.forEach((operand) => {
+  //     const operandValue = this.getCellValue(operand);
+  //     if (operandValue) {
+  //       operandsValues[operand] = operandValue;
+  //     }
+  //     const operandFormula = this.getCellFormula(operand);
+  //     if (operandFormula) {
+  //       operandsValues[operand] = `(${this.getFormulaFill(operandFormula)})`;
+  //     }
+  //   });
+  //   return operandsValues;
+  // }
 
   deleteRows(range) {
     let cellsInRangeDelete = this.getCellsInRange(range);
