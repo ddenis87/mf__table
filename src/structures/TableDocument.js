@@ -17,6 +17,19 @@ const SHIFT_TYPE = {
   horizontal: 'horizontal',
 };
 
+function getOperandsOfFormula(formula) {
+  return formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
+}
+
+function fillFormula(operandsValues, formula) {
+  let formulaFill = formula;
+  Object.entries(operandsValues).forEach((operand) => {
+    const [operandName, operandValue] = operand;
+    formulaFill = formulaFill.replace(`$${operandName}`, operandValue);
+  });
+  return formulaFill;
+}
+
 function getColumnNumberForName(name) {
   const nameLowerCase = name.toLowerCase();
   if (nameLowerCase.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase) + 1;
@@ -177,6 +190,10 @@ class TableDocument {
     this.cellHeight = cellHeight;
   }
 
+  static getFormulaOperansSet(formula) {
+    return formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
+  }
+
   action(cellName) {
     // this.myFun(cellName);
     const actionName = this.cells[cellName].action;
@@ -253,20 +270,29 @@ class TableDocument {
 
   computeFormula(cellName) {
     const formula = this.getCellFormula(cellName);
-    const operands = formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
+    const formulaFill = this.getFormulaFill(formula);
+    this.editingCell(cellName, eval(formulaFill)); // eslint-disable-line no-eval
+  }
+
+  getFormulaFill(formula) {
+    const operands = getOperandsOfFormula(formula);
+    const operandsValues = this.getOperandsValue(operands);
+    return fillFormula(operandsValues, formula);
+  }
+
+  getOperandsValue(operands) {
     const operandsValues = {};
     operands.forEach((operand) => {
       const operandValue = this.getCellValue(operand);
-      operandsValues[operand] = operandValue;
+      if (operandValue) {
+        operandsValues[operand] = operandValue;
+      }
+      const operandFormula = this.getCellFormula(operand);
+      if (operandFormula) {
+        operandsValues[operand] = `(${this.getFormulaFill(operandFormula)})`;
+      }
     });
-    let formulaFill = formula;
-    console.log(formulaFill);
-    Object.entries(operandsValues).forEach((operand) => {
-      const [operandName, operandValue] = operand;
-      formulaFill = formulaFill.replace(`$${operandName}`, operandValue);
-    });
-    console.log(formulaFill);
-    this.editingCell(cellName, eval(formulaFill)); // eslint-disable-line no-eval
+    return operandsValues;
   }
 
   deleteRows(range) {
@@ -395,12 +421,12 @@ class TableDocument {
 
   getCellValue(cellName) {
     if (!this.cells[cellName]) return null;
-    return this.cells[cellName].value || '';
+    return this.cells[cellName].value || null;
   }
 
   getCellFormula(cellName) {
     if (!this.cells[cellName]) return null;
-    return this.cells[cellName].formula || '';
+    return this.cells[cellName].formula || null;
   }
 
   getCellsInRange(range) {
@@ -699,7 +725,7 @@ class TableDocument {
   }
 
   checkEditAccess(cellName) {
-    if (Object.keys(this.cells).includes(cellName) && this.cells[cellName]?.disabled === false) return false;
+    if (Object.keys(this.cells).includes(cellName) && this.cells[cellName].disabled === true) return false;
     if (!Object.keys(this.cells).includes(cellName)) return true;
     if (Object.keys(this.cells[cellName]).includes('areaName')) return true;
     return true;

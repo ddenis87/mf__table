@@ -47,9 +47,9 @@
                     v-model="isGridOff"
                     @input="isGridOff = !isGridOff"></v-checkbox>
       </div>
-      <div class="item item_btn">
+      <!-- <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="computeFormula">Computed formula</v-btn>
-      </div>
+      </div> -->
       <!-- <div class="item item_btn">
         <v-btn small dark color="red darken-3" @click="deleteRow">
           <v-icon>mdi-delete-empty-outline</v-icon>
