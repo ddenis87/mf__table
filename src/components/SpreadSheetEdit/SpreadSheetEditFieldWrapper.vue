@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     eventKeydown(option) {
-      console.log(option);
+      console.log(this.value);
       if (option.event.key === 'Escape') this.$emit('event-keydown-escape', { ...option });
       if (option.event.key === 'Enter') this.$emit('event-keydown-enter', { ...option });
       if (option.event.key === 'Tab') this.$emit('event-keydown-tab', { ...option });
@@ -58,6 +58,7 @@ export default {
       this.value = null;
     },
     eventBlur(option) {
+      console.log(this.value);
       this.$emit('input', this.value);
       this.$emit('event-blur', { ...option });
       this.value = null;

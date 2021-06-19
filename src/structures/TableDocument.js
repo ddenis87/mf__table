@@ -6,40 +6,26 @@ const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 
 
 const REG_SYMBOLS = /[A-Z]/gi;
 const REG_DIGITS = /[0-9]/g;
+const REG_OPERATORS = /[+-/*)(% ]/g;
 
 const CELL_ATTRIBUTES = {
   VALUE: 'value',
   FORMULA: 'formula',
+  ACTION: 'action',
 };
-// const TYPES = {
-//   STRING: 'string',
-//   NUMBER: 'number',
-//   OBJECT: 'object',
-// };
+
 const SHIFT_TYPE = {
   vertical: 'vertical',
   horizontal: 'horizontal',
 };
 
-// function getOperandsOfFormula(formula) {
-//   return formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
-// }
-
-// function fillFormula(operandsValues, formula) {
-//   let formulaFill = formula;
-//   Object.entries(operandsValues).forEach((operand) => {
-//     const [operandName, operandValue] = operand;
-//     formulaFill = formulaFill.replace(`$${operandName}`, operandValue);
-//   });
-//   return formulaFill;
-// }
-
-function getColumnNumberForName(name) {
-  const nameLowerCase = name.toLowerCase();
-  if (nameLowerCase.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase) + 1;
-  const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[0]) + 1;
-  const indexSecond = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[1]) + 1;
-  return (indexFirst * SET_COLUMN_NAME.length) + indexSecond;
+function fillingFormula(operandsValues, formula) {
+  let fillFormula = formula;
+  Object.entries(operandsValues).forEach((operand) => {
+    const [operandName, operandValue] = operand;
+    fillFormula = fillFormula.replace(`$${operandName}`, operandValue);
+  });
+  return fillFormula;
 }
 
 function getColumnNameForNumber(number) {
@@ -61,16 +47,24 @@ function getColumnNameForNumber(number) {
   return columnName;
 }
 
-function parseCellName(cellName) {
+function getColumnNumberForName(name) {
+  const nameLowerCase = name.toLowerCase();
+  if (nameLowerCase.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase) + 1;
+  const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[0]) + 1;
+  const indexSecond = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[1]) + 1;
+  return (indexFirst * SET_COLUMN_NAME.length) + indexSecond;
+}
+
+function getParseAtSymbolDigit(str) {
   return {
-    cellColumn: cellName.replace(REG_DIGITS, ''),
-    cellRow: +cellName.replace(REG_SYMBOLS, ''),
+    parthSymbol: str.replace(REG_DIGITS, ''),
+    parthDigit: +str.replace(REG_SYMBOLS, ''),
   };
 }
 
 function getCellNameShift(cellName, rangeCells, shiftColumn = 1, shiftRow = 1) {
   const [rangeRow, rangeColumn] = rangeCells;
-  const { cellColumn, cellRow } = parseCellName(cellName);
+  const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
   const cellColumnShift = getColumnNameForNumber(+getColumnNumberForName(cellColumn) - +rangeColumn[0] + shiftColumn);
   const cellRowShift = +cellRow - +rangeRow[0] + shiftRow;
   return `${cellColumnShift}${cellRowShift}`;
@@ -80,10 +74,22 @@ function getObjectOfJSON(data) {
   return (typeof data === 'string') ? JSON.parse(data) : data;
 }
 
-function getParseAtSymbolDigit(str) {
+function getOperandsSet(formula) {
+  return formula.replace(REG_OPERATORS, '').split('$').splice(1);
+}
+
+function getOperandsValues(operandsSet) {
+  const operandsValues = {};
+  operandsSet.forEach((operand) => {
+    operandsValues[operand] = ` +this.getCellValue('${operand}')`;
+  });
+  return operandsValues;
+}
+
+function parseCellName(cellName) {
   return {
-    parthSymbol: str.replace(REG_DIGITS, ''),
-    parthDigit: +str.replace(REG_SYMBOLS, ''),
+    cellColumn: cellName.replace(REG_DIGITS, ''),
+    cellRow: +cellName.replace(REG_SYMBOLS, ''),
   };
 }
 
@@ -193,28 +199,6 @@ class TableDocument {
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
   }
-  
-  action(cellName) {
-    // this.myFun(cellName);
-    const actionName = this.cells[cellName].action;
-    const { script } = this.scripts[actionName];
-    const actionFunction = eval(script); // eslint-disable-line no-eval
-    actionFunction(cellName);
-  }
-
-  // myFun() {
-  //   const areaName = 'string3';
-  //   const area = this.documentTemplate.getNamedArea(areaName);
-  //   const { cellRow } = parseCellName(cellName);
-  //   this.insertArea(1, cellRow, area, 'vertical');
-
-  //   const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === sectionName);
-  //   const { range: sectionRange } = namedArea;
-  //   const sectionHeight = getRangeLength(sectionRange);
-  //   const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName);
-  //   const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`;
-  //   this.deleteRows(rangeDelete);
-  // }
 
   buildDocument(data, template, settings) {
     const buldMethods = {
@@ -268,56 +252,71 @@ class TableDocument {
     });
   }
 
-  static getOperandsSetFormula(formula) {
-    return formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
-  }
-
   calculateCellValue(cellName) {
-    const cellFormula = this.getCellFormula(cellName);
+    const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+    const operandsSet = getOperandsSet(cellFormula);
+    if (operandsSet.includes(cellName)) { this.updateCellValue(cellName, NaN); return NaN; }
+    const operandsValues = getOperandsValues(operandsSet);
+    const fillFormula = fillingFormula(operandsValues, cellFormula);
     // check formula
-    // const operandsSet = this.getOperandsSetFormula(cellFormula);
-    console.log(cellFormula);
+    const rezult = eval(fillFormula); // eslint-disable-line no-eval
+    this.updateCellValue(cellName, rezult);
+    return rezult;
   }
 
-  getOperandsValues(formula) {
-    const operandsValues = {};
-    const operandsSet = this.getOperandsSetFormula(formula);
-    operandsSet.forEach((operand) => {
-      const cellValue = this.getCellParameter(operand, CELL_ATTRIBUTES.VALUE);
-      if (cellValue) { operandsValues[operand] = cellValue; return; }
-      const cellFormula = this.getCellParameter(operand, CELL_ATTRIBUTES.FORMULA);
-      if (cellFormula) { operandsValues[operand] = `(${this.getOperandsValues(cellFormula)})`; }
-    });
+  // deleteRange(range, shift = null) {
+  //   const cells = this.getCellsInRange(range);
+
+  // }
+
+  executeAction(cellName) {
+    const actionName = this.getCellParameter(cellName, CELL_ATTRIBUTES.ACTION);
+    const { script } = this.getScript(actionName);
+    const actionFunction = eval(script); // eslint-disable-line no-eval
+
+    actionFunction(cellName);
+    this.recalculateFormulas();
+  }
+
+  recalculateFormulas() {
+    const formulasCellsSet = this.getFormularsCellsSet();
+    formulasCellsSet.map((cellName) => this.calculateCellValue(cellName));
+    console.log(formulasCellsSet);
+  }
+
+  getCell(cellName) {
+    let cell = {};
+    if (Object.keys(this.cells).includes(cellName)) {
+      cell = this.cells[cellName];
+    }
+    return cell;
+  }
+
+  getCellValue(cellName) {
+    const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+    if (cellFormula) {
+      const calculateValue = this.calculateCellValue(cellName);
+      return calculateValue;
+    }
+    const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
+    if (cellValue) return cellValue;
+    return NaN;
   }
 
   getCellParameter(cellName, parametarCell) {
+    if (!this.cells[cellName]) return null;
     return this.cells[cellName][parametarCell] || null;
   }
-  // computeFormula(cellName) {
-  //   const formula = this.getCellFormula(cellName);
-  //   const formulaFill = this.getFormulaFill(formula);
-  //   this.editingCell(cellName, eval(formulaFill)); // eslint-disable-line no-eval
-  // }
 
-  // getFormulaFill(formula) {
-  //   const operands = getOperandsOfFormula(formula);
-  //   const operandsValues = this.getOperandsValue(operands);
-  //   return fillFormula(operandsValues, formula);
-  // }
+  getCellStyles(cellName) {
+    const cellStyle = this.styles.find((item) => item.name === cellName);
+    if (!cellStyle) return null;
+    return cellStyle;
+  }
 
-  // getOperandsValue(operands) {
-  //   const operandsValues = {};
-  //   operands.forEach((operand) => {
-  //     const operandValue = this.getCellValue(operand);
-  //     if (operandValue) {
-  //       operandsValues[operand] = operandValue;
-  //     }
-  //     const operandFormula = this.getCellFormula(operand);
-  //     if (operandFormula) {
-  //       operandsValues[operand] = `(${this.getFormulaFill(operandFormula)})`;
-  //     }
-  //   });
-  //   return operandsValues;
+  // getCellsInRange(range) {
+  //   const cells = {}
+
   // }
 
   deleteRows(range) {
@@ -430,28 +429,25 @@ class TableDocument {
     });
   }
 
-  getCellByName(cellName) {
-    let cell = {};
-    if (Object.keys(this.cells).includes(cellName)) {
-      cell = this.cells[cellName];
-    }
-    return cell;
-  }
+  // getCellValue(cellName) {
+  //   if (!this.cells[cellName]) return null;
+  //   return this.cells[cellName].value || null;
+  // }
 
-  getCellStyles(cellName) {
-    const cellStyle = this.styles.find((item) => item.name === cellName);
-    if (!cellStyle) return null;
-    return cellStyle;
-  }
+  // getCellFormula(cellName) {
+  //   if (!this.cells[cellName]) return null;
+  //   return this.cells[cellName].formula || null;
+  // }
 
-  getCellValue(cellName) {
-    if (!this.cells[cellName]) return null;
-    return this.cells[cellName].value || null;
-  }
-
-  getCellFormula(cellName) {
-    if (!this.cells[cellName]) return null;
-    return this.cells[cellName].formula || null;
+  getCellsInColumn(column) {
+    const columnName = (+column) ? getColumnNameForNumber(column) : column;
+    const cells = Object.entries(this.cells).filter((cell) => {
+      const [cellName] = cell;
+      const { cellColumn } = parseCellName(cellName);
+      console.log(cellColumn, columnName);
+      return (cellColumn === columnName);
+    });
+    return Object.fromEntries(cells);
   }
 
   getCellsInRange(range) {
@@ -497,28 +493,24 @@ class TableDocument {
     return Object.fromEntries(cellKeys);
   }
 
-  getCellsInColumn(column) {
-    const columnName = (+column) ? getColumnNameForNumber(column) : column;
-    const cells = Object.entries(this.cells).filter((cell) => {
-      const [cellName] = cell;
-      const { cellColumn } = parseCellName(cellName);
-      console.log(cellColumn, columnName);
-      return (cellColumn === columnName);
-    });
-    return Object.fromEntries(cells);
+  getFormularsCellsSet() {
+    // const formulasCellsSet = Object.entries(this.cells).filter((cell) => Object.keys(cell[1]).includes(CELL_ATTRIBUTES.FORMULA));
+    const formulasCellsSet = Object.keys(this.cells)
+      .filter((cellName) => Object.keys(this.cells[cellName]).includes(CELL_ATTRIBUTES.FORMULA));
+    return formulasCellsSet;
   }
 
-  // getDocument(JSONFormat = false) {
-  //   const document = {
-  //     rows: this.rows,
-  //     rowCount: this.rowCount,
-  //     columns: this.columns,
-  //     columnCount: this.columnCount,
-  //     cells: this.cells,
-  //     styles: this.styles,
-  //   };
-  //   return (JSONFormat) ? JSON.stringify(document) : document;
-  // }
+  getDocument(JSONFormat = false) {
+    const document = {
+      rows: this.rows,
+      rowCount: this.rowCount,
+      columns: this.columns,
+      columnCount: this.columnCount,
+      cells: this.cells,
+      styles: this.styles,
+    };
+    return (JSONFormat) ? JSON.stringify(document) : document;
+  }
 
   // getDocumentData(JSONFormat = false) {
   //   const documentData = [];
@@ -577,12 +569,6 @@ class TableDocument {
   //   return (JSONFormat) ? JSON.stringify(documentData) : documentData;
   // }
 
-  getLastRow() {
-    const rows = [0];
-    Object.keys(this.rows).forEach((row) => rows.push(+row));
-    return Math.max(...rows);
-  }
-
   getLastColumn() {
     const columns = [0];
     Object.keys(this.columns).forEach((column) => columns.push(+getColumnNumberForName(column)));
@@ -592,6 +578,12 @@ class TableDocument {
   getLastColumnInRow(numberRow) {
     const cellsInRow = this.getCellsInRange(`${numberRow}:${numberRow}`);
     return +getRangeOfCellArea(cellsInRow)[1][1];
+  }
+
+  getLastRow() {
+    const rows = [0];
+    Object.keys(this.rows).forEach((row) => rows.push(+row));
+    return Math.max(...rows);
   }
 
   getNamedArea(areaName) {
@@ -671,6 +663,12 @@ class TableDocument {
       range = namedArea.range.toLowerCase();
     }
     return range;
+  }
+
+  getScript(scriptName) {
+    const script = this.scripts[scriptName];
+    if (script) return script;
+    return null;
   }
 
   insertArea(numberColumn, numberRow, area, shift = null) {
@@ -759,10 +757,16 @@ class TableDocument {
   editingCell(cellName, cellValue) { // проверять существует строка/столбец
     // получать максимальный из имеющихся, сравнивать
     // если пусстое значение и больше ничего нет, то удалять ячейку из набора
-    const cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
-    cellValues.value = cellValue;
+    let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
+    cellValues = { ...cellValues, ...{ value: cellValue } };
     if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
     this.cells = { ...this.cells, ...{ [cellName]: cellValues } };
+    this.recalculateFormulas();
+  }
+
+  updateCellValue(cellName, cellValue) {
+    this.cells[cellName].value = cellValue;
+    this.cells = { ...this.cells, ...{ [cellName]: this.cells[cellName] } };
   }
 
   shiftVertical({ shiftStart, shiftStep = 1 }) {

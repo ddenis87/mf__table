@@ -43,26 +43,30 @@
           <v-icon small left>mdi-cloud-print-outline</v-icon>Печать</v-btn>
       </div>
       <div class="item item_btn">
-        <v-checkbox label="Сетка"
-                    v-model="isGridOff"
-                    @input="isGridOff = !isGridOff"></v-checkbox>
+        <v-menu bottom
+                :offset-y="true"
+                min-width="200">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn small dark color="blue darken-3" v-bind="attrs" v-on="on">
+              <v-icon small left>mdi-tune-vertical</v-icon>Вид</v-btn>
+          </template>
+          <v-list>
+            <v-list-item>
+              <v-checkbox dense
+                          label="Сетка"
+                          v-model="isGrid"
+                          @input="isGrid = !isGrid"></v-checkbox>
+            </v-list-item>
+            <v-list-item>
+              <v-checkbox dense
+                          label="Заголовок"
+                          v-model="isTitle"
+                          @input="isTitle = !isTitle"></v-checkbox>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
-      <!-- <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="computeFormula">Computed formula</v-btn>
-      </div> -->
-      <!-- <div class="item item_btn">
-        <v-btn small dark color="red darken-3" @click="deleteRow">
-          <v-icon>mdi-delete-empty-outline</v-icon>
-        </v-btn>
-      </div>
-      <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="insertColumn">Shift column, step 1</v-btn>
-      </div>
-      <div class="item item_btn">
-        <v-btn small dark color="red darken-3" @click="deleteColumn">
-          <v-icon>mdi-delete-empty-outline</v-icon>
-        </v-btn>
-      </div> -->
+
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
         <v-card>
@@ -80,7 +84,7 @@
                          @editing:cancel="cancelEditingCell"></spread-sheet-edit>
       <spread-sheet ref="SpreadSheet"
                     v-bind="tableDocument"
-                    :is-grid-off="!isGridOff"
+                    :is-grid-off="!isGrid"
                     @click:cell="evtClickCell"
                     @dblclick:cell="evtEditCell"
                     @keydown:cell="evtEditCell"
@@ -119,7 +123,8 @@ export default {
       editableCellGeometry: null,
       isEditableCellLabel: false,
 
-      isGridOff: true,
+      isGrid: true,
+      isTitle: true,
       isFileDataDisabled: true,
       isFileTemplateDisabled: false,
       isShowDialog: false,
@@ -160,16 +165,16 @@ export default {
     },
     evtClickCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
-      const selectedCell = this.tableDocument.getCellByName(cellName);
+      const selectedCell = this.tableDocument.getCell(cellName);
       // console.log(selectedCell);
-      if (Object.keys(selectedCell).includes('action')) this.tableDocument.action(cellName);
-      if (Object.keys(selectedCell).includes('formula')) this.tableDocument.computeFormula(cellName);
+      if (Object.keys(selectedCell).includes('action')) this.tableDocument.executeAction(cellName);
+      if (Object.keys(selectedCell).includes('formula')) this.tableDocument.calculateCellValue(cellName);
       // eval(selectedCell.script); // eslint-disable-line no-eval
     },
     evtEditCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
       if (!this.tableDocument.checkEditAccess(cellName)) return;
-      this.editableCell = this.tableDocument.getCellByName(cellName);
+      this.editableCell = this.tableDocument.getCell(cellName);
       this.editableCellEvent = evt;
       this.editableCellElement = evt.target;
       this.editableCellGeometry = evt.target.getBoundingClientRect();
@@ -203,6 +208,8 @@ export default {
     acceptEditingCell(option) {
       this.tableDocument.editingCell(option.cellName, option.value);
       this.clearEditCell();
+      console.log(option.cellName, option.value);
+      console.log(this.tableDocument);
     },
     cancelEditingCell() {
       this.clearEditCell();
@@ -231,7 +238,7 @@ export default {
       this.tableDocument = new TableDocument();
       this.tableDocumentTemplate = {};
       this.$refs.SpreadSheet.createNewDocument();
-      this.isGridOff = true;
+      this.isGrid = true;
 
       this.isFileTemplateDisabled = false;
       this.isFileDataDisabled = true;
@@ -256,8 +263,9 @@ export default {
         const tableDocument = new TableDocument();
         tableDocument.buildDocument(JSONData, this.tableDocumentTemplate, setting);
         this.tableDocument = tableDocument;
+        this.tableDocument.recalculateFormulas();
         this.isFileDataDisabled = true;
-        this.isGridOff = false;
+        this.isGrid = false;
         // console.log(this.tableDocument);
       });
     },
