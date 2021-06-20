@@ -34,7 +34,7 @@
 |||||String|'2:2', '3:5', 'b:e', 'a1:d3'
 |||**Parameters:**
 ||||areaName|String|any
-|
+||||
 |3|**getRangeByCellName**
 |||**Return:**
 |||||String|'a1', '3', 'c', '3:5', 'b:e', 'a1:d3'
@@ -42,19 +42,19 @@
 ||||cellName|String|any
 ||||areaName|String|any <br>null (default)
 ||||rangeType|CONST|RANGE_TYPE.ROW (default) <br>RANGE_TYPE.COLUMN <br>RANGE_TYPE.CELL
-|
+||||
 |4|**getRangeSplit** *(Helper)*
 |||**Return:**
 |||||Array|['2', '5'], ['b', 'b'], ['c3', 'd5']
 |||**Parameters:**
 ||||range|String|'a1', 'b', '3', '2:5', 'd:e', 'a1:d3'
-|
+||||
 |5|**getRangeType** *(Helper)*
 |||**Return:**
 |||||CONST|RANGE_TYPE.CELL <br>RANGE_TYPE.ROW <br>RANGE_TYPE.COLUMN <br>RANGE_TYPE.RANGE
 |||**Parameters:**
 ||||range|String|'a1', 'b', '3', '2:5', 'd:e', 'a1:d3'
-|
+||||
 |6|**getRangeLength** *(Helper)*
 |||**Return:**
 |||||Array|[0, 1], [1, 1], [1, 5]
@@ -62,13 +62,13 @@
 |||**Parameters:**
 ||||range|String|'a1', 'b', '3', '2:5', 'd:e', 'a1:d3'
 ||||isCompute|Boolean| false (default), true
-|
+||||
 |7|**getRangeToEdge**
 |||**Return:**
 |||||String|'${rangeFrom}:maxRow', <br>'${rangeFrom}:maxColumn', <br>'${rangeFrom}:maxColumnRow)'
 |||**Parameters:**
 ||||rangeFrom|String|any
-|
+||||
 |8|**getRangeShift** *(Helper)*
 |||**Return:**
 |||||String|2, '3:5', 'a2:d5', 'b1:e4'
