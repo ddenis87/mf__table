@@ -14,9 +14,28 @@ const CELL_ATTRIBUTES = {
   ACTION: 'action',
 };
 
+const RANGE_TYPE = {
+  CELL: 'cell',
+  RANGE: 'range',
+  COLUMN: 'column',
+  ROW: 'row',
+};
+
+const DELETE_MODE = {
+  DATA: 'data',
+  COLUMN: 'column',
+  ROW: 'row',
+};
+
+const RETURN_FORMAT = {
+  OBJECT: 'object',
+  ENTRIES: 'entries',
+  KEYS: 'keys',
+};
+
 const SHIFT_TYPE = {
-  vertical: 'vertical',
-  horizontal: 'horizontal',
+  VERTICAL: 'vertical',
+  HORIZONTAL: 'horizontal',
 };
 
 function fillingFormula(operandsValues, formula) {
@@ -95,31 +114,16 @@ function parseCellName(cellName) {
 
 function getRangeType(range) {
   const [v1, v2] = `${range}`.toLowerCase().split(':');
-  if (!v2) return 'cell';
+  if (!v2) {
+    if (!v1.match(REG_DIGITS)) return 'column';
+    if (!v1.match(REG_SYMBOLS)) return 'row';
+    return 'cell';
+  }
   if (+v1 && +v2) return 'row';
   if (v1.match(REG_DIGITS) && v1.match(REG_SYMBOLS)
     && v2.match(REG_DIGITS) && v2.match(REG_SYMBOLS)) return 'range';
   if (getColumnNumberForName(v1) && getColumnNumberForName(v2)) return 'column';
-  return 'RaN';
-}
-
-function getRangeSize(range) {
-  const rangeType = getRangeType(range);
-  const [v1, v2] = range.toLowerCase().split(':');
-  const rangeSize = {
-    cell: () => [1, 1],
-    row: () => [+v1, +v2],
-    column: () => [+getColumnNumberForName(v1), getColumnNumberForName(v2)],
-    range: () => {
-      const { parthSymbol: fromCellColumn, parthDigit: fromCellRow } = getParseAtSymbolDigit(v1);
-      const { parthSymbol: toCellColumn, parthDigit: toCellRow } = getParseAtSymbolDigit(v2);
-      return [
-        [fromCellRow, getColumnNumberForName(fromCellColumn)],
-        [toCellRow, getColumnNumberForName(toCellColumn)],
-      ];
-    },
-  };
-  return rangeSize[rangeType]();
+  return undefined;
 }
 
 function getRangeOfCellArea(cells) {
@@ -135,19 +139,61 @@ function getRangeOfCellArea(cells) {
   return [[Math.min(...rows), Math.max(...rows)], [Math.min(...columns), Math.max(...columns)]];
 }
 
-function getRangeLength(range) {
-  if (Array.isArray(range)) return range[1] - range[0] + 1;
-  // if (typeof range === 'string') {
-  const rangeType = getRangeType(range);
-  const [v1, v2] = range.toLowerCase().split(':');
-  const rangeLength = {
-    cell: () => 1,
-    row: () => +v2 - +v1 + 1,
-    column: () => +getColumnNumberForName(v2) - +getColumnNumberForName(v1) + 1,
-  };
-  return rangeLength[rangeType]();
-  // }
+function getRangeSplit(range) {
+  let splitRange = range.toString();
+  if (splitRange.includes(':')) splitRange = splitRange.split(':');
+  else splitRange = [splitRange, splitRange];
+  return splitRange;
 }
+
+function getRangeLength(range, isCompute = false) {
+  const rangeType = getRangeType(range);
+  let [r1, r2] = getRangeSplit(range);
+  if (!r2 && [RANGE_TYPE.COLUMN, RANGE_TYPE.ROW].includes(rangeType)) r2 = r1;
+  const rangeLength = {
+    [RANGE_TYPE.CELL]: () => [1, 1],
+    [RANGE_TYPE.ROW]: () => [0, (+r2 - +r1) + 1],
+    [RANGE_TYPE.COLUMN]: () => {
+      r1 = getColumnNumberForName(r1);
+      r2 = getColumnNumberForName(r2);
+      return [(+r2 - +r1) + 1, 0];
+    },
+    [RANGE_TYPE.RANGE]: () => {
+      const { parthSymbol: columnFrom, parthDigit: rowFrom } = getParseAtSymbolDigit(r1);
+      const { parthSymbol: columnTo, parthDigit: rowTo } = getParseAtSymbolDigit(r2);
+      return [
+        (+getColumnNumberForName(columnTo) - +getColumnNumberForName(columnFrom)) + 1,
+        (+rowTo - +rowFrom) + 1,
+      ];
+    },
+  };
+  const rezult = rangeLength[rangeType]();
+  return (isCompute) ? rezult[1] - rezult[0] : rezult;
+}
+
+function getRangeShift(range, shift = SHIFT_TYPE.VERTICAL, step = 1) {
+  console.log(shift);
+  const rangeType = getRangeType(range);
+  const rangeTypes = {
+    [RANGE_TYPE.ROW]: () => {
+      if (!range.includes(':')) return +range + +step;
+      const [rangeFrom, rangeTo] = getRangeSplit(range);
+      return `${+rangeFrom + +step}:${+rangeTo + +step}`;
+    },
+  };
+  return rangeTypes[rangeType]();
+}
+
+// function getRangeShift(range, shiftType = SHIFT_TYPE.VERTICAL, step = 1) {
+//   const [, rangeTo] = getRangeSplit(range);
+//   const { parthSymbol, parthDigit } = getParseAtSymbolDigit(rangeTo);
+//   const rangeShift = {
+//     [SHIFT_TYPE.VERTICAL]: () => `${parthSymbol}${parthDigit + step}`,
+//     // [SHIFT_TYPE.HORIZONTAL]: () => `${rangeFrom}:${getColumnNameForNumber(+getColumnNumberForName(parthSymbol) + step)}${parthDigit}`,
+//   };
+//   console.log(rangeShift[shiftType]);
+//   return rangeShift[shiftType]();
+// }
 
 class TableDocument {
   constructor({
@@ -264,10 +310,56 @@ class TableDocument {
     return rezult;
   }
 
-  // deleteRange(range, shift = null) {
-  //   const cells = this.getCellsInRange(range);
+  deleteArea(range, shiftType = null) {
+    console.log(range);
+    const rangeType = getRangeType(range);
+    this.deleteRange(range);
 
-  // }
+    if (!shiftType || [RANGE_TYPE.CELL, RANGE_TYPE.RANGE].includes(rangeType)) return;
+
+    const [rangeFrom, rangeTo] = getRangeSplit(range);
+    const rangeShiftFrom = getRangeShift(rangeTo, SHIFT_TYPE.VERTICAL, 1);
+    const rangeShiftArea = this.getRangeToEdge(rangeShiftFrom);
+    const areaShift = this.getAreaForRange(rangeShiftArea);
+    const shiftArea = {
+      [SHIFT_TYPE.VERTICAL]: () => {
+        this.deleteRange(rangeShiftArea, DELETE_MODE.ROW);
+        this.insertArea(1, +rangeFrom, areaShift);
+      },
+      [SHIFT_TYPE.HORIZONTAL]: () => {
+        this.deleteRange(rangeShiftArea, DELETE_MODE.COLUMN);
+        this.insertArea(getColumnNumberForName(rangeFrom), 1, areaShift);
+      },
+      null: () => {},
+    };
+    shiftArea[shiftType]();
+  }
+
+  deleteRange(range, mode = null) {
+    const cellsInRange = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
+    console.log(cellsInRange);
+    const cells = Object.entries(this.cells).filter((cell) => {
+      const [cellName] = cell;
+      return (!cellsInRange.includes(cellName));
+    });
+    this.cells = { ...Object.fromEntries(cells) };
+    if (mode === DELETE_MODE.ROW) {
+      const rowKeys = this.getRowKeysInRange(range);
+      const rows = Object.entries(this.rows).filter((row) => {
+        const [rowName] = row;
+        return (!rowKeys.includes(+rowName));
+      });
+      this.rows = { ...Object.fromEntries(rows) };
+    }
+    if (mode === DELETE_MODE.COLUMN) {
+      const columnKeys = this.getColumnKeysInRange(range);
+      const columns = Object.entries(this.columns).filter((column) => {
+        const [columnName] = column;
+        return (!columnKeys.includes(columnName));
+      });
+      this.columns = { ...Object.fromEntries(columns) };
+    }
+  }
 
   executeAction(cellName) {
     const actionName = this.getCellParameter(cellName, CELL_ATTRIBUTES.ACTION);
@@ -281,7 +373,6 @@ class TableDocument {
   recalculateFormulas() {
     const formulasCellsSet = this.getFormularsCellsSet();
     formulasCellsSet.map((cellName) => this.calculateCellValue(cellName));
-    console.log(formulasCellsSet);
   }
 
   getCell(cellName) {
@@ -303,9 +394,9 @@ class TableDocument {
     return NaN;
   }
 
-  getCellParameter(cellName, parametarCell) {
+  getCellParameter(cellName, cellParameter) {
     if (!this.cells[cellName]) return null;
-    return this.cells[cellName][parametarCell] || null;
+    return this.cells[cellName][cellParameter] || null;
   }
 
   getCellStyles(cellName) {
@@ -314,83 +405,133 @@ class TableDocument {
     return cellStyle;
   }
 
-  // getCellsInRange(range) {
-  //   const cells = {}
-
-  // }
-
-  deleteRows(range) {
-    let cellsInRangeDelete = this.getCellsInRange(range);
-    let cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
-    let cells = Object.entries(this.cells).filter((cell) => {
+  getCellsInRange(range, returnFormat = RETURN_FORMAT.ENTRIES) {
+    const rowKeys = this.getRowKeysInRange(range);
+    const columnKeys = this.getColumnKeysInRange(range);
+    console.log(rowKeys);
+    console.log(columnKeys);
+    const cells = Object.entries(this.cells).filter((cell) => {
       const [cellName] = cell;
-      return (!cellsInRangeDeleteKey.includes(cellName));
+      const { parthSymbol: columnKey, parthDigit: rowKey } = getParseAtSymbolDigit(cellName);
+      return (columnKeys.includes(columnKey) && rowKeys.includes(rowKey));
     });
-    this.cells = Object.fromEntries(cells);
-
-    const rangeAreaDelete = getRangeOfCellArea(cellsInRangeDelete);
-    const [rangeDeleteFrom] = range.split(':');
-    const {
-      parthSymbol: rangeDeleteFromColumn,
-      parthDigit: rangeDeleteFromRow,
-    } = getParseAtSymbolDigit(rangeDeleteFrom);
-    const areaDeleteHeigth = getRangeLength(rangeAreaDelete[0]);
-    const rangeAreaShiftFrom = `${rangeDeleteFromColumn}${rangeDeleteFromRow + areaDeleteHeigth}`;
-    const rangeAreaShiftTo = `${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
-    const rangeAreaShift = `${rangeAreaShiftFrom}:${rangeAreaShiftTo}`;
-
-    const areaShift = this.getAreaForRange(rangeAreaShift);
-    console.log(rangeAreaShift);
-    cellsInRangeDelete = this.getCellsInRange(rangeAreaShift);
-    cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
-    cells = Object.entries(this.cells).filter((cell) => {
-      const [cellName] = cell;
-      if (cellsInRangeDeleteKey.includes(cellName)) {
-        const { cellRow } = parseCellName(cellName);
-        delete this.rows[cellRow];
-      }
-      return (!cellsInRangeDeleteKey.includes(cellName));
-    });
-    delete this.rows[this.getLastRow()];
-    this.cells = Object.fromEntries(cells);
-    this.insertArea(getColumnNumberForName(rangeDeleteFromColumn), rangeDeleteFromRow, areaShift);
-    this.rowCount = this.getLastRow();
+    const formatRezult = {
+      [RETURN_FORMAT.ENTRIES]: () => cells,
+      [RETURN_FORMAT.KEYS]: () => Object.keys(Object.fromEntries(cells)),
+      [RETURN_FORMAT.OBJECT]: () => Object.fromEntries(cells),
+    };
+    return formatRezult[returnFormat]();
   }
 
-  deleteColumns(range) {
-    let cellsInRangeDelete = this.getCellsInRange(range);
-    let cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
-    let cells = Object.entries(this.cells).filter((cell) => {
-      const [cellName] = cell;
-      return (!cellsInRangeDeleteKey.includes(cellName));
-    });
-    this.cells = Object.fromEntries(cells);
+  getColumnKeysInRange(range) {
+    const type = getRangeType(range);
+    const columnKeys = [];
+    const columnSet = {
+      [RANGE_TYPE.CELL]: () => {
+        const { parthSymbol: columnKey } = getParseAtSymbolDigit(range);
+        columnKeys.push(columnKey);
+        return columnKeys;
+      },
+      [RANGE_TYPE.COLUMN]: () => {
+        let [rangeFrom, rangeTo] = getRangeSplit(range);
+        rangeFrom = +getColumnNumberForName(rangeFrom);
+        rangeTo = +getColumnNumberForName(rangeTo);
+        for (let columnKey = rangeFrom; columnKey < rangeTo + 1; columnKey += 1) {
+          columnKeys.push(getColumnNameForNumber(columnKey));
+        }
+        return columnKeys;
+      },
+      [RANGE_TYPE.ROW]: () => {
+        columnKeys.push(...Object.keys(this.columns));
+        return columnKeys;
+      },
+      [RANGE_TYPE.RANGE]: () => {
+        // console.log(range);
+        const [rangeFrom, rangeTo] = getRangeSplit(range);
+        let { parthSymbol: columnFrom } = getParseAtSymbolDigit(rangeFrom);
+        let { parthSymbol: columnTo } = getParseAtSymbolDigit(rangeTo);
+        columnFrom = +getColumnNumberForName(columnFrom);
+        columnTo = +getColumnNumberForName(columnTo);
+        for (let columnKey = columnFrom; columnKey < columnTo + 1; columnKey += 1) {
+          columnKeys.push(getColumnNameForNumber(columnKey));
+        }
+        return columnKeys;
+      },
+    };
+    return columnSet[type]();
+  }
 
-    const rangeAreaDelete = getRangeOfCellArea(cellsInRangeDelete);
-    const [rangeDeleteFrom] = range.split(':');
-    const { cellColumn: rangeDeleteFromColumn, cellRow: rangeDeleteFromRow } = parseCellName(rangeDeleteFrom);
-    const areaDeleteWidth = getRangeLength(rangeAreaDelete[1]);
-    const rangeAreaShiftFrom = `${getColumnNameForNumber(getColumnNumberForName(rangeDeleteFromColumn) + areaDeleteWidth)}${rangeDeleteFromRow}`;
-    const rangeAreaShiftTo = `${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
-    const rangeAreaShift = `${rangeAreaShiftFrom}:${rangeAreaShiftTo}`;
-    const areaShift = this.getAreaForRange(rangeAreaShift);
-    console.log(areaShift);
-    cellsInRangeDelete = this.getCellsInRange(rangeAreaShift);
-    console.log(cellsInRangeDelete);
-    cellsInRangeDeleteKey = Object.keys(Object.fromEntries(cellsInRangeDelete));
-    cells = Object.entries(this.cells).filter((cell) => {
-      const [cellName] = cell;
-      return (!cellsInRangeDeleteKey.includes(cellName));
-    });
-    this.cells = Object.fromEntries(cells);
-    this.insertArea(getColumnNumberForName(rangeDeleteFromColumn), rangeDeleteFromRow, areaShift);
+  getRowKeysInRange(range) {
+    const type = getRangeType(range);
+    const rowKeys = [];
+    const rowSet = {
+      [RANGE_TYPE.CELL]: () => {
+        const { parthDigit: rowKey } = getParseAtSymbolDigit(range);
+        rowKeys.push(+rowKey);
+        return rowKeys;
+      },
+      [RANGE_TYPE.COLUMN]: () => {
+        Object.keys(this.rows).forEach((row) => rowKeys.push(+row));
+        return rowKeys;
+      },
+      [RANGE_TYPE.ROW]: () => {
+        const [rangeFrom, rangeTo] = getRangeSplit(range);
+        for (let rowKey = +rangeFrom; rowKey < +rangeTo + 1; rowKey += 1) rowKeys.push(+rowKey);
+        return rowKeys;
+      },
+      [RANGE_TYPE.RANGE]: () => {
+        const [rangeFrom, rangeTo] = getRangeSplit(range);
+        const { parthDigit: rowFrom } = getParseAtSymbolDigit(rangeFrom);
+        const { parthDigit: rowTo } = getParseAtSymbolDigit(rangeTo);
+        for (let rowKey = rowFrom; rowKey < rowTo + 1; rowKey += 1) rowKeys.push(+rowKey);
+        return rowKeys;
+      },
+    };
+    return rowSet[type]();
+  }
 
-    const lastColumn = this.getLastColumn();
-    for (let i = 0; i < areaDeleteWidth; i += 1) {
-      const deleteColumn = lastColumn - i;
-      delete this.columns[getColumnNameForNumber(deleteColumn)];
+  getRangeByAreaName(areaName) {
+    let range = null;
+    if (!areaName) return null;
+    if (areaName.includes('|')) {
+      const [areaNameRow, areaNameColumn] = areaName.split('|');
+      const rangeRow = this.namedAreas.find((item) => item.name === areaNameRow);
+      const [r1, r2] = rangeRow.range.split(':');
+      const rangeColumn = this.namedAreas.find((item) => item.name === areaNameColumn);
+      const [c1, c2] = rangeColumn.range.split(':');
+      range = `${c1}${r1}:${c2}${r2}`.toLowerCase();
+    } else {
+      const namedArea = this.namedAreas.find((item) => item.name === areaName);
+      range = namedArea?.range.toLowerCase() || null;
     }
-    this.columnCount = this.getLastColumn();
+    return range;
+  }
+
+  getRangeByCellName(cellName, areaName = null, rangeType = RANGE_TYPE.ROW) { // ??????
+    if (rangeType === RANGE_TYPE.CELL) return cellName;
+    let range = '';
+    const rangeArea = this.getRangeByAreaName(areaName);
+    const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
+    if (rangeArea) {
+      const rangeLength = getRangeLength(rangeArea);
+      if (rangeType === RANGE_TYPE.ROW) range = `a${cellRow}:${cellColumn}${cellRow + (rangeLength - 1)}`;
+      if (rangeType === RANGE_TYPE.COLUMN) range = `${cellColumn}1:${cellColumn + (rangeLength - 1)}${cellRow + (rangeLength - 1)}`; // ????
+    }
+    if (rangeArea === null) {
+      if (rangeType === RANGE_TYPE.ROW) range = cellRow;
+      if (rangeType === RANGE_TYPE.COLUMN) range = cellColumn;
+    }
+    return range;
+  }
+
+  getRangeToEdge(rangeFrom) {
+    const rangeType = getRangeType(rangeFrom);
+    const rangeEdge = {
+      [RANGE_TYPE.CELL]: () => `${rangeFrom}:${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`,
+      [RANGE_TYPE.ROW]: () => `${rangeFrom}:${this.getLastRow()}`,
+      [RANGE_TYPE.COLUMN]: () => `${rangeFrom}:${getColumnNameForNumber(this.getLastColumn())}`,
+    };
+    return rangeEdge[rangeType]();
   }
 
   fillArea(dataArea, parameters) {
@@ -439,59 +580,59 @@ class TableDocument {
   //   return this.cells[cellName].formula || null;
   // }
 
-  getCellsInColumn(column) {
-    const columnName = (+column) ? getColumnNameForNumber(column) : column;
-    const cells = Object.entries(this.cells).filter((cell) => {
-      const [cellName] = cell;
-      const { cellColumn } = parseCellName(cellName);
-      console.log(cellColumn, columnName);
-      return (cellColumn === columnName);
-    });
-    return Object.fromEntries(cells);
-  }
+  // getCellsInColumn(column) {
+  //   const columnName = (+column) ? getColumnNameForNumber(column) : column;
+  //   const cells = Object.entries(this.cells).filter((cell) => {
+  //     const [cellName] = cell;
+  //     const { cellColumn } = parseCellName(cellName);
+  //     console.log(cellColumn, columnName);
+  //     return (cellColumn === columnName);
+  //   });
+  //   return Object.fromEntries(cells);
+  // }
 
-  getCellsInRange(range) {
-    const rangeType = getRangeType(range);
-    const [rangeFrom, rangeTo] = getRangeSize(range);
-    const setRange = [];
-    if (rangeType === 'cell') {
-      return Object.entries(this.cells).filter((cell) => {
-        const [cellName] = cell;
-        return cellName === range;
-      });
-    }
-    if (['column', 'row'].includes(rangeType)) {
-      for (let n = rangeFrom; n <= rangeTo; n += 1) setRange.push(n);
-      return Object.entries(this.cells).filter((cell) => {
-        const [cellName] = cell;
-        const { cellColumn, cellRow } = parseCellName(cellName);
-        const condition = {
-          row: () => setRange.includes(cellRow),
-          column: () => setRange.includes(getColumnNumberForName(cellColumn)),
-        };
-        return (condition[rangeType]());
-      });
-    }
-    if (rangeType === 'range') {
-      for (let n = rangeFrom[0]; n <= rangeTo[0]; n += 1) setRange.push(n);
-      for (let n = rangeFrom[1]; n <= rangeTo[1]; n += 1) setRange.push(getColumnNameForNumber(n));
-      return Object.entries(this.cells).filter((cell) => {
-        const [cellName] = cell;
-        const { cellColumn, cellRow } = parseCellName(cellName);
-        return (setRange.includes(cellRow) && setRange.includes(cellColumn));
-      });
-    }
-    return Object.entries({});
-  }
+  // getCellsInRange(range) {
+  //   const rangeType = getRangeType(range);
+  //   const [rangeFrom, rangeTo] = getRangeSize(range);
+  //   const setRange = [];
+  //   if (rangeType === 'cell') {
+  //     return Object.entries(this.cells).filter((cell) => {
+  //       const [cellName] = cell;
+  //       return cellName === range;
+  //     });
+  //   }
+  //   if (['column', 'row'].includes(rangeType)) {
+  //     for (let n = rangeFrom; n <= rangeTo; n += 1) setRange.push(n);
+  //     return Object.entries(this.cells).filter((cell) => {
+  //       const [cellName] = cell;
+  //       const { cellColumn, cellRow } = parseCellName(cellName);
+  //       const condition = {
+  //         row: () => setRange.includes(cellRow),
+  //         column: () => setRange.includes(getColumnNumberForName(cellColumn)),
+  //       };
+  //       return (condition[rangeType]());
+  //     });
+  //   }
+  //   if (rangeType === 'range') {
+  //     for (let n = rangeFrom[0]; n <= rangeTo[0]; n += 1) setRange.push(n);
+  //     for (let n = rangeFrom[1]; n <= rangeTo[1]; n += 1) setRange.push(getColumnNameForNumber(n));
+  //     return Object.entries(this.cells).filter((cell) => {
+  //       const [cellName] = cell;
+  //       const { cellColumn, cellRow } = parseCellName(cellName);
+  //       return (setRange.includes(cellRow) && setRange.includes(cellColumn));
+  //     });
+  //   }
+  //   return Object.entries({});
+  // }
 
-  getCellsInRow(row, columnFrom = 1) {
-    const cellKeys = Object.entries(this.cells).filter((cell) => {
-      const [cellName] = cell;
-      const { cellColumn, cellRow } = parseCellName(cellName);
-      return (+cellRow === +row && getColumnNumberForName(cellColumn) >= columnFrom);
-    });
-    return Object.fromEntries(cellKeys);
-  }
+  // getCellsInRow(row, columnFrom = 1) {
+  //   const cellKeys = Object.entries(this.cells).filter((cell) => {
+  //     const [cellName] = cell;
+  //     const { cellColumn, cellRow } = parseCellName(cellName);
+  //     return (+cellRow === +row && getColumnNumberForName(cellColumn) >= columnFrom);
+  //   });
+  //   return Object.fromEntries(cellKeys);
+  // }
 
   getFormularsCellsSet() {
     // const formulasCellsSet = Object.entries(this.cells).filter((cell) => Object.keys(cell[1]).includes(CELL_ATTRIBUTES.FORMULA));
@@ -593,7 +734,7 @@ class TableDocument {
     const cells = {};
     const styles = [];
     const scripts = {};
-    const range = this.getNamedAreaRange(areaName);
+    const range = this.getRangeByAreaName(areaName);
     const namedAreas = [{
       name: areaName,
       range: null,
@@ -649,22 +790,6 @@ class TableDocument {
     };
   }
 
-  getNamedAreaRange(areaName) {
-    let range = null;
-    if (areaName.includes('|')) {
-      const [areaNameRow, areaNameColumn] = areaName.split('|');
-      const rangeRow = this.namedAreas.find((item) => item.name === areaNameRow);
-      const [r1, r2] = rangeRow.range.split(':');
-      const rangeColumn = this.namedAreas.find((item) => item.name === areaNameColumn);
-      const [c1, c2] = rangeColumn.range.split(':');
-      range = `${c1}${r1}:${c2}${r2}`.toLowerCase();
-    } else {
-      const namedArea = this.namedAreas.find((item) => item.name === areaName);
-      range = namedArea.range.toLowerCase();
-    }
-    return range;
-  }
-
   getScript(scriptName) {
     const script = this.scripts[scriptName];
     if (script) return script;
@@ -687,20 +812,22 @@ class TableDocument {
     const rangeCellArea = getRangeOfCellArea(areaCells);
 
     const areaNamedAreaFrom = `${getColumnNameForNumber(numberColumn)}${numberRow}`;
-    const areaNamedAreaTo = `${getColumnNameForNumber(numberColumn + (getRangeLength(rangeCellArea[1]) - 1))}${numberRow + (getRangeLength(rangeCellArea[0]) - 1)}`;
+    const areaNamedAreaTo = `${getColumnNameForNumber(numberColumn + (getRangeLength(rangeCellArea[1].join(':'), true) - 1))}${numberRow + (getRangeLength(rangeCellArea[0].join(':'), true) - 1)}`;
     if (areaNamedArea[0]) areaNamedArea[0].range = `${areaNamedAreaFrom}:${areaNamedAreaTo}`;
     const shiftInsert = {
-      [SHIFT_TYPE.horizontal]: () => {
+      [SHIFT_TYPE.HORIZONTAL]: () => {
         this.shiftHorizontal({
           shiftStart: numberColumn,
-          shiftStep: getRangeLength(rangeCellArea[1]),
+          shiftStep: getRangeLength(rangeCellArea[1].join(':'), true),
         });
       },
-      [SHIFT_TYPE.vertical]: () => {
+      [SHIFT_TYPE.VERTICAL]: () => {
         console.log('shift');
+        console.log(rangeCellArea[0]);
+        console.log(getRangeLength(rangeCellArea[0].join(':'), true));
         this.shiftVertical({
           shiftStart: numberRow,
-          shiftStep: getRangeLength(rangeCellArea[0]),
+          shiftStep: getRangeLength(rangeCellArea[0].join(':'), true),
         });
       },
       null: () => {},
@@ -769,6 +896,14 @@ class TableDocument {
     this.cells = { ...this.cells, ...{ [cellName]: this.cells[cellName] } };
   }
 
+  // shiftAreaVertical(range, step = 1) {
+  //   const areaShift = this.getAreaForRange(range);
+  //   const rangeShift = getRangeShift(range, step);
+  //   const rangeFrom = getRangeFrom(rangeShift);
+  //   const { parthSymbol: column, parthDigit: row } = getParseAtSymbolDigit(rangeFrom);
+  //   this.insertArea(column, row, areaShift);
+  // }
+
   shiftVertical({ shiftStart, shiftStep = 1 }) {
     const rangeShiftArea = `a${shiftStart}:${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
     const shiftArea = this.getAreaForRange(rangeShiftArea);
@@ -784,46 +919,11 @@ class TableDocument {
     this.insertArea(1, shiftStart + shiftStep, shiftArea);
   }
 
-  // shiftRows({ shiftStart, shiftStep = 1 }) {
-  //   const cells = {};
-  //   const lastRow = this.getLastRow();
-  //   for (let i = 0; i < lastRow - (shiftStart - 1); i += 1) {
-  //     const newRowName = lastRow - i + shiftStep;
-  //     this.rows[newRowName] = this.rows[lastRow - i];
-  //     Object.entries(this.getCellsInRow(lastRow - i)).forEach((cell) => {
-  //       const [cellName, cellValue] = cell;
-  //       cells[`${cellName.replace(REG_DIGITS, '')}${newRowName}`] = cellValue;
-  //       delete this.cells[cellName];
-  //     });
-  //   }
-  //   this.cells = { ...this.cells, ...cells };
-  //   this.rows[shiftStart + shiftStep] = this.rows[shiftStart];
-  //   this.rowCount = Object.keys(this.rows).length;
-  // }
-
   shiftHorizontal({ shiftStart, shiftStep = 1 }) {
     const rangeShiftArea = `${getColumnNameForNumber(shiftStart)}1:${getColumnNameForNumber(this.getLastColumn())}${this.getLastRow()}`;
     const shiftArea = this.getAreaForRange(rangeShiftArea);
     this.insertArea(shiftStart + shiftStep, 1, shiftArea);
   }
-
-  // shiftColumns({ shiftStart, shiftStep = 1 }) {
-  //   const cells = {};
-  //   const lastColumn = this.getLastColumn();
-  //   for (let i = 0; i < lastColumn - (shiftStart - 1); i += 1) {
-  //     const newColumnName = getColumnNameForNumber(lastColumn - i + shiftStep);
-  //     this.columns[newColumnName] = this.columns[getColumnNameForNumber(lastColumn - i)];
-  //     Object.entries(this.getCellsInColumn(lastColumn - i)).forEach((cell) => {
-  //       const [cellName, cellValue] = cell;
-  //       const { cellRow } = parseCellName(cellName);
-  //       cells[`${newColumnName}${cellRow}`] = cellValue;
-  //       delete this.cells[cellName];
-  //     });
-  //   }
-  //   this.cells = { ...this.cells, ...cells };
-  //   this.columns[getColumnNameForNumber(shiftStart + shiftStep)] = this.columns[getColumnNameForNumber(shiftStart)];
-  //   this.columnCount = Object.keys(this.columns).length;
-  // }
 
   getAreaForRange(range) {
     console.log(range);

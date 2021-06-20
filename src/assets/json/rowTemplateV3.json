@@ -197,19 +197,19 @@
   "scripts":{
     "deleteRowSection1": {
       "template": "default",
-      "script": "(cellName) => { const areaName = 'string1'; const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === areaName); const { range: sectionRange } = namedArea; const sectionHeight = getRangeLength(sectionRange); const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName); const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`; this.deleteRows(rangeDelete);}"
+      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, SHIFT_TYPE.VERTICAL);}"
     },
     "deleteRowSection2": {
       "template": "default",
-      "script": "(cellName) => { const areaName = 'string2'; const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === areaName); const { range: sectionRange } = namedArea; const sectionHeight = getRangeLength(sectionRange); const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName); const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`; this.deleteRows(rangeDelete);}"
+      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, SHIFT_TYPE.VERTICAL);}"
     },
     "deleteRowSection3": {
       "template": "default",
-      "script": "(cellName) => { const areaName = 'string3'; const namedArea = this.documentTemplate.namedAreas.find((item) => item.name === areaName); const { range: sectionRange } = namedArea; const sectionHeight = getRangeLength(sectionRange); const { cellColumn: rangeColumnFrom, cellRow: rangeRowFrom } = parseCellName(cellName); const rangeDelete = `a${rangeRowFrom}:${rangeColumnFrom}${rangeRowFrom + (sectionHeight - 1)}`; this.deleteRows(rangeDelete);}"
+      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, SHIFT_TYPE.VERTICAL);}"
     },
     "addRowSection3": {
       "template": "default",
-      "script": "(cellName) => { const areaName = 'string3'; const area = this.documentTemplate.getNamedArea(areaName); const { cellRow } = parseCellName(cellName); this.insertArea(1, cellRow, area, SHIFT_TYPE.vertical); }"
+      "script": "(cellName) => { const areaName = 'string3'; const area = this.documentTemplate.getNamedArea(areaName); const { cellRow } = parseCellName(cellName); this.insertArea(1, cellRow, area, SHIFT_TYPE.VERTICAL); }"
     }
   }
 }

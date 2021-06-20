@@ -59,14 +59,17 @@
             </v-list-item>
             <v-list-item>
               <v-checkbox dense
-                          label="Заголовок"
+                          label="Заголовоки"
                           v-model="isTitle"
                           @input="isTitle = !isTitle"></v-checkbox>
             </v-list-item>
           </v-list>
         </v-menu>
       </div>
-
+      <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" @click="delColumn">
+          <v-icon small left>mdi-cloud-print-outline</v-icon>Del column</v-btn>
+      </div>
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
         <v-card>
@@ -137,6 +140,9 @@ export default {
     getCellValue(cellName) {
       if (!this.tableDocument.cells[cellName]) return null;
       return this.tableDocument.cells[cellName].value || '';
+    },
+    delColumn() {
+      this.tableDocument.deleteArea('c8:e9');
     },
 
     computeFormula() {
