@@ -28,7 +28,7 @@
 |||**Parameters:**
 ||||range|String|'a1', 'b', '3', '2:5', 'd:e', 'a1:d3'
 ||||mode|CONST|DELETE_MODE.ROW <br>DELETE_MODE.COLUMN, <br>null (default)
-|
+||||
 |2|**getRangeByAreaName**
 |||**Return:**
 |||||String|'2:2', '3:5', 'b:e', 'a1:d3'
