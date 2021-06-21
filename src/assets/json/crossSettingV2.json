@@ -1,0 +1,38 @@
+{
+  "header": {
+    "templateSectionName":"title|header",
+    "methodName":"put",
+    "countData":"uno",
+    "paremeters": {
+      "headerName":"headerName"
+    },
+    "insertData": {
+      "year": {
+        "templateSectionName":"column|header",
+        "methodName":"join",
+        "countData":"lot",
+        "parameters": {
+          "columnYear":"columnYear"
+        }
+      }
+    }
+  },
+  "string": {
+    "templateSectionName":"title|string",
+    "methodName":"put",
+    "countData":"lot",
+    "parameters": {
+      "stringTitleIndicator":"stringTitleIndicator"
+    },
+    "insertData": {
+      "columns": {
+        "templateSectionName":"column|string",
+        "methodName":"join",
+        "countData":"lot",
+        "parameters": {
+          "indicator":"indicator"
+        }
+      }
+    }
+  }  
+}

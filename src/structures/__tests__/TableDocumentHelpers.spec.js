@@ -35,11 +35,12 @@ describe('TableDocumentHelpers', () => {
   });
 
   describe('getRangeShift', () => {
+    it('"2"     -> "3"', () => expect(getRangeShift('2')).toBe('3'));
+    it('"2:5"   -> "3:6"', () => expect(getRangeShift('2:5')).toBe('3:6'));
+    it('"b"     -> "c"', () => expect(getRangeShift('b')).toBe('c'));
+    it('"a:c"   -> "b:d"', () => expect(getRangeShift('a:c')).toBe('b:d'));
+    
     describe('shiftType = SHIFT_TYPE.VERTICAL, step = 1', () => {
-      it('"2"     -> "3"', () => expect(getRangeShift('2')).toBe('3'));
-      it('"2:5"   -> "3:6"', () => expect(getRangeShift('2:5')).toBe('3:6'));
-      it('"b"     -> "c"', () => expect(getRangeShift('b')).toBe('c'));
-      it('"a:c"   -> "b:d"', () => expect(getRangeShift('a:c')).toBe('b:d'));
       it('"a1"    -> "a2"', () => expect(getRangeShift('a1')).toBe('a2'));
       it('"a1:c1" -> "a2:c2"', () => expect(getRangeShift('a1:c1')).toBe('a2:c2'));
     });

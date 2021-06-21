@@ -129,7 +129,7 @@ class TableDocument {
     this.cellHeight = cellHeight;
   }
 
-  addArea(cellName, areaName, shiftType = 'vertical') {
+  addArea(cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) {
     const area = this.documentTemplate.getNamedArea(areaName);
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
     if (shiftType === SHIFT_TYPE.VERTICAL) {
