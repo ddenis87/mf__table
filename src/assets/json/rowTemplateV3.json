@@ -197,19 +197,19 @@
   "scripts":{
     "deleteRowSection1": {
       "template": "default",
-      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, SHIFT_TYPE.VERTICAL);}"
+      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, 'vertical');}"
     },
     "deleteRowSection2": {
       "template": "default",
-      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, SHIFT_TYPE.VERTICAL);}"
+      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, 'vertical');}"
     },
     "deleteRowSection3": {
       "template": "default",
-      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, SHIFT_TYPE.VERTICAL);}"
+      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, 'vertical');}"
     },
     "addRowSection3": {
       "template": "default",
-      "script": "(cellName) => { const areaName = 'string3'; const area = this.documentTemplate.getNamedArea(areaName); const { cellRow } = parseCellName(cellName); this.insertArea(1, cellRow, area, SHIFT_TYPE.VERTICAL); }"
+      "script": "(cellName) => { this.addArea(cellName, 'string3', 'vertical'); }"
     }
   }
 }

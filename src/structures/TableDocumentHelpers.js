@@ -3,26 +3,16 @@ const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 
 const REG_SYMBOLS = /[A-Z]/gi;
 const REG_DIGITS = /[0-9]/g;
 
-const RANGE_TYPE = {
+export const RANGE_TYPE = {
   CELL: 'cell',
   RANGE: 'range',
   COLUMN: 'column',
   ROW: 'row',
 };
 
-export function getParseAtSymbolDigit(str) {
-  return {
-    parthSymbol: str.replace(REG_DIGITS, ''),
-    parthDigit: +str.replace(REG_SYMBOLS, ''),
-  };
-};
-
-export function getColumnNumberForName(name) {
-  const nameLowerCase = name.toLowerCase();
-  if (nameLowerCase.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase) + 1;
-  const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[0]) + 1;
-  const indexSecond = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[1]) + 1;
-  return (indexFirst * SET_COLUMN_NAME.length) + indexSecond;
+export const SHIFT_TYPE = {
+  VERTICAL: 'vertical',
+  HORIZONTAL: 'horizontal',
 };
 
 export function getColumnNameForNumber(number) {
@@ -42,7 +32,29 @@ export function getColumnNameForNumber(number) {
     (Math.floor(number / settLength)) - 1
   ]}${SET_COLUMN_NAME[(number % settLength) - 1]}`;
   return columnName;
-};
+}
+
+export function getColumnNumberForName(name) {
+  const nameLowerCase = name.toLowerCase();
+  if (nameLowerCase.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase) + 1;
+  const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[0]) + 1;
+  const indexSecond = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[1]) + 1;
+  return (indexFirst * SET_COLUMN_NAME.length) + indexSecond;
+}
+
+export function getParseAtSymbolDigit(str) {
+  return {
+    parthSymbol: str.replace(REG_DIGITS, ''),
+    parthDigit: +str.replace(REG_SYMBOLS, ''),
+  };
+}
+
+export function getRangeSplit(range) {
+  let splitRange = range.toString();
+  if (splitRange.includes(':')) splitRange = splitRange.split(':');
+  else splitRange = [splitRange, splitRange];
+  return splitRange;
+}
 
 export function getRangeType(range) {
   const [v1, v2] = `${range}`.toLowerCase().split(':');
@@ -56,50 +68,68 @@ export function getRangeType(range) {
     && v2.match(REG_DIGITS) && v2.match(REG_SYMBOLS)) return RANGE_TYPE.RANGE;
   if (getColumnNumberForName(v1) && getColumnNumberForName(v2)) return RANGE_TYPE.COLUMN;
   return undefined;
-};
-
-export function getRangeSplit(range) {
-  let splitRange = range.toString();
-  if (splitRange.includes(':')) splitRange = splitRange.split(':');
-  else splitRange = [splitRange, splitRange];
-  return splitRange;
-};
+}
 
 export function getRangeLength(range, isCompute = false) {
   const rangeType = getRangeType(range);
   let [r1, r2] = getRangeSplit(range);
-  if (!r2 && [RANGE_TYPE.COLUMN, RANGE_TYPE.ROW].includes(rangeType)) r2 = r1;
   const rangeLength = {
-    [RANGE_TYPE.CELL]: () => [1, 1],
-    [RANGE_TYPE.ROW]: () => [0, (+r2 - +r1) + 1],
+    [RANGE_TYPE.CELL]: () => {
+      const rezult = (isCompute) ? 1 : [1, 1];
+      return rezult;
+    },
+    [RANGE_TYPE.ROW]: () => {
+      const rezult = (isCompute) ? (+r2 - +r1) + 1 : [0, (+r2 - +r1) + 1];
+      return rezult;
+    },
     [RANGE_TYPE.COLUMN]: () => {
       r1 = getColumnNumberForName(r1);
       r2 = getColumnNumberForName(r2);
-      console.log(r1, r2);
-      return [(+r2 - +r1) + 1, 0];
+      return (isCompute) ? (+r2 - +r1) + 1 : [(+r2 - +r1) + 1, 0];
     },
     [RANGE_TYPE.RANGE]: () => {
       const { parthSymbol: columnFrom, parthDigit: rowFrom } = getParseAtSymbolDigit(r1);
       const { parthSymbol: columnTo, parthDigit: rowTo } = getParseAtSymbolDigit(r2);
-      return [
-        (+getColumnNumberForName(columnTo) - +getColumnNumberForName(columnFrom)) + 1,
-        (+rowTo - +rowFrom) + 1,
+      return (isCompute) ? NaN : [
+        (getColumnNumberForName(columnTo) - getColumnNumberForName(columnFrom)) + 1,
+        (rowTo - rowFrom) + 1,
       ];
     },
   };
   const rezult = rangeLength[rangeType]();
-  return (isCompute) ? rezult[1] - rezult[0] + 1 : rezult;
-};
+  return rezult;
+}
 
-export function getRangeShift(range, shift = SHIFT_TYPE.VERTICAL, step = 1) {
-  console.log(shift);
-  const rangeType = getRangeType(range);
+export function getRangeShift(range, shiftType = SHIFT_TYPE.VERTICAL, step = 1) {
+  const rangeString = range.toString();
+  const rangeType = getRangeType(rangeString);
   const rangeTypes = {
+    [RANGE_TYPE.CELL]: () => {
+      let rezult = rangeString;
+      const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(rangeString);
+      if (shiftType === SHIFT_TYPE.VERTICAL) rezult = `${cellColumn}${cellRow + step}`;
+      if (shiftType === SHIFT_TYPE.HORIZONTAL) rezult = `${getColumnNameForNumber(getColumnNumberForName(cellColumn) + step)}${cellRow}`;
+      return rezult;
+    },
+    [RANGE_TYPE.COLUMN]: () => {
+      if (!rangeString.includes(':')) return getColumnNameForNumber(getColumnNumberForName(range) + step);
+      const [rangeFrom, rangeTo] = getRangeSplit(rangeString);
+      return `${getColumnNameForNumber(getColumnNumberForName(rangeFrom) + step)}:${getColumnNameForNumber(getColumnNumberForName(rangeTo) + step)}`;
+    },
     [RANGE_TYPE.ROW]: () => {
-      if (!range.includes(':')) return +range + +step;
-      const [rangeFrom, rangeTo] = getRangeSplit(range);
+      if (!rangeString.includes(':')) return +range + +step;
+      const [rangeFrom, rangeTo] = getRangeSplit(rangeString);
       return `${+rangeFrom + +step}:${+rangeTo + +step}`;
     },
+    [RANGE_TYPE.RANGE]: () => {
+      let rezult = rangeString;
+      const [rangeFrom, rangeTo] = getRangeSplit(rangeString);
+      const { parthSymbol: rangeFromColumn, parthDigit: rangeFromRow } = getParseAtSymbolDigit(rangeFrom);
+      const { parthSymbol: rangeToColumn, parthDigit: rangeToRow } = getParseAtSymbolDigit(rangeTo);
+      if (shiftType === SHIFT_TYPE.VERTICAL) rezult = `${rangeFromColumn}${rangeFromRow + step}:${rangeToColumn}${rangeToRow + step}`;
+      if (shiftType === SHIFT_TYPE.HORIZONTAL) rezult = `${getColumnNameForNumber(getColumnNumberForName(rangeFromColumn) + step)}${rangeFromRow}:${getColumnNameForNumber(getColumnNumberForName(rangeToColumn) + step)}${rangeToRow}`;
+      return rezult;
+    },
   };
-  return rangeTypes[rangeType]();
+  return rangeTypes[rangeType]().toString();
 }
