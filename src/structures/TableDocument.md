@@ -4,7 +4,8 @@
 This class is intended for creating and working with the tabular section of the document.  
 
 **This class usage a next helpers:**  
-* <small>[TableDocumentHelpers](https://git.digitatl.ru/DDenis87/mf__table/-/blob/main/src/structures/TableDocumentHelpers.js)</small>
+* <small>[TableDocumentHelpers.md](https://git.digitatl.ru/DDenis87/mf__table/-/blob/main/src/structures/TableDocumentHelpers.md)</small>
+* <small>[TableDocumentHelpers.js](https://git.digitatl.ru/DDenis87/mf__table/-/blob/main/src/structures/TableDocumentHelpers.js)</small>
 ### Properties
 
 | # | Name | Type | Default | Description |

@@ -34,5 +34,6 @@
 
 **When use:**  
 <small>[class TableDocument](https://git.digitatl.ru/DDenis87/mf__table/-/blob/main/src/structures/TableDocument.js)</small>
+<small>[class TableDocument.md](https://git.digitatl.ru/DDenis87/mf__table/-/blob/main/src/structures/TableDocument.md)</small>
 ---
 
