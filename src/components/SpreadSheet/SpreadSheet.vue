@@ -5,10 +5,11 @@
   }">
     <div class="sheet"
         :style="templateSheet">
-      <div class="sheet__angle"></div>
+      <div class="sheet__angle" v-show="isTitle"></div>
       <div class="sheet__head">
         <spread-sheet-head ref="SheetHead"
-                          v-if="!isPrintMode || !isTitle"
+                          v-if="!isPrintMode"
+                          v-show="isTitle"
                           :columns="tableColumns"
                           :template-column-width="templateColumnWidth"
                           :template-table-width="templateTableWidth"
@@ -40,6 +41,7 @@
                            :template-table-width="templateTableWidth"
                            :set-open-group-rows="setOpenGroupRows"
                            :is-grid="isGrid"
+                           :is-title="isTitle"
                            @click:cell="evtClickCell"
                            @dblclick:cell="evtDblclickCell"
                            @keydown:cell="evtKeydownCell"

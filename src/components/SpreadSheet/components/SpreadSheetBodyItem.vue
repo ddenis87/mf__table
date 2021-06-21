@@ -3,25 +3,27 @@
        class="sheet-body__row"
        :style="templateRow(source.height)">
     <template v-if="!printMode">
-      <div v-for="level in maxLevelGroupRow"
-          :key="`${source.value}-${level}`"
-          class="column column-group"
-          :class="{
-            'line-start': (setOpenGroupRows.includes(source.value) && source.rowLevel === level - 1),
-            'line': (source.parent && level <= source.rowLevel),
-            'line-end': (getEndGroup(index, level) && level <= source.rowLevel),
-          }"
-          :style="getStyleGroup(level)">
-          <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
-                                  :data-row-index="index"
-                                  :data-row-parent="source.value"
-                                  :data-row-count="source.rowGroup - 1"
-                                  :data-row-status="source.openGroup">
-            {{ (setOpenGroupRows.includes(source.value)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
-          </spread-sheet-btn-group>
+      <div v-show="isTitle"
+           v-for="level in maxLevelGroupRow"
+           :key="`${source.value}-${level}`"
+           class="column column-group"
+           :class="{
+             'line-start': (setOpenGroupRows.includes(source.value) && source.rowLevel === level - 1),
+             'line': (source.parent && level <= source.rowLevel),
+             'line-end': (getEndGroup(index, level) && level <= source.rowLevel),
+           }"
+           :style="getStyleGroup(level)">
+        <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
+                                :data-row-index="index"
+                                :data-row-parent="source.value"
+                                :data-row-count="source.rowGroup - 1"
+                                :data-row-status="source.openGroup">
+          {{ (setOpenGroupRows.includes(source.value)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+        </spread-sheet-btn-group>
       </div>
-      <div class="column column-title"
-          :style="shiftTitle"><div class="content">{{ source.value }}</div></div>
+      <div v-show="isTitle"
+           class="column column-title"
+           :style="shiftTitle"><div class="content">{{ source.value }}</div></div>
     </template>
     <template v-for="(column, columnIndex) in columns">
       <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
@@ -69,6 +71,7 @@ export default {
     setOpenGroupRows: { type: Array, default() { return []; } },
     printMode: { type: Boolean, default: false },
     isGrid: { type: Boolean, default: true },
+    isTitle: { type: Boolean, default: true },
   },
   data() {
     return {

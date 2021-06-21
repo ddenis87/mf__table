@@ -66,6 +66,7 @@ export default {
     setExcludedCells: { type: Object, default() { return {}; } },
     setOpenGroupRows: { type: Array, default() { return []; } },
     isGrid: { type: Boolean, default: true },
+    isTitle: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -109,6 +110,7 @@ export default {
         maxLevelGroupRow: this.maxLevelGroupRow,
         setOpenGroupRows: this.setOpenGroupRows,
         isGrid: this.isGrid,
+        isTitle: this.isTitle,
       };
     },
   },
