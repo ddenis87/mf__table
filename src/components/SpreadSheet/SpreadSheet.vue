@@ -8,13 +8,13 @@
       <div class="sheet__angle"></div>
       <div class="sheet__head">
         <spread-sheet-head ref="SheetHead"
-                          v-if="!isPrintMode"
+                          v-if="!isPrintMode || !isTitle"
                           :columns="tableColumns"
                           :template-column-width="templateColumnWidth"
                           :template-table-width="templateTableWidth"
                           :max-level-group-column="maxLevelGroupColumn"
                           :set-open-group-column="setOpenGroupColumns"
-                          :is-grid-off="isGridOff"
+                          :is-grid="isGrid"
                           @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
       </div>
       <div class="sheet__body">
@@ -39,7 +39,7 @@
                            :set-excluded-cells="setExcludedCells"
                            :template-table-width="templateTableWidth"
                            :set-open-group-rows="setOpenGroupRows"
-                           :is-grid-off="isGridOff"
+                           :is-grid="isGrid"
                            @click:cell="evtClickCell"
                            @dblclick:cell="evtDblclickCell"
                            @keydown:cell="evtKeydownCell"
@@ -81,7 +81,8 @@ export default {
     cellWidth: { type: Number, default: CELL_WIDTH },
     cellHeight: { type: Number, default: CELL_HEIGHT },
     isPrintMode: { type: Boolean, default: false },
-    isGridOff: { type: Boolean, default: false },
+    isGrid: { type: Boolean, default: true },
+    isTitle: { type: Boolean, default: true },
   },
   data() {
     return {

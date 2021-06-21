@@ -67,8 +67,8 @@
         </v-menu>
       </div>
       <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="delColumn">
-          <v-icon small left>mdi-cloud-print-outline</v-icon>Del column</v-btn>
+        <v-btn small dark color="blue darken-3" @click="insertColumn">
+          <v-icon small left>mdi-cloud-print-outline</v-icon>Test button</v-btn>
       </div>
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
@@ -87,7 +87,8 @@
                          @editing:cancel="cancelEditingCell"></spread-sheet-edit>
       <spread-sheet ref="SpreadSheet"
                     v-bind="tableDocument"
-                    :is-grid-off="!isGrid"
+                    :is-grid="isGrid"
+                    :is-title="isTitle"
                     @click:cell="evtClickCell"
                     @dblclick:cell="evtEditCell"
                     @keydown:cell="evtEditCell"
@@ -272,7 +273,7 @@ export default {
         this.tableDocument.recalculateFormulas();
         this.isFileDataDisabled = true;
         this.isGrid = false;
-        // console.log(this.tableDocument);
+        console.log(this.tableDocument);
       });
     },
     openPrintPage() {

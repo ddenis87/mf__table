@@ -6,7 +6,7 @@
        @keydown="evtKeydownBody">
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed"
-         :class="{'sheet-body-fixed_grid-off': (isGridOff && rowsFixed.length)}">
+         :class="{'sheet-body-fixed_grid-off': (!isGrid && rowsFixed.length)}">
       <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
            class="sheet-body-fixed__item"
            :key="rowFixedIndex"
@@ -19,7 +19,7 @@
                                 :set-excluded-cell="setExcludedCellsArray"
                                 :max-level-group-row="maxLevelGroupRow"
                                 :template-column-width="templateColumnWidth"
-                                :is-grid-off="isGridOff"></spread-sheet-body-item>
+                                :is-grid="isGrid"></spread-sheet-body-item>
         <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
       </div>
     </div>
@@ -65,7 +65,7 @@ export default {
     maxLevelGroupColumn: { type: Number, default: 0 },
     setExcludedCells: { type: Object, default() { return {}; } },
     setOpenGroupRows: { type: Array, default() { return []; } },
-    isGridOff: { type: Boolean, default: false },
+    isGrid: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -108,7 +108,7 @@ export default {
         setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
         maxLevelGroupRow: this.maxLevelGroupRow,
         setOpenGroupRows: this.setOpenGroupRows,
-        isGridOff: this.isGridOff,
+        isGrid: this.isGrid,
       };
     },
   },

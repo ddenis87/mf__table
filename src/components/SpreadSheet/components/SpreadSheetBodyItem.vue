@@ -30,7 +30,7 @@
           :class="[
             (cells[`${column.name}${source.value}`])
               ? cells[`${column.name}${source.value}`].style : '',
-            (isGridOff) ? 'column-body_grid-off' : '',
+            (!isGrid) ? 'column-body_grid-off' : '',
           ]"
           :style="[
             getCellGeometry(source, column, columnIndex),
@@ -68,7 +68,7 @@ export default {
     templateColumnWidth: { type: String, default: '' },
     setOpenGroupRows: { type: Array, default() { return []; } },
     printMode: { type: Boolean, default: false },
-    isGridOff: { type: Boolean, default: false },
+    isGrid: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -127,7 +127,7 @@ export default {
         }
         fixed.left += 'px';
         // if (!this.columns[columnIndex + 1].fixed) fixed['border-right'] = '3px solid rgba(0, 0, 0, .3)';
-        if (!this.columns[columnIndex + 1].fixed && this.isGridOff) fixed['box-shadow'] = '2px 0px 0px rgba(0, 0, 0, .2)';
+        if (!this.columns[columnIndex + 1].fixed && !this.isGrid) fixed['box-shadow'] = '2px 0px 0px rgba(0, 0, 0, .2)';
       }
       return fixed;
     },
