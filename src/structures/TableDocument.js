@@ -303,6 +303,47 @@ class TableDocument {
     }
   }
 
+  deserialize(data, template, settings) {
+    const documentData = getObjectOfJSON(data);
+    const documentTemplate = getObjectOfJSON(template);
+    const documentSettings = getObjectOfJSON(settings);
+    if (!this.documentTemplate) this.documentTemplate = documentTemplate;
+    if (!this.documentSettings) this.documentSettings = documentSettings;
+
+    documentSettings.forEach((setting) => {
+      const [key, keyValue] = Object.entries(setting)[0];
+      if (Object.keys(keyValue).includes('nested')) return;
+      const dataItem = documentData.find((item) => Object.keys(item).includes(key));
+      console.log(Object.entries(dataItem)[0]);
+      this.deserializeArea(key, keyValue, dataItem);
+    });
+  }
+
+  deserializeArea(key, keyValue, dataItem) {
+    const insertMethods = {
+      put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
+      join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
+    };
+    // console.log(key);
+    // console.log(keyValue);
+    // console.log(dataItem);
+    if (!Array.isArray(dataItem)) {
+      const wrapData = [
+        { ...dataItem },
+      ];
+      this.deserializeArea(key, keyValue, wrapData);
+      return;
+    }
+    console.log(dataItem);
+    dataItem.forEach((item) => {
+      const { templateSectionName, methodName: insertMethod, parameters } = keyValue;
+      console.log(templateSectionName);
+      console.log(Object.entries(item)[0][1]);
+      const area = this.documentTemplate.getNamedArea(templateSectionName);
+      insertMethods[insertMethod](Object.entries(item)[0][1], area, parameters);
+    });
+  }
+
   executeAction(cellName) {
     const actionName = this.getCellParameter(cellName, CELL_ATTRIBUTES.ACTION);
     const { script } = this.getScript(actionName);
@@ -329,7 +370,7 @@ class TableDocument {
             cellsValue[keyValue.parameters[cellValue.parameter]] = cellValue.value;
           }
         });
-        
+
         // const [presentationType, nestedData] = keyValue;
         const { presentationType, nestedData } = keyValue;
         if (nestedData) {
@@ -696,7 +737,7 @@ class TableDocument {
   }
 
   getNamedArea(areaName) {
-    // console.log(areaName);
+    console.log(areaName);
     const rows = {};
     const columns = {};
     const cells = {};

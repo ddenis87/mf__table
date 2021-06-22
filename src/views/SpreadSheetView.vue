@@ -291,7 +291,7 @@ export default {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
         const tableDocument = new TableDocument();
-        tableDocument.buildDocument(JSONData, this.tableDocumentTemplate, this.documentSetting);
+        tableDocument.deserialize(JSONData, this.tableDocumentTemplate, this.documentSetting);
         this.tableDocument = tableDocument;
         this.tableDocument.recalculateFormulas();
         this.isFileDataDisabled = true;
