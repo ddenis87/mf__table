@@ -149,7 +149,8 @@ class TableDocument {
     const documentTemplate = getObjectOfJSON(template);
     const documentSettings = getObjectOfJSON(settings);
 
-    this.documentTemplate = documentTemplate;
+    if (!this.documentTemplate) this.documentTemplate = documentTemplate;
+    if (!this.documentSettings) this.documentSettings = documentSettings;
 
     documentData.forEach((item) => {
       const [dataKey, dataValue] = Object.entries(item)[0];
@@ -312,7 +313,44 @@ class TableDocument {
   }
 
   exportData() {
-    console.log(this);
+    // console.log(this);
+    const documentData = [];
+    this.namedAreas.forEach((namedArea) => {
+      const cells = this.getCellsInRange(namedArea.range);
+      const cellsValue = {};
+      // console.log(cells);
+      const sectionSetting = Object.entries(this.documentSettings)
+        .find((section) => section[1].templateSectionName === namedArea.name);
+      if (sectionSetting) {
+        const [key, keyValue] = sectionSetting;
+        cells.forEach((cell) => {
+          const [, cellValue] = cell;
+          if (Object.keys(keyValue.parameters).includes(cellValue.parameter)) {
+            cellsValue[keyValue.parameters[cellValue.parameter]] = cellValue.value;
+          }
+        });
+        
+        // const [presentationType, nestedData] = keyValue;
+        const { presentationType, nestedData } = keyValue;
+        if (nestedData) {
+          console.log('rec');
+          console.log(key);
+          console.log(nestedData);
+          console.log(cells);
+        }
+        const documentDataItem = documentData.find((item) => Object.keys(item).includes(key));
+        if (!documentDataItem) {
+          documentData.push({ [key]: (presentationType === 'unit') ? { ...cellsValue } : [{ ...cellsValue }] });
+          // if (nestedData) {
+          //   //recurse
+          // }
+          return;
+        }
+        if (presentationType === 'multiple') documentDataItem[key].push({ ...cellsValue });
+        // console.log(documentDataItem[key]);
+      }
+    });
+    console.log(documentData);
   }
 
   fillArea(dataArea, parameters) {
@@ -477,6 +515,63 @@ class TableDocument {
     };
     return columnSet[type]();
   }
+
+  // getDocumentData(JSONFormat = false) {
+  //   const documentData = [];
+  //   this.namedAreas.forEach((namedArea) => {
+  //     const cells = this.getCellsInRange(namedArea.range);
+  //     const cellsValue = {};
+  //     // console.log(cells);
+  //     const settingSection = Object.entries(this.documentSettings)
+  //       .find((section) => section[1].templateSectionName === namedArea.name);
+  //     if (settingSection) {
+  //       const [sectionKey, sectionValue] = Object.entries(this.documentSettings)
+  //         .find((section) => section[1].templateSectionName === namedArea.name);
+  //       cells.forEach((cell) => {
+  //         const [, cellValue] = cell;
+  //         if (Object.keys(sectionValue.parameters).includes(cellValue.parameter)) {
+  //           cellsValue[sectionValue.parameters[cellValue.parameter]] = cellValue.value;
+  //         }
+  //       });
+  //       if (sectionValue.methodName === 'put') {
+  //         const itemSection = documentData.find((item) => Object.keys(item).includes(sectionKey));
+  //         if (!itemSection) {
+  //           documentData.push({ [sectionKey]: [{ ...cellsValue }] });
+  //         }
+  //         if (itemSection) {
+  //           itemSection[sectionKey].push({ ...cellsValue });
+  //         }
+  //       }
+  //       if (sectionValue.methodName === 'join') {
+  //         const [parentSection] = Object.entries(documentData[documentData.length - 1]);
+  //         const [, parentSectionValue] = parentSection;
+  //         if (Object.keys(parentSectionValue[parentSectionValue.length - 1]).includes(sectionKey)) {
+  //           parentSectionValue[parentSectionValue.length - 1][sectionKey].push({ ...cellsValue });
+  //         }
+  //         if (!Object.keys(parentSectionValue[parentSectionValue.length - 1]).includes(sectionKey)) {
+  //           parentSectionValue[parentSectionValue.length - 1][sectionKey] = [{ ...cellsValue }];
+  //         }
+  //       }
+  //     }
+  //     if (!settingSection) {
+  //       console.log(namedArea);
+  //       cells.forEach((cell) => {
+  //         const [, cellValue] = cell;
+  //         cellsValue[cellValue.parameter] = cellValue.value;
+  //       });
+  //       const section = documentData.find((item) => {
+  //         console.log(item, namedArea.name);
+  //         return Object.keys(item).includes(namedArea.name);
+  //       });
+  //       if (!section) documentData.push({ [namedArea.name]: [{ ...cellsValue }] });
+  //       if (section) {
+  //         section[namedArea.name].push({ ...cellsValue });
+  //       }
+  //     }
+  //   });
+  //   console.log(documentData);
+  //   return (JSONFormat) ? JSON.stringify(documentData) : documentData;
+  // }
 
   getRangeByAreaName(areaName) {
     console.log(areaName);
