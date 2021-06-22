@@ -50,6 +50,7 @@ export function getParseAtSymbolDigit(str) {
 }
 
 export function getRangeSplit(range) {
+  console.log(range);
   let splitRange = range.toString();
   if (splitRange.includes(':')) splitRange = splitRange.split(':');
   else splitRange = [splitRange, splitRange];

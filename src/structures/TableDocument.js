@@ -141,56 +141,103 @@ class TableDocument {
   }
 
   buildDocument(data, template, settings) {
-    const buldMethods = {
+    const insertMethods = {
       put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
       join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
     };
     const documentData = getObjectOfJSON(data);
     const documentTemplate = getObjectOfJSON(template);
     const documentSettings = getObjectOfJSON(settings);
+
     this.documentTemplate = documentTemplate;
-    this.documentSettings = documentSettings;
 
     documentData.forEach((item) => {
-      const [itemDataKey, itemDataValue] = Object.entries(item)[0];
-      const itemSetting = Object.entries(documentSettings).find((setting) => setting[0] === itemDataKey);
+      const [dataKey, dataValue] = Object.entries(item)[0];
+      const dataSetting = documentSettings[dataKey] || null;
       let area = null;
-      let buildMethodName = null;
-      let areaParameters = {};
-
-      if (itemSetting) {
-        const [, tagValue] = itemSetting;
-        const { templateSectionName, methodName, parameters } = tagValue;
-
-        area = documentTemplate.getNamedArea(templateSectionName);
-        areaParameters = parameters;
-        buildMethodName = methodName;
+      let insertMethod = null;
+      let parameters = {};
+      if (dataSetting) {
+        ({ methodName: insertMethod, parameters } = dataSetting);
+        area = this.documentTemplate.getNamedArea(dataSetting.templateSectionName);
       } else {
-        area = documentTemplate.getNamedArea(itemDataKey);
-        buildMethodName = area.methodName;
+        area = this.documentTemplate.getNamedArea(dataKey);
+        insertMethod = area.methodName;
       }
-      if (!Array.isArray(itemDataValue)) {
+      if (!Array.isArray(dataValue)) {
         const nestedData = [
-          { [itemDataKey]: [{ ...itemDataValue }] },
+          { [dataKey]: [{ ...dataValue }] },
         ];
         this.buildDocument(nestedData, template, settings);
         return;
       }
-      itemDataValue.forEach((itemData) => {
-        // console.log(areaParameters);
-        buldMethods[buildMethodName](itemData, area, areaParameters);
-
-        Object.keys(itemData).forEach((parameterKey) => {
-          if (Array.isArray(itemData[parameterKey])) {
+      dataValue.forEach((dataValueItem) => {
+        insertMethods[insertMethod](dataValueItem, area, parameters);
+        Object.entries(dataValueItem).forEach((parameter) => {
+          const [parameterKey, parameterValue] = parameter;
+          if (Array.isArray(parameterValue)) {
             const nestedData = [
-              { [parameterKey]: [...itemData[parameterKey]] },
+              { [parameterKey]: [...parameterValue] },
             ];
-            this.buildDocument(nestedData, template, settings);
+            this.buildDocument(nestedData, template, dataSetting.nestedData);
           }
         });
       });
     });
   }
+
+  // buildDocument(data, template, settings) {
+  //   const buldMethods = {
+  //     put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
+  //     join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
+  //   };
+  //   const documentData = getObjectOfJSON(data);
+  //   const documentTemplate = getObjectOfJSON(template);
+  //   const documentSettings = getObjectOfJSON(settings);
+  //   this.documentTemplate = documentTemplate;
+  //   this.documentSettings = documentSettings;
+  //   console.log(documentSettings);
+  //   documentData.forEach((item) => {
+  //     const [itemDataKey, itemDataValue] = Object.entries(item)[0];
+  //     const itemSetting = Object.entries(documentSettings).find((setting) => setting[0] === itemDataKey);
+  //     let area = null;
+  //     let buildMethodName = null;
+  //     let areaParameters = {};
+
+  //     if (itemSetting) {
+  //       console.log(itemSetting);
+  //       const [, tagValue] = itemSetting;
+  //       const { templateSectionName, methodName, parameters } = tagValue;
+
+  //       area = documentTemplate.getNamedArea(templateSectionName);
+  //       areaParameters = parameters;
+  //       buildMethodName = methodName;
+  //     } else {
+  //       area = documentTemplate.getNamedArea(itemDataKey);
+  //       buildMethodName = area.methodName;
+  //     }
+  //     if (!Array.isArray(itemDataValue)) {
+  //       const nestedData = [
+  //         { [itemDataKey]: [{ ...itemDataValue }] },
+  //       ];
+  //       this.buildDocument(nestedData, template, settings);
+  //       return;
+  //     }
+  //     itemDataValue.forEach((itemData) => {
+  //       console.log(areaParameters);
+  //       buldMethods[buildMethodName](itemData, area, areaParameters);
+
+  //       Object.keys(itemData).forEach((parameterKey) => {
+  //         if (Array.isArray(itemData[parameterKey])) {
+  //           const nestedData = [
+  //             { [parameterKey]: [...itemData[parameterKey]] },
+  //           ];
+  //           this.buildDocument(nestedData, template, settings);
+  //         }
+  //       });
+  //     });
+  //   });
+  // }
 
   calculateCellValue(cellName) {
     const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
@@ -264,8 +311,13 @@ class TableDocument {
     this.recalculateFormulas();
   }
 
+  exportData() {
+    console.log(this);
+  }
+
   fillArea(dataArea, parameters) {
-    // console.log(dataArea);
+    console.log(dataArea);
+    console.log(parameters);
     Object.entries(this.cells).forEach((cell) => {
       const [, cellValue] = cell;
       const parameterName = cellValue?.parameter || null;

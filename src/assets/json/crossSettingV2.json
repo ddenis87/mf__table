@@ -3,7 +3,7 @@
     "templateSectionName":"title|header",
     "methodName":"put",
     "presentationType":"unit",
-    "paremeters": {
+    "parameters": {
       "headerName": "hName"
     },
     "nestedData": {
@@ -24,7 +24,7 @@
     "parameters": {
       "stringTitleIndicator":"stringTitleIndicator"
     },
-    "insertData": {
+    "nestedData": {
       "columns": {
         "templateSectionName":"column|string",
         "methodName":"join",

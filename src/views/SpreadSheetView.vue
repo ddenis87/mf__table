@@ -177,8 +177,9 @@ export default {
     },
     saveDocument() { alert('save document'); },
     saveDocumentData() {
-      const JSONFormat = true;
-      apiSpreadSheet.dowloadJSONFile(this.tableDocument.getDocumentData(JSONFormat), JSONFormat);
+      this.tableDocument.exportData();
+      // const JSONFormat = true;
+      // apiSpreadSheet.dowloadJSONFile(this.tableDocument.getDocumentData(JSONFormat), JSONFormat);
     },
     evtClickCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
@@ -280,7 +281,7 @@ export default {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONSetting) => {
         this.documentSetting = JSONSetting;
-        console.log(this.documentSetting);
+        // console.log(this.documentSetting);
         this.isFileSettingDisabled = true;
         this.isFileDataDisabled = false;
       });
