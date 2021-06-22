@@ -127,8 +127,12 @@ export default {
       if (evt.target.closest('button')) this.toggleRowGroup(evt.target.closest('button'));
       if (evt.target.closest('.column-body')) {
         const cellName = evt.target.closest('.column-body').getAttribute('data-name');
-        const isTrySelected = Object.entries(this.cells).find((cell) => cell[0] === cellName)[1]?.noSelect || false;
-        if (isTrySelected) return;
+        console.log(cellName);
+        const cell = Object.entries(this.cells).find((item) => item[0] === cellName);
+        if (cell) {
+          const isTrySelected = cell.noSelect || false;
+          if (isTrySelected) return;
+        }
         this.focusCell(this.getCellNodeForName(cellName));
       }
     },

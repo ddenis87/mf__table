@@ -2,15 +2,15 @@
   "header": {
     "templateSectionName":"title|header",
     "methodName":"put",
-    "countData":"uno",
+    "presentationType":"unit",
     "paremeters": {
-      "headerName":"headerName"
+      "headerName": "hName"
     },
-    "insertData": {
+    "nestedData": {
       "year": {
         "templateSectionName":"column|header",
         "methodName":"join",
-        "countData":"lot",
+        "presentationType":"multiple",
         "parameters": {
           "columnYear":"columnYear"
         }
@@ -20,7 +20,7 @@
   "string": {
     "templateSectionName":"title|string",
     "methodName":"put",
-    "countData":"lot",
+    "presentationType":"multiple",
     "parameters": {
       "stringTitleIndicator":"stringTitleIndicator"
     },
@@ -28,7 +28,7 @@
       "columns": {
         "templateSectionName":"column|string",
         "methodName":"join",
-        "countData":"lot",
+        "presentationType":"multiple",
         "parameters": {
           "indicator":"indicator"
         }

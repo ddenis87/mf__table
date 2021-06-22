@@ -15,6 +15,14 @@
       </div>
       <div class="item item_btn item_file">
         <v-file-input dense
+                      label="Открыть настройки"
+                      :disabled="isFileSettingDisabled"
+                      v-model="fileSetting"
+                      @change="openJSONFileSetting">
+        </v-file-input>
+      </div>
+      <div class="item item_btn item_file">
+        <v-file-input dense
                       label="Открыть данные"
                       :disabled="isFileDataDisabled"
                       v-model="fileData"
@@ -105,7 +113,7 @@ import DialogModal from '@/components/Dialogs/DialogModal.vue';
 import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocument from '@/structures/TableDocument';
 
-import setting from '@/assets/json/crossSetting';
+// import setting from '@/assets/json/crossSetting';
 
 export default {
   name: 'SpreadSheetView',
@@ -119,6 +127,7 @@ export default {
       tableDocument: new TableDocument(),
       tableDocumentTemplate: {},
       fileTemplate: [],
+      fileSetting: [],
       fileData: [],
 
       editableCell: null,
@@ -129,8 +138,9 @@ export default {
 
       isGrid: true,
       isTitle: true,
-      isFileDataDisabled: true,
       isFileTemplateDisabled: false,
+      isFileDataDisabled: true,
+      isFileSettingDisabled: true,
       isShowDialog: false,
     };
   },
@@ -249,8 +259,10 @@ export default {
 
       this.isFileTemplateDisabled = false;
       this.isFileDataDisabled = true;
+      this.isFileSettingDisabled = true;
 
       this.fileTemplate = [];
+      this.fileSetting = [];
       this.fileData = [];
     },
 
@@ -258,17 +270,27 @@ export default {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONTemplate) => {
         this.tableDocumentTemplate = new TableDocument({ JSONString: JSONTemplate });
-        this.tableDocument.direction = this.tableDocumentTemplate.direction;
+        // this.tableDocument.direction = this.tableDocumentTemplate.direction;
         this.isFileTemplateDisabled = true;
-        this.isFileDataDisabled = false;
+        this.isFileSettingDisabled = false;
         // console.log(this.tableDocumentTemplate);
       });
     },
+    openJSONFileSetting(file) {
+      if (!file) return;
+      apiSpreadSheet.uploadJSONFile(file).then((JSONSetting) => {
+        this.documentSetting = JSONSetting;
+        console.log(this.documentSetting);
+        this.isFileSettingDisabled = true;
+        this.isFileDataDisabled = false;
+      });
+    },
+
     openJSONFileData(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
         const tableDocument = new TableDocument();
-        tableDocument.buildDocument(JSONData, this.tableDocumentTemplate, setting);
+        tableDocument.buildDocument(JSONData, this.tableDocumentTemplate, this.documentSetting);
         this.tableDocument = tableDocument;
         this.tableDocument.recalculateFormulas();
         this.isFileDataDisabled = true;
