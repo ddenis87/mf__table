@@ -921,12 +921,13 @@ class TableDocument {
   serialization() {
     this.documentData = [];
     this.documentSettings.forEach((setting) => {
-      const [key, keyValue] = Object.entries(setting)[0];
-      if (Object.keys(keyValue).includes('nested')) return;
-      const { templateSectionName } = keyValue;
-      console.log(this.namedAreas.filter((namedArea) => namedArea.name === templateSectionName));
+      const [key] = Object.entries(setting)[0];
+      // if (Object.keys(keyValue).includes('nested')) return;
+      // const { templateSectionName } = keyValue;
+      // console.log(this.namedAreas.filter((namedArea) => namedArea.name === templateSectionName));
       console.log(key);
-      console.log(keyValue);
+      console.log(this.getNamedArea(key));
+      // console.log(keyValue);
     });
   }
 
