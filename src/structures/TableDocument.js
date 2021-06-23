@@ -140,52 +140,52 @@ class TableDocument {
     }
   }
 
-  buildDocument(data, template, settings) {
-    const insertMethods = {
-      put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
-      join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
-    };
-    const documentData = getObjectOfJSON(data);
-    const documentTemplate = getObjectOfJSON(template);
-    const documentSettings = getObjectOfJSON(settings);
+  // buildDocument(data, template, settings) {
+  //   const insertMethods = {
+  //     put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
+  //     join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
+  //   };
+  //   const documentData = getObjectOfJSON(data);
+  //   const documentTemplate = getObjectOfJSON(template);
+  //   const documentSettings = getObjectOfJSON(settings);
 
-    if (!this.documentTemplate) this.documentTemplate = documentTemplate;
-    if (!this.documentSettings) this.documentSettings = documentSettings;
+  //   if (!this.documentTemplate) this.documentTemplate = documentTemplate;
+  //   if (!this.documentSettings) this.documentSettings = documentSettings;
 
-    documentData.forEach((item) => {
-      const [dataKey, dataValue] = Object.entries(item)[0];
-      const dataSetting = documentSettings[dataKey] || null;
-      let area = null;
-      let insertMethod = null;
-      let parameters = {};
-      if (dataSetting) {
-        ({ methodName: insertMethod, parameters } = dataSetting);
-        area = this.documentTemplate.getNamedArea(dataSetting.templateSectionName);
-      } else {
-        area = this.documentTemplate.getNamedArea(dataKey);
-        insertMethod = area.methodName;
-      }
-      if (!Array.isArray(dataValue)) {
-        const nestedData = [
-          { [dataKey]: [{ ...dataValue }] },
-        ];
-        this.buildDocument(nestedData, template, settings);
-        return;
-      }
-      dataValue.forEach((dataValueItem) => {
-        insertMethods[insertMethod](dataValueItem, area, parameters);
-        Object.entries(dataValueItem).forEach((parameter) => {
-          const [parameterKey, parameterValue] = parameter;
-          if (Array.isArray(parameterValue)) {
-            const nestedData = [
-              { [parameterKey]: [...parameterValue] },
-            ];
-            this.buildDocument(nestedData, template, dataSetting.nestedData);
-          }
-        });
-      });
-    });
-  }
+  //   documentData.forEach((item) => {
+  //     const [dataKey, dataValue] = Object.entries(item)[0];
+  //     const dataSetting = documentSettings[dataKey] || null;
+  //     let area = null;
+  //     let insertMethod = null;
+  //     let parameters = {};
+  //     if (dataSetting) {
+  //       ({ methodName: insertMethod, parameters } = dataSetting);
+  //       area = this.documentTemplate.getNamedArea(dataSetting.templateSectionName);
+  //     } else {
+  //       area = this.documentTemplate.getNamedArea(dataKey);
+  //       insertMethod = area.methodName;
+  //     }
+  //     if (!Array.isArray(dataValue)) {
+  //       const nestedData = [
+  //         { [dataKey]: [{ ...dataValue }] },
+  //       ];
+  //       this.buildDocument(nestedData, template, settings);
+  //       return;
+  //     }
+  //     dataValue.forEach((dataValueItem) => {
+  //       insertMethods[insertMethod](dataValueItem, area, parameters);
+  //       Object.entries(dataValueItem).forEach((parameter) => {
+  //         const [parameterKey, parameterValue] = parameter;
+  //         if (Array.isArray(parameterValue)) {
+  //           const nestedData = [
+  //             { [parameterKey]: [...parameterValue] },
+  //           ];
+  //           this.buildDocument(nestedData, template, dataSetting.nestedData);
+  //         }
+  //       });
+  //     });
+  //   });
+  // }
 
   // buildDocument(data, template, settings) {
   //   const buldMethods = {
@@ -893,6 +893,21 @@ class TableDocument {
     const numberNewRow = this.getLastRow() + 1;
     areaCopy.fillArea(dataArea, parameters);
     this.insertArea(1, numberNewRow, areaCopy);
+  }
+
+  serialization() {
+    this.documentSettings.forEach((setting) => {
+      const [key, keyValue] = Object.entries(setting)[0];
+      if (Object.keys(keyValue).includes('nested')) return;
+      const { templateSectionName } = keyValue;
+      console.log(this.namedAreas.filter((namedArea) => namedArea.name === templateSectionName));
+      console.log(key);
+      console.log(keyValue);
+    });
+  }
+
+  serializationArea() {
+    console.log(this.columnCount);
   }
 
   checkEditAccess(cellName) {

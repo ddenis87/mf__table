@@ -1,1 +1,41 @@
-{}
+[
+  {
+    "headerR":{
+      "templateSectionName":"headerR",
+      "methodName":"put",
+      "presentationType":"multiple"
+    }
+  },
+  {
+    "string1":{
+      "templateSectionName":"string1",
+      "methodName":"put",
+      "presentationType":"multiple",
+      "parameters": {}
+    }
+  },
+  {
+    "string2":{
+      "templateSectionName":"string2",
+      "methodName":"put",
+      "presentationType":"multiple",
+      "parameters": {}
+    }
+  },
+  {
+    "string3":{
+      "templateSectionName":"string3",
+      "methodName":"put",
+      "presentationType":"multiple",
+      "parameters": {}
+    }
+  },
+  {
+    "footerR":{
+      "templateSectionName":"footerR",
+      "methodName":"put",
+      "presentationType":"multiple",
+      "parameters": {}
+    }
+  }
+]
