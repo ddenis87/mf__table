@@ -313,35 +313,42 @@ class TableDocument {
     documentSettings.forEach((setting) => {
       const [key, keyValue] = Object.entries(setting)[0];
       if (Object.keys(keyValue).includes('nested')) return;
-      const dataItem = documentData.find((item) => Object.keys(item).includes(key));
-      console.log(Object.entries(dataItem)[0]);
-      this.deserializeArea(key, keyValue, dataItem);
+      const dataSection = documentData.find((item) => Object.keys(item).includes(key));
+      const dataSectionItems = dataSection[key];
+      if (Array.isArray(dataSectionItems)) {
+        dataSectionItems.forEach((dataSectionItem) => {
+          this.deserializeArea(key, dataSectionItem);
+        });
+        return;
+      }
+      this.deserializeArea(key, dataSectionItems);
     });
   }
 
-  deserializeArea(key, keyValue, dataItem) {
+  deserializeArea(key, dataItem) {
     const insertMethods = {
       put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
       join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
     };
-    // console.log(key);
-    // console.log(keyValue);
-    // console.log(dataItem);
-    if (!Array.isArray(dataItem)) {
-      const wrapData = [
-        { ...dataItem },
-      ];
-      this.deserializeArea(key, keyValue, wrapData);
+    console.log(key);
+    if (Array.isArray(dataItem)) {
+      dataItem.forEach((item) => {
+        this.deserializeArea(key, item);
+      });
       return;
     }
-    console.log(dataItem);
-    dataItem.forEach((item) => {
-      const { templateSectionName, methodName: insertMethod, parameters } = keyValue;
-      console.log(templateSectionName);
-      console.log(Object.entries(item)[0][1]);
-      const area = this.documentTemplate.getNamedArea(templateSectionName);
-      insertMethods[insertMethod](Object.entries(item)[0][1], area, parameters);
-    });
+    const [, keyValue] = Object.entries(this.documentSettings.find((setting) => Object.keys(setting).includes(key)))[0];
+    const {
+      templateSectionName, methodName: insertMethod, parameters, nestedData,
+    } = keyValue;
+    const area = this.documentTemplate.getNamedArea(templateSectionName);
+    insertMethods[insertMethod](dataItem, area, parameters);
+
+    if (nestedData) {
+      nestedData.forEach((nestedDataKey) => {
+        if (Object.keys(dataItem).includes(nestedDataKey)) this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
+      });
+    }
   }
 
   executeAction(cellName) {
@@ -395,8 +402,8 @@ class TableDocument {
   }
 
   fillArea(dataArea, parameters) {
-    console.log(dataArea);
-    console.log(parameters);
+    // console.log(dataArea);
+    // console.log(parameters);
     Object.entries(this.cells).forEach((cell) => {
       const [, cellValue] = cell;
       const parameterName = cellValue?.parameter || null;
@@ -615,8 +622,8 @@ class TableDocument {
   // }
 
   getRangeByAreaName(areaName) {
-    console.log(areaName);
-    console.log(this.namedAreas);
+    // console.log(areaName);
+    // console.log(this.namedAreas);
     let range = null;
     if (!areaName) return null;
     if (areaName.includes('|')) {
@@ -641,7 +648,7 @@ class TableDocument {
       const namedArea = this.namedAreas.find((item) => item.name === areaName);
       range = namedArea?.range.toLowerCase() || null;
     }
-    console.log(range);
+    // console.log(range);
     return range;
   }
 
@@ -737,7 +744,7 @@ class TableDocument {
   }
 
   getNamedArea(areaName) {
-    console.log(areaName);
+    // console.log(areaName);
     const rows = {};
     const columns = {};
     const cells = {};
@@ -748,7 +755,7 @@ class TableDocument {
       name: areaName,
       range,
     }];
-    console.log(range);
+    // console.log(range);
     const cellsInRange = this.getCellsInRange(range);
     const rangeCellArea = getRangeOfCellArea(cellsInRange);
 
