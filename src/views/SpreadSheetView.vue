@@ -177,7 +177,7 @@ export default {
     },
     saveDocument() { alert('save document'); },
     saveDocumentData() {
-      this.tableDocument.serialization();
+      this.tableDocument.getSerializationDocument();
       // const JSONFormat = true;
       // apiSpreadSheet.dowloadJSONFile(this.tableDocument.getDocumentData(JSONFormat), JSONFormat);
     },

@@ -564,62 +564,85 @@ class TableDocument {
     return columnSet[type]();
   }
 
-  // getDocumentData(JSONFormat = false) {
-  //   const documentData = [];
-  //   this.namedAreas.forEach((namedArea) => {
-  //     const cells = this.getCellsInRange(namedArea.range);
-  //     const cellsValue = {};
-  //     // console.log(cells);
-  //     const settingSection = Object.entries(this.documentSettings)
-  //       .find((section) => section[1].templateSectionName === namedArea.name);
-  //     if (settingSection) {
-  //       const [sectionKey, sectionValue] = Object.entries(this.documentSettings)
-  //         .find((section) => section[1].templateSectionName === namedArea.name);
-  //       cells.forEach((cell) => {
-  //         const [, cellValue] = cell;
-  //         if (Object.keys(sectionValue.parameters).includes(cellValue.parameter)) {
-  //           cellsValue[sectionValue.parameters[cellValue.parameter]] = cellValue.value;
-  //         }
-  //       });
-  //       if (sectionValue.methodName === 'put') {
-  //         const itemSection = documentData.find((item) => Object.keys(item).includes(sectionKey));
-  //         if (!itemSection) {
-  //           documentData.push({ [sectionKey]: [{ ...cellsValue }] });
-  //         }
-  //         if (itemSection) {
-  //           itemSection[sectionKey].push({ ...cellsValue });
-  //         }
-  //       }
-  //       if (sectionValue.methodName === 'join') {
-  //         const [parentSection] = Object.entries(documentData[documentData.length - 1]);
-  //         const [, parentSectionValue] = parentSection;
-  //         if (Object.keys(parentSectionValue[parentSectionValue.length - 1]).includes(sectionKey)) {
-  //           parentSectionValue[parentSectionValue.length - 1][sectionKey].push({ ...cellsValue });
-  //         }
-  //         if (!Object.keys(parentSectionValue[parentSectionValue.length - 1]).includes(sectionKey)) {
-  //           parentSectionValue[parentSectionValue.length - 1][sectionKey] = [{ ...cellsValue }];
-  //         }
-  //       }
-  //     }
-  //     if (!settingSection) {
-  //       console.log(namedArea);
-  //       cells.forEach((cell) => {
-  //         const [, cellValue] = cell;
-  //         cellsValue[cellValue.parameter] = cellValue.value;
-  //       });
-  //       const section = documentData.find((item) => {
-  //         console.log(item, namedArea.name);
-  //         return Object.keys(item).includes(namedArea.name);
-  //       });
-  //       if (!section) documentData.push({ [namedArea.name]: [{ ...cellsValue }] });
-  //       if (section) {
-  //         section[namedArea.name].push({ ...cellsValue });
-  //       }
-  //     }
-  //   });
-  //   console.log(documentData);
-  //   return (JSONFormat) ? JSON.stringify(documentData) : documentData;
-  // }
+  getSerializationDocument() {
+    console.log(this.namedAreas);
+    // const documentData = [];
+    this.documentSettings.forEach((setting) => {
+      const [, keyValue] = Object.entries(setting)[0];
+      if (Object.keys(keyValue).includes('nested')) return;
+      const { templateSectionName } = keyValue;
+      // const namedAreas = this.namedAreas.filter((namedArea) => namedArea.name === );
+      console.log(templateSectionName);
+    });
+    // this.namedAreas.forEach((namedArea) => {
+    //   // const cells = this.getCellsInRange(namedArea.range);
+    //   // const cellsValue = {};
+    //   // console.log(namedArea);
+    //   const settingSection = this.documentSettings.find((setting) => {
+    //     const settingKey = Object.entries(setting)[0];
+    //     // console.log(settingKey);
+    //     return settingKey[1].templateSectionName === namedArea.name;
+    //   });
+    //   console.log(settingSection);
+    // });
+  }
+
+  getDocumentData(JSONFormat = false) {
+    const documentData = [];
+    this.namedAreas.forEach((namedArea) => {
+      const cells = this.getCellsInRange(namedArea.range);
+      const cellsValue = {};
+      // console.log(cells);
+      const settingSection = Object.entries(this.documentSettings)
+        .find((section) => section[1].templateSectionName === namedArea.name);
+      if (settingSection) {
+        const [sectionKey, sectionValue] = Object.entries(this.documentSettings)
+          .find((section) => section[1].templateSectionName === namedArea.name);
+        cells.forEach((cell) => {
+          const [, cellValue] = cell;
+          if (Object.keys(sectionValue.parameters).includes(cellValue.parameter)) {
+            cellsValue[sectionValue.parameters[cellValue.parameter]] = cellValue.value;
+          }
+        });
+        if (sectionValue.methodName === 'put') {
+          const itemSection = documentData.find((item) => Object.keys(item).includes(sectionKey));
+          if (!itemSection) {
+            documentData.push({ [sectionKey]: [{ ...cellsValue }] });
+          }
+          if (itemSection) {
+            itemSection[sectionKey].push({ ...cellsValue });
+          }
+        }
+        if (sectionValue.methodName === 'join') {
+          const [parentSection] = Object.entries(documentData[documentData.length - 1]);
+          const [, parentSectionValue] = parentSection;
+          if (Object.keys(parentSectionValue[parentSectionValue.length - 1]).includes(sectionKey)) {
+            parentSectionValue[parentSectionValue.length - 1][sectionKey].push({ ...cellsValue });
+          }
+          if (!Object.keys(parentSectionValue[parentSectionValue.length - 1]).includes(sectionKey)) {
+            parentSectionValue[parentSectionValue.length - 1][sectionKey] = [{ ...cellsValue }];
+          }
+        }
+      }
+      if (!settingSection) {
+        console.log(namedArea);
+        cells.forEach((cell) => {
+          const [, cellValue] = cell;
+          cellsValue[cellValue.parameter] = cellValue.value;
+        });
+        const section = documentData.find((item) => {
+          console.log(item, namedArea.name);
+          return Object.keys(item).includes(namedArea.name);
+        });
+        if (!section) documentData.push({ [namedArea.name]: [{ ...cellsValue }] });
+        if (section) {
+          section[namedArea.name].push({ ...cellsValue });
+        }
+      }
+    });
+    console.log(documentData);
+    return (JSONFormat) ? JSON.stringify(documentData) : documentData;
+  }
 
   getRangeByAreaName(areaName) {
     // console.log(areaName);
@@ -896,6 +919,7 @@ class TableDocument {
   }
 
   serialization() {
+    this.documentData = [];
     this.documentSettings.forEach((setting) => {
       const [key, keyValue] = Object.entries(setting)[0];
       if (Object.keys(keyValue).includes('nested')) return;
