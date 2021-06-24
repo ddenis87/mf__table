@@ -343,7 +343,7 @@ class TableDocument {
     } = keyValue;
     const area = this.documentTemplate.getNamedArea(templateSectionName);
     // console.log(templateSectionName);
-    // console.log(area);
+    console.log(area);
     insertMethods[insertMethod](dataItem, area, parameters);
 
     if (nestedData) {
@@ -778,22 +778,27 @@ class TableDocument {
     return null;
   }
 
+  getNamedAreas(areaName) {
+    const namedAreas = [];
+    const areaNames = areaName.split('|');
+    areaNames.forEach((name) => {
+      const namedArea = this.namedAreas.find((item) => item.name === name);
+      if (namedArea) namedAreas.push(namedArea);
+    });
+    return namedAreas;
+  }
+
   getNamedArea(areaName) {
     const namedSection = [];
     const range = this.getRangeByAreaName(areaName);
-    console.log(range);
+    console.log(areaName);
     range.forEach((rangeItem) => {
-      console.log(rangeItem);
       const rows = {};
       const columns = {};
       const cells = {};
       const styles = [];
       const scripts = {};
-      const namedAreas = [{
-        name: areaName,
-        range: rangeItem,
-      }];
-      // const namedAreas = [];
+      const namedAreas = [...this.getNamedAreas(areaName)];
       const cellsInRange = this.getCellsInRange(rangeItem);
       const rangeCellArea = getRangeOfCellArea(cellsInRange);
 
@@ -813,12 +818,10 @@ class TableDocument {
         if (Object.keys(cellValueCurrent).includes('action')) {
           const actionName = cellValueCurrent.action;
           const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
-          // console.log(script);
           if (script) {
             scripts[actionName] = this.scripts[actionName];
           }
         }
-        // const namedAreaCell = this.getNamedAreaNameForCell(cellNameCurrent);
       });
       namedSection.push(
         new TableDocument({
@@ -836,44 +839,6 @@ class TableDocument {
     });
     if (namedSection.length === 1) return namedSection[0];
     return namedSection;
-    // const cellsInRange = this.getCellsInRange(range);
-    // const rangeCellArea = getRangeOfCellArea(cellsInRange);
-
-    // cellsInRange.forEach((cell) => {
-    //   const [cellNameCurrent, cellValueCurrent] = cell;
-    //   const cellNameShift = getCellNameShift(cellNameCurrent, rangeCellArea);
-    //   const { parthSymbol: cellColumnCurrent, parthDigit: cellRowCurrent } = getParseAtSymbolDigit(cellNameCurrent);
-    //   const { parthSymbol: cellColumnShift, parthDigit: cellRowShift } = getParseAtSymbolDigit(cellNameShift);
-
-    //   cells[cellNameShift] = this.cells[cellNameCurrent];
-    //   columns[cellColumnShift] = this.columns[cellColumnCurrent];
-    //   rows[cellRowShift] = this.rows[cellRowCurrent];
-
-    //   const cellStyles = this.getCellStyles(cellNameCurrent);
-    //   if (cellStyles) styles.push(cellStyles);
-
-    //   if (Object.keys(cellValueCurrent).includes('action')) {
-    //     const actionName = cellValueCurrent.action;
-    //     const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
-    //     // console.log(script);
-    //     if (script) {
-    //       scripts[actionName] = this.scripts[actionName];
-    //     }
-    //   }
-    //   // console.log(cellValueCurrent);
-    // });
-    // // console.log(scripts);
-    // return new TableDocument({
-    //   methodName: (getRangeType(range) === 'row') ? 'put' : 'join',
-    //   rows,
-    //   rowCount: Object.keys(rows).length,
-    //   columns,
-    //   columnCount: Object.keys(columns).length,
-    //   cells,
-    //   styles,
-    //   scripts,
-    //   namedAreas,
-    // });
   }
 
   getNamedAreaCellShift(cellNameCurrent, cellNameShift, areaName) {
@@ -893,7 +858,7 @@ class TableDocument {
   }
 
   insertArea(numberColumn, numberRow, area, shiftType = null) {
-    // console.log(area);
+    console.log(area);
     const rows = {};
     const columns = {};
     const cells = {};
@@ -904,51 +869,51 @@ class TableDocument {
       cells: areaCells,
       styles: areaStyles,
       scripts: areaScripts,
-      namedAreas: areaNamedArea,
+      namedAreas: areaNamedAreas,
     } = area;
 
-    const rangeType = getRangeType(areaNamedArea[0].range);
-    const rangeLength = getRangeLength(areaNamedArea[0].range);
+    // const rangeType = getRangeType(areaNamedArea[0].range);
+    // const rangeLength = getRangeLength(areaNamedArea[0].range);
     const rangeFrom = `${getColumnNameForNumber(numberColumn)}${numberRow}`;
-    let rangeTo = `${getColumnNameForNumber(numberColumn + rangeLength[0] - 1)}${numberRow + rangeLength[1] - 1}`;
-    if (rangeType === RANGE_TYPE.ROW) {
-      rangeTo = `${getColumnNameForNumber(numberColumn)}${numberRow + rangeLength[1] - 1}`;
-    }
-    if (rangeType === RANGE_TYPE.COLUMN) {
-      rangeTo = `${getColumnNameForNumber(numberColumn + rangeLength[0] - 1)}${numberRow}`;
-    }
-    areaNamedArea[0].range = `${rangeFrom}:${rangeTo}`;
+    // let rangeTo = `${getColumnNameForNumber(numberColumn + rangeLength[0] - 1)}${numberRow + rangeLength[1] - 1}`;
+    // if (rangeType === RANGE_TYPE.ROW) {
+    //   rangeTo = `${getColumnNameForNumber(numberColumn)}${numberRow + rangeLength[1] - 1}`;
+    // }
+    // if (rangeType === RANGE_TYPE.COLUMN) {
+    //   rangeTo = `${getColumnNameForNumber(numberColumn + rangeLength[0] - 1)}${numberRow}`;
+    // }
+    // areaNamedArea[0].range = `${rangeFrom}:${rangeTo}`;
 
-    // console.log(areaNamedArea);
-    const baseSection = this.getSettingBaseSection(areaNamedArea[0].name);
-    if (baseSection) {
-      namedAreas.push({
-        name: baseSection,
-        range: `${getParseAtSymbolDigit(rangeFrom).parthDigit}:${getParseAtSymbolDigit(rangeTo).parthDigit}`,
-      });
-      // console.log(this.namedAreas);
-      // areaNamedArea[0].name = baseSection;
-      // areaNamedArea[0].range = `${getParseAtSymbolDigit(rangeFrom).parthDigit}:${getParseAtSymbolDigit(rangeTo).parthDigit}`;
-    } else {
-      namedAreas.push({
-        name: areaNamedArea[0].name,
-        range: areaNamedArea[0].range,
-      });
-      // console.log(areaNamedArea);
-    }
+    // // console.log(areaNamedArea);
+    // const baseSection = this.getSettingBaseSection(areaNamedArea[0].name);
+    // if (baseSection) {
+    //   namedAreas.push({
+    //     name: baseSection,
+    //     range: `${getParseAtSymbolDigit(rangeFrom).parthDigit}:${getParseAtSymbolDigit(rangeTo).parthDigit}`,
+    //   });
+    //   // console.log(this.namedAreas);
+    //   // areaNamedArea[0].name = baseSection;
+    //   // areaNamedArea[0].range = `${getParseAtSymbolDigit(rangeFrom).parthDigit}:${getParseAtSymbolDigit(rangeTo).parthDigit}`;
+    // } else {
+    //   namedAreas.push({
+    //     name: areaNamedArea[0].name,
+    //     range: areaNamedArea[0].range,
+    //   });
+    //   // console.log(areaNamedArea);
+    // }
     // console.log(this.getSettingBaseSection(areaNamedArea[0].name));
 
     const rangeCellArea = getRangeOfCellArea(areaCells);
     const rangeShift = this.getRangeToEdge(`${rangeFrom}`);
-    const areaShift = this.getAreaForRange(rangeShift);
+    // const areaShift = this.getAreaForRange(rangeShift);
     const shiftInsert = {
       [SHIFT_TYPE.HORIZONTAL]: () => {
         this.deleteRange(rangeShift, DELETE_MODE.COLUMN);
-        this.insertArea(numberColumn + rangeLength[0], numberRow, areaShift);
+        // this.insertArea(numberColumn + rangeLength[0], numberRow, areaShift);
       },
       [SHIFT_TYPE.VERTICAL]: () => {
         this.deleteRange(rangeShift, DELETE_MODE.ROW);
-        this.insertArea(numberColumn, numberRow + rangeLength[1], areaShift);
+        // this.insertArea(numberColumn, numberRow + rangeLength[1], areaShift);
       },
       null: () => {},
     };
@@ -971,6 +936,15 @@ class TableDocument {
       if (!style) this.styles.push(itemAreaStyle);
     });
 
+    areaNamedAreas.forEach((areaNamedArea) => {
+      const namedArea = this.namedAreas
+        .find((item) => {
+          console.log(item, areaNamedArea);
+          return item?.name === areaNamedArea.name && item?.range === areaNamedArea.range;
+        });
+      if (!namedArea) this.namedAreas.push(areaNamedArea);
+    });
+
     this.rows = { ...this.rows, ...rows };
     this.columns = { ...this.columns, ...columns };
     this.cells = { ...this.cells, ...cells };
@@ -989,9 +963,11 @@ class TableDocument {
   }
 
   putArea(dataArea, area, parameters) {
+    // console.log(this.columnCount);
     const areaCopy = area.getAreaCopy();
     const numberNewRow = this.getLastRow() + 1;
     areaCopy.fillArea(dataArea, parameters);
+    // console.log(areaCopy);
     this.insertArea(1, numberNewRow, areaCopy);
   }
 
