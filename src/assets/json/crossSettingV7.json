@@ -2,6 +2,7 @@
   {
     "header": {
       "templateSectionName":"title|header",
+      "baseSection":"header",
       "methodName":"put",
       "presentationType":"unit",
       "parameters": {
@@ -13,6 +14,7 @@
   {
     "year": {
       "templateSectionName":"column|header",
+      "baseSection":"column",
       "methodName":"join",
       "nested":"header",
       "presentationType":"multiple",
@@ -24,6 +26,7 @@
   {
     "string": {
       "templateSectionName":"title|string",
+      "baseSection":"string",
       "methodName":"put",
       "presentationType":"multiple",
       "parameters": {
@@ -35,6 +38,7 @@
   {
     "columns": {
       "templateSectionName":"column|string",
+      "baseSection":"column",
       "methodName":"join",
       "nested":"string",
       "presentationType":"multiple",

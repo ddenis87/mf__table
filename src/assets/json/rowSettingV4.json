@@ -2,6 +2,7 @@
   {
     "headerR":{
       "templateSectionName":"headerR",
+      "baseSection":"headerR",
       "methodName":"put",
       "presentationType":"multiple"
     }
@@ -9,6 +10,7 @@
   {
     "string1":{
       "templateSectionName":"string1",
+      "baseSection":"string1",
       "methodName":"put",
       "presentationType":"multiple",
       "parameters": {}
@@ -17,6 +19,7 @@
   {
     "string2":{
       "templateSectionName":"string2",
+      "baseSection":"string2",
       "methodName":"put",
       "presentationType":"multiple",
       "parameters": {}
@@ -25,6 +28,7 @@
   {
     "string3":{
       "templateSectionName":"string3",
+      "baseSection":"string3",
       "methodName":"put",
       "presentationType":"multiple",
       "parameters": {}
@@ -33,6 +37,7 @@
   {
     "footerR":{
       "templateSectionName":"footerR",
+      "baseSection":"footerR",
       "methodName":"put",
       "presentationType":"multiple",
       "parameters": {}
