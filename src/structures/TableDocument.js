@@ -367,7 +367,6 @@ class TableDocument {
     const columns = {};
     const cells = {};
     const styles = [];
-    // const namedAreas = [...this.getListNamedAreas(areaName)];
     const namedAreas = [...this.getListNamedAreaForRange(range)];
     const scripts = {};
     const cellsInRange = this.getCellsInRange(range);
@@ -778,58 +777,59 @@ class TableDocument {
   }
 
   getNamedArea(areaName) {
-    const namedSection = [];
+    const namedAreas = [];
     const range = this.getRangeByAreaName(areaName);
     console.log(areaName);
     range.forEach((rangeItem) => {
-      const rows = {};
-      const columns = {};
-      const cells = {};
-      const styles = [];
-      // const namedAreas = [...this.getListNamedAreas(areaName)];
-      const namedAreas = [...this.getListNamedAreaForRange(rangeItem)];
-      const scripts = {};
-      const cellsInRange = this.getCellsInRange(rangeItem);
-      const rangeCellArea = getRangeOfCellArea(cellsInRange);
+      namedAreas.push(this.getAreaForRange(rangeItem));
+      // const rows = {};
+      // const columns = {};
+      // const cells = {};
+      // const styles = [];
+      // // const namedAreas = [...this.getListNamedAreas(areaName)];
+      // const namedAreas = [...this.getListNamedAreaForRange(rangeItem)];
+      // const scripts = {};
+      // const cellsInRange = this.getCellsInRange(rangeItem);
+      // const rangeCellArea = getRangeOfCellArea(cellsInRange);
 
-      cellsInRange.forEach((cell) => {
-        const [cellNameCurrent, cellValueCurrent] = cell;
-        const cellNameShift = getCellNameShift(cellNameCurrent, rangeCellArea);
-        // const cellNameShift = shiftCell(cellNameCurrent);
-        const { parthSymbol: cellColumnCurrent, parthDigit: cellRowCurrent } = getParseAtSymbolDigit(cellNameCurrent);
-        const { parthSymbol: cellColumnShift, parthDigit: cellRowShift } = getParseAtSymbolDigit(cellNameShift);
+      // cellsInRange.forEach((cell) => {
+      //   const [cellNameCurrent, cellValueCurrent] = cell;
+      //   const cellNameShift = getCellNameShift(cellNameCurrent, rangeCellArea);
+      //   // const cellNameShift = shiftCell(cellNameCurrent);
+      //   const { parthSymbol: cellColumnCurrent, parthDigit: cellRowCurrent } = getParseAtSymbolDigit(cellNameCurrent);
+      //   const { parthSymbol: cellColumnShift, parthDigit: cellRowShift } = getParseAtSymbolDigit(cellNameShift);
 
-        cells[cellNameShift] = this.cells[cellNameCurrent];
-        columns[cellColumnShift] = this.columns[cellColumnCurrent];
-        rows[cellRowShift] = this.rows[cellRowCurrent];
+      //   cells[cellNameShift] = this.cells[cellNameCurrent];
+      //   columns[cellColumnShift] = this.columns[cellColumnCurrent];
+      //   rows[cellRowShift] = this.rows[cellRowCurrent];
 
-        const cellStyles = this.getCellStyles(cellNameCurrent);
-        if (cellStyles) styles.push(cellStyles);
+      //   const cellStyles = this.getCellStyles(cellNameCurrent);
+      //   if (cellStyles) styles.push(cellStyles);
 
-        if (Object.keys(cellValueCurrent).includes('action')) {
-          const actionName = cellValueCurrent.action;
-          const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
-          if (script) {
-            scripts[actionName] = this.scripts[actionName];
-          }
-        }
-      });
-      namedSection.push(
-        new TableDocument({
-          methodName: (getRangeType(rangeItem) === 'row') ? 'put' : 'join',
-          rows,
-          rowCount: Object.keys(rows).length,
-          columns,
-          columnCount: Object.keys(columns).length,
-          cells,
-          styles,
-          scripts,
-          namedAreas,
-        }),
-      );
+      //   if (Object.keys(cellValueCurrent).includes('action')) {
+      //     const actionName = cellValueCurrent.action;
+      //     const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
+      //     if (script) {
+      //       scripts[actionName] = this.scripts[actionName];
+      //     }
+      //   }
+      // });
+      // namedSection.push(
+      //   new TableDocument({
+      //     methodName: (getRangeType(rangeItem) === 'row') ? 'put' : 'join',
+      //     rows,
+      //     rowCount: Object.keys(rows).length,
+      //     columns,
+      //     columnCount: Object.keys(columns).length,
+      //     cells,
+      //     styles,
+      //     scripts,
+      //     namedAreas,
+      //   }),
+      // );
     });
-    if (namedSection.length === 1) return namedSection[0];
-    return namedSection;
+    if (namedAreas.length === 1) return namedAreas[0];
+    return namedAreas;
   }
 
   getNamedAreaCellShift(cellNameCurrent, cellNameShift, areaName) {
@@ -878,23 +878,30 @@ class TableDocument {
       scripts: areaScripts,
       namedAreas: areaNamedAreas,
     } = area;
-    
-    const rangeFrom = `${getColumnNameForNumber(numberColumn)}${numberRow}`;
-    const rangeShift = this.getRangeToEdge(`${rangeFrom}`);
+
+    let rangeShift = null;
+    let areaShift = null;
+
     const shiftInsert = {
       [SHIFT_TYPE.HORIZONTAL]: () => {
         this.deleteRange(rangeShift, DELETE_MODE.COLUMN);
-        // const numberColumnShift = numberColumn + area.getAreaWidth();
-        // this.insertArea(numberColumnShift, numberRow, areaShift);
+        const numberColumnShift = numberColumn + area.getAreaWidth();
+        this.insertArea(numberColumnShift, numberRow, areaShift);
       },
       [SHIFT_TYPE.VERTICAL]: () => {
         this.deleteRange(rangeShift, DELETE_MODE.ROW);
-        // const numberRowShift = numberRow + area.getAreaHeight();
-        // this.insertArea(numberColumn, numberRowShift, areaShift);
+        const numberRowShift = numberRow + area.getAreaHeight();
+        this.insertArea(numberColumn, numberRowShift, areaShift);
       },
       null: () => {},
     };
-    shiftInsert[shiftType]();
+
+    if (shiftType) {
+      const rangeFrom = `${getColumnNameForNumber(numberColumn)}${numberRow}`;
+      rangeShift = this.getRangeToEdge(`${rangeFrom}`);
+      areaShift = this.getAreaForRange(rangeShift);
+      shiftInsert[shiftType]();
+    }
 
     Object.entries(areaCells).forEach((cell) => {
       const [currentCellName] = cell;
