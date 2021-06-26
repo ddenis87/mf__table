@@ -42,5 +42,14 @@
       "presentationType":"multiple",
       "parameters": {}
     }
+  },
+  {
+    "footerF":{
+      "templateSectionName":"footerF",
+      "baseSection":"footerF",
+      "methodName":"put",
+      "presentationType":"multiple",
+      "parameters": {}
+    }
   }
 ]

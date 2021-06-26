@@ -192,7 +192,8 @@
     {"name":"string1","range":"5:5"},
     {"name":"string3","range":"7:7"},
     {"name":"headerR","range":"1:4"},
-    {"name":"footerR","range":"8:9"}
+    {"name":"footerR","range":"8:8"},
+    {"name":"footerF","range":"9:9"}
   ],
   "scripts":{
     "deleteRowSection1": {
