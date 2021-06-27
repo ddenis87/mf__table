@@ -68,7 +68,8 @@ export default {
         .catch(() => {
           this.isError = true;
           this.$refs.FormLogin.reset();
-          setTimeout(() => this.isError = false, 3000);
+          setTimeout(() => { this.isError = false; }, 3000);
+          return false;
         });
     },
   },

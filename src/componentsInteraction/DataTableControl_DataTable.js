@@ -2,7 +2,7 @@
   //  tableName
   //  guid
   
-export const DataTableControl_DataTable = {
+export const DataTableControlDataTable = {
   computed: {
     componentTable() {
       return () => import(`@/components/TheTable/TheTable${this.tableName[0].toUpperCase() + this.tableName.slice(1)}`);

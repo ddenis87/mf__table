@@ -25,10 +25,9 @@
 </template>
 
 <script>
+import { DataTableControlDataTable } from '@/componentsInteraction/DataTableControl_DataTable';
 import DataTableControl from '@/components/DataTableControls/DataTableControl.vue';
 import ElFieldSearch from '@/components/Elements/ElField/ElFieldSearch.vue';
-
-import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
 
 export default {
   name: 'TablesPage',
@@ -37,7 +36,7 @@ export default {
     ElFieldSearch,
   },
   mixins: [
-    DataTableControl_DataTable, // propertiesControl, componentTable, @mountedTable
+    DataTableControlDataTable, // propertiesControl, componentTable, @mountedTable
   ],
   data() {
     return {
