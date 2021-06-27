@@ -29,7 +29,7 @@
                       @change="openJSONFileData">
         </v-file-input>
       </div>
-      <div class="item item_btn">
+      <!-- <div class="item item_btn">
         <v-menu bottom
                 :offset-y="true">
           <template v-slot:activator="{ on, attrs }">
@@ -45,6 +45,10 @@
             </v-list-item>
           </v-list>
         </v-menu>
+      </div> -->
+      <div class="item item_btn">
+        <v-btn small dark color="blue darken-3" @click="saveDocumentData">
+          <v-icon small left>mdi-cloud-download-outline</v-icon>Сохранить</v-btn>
       </div>
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="openPrintPage">
@@ -74,10 +78,10 @@
           </v-list>
         </v-menu>
       </div>
-      <div class="item item_btn">
+      <!-- <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="insertColumn">
           <v-icon small left>mdi-cloud-print-outline</v-icon>Test button</v-btn>
-      </div>
+      </div> -->
       <dialog-modal :is-dialog-show="isShowDialog"
                     is-dialog-name="Ошибка">
         <v-card>
@@ -177,9 +181,9 @@ export default {
     },
     saveDocument() { alert('save document'); },
     saveDocumentData() {
-      this.tableDocument.serialization();
-      // const JSONFormat = true;
-      // apiSpreadSheet.dowloadJSONFile(this.tableDocument.getDocumentData(JSONFormat), JSONFormat);
+      // this.tableDocument.serialization();
+      const JSONFormat = true;
+      apiSpreadSheet.dowloadJSONFile(this.tableDocument.serialization(JSONFormat), JSONFormat);
     },
     evtClickCell(evt) {
       const cellName = evt.target.getAttribute('data-name');

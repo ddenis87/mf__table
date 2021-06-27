@@ -167,6 +167,7 @@ class TableDocument {
     if (shiftType === SHIFT_TYPE.HORIZONTAL) {
       this.insertArea(getColumnNumberForName(cellColumn), 1, area, SHIFT_TYPE.HORIZONTAL);
     }
+    this.recalculateFormulas();
   }
 
   calculateCellValue(cellName) {
@@ -590,29 +591,29 @@ class TableDocument {
     return Math.max(...rows);
   }
 
-  getNamedAreaNameForCell(cellName) {
-    console.log(cellName);
-    const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
-    for (let i = 0; i < this.namedAreas.length; i += 1) {
-      const [rangeFrom, rangeTo] = getRangeSplit(this.namedAreas[i].range);
-      const { parthSymbol: rangeColumnFrom, parthDigit: rangeRowFrom } = getParseAtSymbolDigit(rangeFrom);
-      const { parthSymbol: rangeColumnTo, parthDigit: rangeRowTo } = getParseAtSymbolDigit(rangeTo);
-      if (cellRow >= rangeRowFrom && cellRow <= rangeRowTo) return this.namedAreas[i];
-      if (getColumnNumberForName(cellColumn) >= getColumnNumberForName(rangeColumnFrom)
-        && getColumnNumberForName(cellColumn) <= getColumnNumberForName(rangeColumnTo)) return this.namedAreas[i];
-    }
-    return null;
-  }
+  // getNamedAreaNameForCell(cellName) {
+  //   console.log(cellName);
+  //   const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
+  //   for (let i = 0; i < this.namedAreas.length; i += 1) {
+  //     const [rangeFrom, rangeTo] = getRangeSplit(this.namedAreas[i].range);
+  //     const { parthSymbol: rangeColumnFrom, parthDigit: rangeRowFrom } = getParseAtSymbolDigit(rangeFrom);
+  //     const { parthSymbol: rangeColumnTo, parthDigit: rangeRowTo } = getParseAtSymbolDigit(rangeTo);
+  //     if (cellRow >= rangeRowFrom && cellRow <= rangeRowTo) return this.namedAreas[i];
+  //     if (getColumnNumberForName(cellColumn) >= getColumnNumberForName(rangeColumnFrom)
+  //       && getColumnNumberForName(cellColumn) <= getColumnNumberForName(rangeColumnTo)) return this.namedAreas[i];
+  //   }
+  //   return null;
+  // }
 
-  getListNamedAreasForName(areaName) {
-    const namedAreas = [];
-    this.namedAreas.forEach((namedArea) => {
-      if (namedArea.name === areaName) {
-        namedAreas.push(namedArea);
-      }
-    });
-    return namedAreas;
-  }
+  // getListNamedAreasForName(areaName) {
+  //   const namedAreas = [];
+  //   this.namedAreas.forEach((namedArea) => {
+  //     if (namedArea.name === areaName) {
+  //       namedAreas.push(namedArea);
+  //     }
+  //   });
+  //   return namedAreas;
+  // }
 
   getListNamedAreasForRange(range) {
     const namedAreas = [];
@@ -816,7 +817,7 @@ class TableDocument {
     this.insertArea(1, numberNewRow, areaCopy);
   }
 
-  serialization() {
+  serialization(JSONFormat = false) {
     const rezult = [];
     this.documentSettings.forEach((setting) => {
       const [key, keyValue] = Object.entries(setting)[0];
@@ -825,7 +826,8 @@ class TableDocument {
       if (!Array.isArray(areas)) areas = [areas];
       rezult.push({ [key]: this.serializationArea(keyValue, areas) });
     });
-    console.log(rezult);
+    return (JSONFormat) ? JSON.stringify(rezult) : rezult;
+    // console.log(rezult);
   }
 
   serializationArea(keyValue, areas) {

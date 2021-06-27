@@ -129,7 +129,8 @@ export default {
         const cellName = evt.target.closest('.column-body').getAttribute('data-name');
         const cell = Object.entries(this.cells).find((item) => item[0] === cellName);
         if (cell) {
-          const isTrySelected = cell.noSelect || false;
+          const [, cellValue] = cell;
+          const isTrySelected = cellValue.noSelect || false;
           if (isTrySelected) return;
         }
         this.focusCell(this.getCellNodeForName(cellName));
