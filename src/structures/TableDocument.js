@@ -774,6 +774,33 @@ class TableDocument {
   }
   // ------------------------------------------------------------------
 
+  getAreaValue(parameters) {
+    const parametersSet = new Map(Object.entries(parameters));
+    const parametersValue = {};
+    if (parametersSet.size === 0) {
+      Object.values(this.cells).forEach((cellValue) => {
+        if (cellValue.parameter) parametersValue[cellValue.parameter] = cellValue.value;
+      });
+      return parametersValue;
+    }
+    Object.values(this.cells).forEach((cellValue) => {
+      if (Object.keys(cellValue).includes('parameter')) {
+        if (parametersSet.has(cellValue.parameter)) {
+          parametersValue[parametersSet.get(cellValue.parameter)] = cellValue.value;
+        }
+      }
+    });
+    return parametersValue;
+  }
+
+  getSectionSettings(sectionName) {
+    const sectionSettings = this.documentSettings.find((setting) => {
+      const [sectionKey] = Object.keys(setting);
+      return sectionKey === sectionName;
+    });
+    return Object.entries(sectionSettings)[0];
+  }
+
   joinArea(dataArea, area, parameters) {
     const areaCopy = area.getAreaCopy();
     const numberLastRow = this.getLastRow();
@@ -790,18 +817,32 @@ class TableDocument {
   }
 
   serialization() {
+    const rezult = [];
     this.documentSettings.forEach((setting) => {
       const [key, keyValue] = Object.entries(setting)[0];
       if (Object.keys(keyValue).includes('nested')) return;
-      console.log(this.getNamedArea(key));
+      let areas = this.getNamedArea(key);
+      if (!Array.isArray(areas)) areas = [areas];
+      rezult.push({ [key]: this.serializationArea(keyValue, areas) });
     });
+    console.log(rezult);
   }
 
-  serializationArea(key, keyValue, area) {
-    console.log(this.columnCount);
-    console.log(key);
-    console.log(keyValue);
-    console.log(area);
+  serializationArea(keyValue, areas) {
+    let rezult = (keyValue.presentationType === 'unit') ? {} : [];
+    areas.forEach((area) => {
+      const areaValue = area.getAreaValue(keyValue.parameters || {});
+      if (keyValue.nestedData) {
+        keyValue.nestedData.forEach((nestedSection) => {
+          const [nestedKey, nestedKeyValue] = this.getSectionSettings(nestedSection);
+          const nestedArea = area.getNamedArea(nestedKeyValue.baseSection);
+          areaValue[nestedKey] = this.serializationArea(nestedKeyValue, nestedArea);
+        });
+      }
+      if (keyValue.presentationType === 'unit') rezult = { ...areaValue };
+      else rezult.push({ ...areaValue });
+    });
+    return rezult;
   }
 
   checkEditAccess(cellName) {
