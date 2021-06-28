@@ -149,13 +149,9 @@ class TableDocument {
   addArea(cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) {
     const area = this.documentTemplate.getNamedArea(areaName);
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
-
-    if (shiftType === SHIFT_TYPE.VERTICAL) {
-      this.insertArea(1, cellRow, area, SHIFT_TYPE.VERTICAL);
-    }
-    if (shiftType === SHIFT_TYPE.HORIZONTAL) {
-      this.insertArea(getColumnNumberForName(cellColumn), 1, area, SHIFT_TYPE.HORIZONTAL);
-    }
+    const cellColumnNumber = (shiftType === SHIFT_TYPE.VERTICAL) ? 1 : getColumnNumberForName(cellColumn);
+    const cellRowNumber = (shiftType === SHIFT_TYPE.HORIZONTAL) ? 1 : cellRow;
+    this.insertArea(cellColumnNumber, cellRowNumber, area, shiftType);
     this.recalculateFormulas();
   }
 
@@ -185,7 +181,7 @@ class TableDocument {
     if (shiftType && [RANGE_TYPE.CELL, RANGE_TYPE.RANGE].includes(rangeType)) return; // if delete only data at not shift
 
     const [rangeFrom, rangeTo] = getRangeSplit(range);
-    const rangeShiftFrom = getRangeShift(rangeTo, SHIFT_TYPE.VERTICAL, 1);
+    const rangeShiftFrom = getRangeShift(rangeTo, shiftType, 1);
     const rangeShiftArea = this.getRangeToEdge(rangeShiftFrom);
     const areaShift = this.getAreaForRange(rangeShiftArea);
     const shiftArea = {
@@ -264,28 +260,30 @@ class TableDocument {
       put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
       join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
     };
+
     if (Array.isArray(dataItem)) {
       dataItem.forEach((item) => {
         this.deserializeArea(key, item);
       });
       return;
     }
+
     const [, keyValue] = Object.entries(this.documentSettings.find((setting) => Object.keys(setting).includes(key)))[0];
     const {
       templateSectionName, methodName: insertMethod, parameters, nestedData,
     } = keyValue;
     const area = this.documentTemplate.getNamedArea(templateSectionName);
+
     insertMethods[insertMethod](dataItem, area, parameters);
-    if (nestedData) {
-      nestedData.forEach((nestedDataKey) => {
-        if (Object.keys(dataItem).includes(nestedDataKey)) this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
-      });
-    }
+    if (!nestedData) return;
+    nestedData.forEach((nestedDataKey) => {
+      if (Object.keys(dataItem).includes(nestedDataKey)) this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
+    });
   }
 
   editingCell(cellName, cellValue) { // проверять существует строка/столбец
     // получать максимальный из имеющихся, сравнивать
-    // если пусстое значение и больше ничего нет, то удалять ячейку из набора
+    // если пусстое значение и больше ничего нет, то удалять ячейку из набора ???
     let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
     cellValues = { ...cellValues, ...{ value: cellValue } };
     if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
@@ -585,15 +583,15 @@ class TableDocument {
     return namedAreas;
   }
 
-  getNamedAreaCellShift(cellNameCurrent, cellNameShift, areaName) {
-    const cellNamedArea = this.namedAreas.find((namedArea) => namedArea.range.split(':')[0].toLowerCase() === cellNameCurrent
-      && namedArea.name !== areaName);
-    if (!cellNamedArea) return null;
-    return {
-      name: cellNamedArea.name,
-      range: cellNameShift,
-    };
-  }
+  // getNamedAreaCellShift(cellNameCurrent, cellNameShift, areaName) {
+  //   const cellNamedArea = this.namedAreas.find((namedArea) => namedArea.range.split(':')[0].toLowerCase() === cellNameCurrent
+  //     && namedArea.name !== areaName);
+  //   if (!cellNamedArea) return null;
+  //   return {
+  //     name: cellNamedArea.name,
+  //     range: cellNameShift,
+  //   };
+  // }
 
   getRangeByAreaName(areaName) {
     const range = [];
@@ -801,6 +799,50 @@ class TableDocument {
     formulasCellsSet.map((cellName) => this.calculateCellValue(cellName));
   }
 
+  serializationV2(JSONFormat = false) {
+    const rezult = [];
+    this.documentSettings.forEach((setting) => {
+      const [key, keyValue] = Object.entries(setting)[0];
+      if (Object.keys(keyValue).includes('nested')) return;
+      const areas = this.getNamedArea(key);
+      const section = { [key]: (keyValue.presentationType === 'unit') ? {} : [] };
+      if (!Array.isArray(areas)) section[key] = areas.serializationAreaV2(keyValue, this.documentSettings);
+      else {
+        areas.forEach((area) => {
+          section[key].push(...area.serializationAreaV2(keyValue, this.documentSettings));
+        });
+      }
+      rezult.push(section);
+    });
+    return (JSONFormat) ? JSON.stringify(rezult) : rezult;
+  }
+
+  serializationAreaV2(keyValue, settings) {
+    let rezult = (keyValue.presentationType === 'unit') ? {} : [];
+    const areaValue = this.getAreaValue(keyValue.parameters || {});
+    if (keyValue.nestedData) {
+      keyValue.nestedData.forEach((nestedSection) => {
+        const settingItem = settings.find((setting) => {
+          const [sectionKey] = Object.keys(setting);
+          return sectionKey === nestedSection;
+        });
+        const [nestedKey, nestedKeyValue] = Object.entries(settingItem)[0];
+        const nestedAreas = this.getNamedArea(nestedKeyValue.baseSection);
+        areaValue[nestedKey] = (nestedKeyValue.presentationType === 'unit') ? {} : [];
+        if (!Array.isArray(nestedAreas)) {
+          areaValue[nestedKey] = nestedAreas.serializationAreaV2(nestedKeyValue, settings);
+          return;
+        }
+        nestedAreas.forEach((nestedArea) => {
+          areaValue[nestedKey].push(...nestedArea.serializationAreaV2(nestedKeyValue, settings));
+        });
+      });
+    }
+    if (keyValue.presentationType === 'unit') rezult = { ...areaValue };
+    else rezult.push({ ...areaValue });
+    return rezult;
+  }
+
   serialization(JSONFormat = false) {
     const rezult = [];
     this.documentSettings.forEach((setting) => {
@@ -811,7 +853,6 @@ class TableDocument {
       rezult.push({ [key]: this.serializationArea(keyValue, areas) });
     });
     return (JSONFormat) ? JSON.stringify(rezult) : rezult;
-    // console.log(rezult);
   }
 
   serializationArea(keyValue, areas) {

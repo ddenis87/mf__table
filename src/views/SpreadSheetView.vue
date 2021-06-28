@@ -183,7 +183,7 @@ export default {
     saveDocumentData() {
       // this.tableDocument.serialization();
       const JSONFormat = true;
-      apiSpreadSheet.dowloadJSONFile(this.tableDocument.serialization(JSONFormat), JSONFormat);
+      apiSpreadSheet.dowloadJSONFile(this.tableDocument.serializationV2(JSONFormat), JSONFormat);
     },
     evtClickCell(evt) {
       const cellName = evt.target.getAttribute('data-name');
