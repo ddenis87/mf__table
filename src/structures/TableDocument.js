@@ -684,7 +684,7 @@ class TableDocument {
     if (script) return script;
     return null;
   }
-  
+
   hasNamedArea(namedArea) {
     let rezult = false;
     const foundNamedArea = this.namedAreas
@@ -800,21 +800,21 @@ class TableDocument {
   }
 
   serializationV2(JSONFormat = false) {
-    const rezult = [];
+    const result = [];
     this.documentSettings.forEach((setting) => {
       const [key, keyValue] = Object.entries(setting)[0];
       if (Object.keys(keyValue).includes('nested')) return;
       const areas = this.getNamedArea(key);
       const section = { [key]: (keyValue.presentationType === 'unit') ? {} : [] };
-      if (!Array.isArray(areas)) section[key] = areas.serializationAreaV2(keyValue, this.documentSettings);
+      if (!Array.isArray(areas)) section[key] = areas.serializationAreaV2(keyValue, this.documentSettings); //
       else {
         areas.forEach((area) => {
           section[key].push(...area.serializationAreaV2(keyValue, this.documentSettings));
         });
       }
-      rezult.push(section);
+      result.push(section);
     });
-    return (JSONFormat) ? JSON.stringify(rezult) : rezult;
+    return (JSONFormat) ? JSON.stringify(result) : result;
   }
 
   serializationAreaV2(keyValue, settings) {
@@ -822,10 +822,12 @@ class TableDocument {
     const areaValue = this.getAreaValue(keyValue.parameters || {});
     if (keyValue.nestedData) {
       keyValue.nestedData.forEach((nestedSection) => {
-        const settingItem = settings.find((setting) => {
-          const [sectionKey] = Object.keys(setting);
-          return sectionKey === nestedSection;
-        });
+        const settingItem = settings
+          .find((setting) => Object.keys(setting)[0] === nestedSection); // не учитывает если несколько секций с одним именем
+        // const settingItem = settings.find((setting) => {
+        //   // const [sectionKey] = Object.keys(setting);
+        //   return Object.keys(setting)[0] === nestedSection;
+        // });
         const [nestedKey, nestedKeyValue] = Object.entries(settingItem)[0];
         const nestedAreas = this.getNamedArea(nestedKeyValue.baseSection);
         areaValue[nestedKey] = (nestedKeyValue.presentationType === 'unit') ? {} : [];
@@ -844,19 +846,19 @@ class TableDocument {
   }
 
   serialization(JSONFormat = false) {
-    const rezult = [];
+    const result = [];
     this.documentSettings.forEach((setting) => {
       const [key, keyValue] = Object.entries(setting)[0];
       if (Object.keys(keyValue).includes('nested')) return;
       let areas = this.getNamedArea(key);
       if (!Array.isArray(areas)) areas = [areas];
-      rezult.push({ [key]: this.serializationArea(keyValue, areas) });
+      result.push({ [key]: this.serializationArea(keyValue, areas) });
     });
-    return (JSONFormat) ? JSON.stringify(rezult) : rezult;
+    return (JSONFormat) ? JSON.stringify(result) : result;
   }
 
   serializationArea(keyValue, areas) {
-    let rezult = (keyValue.presentationType === 'unit') ? {} : [];
+    let result = (keyValue.presentationType === 'unit') ? {} : [];
     areas.forEach((area) => {
       const areaValue = area.getAreaValue(keyValue.parameters || {});
       if (keyValue.nestedData) {
@@ -866,10 +868,42 @@ class TableDocument {
           areaValue[nestedKey] = this.serializationArea(nestedKeyValue, nestedArea);
         });
       }
-      if (keyValue.presentationType === 'unit') rezult = { ...areaValue };
-      else rezult.push({ ...areaValue });
+      if (keyValue.presentationType === 'unit') result = { ...areaValue };
+      else result.push({ ...areaValue });
     });
-    return rezult;
+    return result;
+  }
+
+  serializationDataSection(nameDataSection, settings) {
+    if (!nameDataSection) {
+      const result = [];
+      this.documentSettings.forEach((setting) => {
+        const [key, keyValue] = Object.entries(setting)[0];
+        if (Object.keys(keyValue).includes('nested')) return;
+        result.push({ [key]: this.serializationDataSection(key, this.documentSettings) });
+      });
+      return result;
+    }
+    const settingItem = settings
+      .find((setting) => Object.keys(setting)[0] === nameDataSection); // не учитывает если несколько секций с одним именем
+    const [, keyValue] = Object.entries(settingItem)[0];
+    const areas = this.getNamedArea(keyValue.baseSection);
+
+    if (Array.isArray(areas)) {
+      const result = [];
+      areas.forEach((area) => {
+        result.push(...area.serializationDataSection(nameDataSection, settings));
+      });
+      return result;
+    }
+
+    const areaValue = areas.getAreaValue(keyValue.parameters || {});
+    if (keyValue.nestedData) {
+      keyValue.nestedData.forEach((nestedSection) => {
+        areaValue[nestedSection] = this.serializationDataSection(nestedSection, settings);
+      });
+    }
+    return (keyValue.presentationType === 'unit') ? { ...areaValue } : [{ ...areaValue }];
   }
 
   updateCellValue(cellName, cellValue) {

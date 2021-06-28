@@ -206,7 +206,7 @@
     },
     "deleteRowSection3": {
       "template": "default",
-      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, 'vertical');}"
+      "script": "(cellName) => { this.deleteArea(this.getRangeByCellName(cellName), 'vertical'); }"
     },
     "addRowSection3": {
       "template": "default",

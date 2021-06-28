@@ -163,27 +163,28 @@ export default {
     computeFormula() {
       // this.tableDocument.computeFormula();
       // console.log(this.rowCount);
-      const formula = '$e5 + $e6 + $e7 + $e8 + $e9 + $e10 + $e11 + $e12 + $e13';
-      const operands = formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
-      const operandsValues = {};
-      operands.forEach((operand) => {
-        const operandValue = this.getCellValue(operand);
-        operandsValues[operand] = operandValue;
-      });
-      let formulaFill = formula;
-      Object.entries(operandsValues).forEach((operand) => {
-        const [operandName, operandValue] = operand;
-        formulaFill = formulaFill.replace(`$${operandName}`, operandValue);
-      });
-      this.tableDocument.editingCell('e14', eval(formulaFill)); // eslint-disable-line no-eval
-      // console.log(formulaFill);
-      console.log(this.tableDocument);
+      // const formula = '$e5 + $e6 + $e7 + $e8 + $e9 + $e10 + $e11 + $e12 + $e13';
+      // const operands = formula.replace(/[+-/*)(% ]/g, '').split('$').splice(1);
+      // const operandsValues = {};
+      // operands.forEach((operand) => {
+      //   const operandValue = this.getCellValue(operand);
+      //   operandsValues[operand] = operandValue;
+      // });
+      // let formulaFill = formula;
+      // Object.entries(operandsValues).forEach((operand) => {
+      //   const [operandName, operandValue] = operand;
+      //   formulaFill = formulaFill.replace(`$${operandName}`, operandValue);
+      // });
+      // this.tableDocument.editingCell('e14', eval(formulaFill)); // eslint-disable-line no-eval
+      // // console.log(formulaFill);
+      // console.log(this.tableDocument);
     },
     saveDocument() { alert('save document'); },
     saveDocumentData() {
       // this.tableDocument.serialization();
-      const JSONFormat = true;
-      apiSpreadSheet.dowloadJSONFile(this.tableDocument.serializationV2(JSONFormat), JSONFormat);
+      // const JSONFormat = true;
+      console.log(this.tableDocument.serializationDataSection());
+      // apiSpreadSheet.dowloadJSONFile(this.tableDocument.serializationDataSection(JSONFormat), JSONFormat);
     },
     evtClickCell(evt) {
       const cellName = evt.target.getAttribute('data-name');

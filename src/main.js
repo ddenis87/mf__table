@@ -9,7 +9,7 @@ import vuetify from './plugins/vuetify';
 import VueMask from './plugins/vmask';
 
 Vue.use(VueVirtualScroller);
-// Vue.use(VirtualList);
+Vue.use(VirtualList);
 Vue.component('virtual-list', VirtualList);
 
 Vue.config.productionTip = false;
@@ -20,6 +20,6 @@ new Vue({
   vuetify,
   VueMask,
   VueVirtualScroller,
-  // VirtualList,
+  VirtualList,
   render: (h) => h(App),
 }).$mount('#app');
