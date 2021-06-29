@@ -56,7 +56,7 @@ function getOperandsSet(formula) {
 function getOperandsValues(operandsSet) {
   const operandsValues = {};
   operandsSet.forEach((operand) => {
-    operandsValues[operand] = ` +this.getCellValue('${operand}')`;
+    operandsValues[operand] = ` +this.getCellValueForFormula('${operand}')`;
   });
   return operandsValues;
 }
@@ -156,11 +156,21 @@ class TableDocument {
   }
 
   calculateCellValue(cellName) {
-    const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+    const FUNCTION_FORMULA = {
+      SUM: (parameters) => this.getFormulaSUMForRange(parameters),
+    };
+    let cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+    if (cellFormula[0] === '=') {
+      const [functionName, functionParameters] = cellFormula.slice(1, -1).split('(');
+      cellFormula = FUNCTION_FORMULA[functionName](functionParameters);
+    }
     const operandsSet = getOperandsSet(cellFormula);
+    console.log(operandsSet);
     if (operandsSet.includes(cellName)) { this.updateCellValue(cellName, NaN); return NaN; }
     const operandsValues = getOperandsValues(operandsSet);
+    console.log(operandsValues);
     const fillFormula = fillingFormula(operandsValues, cellFormula);
+    console.log(fillFormula);
     // check formula
     const rezult = eval(fillFormula); // eslint-disable-line no-eval
     this.updateCellValue(cellName, rezult);
@@ -438,15 +448,21 @@ class TableDocument {
     return cellStyle;
   }
 
-  getCellValue(cellName) {
-    const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
-    if (cellFormula) {
-      const calculateValue = this.calculateCellValue(cellName);
-      return calculateValue;
-    }
+  // getCellValue(cellName) {
+  //   const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+  //   if (cellFormula) {
+  //     const calculateValue = this.calculateCellValue(cellName);
+  //     return calculateValue;
+  //   }
+  //   const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
+  //   if (cellValue) return cellValue;
+  //   return 0;
+  // }
+
+  getCellValueForFormula(cellName) {
+    if (this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA)) return this.calculateCellValue(cellName);
     const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
-    if (cellValue) return cellValue;
-    return NaN;
+    return cellValue || 0;
   }
 
   getCellsInRange(range, returnFormat = RETURN_FORMAT.ENTRIES) {
@@ -518,6 +534,11 @@ class TableDocument {
     const formulasCellsSet = Object.keys(this.cells)
       .filter((cellName) => Object.keys(this.cells[cellName]).includes(CELL_ATTRIBUTES.FORMULA));
     return formulasCellsSet;
+  }
+
+  getFormulaSUMForRange(range) {
+    const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
+    return cellKeys.map((cellKey) => `$${cellKey}`).join(' + ');
   }
 
   getLastColumn() {
@@ -824,10 +845,6 @@ class TableDocument {
       keyValue.nestedData.forEach((nestedSection) => {
         const settingItem = settings
           .find((setting) => Object.keys(setting)[0] === nestedSection); // не учитывает если несколько секций с одним именем
-        // const settingItem = settings.find((setting) => {
-        //   // const [sectionKey] = Object.keys(setting);
-        //   return Object.keys(setting)[0] === nestedSection;
-        // });
         const [nestedKey, nestedKeyValue] = Object.entries(settingItem)[0];
         const nestedAreas = this.getNamedArea(nestedKeyValue.baseSection);
         areaValue[nestedKey] = (nestedKeyValue.presentationType === 'unit') ? {} : [];
