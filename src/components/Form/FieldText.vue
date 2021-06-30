@@ -1,14 +1,7 @@
 <template>
   <div class="field">
-    <v-text-field class="field-text"
-                  dense
-                  hide-details="auto"
-                  :label="fieldLabel"
-                  :clearable="isClearable"
-                  :disabled="isDisabled"
-                  :flat="isFlat"
-                  :solo="isSolo"
-                  :single-line="isSingleLine"
+    <v-text-field class="field-item text"
+                  v-bind="fieldPropsNested"
                   :rules="(isRequired) ? [rules.required] : []"
                   v-model="fieldValue"
                   @input="evtInput"
@@ -22,13 +15,14 @@
 </template>
 
 <script>
-import fieldProps from './FiledProps';
-import filedModel from './FieldModel';
+import fieldModel from './FieldModel';
+import fieldProps from './FieldProps';
+import fieldComputed from './FieldComputed';
 
 export default {
   name: 'FieldText',
   model: {
-    ...filedModel,
+    ...fieldModel,
   },
   props: {
     ...fieldProps,
@@ -40,6 +34,9 @@ export default {
         required(value) { return !!value || false; },
       },
     };
+  },
+  computed: {
+    ...fieldComputed,
   },
   watch: {
     fieldValueInput() { this.fieldValue = this.fieldValueInput; },

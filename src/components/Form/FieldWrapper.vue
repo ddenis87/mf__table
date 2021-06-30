@@ -11,6 +11,7 @@
 <script>
 import FieldText from './FieldText.vue';
 import FieldNumber from './FieldNumber.vue';
+import FieldDate from './FieldDate.vue';
 
 export default {
   name: 'InputFieldWrapper',
@@ -21,6 +22,7 @@ export default {
   components: {
     FieldText,
     FieldNumber,
+    FieldDate,
   },
   props: {
     fieldType: { type: String, default: 'string' },
@@ -33,6 +35,7 @@ export default {
       fields: {
         string: FieldText,
         number: FieldNumber,
+        date: FieldDate,
       },
     };
   },
@@ -80,7 +83,7 @@ export default {
   align-items: center;
   padding: 0 3px;
   width: 100%;
-  min-width: 90px;
+  min-width: 80px;
   height: 100%;
   min-height: 22px;
   max-height: 22px;

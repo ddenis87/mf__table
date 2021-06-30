@@ -164,19 +164,8 @@ export default {
     // console.log(this.tableDocument);
   },
   methods: {
-    getCellValue(cellName) {
-      if (!this.tableDocument.cells[cellName]) return null;
-      return this.tableDocument.cells[cellName].value || '';
-    },
-    delColumn() {
-      this.tableDocument.deleteArea('c8:e9');
-    },
-
-    saveDocument() { alert('save document'); },
     saveDocumentData() {
-      // this.tableDocument.serialization();
       const JSONFormat = true;
-      // console.log(this.tableDocument.serializationDataSection());
       apiSpreadSheet.dowloadJSONFile(JSON.stringify(this.tableDocument.serializationDataSection()), JSONFormat);
     },
     evtClickCell(evt) {
@@ -227,30 +216,9 @@ export default {
     acceptEditingCell(option) {
       this.tableDocument.editingCell(option.cellName, option.value);
       this.clearEditCell();
-      console.log(option.cellName, option.value);
-      console.log(this.tableDocument);
     },
     cancelEditingCell() {
       this.clearEditCell();
-    },
-    insertRow() {
-      // console.log(this.tableDocument.getAreaForRange('a2:d2'));
-      this.tableDocument.insertArea(1, 2, this.tableDocument.getAreaForRange('a2:d2'), 'vertical');
-      // this.tableDocument.shiftRows({ shiftStart: 2, shiftBefore: false, shiftStep: 2 });
-      console.log(this.tableDocument);
-    },
-    insertColumn() {
-      this.tableDocument.insertArea(2, 1, this.tableDocument.getAreaForRange('b1:b4'), 'horizontal');
-      // this.tableDocument.shiftColumns({ shiftStart: 4, shiftBefore: false, shiftStep: 1 });
-      console.log(this.tableDocument);
-    },
-    deleteRow() {
-      this.tableDocument.deleteRows('a2:d2');
-      console.log(this.tableDocument);
-    },
-    deleteColumn() {
-      this.tableDocument.deleteColumns('b1:b4');
-      console.log(this.tableDocument);
     },
 
     createNewDocument() {
@@ -272,17 +240,14 @@ export default {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONTemplate) => {
         this.tableDocumentTemplate = new TableDocument({ JSONString: JSONTemplate });
-        // this.tableDocument.direction = this.tableDocumentTemplate.direction;
         this.isFileTemplateDisabled = true;
         this.isFileSettingDisabled = false;
-        // console.log(this.tableDocumentTemplate);
       });
     },
     openJSONFileSetting(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONSetting) => {
         this.documentSetting = JSONSetting;
-        // console.log(this.documentSetting);
         this.isFileSettingDisabled = true;
         this.isFileDataDisabled = false;
       });
