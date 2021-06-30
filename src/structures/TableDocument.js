@@ -157,24 +157,29 @@ class TableDocument {
 
   calculateCellValue(cellName) {
     const FUNCTION_FORMULA = {
-      SUM: (parameters) => this.getFormulaSUMForRange(parameters),
+      SUM: () => 'calculateSUM',
     };
-    let cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+    const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
     if (cellFormula[0] === '=') {
       const [functionName, functionParameters] = cellFormula.slice(1, -1).split('(');
-      cellFormula = FUNCTION_FORMULA[functionName](functionParameters);
+      const evalFunction = `this.${FUNCTION_FORMULA[functionName]()}('${functionParameters}','${cellName}')`;
+      console.log(evalFunction);
+      // cellFormula = FUNCTION_FORMULA[functionName](functionParameters);
+      const result = eval(evalFunction); // eslint-disable-line no-eval
+      this.updateCellValue(cellName, result);
+      return result;
     }
     const operandsSet = getOperandsSet(cellFormula);
-    console.log(operandsSet);
+    // console.log(operandsSet);
     if (operandsSet.includes(cellName)) { this.updateCellValue(cellName, NaN); return NaN; }
     const operandsValues = getOperandsValues(operandsSet);
-    console.log(operandsValues);
+    // console.log(operandsValues);
     const fillFormula = fillingFormula(operandsValues, cellFormula);
-    console.log(fillFormula);
+    // console.log(fillFormula);
     // check formula
-    const rezult = eval(fillFormula); // eslint-disable-line no-eval
-    this.updateCellValue(cellName, rezult);
-    return rezult;
+    const result = eval(fillFormula); // eslint-disable-line no-eval
+    this.updateCellValue(cellName, result);
+    return result;
   }
 
   checkEditAccess(cellName) {
@@ -448,6 +453,13 @@ class TableDocument {
     return cellStyle;
   }
 
+  getCellType(cellName) {
+    const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
+    return this.cells[cellName]?.type
+      || this.columns[cellColumn]?.type
+      || this.rows[cellRow]?.type
+      || 'string';
+  }
   // getCellValue(cellName) {
   //   const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
   //   if (cellFormula) {
@@ -536,9 +548,16 @@ class TableDocument {
     return formulasCellsSet;
   }
 
-  getFormulaSUMForRange(range) {
+  calculateSUM(range, currentCellName) {
     const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
-    return cellKeys.map((cellKey) => `$${cellKey}`).join(' + ');
+    const formula = cellKeys.map((cellKey) => `$${cellKey}`).join(' + ');
+    const operandsSet = getOperandsSet(formula);
+    if (operandsSet.includes(currentCellName)) { this.updateCellValue(currentCellName, NaN); return NaN; }
+    const operandsValues = getOperandsValues(operandsSet);
+    const fillFormula = fillingFormula(operandsValues, formula);
+    const result = eval(fillFormula); // eslint-disable-line no-eval
+    // this.updateCellValue(cellName, result);
+    return result;
   }
 
   getLastColumn() {

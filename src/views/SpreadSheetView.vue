@@ -90,13 +90,21 @@
       </dialog-modal>
     </div>
     <div class="spread-sheet-view__table">
-      <spread-sheet-edit ref="SpreadSheetEditDOM"
+      <spread-sheet-editing ref="SpreadSheetEditDOM"
+                            :cell="editableCell"
+                            :cell-type="editableCellType"
+                            :cell-element="editableCellElement"
+                            :edit-event="editableCellEvent"
+                            :is-label="isEditableCellLabel"
+                            @editing:accept="acceptEditingCell"
+                            @editing:cancel="cancelEditingCell"></spread-sheet-editing>
+      <!-- <spread-sheet-edit ref="SpreadSheetEditDOM"
                          :editable-cell="editableCell"
                          :editable-cell-event="editableCellEvent"
                          :editable-cell-element="editableCellElement"
                          :is-editable-cell-label="isEditableCellLabel"
                          @editing:accept="acceptEditingCell"
-                         @editing:cancel="cancelEditingCell"></spread-sheet-edit>
+                         @editing:cancel="cancelEditingCell"></spread-sheet-edit> -->
       <spread-sheet ref="SpreadSheet"
                     v-bind="tableDocument"
                     :is-grid="isGrid"
@@ -111,7 +119,9 @@
 
 <script>
 import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
-import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
+// import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
+import SpreadSheetEditing from '@/components/SpreadSheetEditing/SpreadSheetEditing.vue';
+
 import DialogModal from '@/components/Dialogs/DialogModal.vue';
 
 import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
@@ -123,7 +133,8 @@ export default {
   name: 'SpreadSheetView',
   components: {
     SpreadSheet,
-    SpreadSheetEdit,
+    // SpreadSheetEdit,
+    SpreadSheetEditing,
     DialogModal,
   },
   data() {
@@ -135,6 +146,7 @@ export default {
       fileData: [],
 
       editableCell: null,
+      editableCellType: null,
       editableCellEvent: null,
       editableCellElement: null,
       editableCellGeometry: null,
@@ -179,6 +191,7 @@ export default {
       const cellName = evt.target.getAttribute('data-name');
       if (!this.tableDocument.checkEditAccess(cellName)) return;
       this.editableCell = this.tableDocument.getCell(cellName);
+      this.editableCellType = this.tableDocument.getCellType(cellName);
       this.editableCellEvent = evt;
       this.editableCellElement = evt.target;
       this.editableCellGeometry = evt.target.getBoundingClientRect();
@@ -187,8 +200,10 @@ export default {
       });
     },
     clearEditCell() {
-      this.editableCellElement.focus();
+      // console.log(this.editableCellElement);
+      if (this.editableCellElement) this.editableCellElement.focus();
       this.editableCell = null;
+      this.editableCellType = null;
       this.editableCellEvent = null;
       this.editableCellElement = null;
       this.isEditableCellLabel = false;

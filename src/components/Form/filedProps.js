@@ -1,6 +1,10 @@
 export default {
-  fieldLabel: { type: String, default: '' },
-  inputFieldValue: { type: String, default: '' },
-  isClearable: { type: Boolean, default: true },
+  fieldLabel: { type: String, default: null },
+  fieldValueInput: { type: String, default: '' },
+  isFlat: { type: Boolean, default: false },
+  isSolo: { type: Boolean, default: false },
+  isSingleLine: { type: Boolean, default: false },
+  isRequired: { type: Boolean, default: false },
+  isClearable: { type: Boolean, default: false },
   isDisabled: { type: Boolean, default: false },
 };

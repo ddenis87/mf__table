@@ -1,18 +1,18 @@
 <template>
   <div class="test">
     <div class="field">
-      <input-field-wrapper field-type="string"></input-field-wrapper>
+      <field-wrapper field-type="string"></field-wrapper>
     </div>
   </div>
 </template>
 
 <script>
-import InputFieldWrapper from '../components/Form/InputFieldWrapper.vue';
+import FieldWrapper from '../components/Form/FieldWrapper.vue';
 
 export default {
   name: 'Test',
   components: {
-    InputFieldWrapper,
+    FieldWrapper,
   },
   methods: {
   },
