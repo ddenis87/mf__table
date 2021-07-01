@@ -451,6 +451,10 @@ class TableDocument {
     return cell;
   }
 
+  getCellObject(cellName) {
+    return this.cells[cellName] || undefined;
+  }
+
   getCellParameter(cellName, cellParameter) {
     if (!this.cells[cellName]) return null;
     return this.cells[cellName][cellParameter] || null;
