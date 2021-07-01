@@ -10,12 +10,14 @@ import {
   getRangeShift,
 } from './TableDocumentHelpers';
 
+import Formulas from './Formulas';
+
 const CELL_WIDTH = 94;
 const CELL_HEIGHT = 22;
 const ROW_COUNT = 1000;
 const COLUMNS_COUNT = 26;
 
-const REG_OPERATORS = /[+-/*)(% ]/g;
+// const REG_OPERATORS = /[+-/*)(% ]/g;
 
 const CELL_ATTRIBUTES = {
   VALUE: 'value',
@@ -36,30 +38,30 @@ const RETURN_FORMAT = {
   KEYS: 'keys',
 };
 
-function fillingFormula(operandsValues, formula) {
-  let fillFormula = formula;
-  Object.entries(operandsValues).forEach((operand) => {
-    const [operandName, operandValue] = operand;
-    fillFormula = fillFormula.replace(`$${operandName}`, operandValue);
-  });
-  return fillFormula;
-}
+// function fillingFormula(operandsValues, formula) {
+//   let fillFormula = formula;
+//   Object.entries(operandsValues).forEach((operand) => {
+//     const [operandName, operandValue] = operand;
+//     fillFormula = fillFormula.replace(`$${operandName}`, operandValue);
+//   });
+//   return fillFormula;
+// }
 
 function getObjectOfJSON(data) {
   return (typeof data === 'string') ? JSON.parse(data) : data;
 }
 
-function getOperandsSet(formula) {
-  return formula.replace(REG_OPERATORS, '').split('$').splice(1);
-}
+// function getOperandsSet(formula) {
+//   return formula.replace(REG_OPERATORS, '').split('$').splice(1);
+// }
 
-function getOperandsValues(operandsSet) {
-  const operandsValues = {};
-  operandsSet.forEach((operand) => {
-    operandsValues[operand] = ` +this.getCellValueForFormula('${operand}')`;
-  });
-  return operandsValues;
-}
+// function getOperandsValues(operandsSet) {
+//   const operandsValues = {};
+//   operandsSet.forEach((operand) => {
+//     operandsValues[operand] = ` +this.getCellValueForFormula('${operand}')`;
+//   });
+//   return operandsValues;
+// }
 
 function moveCell(cellName, from = 'a1', rangeLimit = 'a1:a1') {
   const [rangeLimitFrom] = getRangeSplit(rangeLimit);
@@ -156,31 +158,38 @@ class TableDocument {
   }
 
   calculateCellValue(cellName) {
-    const FUNCTION_FORMULA = {
-      SUM: () => 'calculateSUM',
-    };
     const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
-    if (cellFormula[0] === '=') {
-      const [functionName, functionParameters] = cellFormula.slice(1, -1).split('(');
-      const evalFunction = `this.${FUNCTION_FORMULA[functionName]()}('${functionParameters}','${cellName}')`;
-      console.log(evalFunction);
-      // cellFormula = FUNCTION_FORMULA[functionName](functionParameters);
-      const result = eval(evalFunction); // eslint-disable-line no-eval
-      this.updateCellValue(cellName, result);
-      return result;
+    const formula = new Formulas(cellFormula, cellName);
+    if (formula.hasOperandsInclude(cellName)) {
+      this.updateCellValue(cellName, NaN);
+      return NaN;
     }
-    const operandsSet = getOperandsSet(cellFormula);
-    // console.log(operandsSet);
-    if (operandsSet.includes(cellName)) { this.updateCellValue(cellName, NaN); return NaN; }
-    const operandsValues = getOperandsValues(operandsSet);
-    // console.log(operandsValues);
-    const fillFormula = fillingFormula(operandsValues, cellFormula);
-    // console.log(fillFormula);
-    // check formula
-    const result = eval(fillFormula); // eslint-disable-line no-eval
+    const result = eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
     this.updateCellValue(cellName, result);
     return result;
   }
+
+  // calculateCellValueV1(cellName) {
+  //   const FUNCTION_FORMULA = {
+  //     SUM: () => 'calculateSUM',
+  //   };
+  //   const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+  //   if (cellFormula[0] === '=') {
+  //     const [functionName, functionParameters] = cellFormula.slice(1, -1).split('(');
+  //     const evalFunction = `this.${FUNCTION_FORMULA[functionName]()}('${functionParameters}','${cellName}')`;
+  //     console.log(evalFunction);
+  //     const result = eval(evalFunction); // eslint-disable-line no-eval
+  //     this.updateCellValue(cellName, result);
+  //     return result;
+  //   }
+  //   const operandsSet = getOperandsSet(cellFormula);
+  //   if (operandsSet.includes(cellName)) { this.updateCellValue(cellName, NaN); return NaN; }
+  //   const operandsValues = getOperandsValues(operandsSet);
+  //   const fillFormula = fillingFormula(operandsValues, cellFormula);
+  //   const result = eval(fillFormula); // eslint-disable-line no-eval
+  //   this.updateCellValue(cellName, result);
+  //   return result;
+  // }
 
   checkEditAccess(cellName) {
     if (Object.keys(this.cells).includes(cellName) && this.cells[cellName].disabled === true) return false;
@@ -464,7 +473,7 @@ class TableDocument {
   getCellValueForFormula(cellName) {
     if (this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA)) return this.calculateCellValue(cellName);
     const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
-    return cellValue || 0;
+    return +cellValue || 0;
   }
 
   getCellsInRange(range, returnFormat = RETURN_FORMAT.ENTRIES) {
@@ -540,15 +549,22 @@ class TableDocument {
 
   calculateSUM(range, currentCellName) {
     const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
-    const formula = cellKeys.map((cellKey) => `$${cellKey}`).join(' + ');
-    const operandsSet = getOperandsSet(formula);
-    if (operandsSet.includes(currentCellName)) { this.updateCellValue(currentCellName, NaN); return NaN; }
-    const operandsValues = getOperandsValues(operandsSet);
-    const fillFormula = fillingFormula(operandsValues, formula);
-    const result = eval(fillFormula); // eslint-disable-line no-eval
-    // this.updateCellValue(cellName, result);
-    return result;
+    const formula = new Formulas(cellKeys.map((cellKey) => `$${cellKey}`).join(' + '), currentCellName);
+    if (formula.hasOperandsInclude(currentCellName)) return NaN;
+    return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
   }
+
+  // calculateSUM(range, currentCellName) {
+  //   const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
+  //   const formula = cellKeys.map((cellKey) => `$${cellKey}`).join(' + ');
+  //   const operandsSet = getOperandsSet(formula);
+  //   if (operandsSet.includes(currentCellName)) { this.updateCellValue(currentCellName, NaN); return NaN; }
+  //   const operandsValues = getOperandsValues(operandsSet);
+  //   const fillFormula = fillingFormula(operandsValues, formula);
+  //   const result = eval(fillFormula); // eslint-disable-line no-eval
+  //   // this.updateCellValue(cellName, result);
+  //   return result;
+  // }
 
   getLastColumn() {
     const columns = [0];
@@ -612,16 +628,6 @@ class TableDocument {
     if (namedAreas.length === 1) return namedAreas[0];
     return namedAreas;
   }
-
-  // getNamedAreaCellShift(cellNameCurrent, cellNameShift, areaName) {
-  //   const cellNamedArea = this.namedAreas.find((namedArea) => namedArea.range.split(':')[0].toLowerCase() === cellNameCurrent
-  //     && namedArea.name !== areaName);
-  //   if (!cellNamedArea) return null;
-  //   return {
-  //     name: cellNamedArea.name,
-  //     range: cellNameShift,
-  //   };
-  // }
 
   getRangeByAreaName(areaName) {
     const range = [];
@@ -829,75 +835,8 @@ class TableDocument {
     formulasCellsSet.map((cellName) => this.calculateCellValue(cellName));
   }
 
-  // serializationV2(JSONFormat = false) {
-  //   const result = [];
-  //   this.documentSettings.forEach((setting) => {
-  //     const [key, keyValue] = Object.entries(setting)[0];
-  //     if (Object.keys(keyValue).includes('nested')) return;
-  //     const areas = this.getNamedArea(key);
-  //     const section = { [key]: (keyValue.presentationType === 'unit') ? {} : [] };
-  //     if (!Array.isArray(areas)) section[key] = areas.serializationAreaV2(keyValue, this.documentSettings); //
-  //     else {
-  //       areas.forEach((area) => {
-  //         section[key].push(...area.serializationAreaV2(keyValue, this.documentSettings));
-  //       });
-  //     }
-  //     result.push(section);
-  //   });
-  //   return (JSONFormat) ? JSON.stringify(result) : result;
-  // }
-
-  // serializationAreaV2(keyValue, settings) {
-  //   let rezult = (keyValue.presentationType === 'unit') ? {} : [];
-  //   const areaValue = this.getAreaValue(keyValue.parameters || {});
-  //   if (keyValue.nestedData) {
-  //     keyValue.nestedData.forEach((nestedSection) => {
-  //       const settingItem = settings
-  //         .find((setting) => Object.keys(setting)[0] === nestedSection); // не учитывает если несколько секций с одним именем
-  //       const [nestedKey, nestedKeyValue] = Object.entries(settingItem)[0];
-  //       const nestedAreas = this.getNamedArea(nestedKeyValue.baseSection);
-  //       areaValue[nestedKey] = (nestedKeyValue.presentationType === 'unit') ? {} : [];
-  //       if (!Array.isArray(nestedAreas)) {
-  //         areaValue[nestedKey] = nestedAreas.serializationAreaV2(nestedKeyValue, settings);
-  //         return;
-  //       }
-  //       nestedAreas.forEach((nestedArea) => {
-  //         areaValue[nestedKey].push(...nestedArea.serializationAreaV2(nestedKeyValue, settings));
-  //       });
-  //     });
-  //   }
-  //   if (keyValue.presentationType === 'unit') rezult = { ...areaValue };
-  //   else rezult.push({ ...areaValue });
-  //   return rezult;
-  // }
-
-  // serialization(JSONFormat = false) {
-  //   const result = [];
-  //   this.documentSettings.forEach((setting) => {
-  //     const [key, keyValue] = Object.entries(setting)[0];
-  //     if (Object.keys(keyValue).includes('nested')) return;
-  //     let areas = this.getNamedArea(key);
-  //     if (!Array.isArray(areas)) areas = [areas];
-  //     result.push({ [key]: this.serializationArea(keyValue, areas) });
-  //   });
-  //   return (JSONFormat) ? JSON.stringify(result) : result;
-  // }
-
-  // serializationArea(keyValue, areas) {
-  //   let result = (keyValue.presentationType === 'unit') ? {} : [];
-  //   areas.forEach((area) => {
-  //     const areaValue = area.getAreaValue(keyValue.parameters || {});
-  //     if (keyValue.nestedData) {
-  //       keyValue.nestedData.forEach((nestedSection) => {
-  //         const [nestedKey, nestedKeyValue] = this.getSectionSettings(nestedSection);
-  //         const nestedArea = area.getNamedArea(nestedKeyValue.baseSection);
-  //         areaValue[nestedKey] = this.serializationArea(nestedKeyValue, nestedArea);
-  //       });
-  //     }
-  //     if (keyValue.presentationType === 'unit') result = { ...areaValue };
-  //     else result.push({ ...areaValue });
-  //   });
-  //   return result;
+  // recalculateFormulas() {
+  //   this.getFormulars.map((formula) => this.updateCellValue())
   // }
 
   serializationDataSection(nameDataSection, settings) {
