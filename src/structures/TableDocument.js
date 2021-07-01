@@ -460,16 +460,6 @@ class TableDocument {
       || this.rows[cellRow]?.type
       || 'string';
   }
-  // getCellValue(cellName) {
-  //   const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
-  //   if (cellFormula) {
-  //     const calculateValue = this.calculateCellValue(cellName);
-  //     return calculateValue;
-  //   }
-  //   const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
-  //   if (cellValue) return cellValue;
-  //   return 0;
-  // }
 
   getCellValueForFormula(cellName) {
     if (this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA)) return this.calculateCellValue(cellName);
@@ -839,76 +829,76 @@ class TableDocument {
     formulasCellsSet.map((cellName) => this.calculateCellValue(cellName));
   }
 
-  serializationV2(JSONFormat = false) {
-    const result = [];
-    this.documentSettings.forEach((setting) => {
-      const [key, keyValue] = Object.entries(setting)[0];
-      if (Object.keys(keyValue).includes('nested')) return;
-      const areas = this.getNamedArea(key);
-      const section = { [key]: (keyValue.presentationType === 'unit') ? {} : [] };
-      if (!Array.isArray(areas)) section[key] = areas.serializationAreaV2(keyValue, this.documentSettings); //
-      else {
-        areas.forEach((area) => {
-          section[key].push(...area.serializationAreaV2(keyValue, this.documentSettings));
-        });
-      }
-      result.push(section);
-    });
-    return (JSONFormat) ? JSON.stringify(result) : result;
-  }
+  // serializationV2(JSONFormat = false) {
+  //   const result = [];
+  //   this.documentSettings.forEach((setting) => {
+  //     const [key, keyValue] = Object.entries(setting)[0];
+  //     if (Object.keys(keyValue).includes('nested')) return;
+  //     const areas = this.getNamedArea(key);
+  //     const section = { [key]: (keyValue.presentationType === 'unit') ? {} : [] };
+  //     if (!Array.isArray(areas)) section[key] = areas.serializationAreaV2(keyValue, this.documentSettings); //
+  //     else {
+  //       areas.forEach((area) => {
+  //         section[key].push(...area.serializationAreaV2(keyValue, this.documentSettings));
+  //       });
+  //     }
+  //     result.push(section);
+  //   });
+  //   return (JSONFormat) ? JSON.stringify(result) : result;
+  // }
 
-  serializationAreaV2(keyValue, settings) {
-    let rezult = (keyValue.presentationType === 'unit') ? {} : [];
-    const areaValue = this.getAreaValue(keyValue.parameters || {});
-    if (keyValue.nestedData) {
-      keyValue.nestedData.forEach((nestedSection) => {
-        const settingItem = settings
-          .find((setting) => Object.keys(setting)[0] === nestedSection); // не учитывает если несколько секций с одним именем
-        const [nestedKey, nestedKeyValue] = Object.entries(settingItem)[0];
-        const nestedAreas = this.getNamedArea(nestedKeyValue.baseSection);
-        areaValue[nestedKey] = (nestedKeyValue.presentationType === 'unit') ? {} : [];
-        if (!Array.isArray(nestedAreas)) {
-          areaValue[nestedKey] = nestedAreas.serializationAreaV2(nestedKeyValue, settings);
-          return;
-        }
-        nestedAreas.forEach((nestedArea) => {
-          areaValue[nestedKey].push(...nestedArea.serializationAreaV2(nestedKeyValue, settings));
-        });
-      });
-    }
-    if (keyValue.presentationType === 'unit') rezult = { ...areaValue };
-    else rezult.push({ ...areaValue });
-    return rezult;
-  }
+  // serializationAreaV2(keyValue, settings) {
+  //   let rezult = (keyValue.presentationType === 'unit') ? {} : [];
+  //   const areaValue = this.getAreaValue(keyValue.parameters || {});
+  //   if (keyValue.nestedData) {
+  //     keyValue.nestedData.forEach((nestedSection) => {
+  //       const settingItem = settings
+  //         .find((setting) => Object.keys(setting)[0] === nestedSection); // не учитывает если несколько секций с одним именем
+  //       const [nestedKey, nestedKeyValue] = Object.entries(settingItem)[0];
+  //       const nestedAreas = this.getNamedArea(nestedKeyValue.baseSection);
+  //       areaValue[nestedKey] = (nestedKeyValue.presentationType === 'unit') ? {} : [];
+  //       if (!Array.isArray(nestedAreas)) {
+  //         areaValue[nestedKey] = nestedAreas.serializationAreaV2(nestedKeyValue, settings);
+  //         return;
+  //       }
+  //       nestedAreas.forEach((nestedArea) => {
+  //         areaValue[nestedKey].push(...nestedArea.serializationAreaV2(nestedKeyValue, settings));
+  //       });
+  //     });
+  //   }
+  //   if (keyValue.presentationType === 'unit') rezult = { ...areaValue };
+  //   else rezult.push({ ...areaValue });
+  //   return rezult;
+  // }
 
-  serialization(JSONFormat = false) {
-    const result = [];
-    this.documentSettings.forEach((setting) => {
-      const [key, keyValue] = Object.entries(setting)[0];
-      if (Object.keys(keyValue).includes('nested')) return;
-      let areas = this.getNamedArea(key);
-      if (!Array.isArray(areas)) areas = [areas];
-      result.push({ [key]: this.serializationArea(keyValue, areas) });
-    });
-    return (JSONFormat) ? JSON.stringify(result) : result;
-  }
+  // serialization(JSONFormat = false) {
+  //   const result = [];
+  //   this.documentSettings.forEach((setting) => {
+  //     const [key, keyValue] = Object.entries(setting)[0];
+  //     if (Object.keys(keyValue).includes('nested')) return;
+  //     let areas = this.getNamedArea(key);
+  //     if (!Array.isArray(areas)) areas = [areas];
+  //     result.push({ [key]: this.serializationArea(keyValue, areas) });
+  //   });
+  //   return (JSONFormat) ? JSON.stringify(result) : result;
+  // }
 
-  serializationArea(keyValue, areas) {
-    let result = (keyValue.presentationType === 'unit') ? {} : [];
-    areas.forEach((area) => {
-      const areaValue = area.getAreaValue(keyValue.parameters || {});
-      if (keyValue.nestedData) {
-        keyValue.nestedData.forEach((nestedSection) => {
-          const [nestedKey, nestedKeyValue] = this.getSectionSettings(nestedSection);
-          const nestedArea = area.getNamedArea(nestedKeyValue.baseSection);
-          areaValue[nestedKey] = this.serializationArea(nestedKeyValue, nestedArea);
-        });
-      }
-      if (keyValue.presentationType === 'unit') result = { ...areaValue };
-      else result.push({ ...areaValue });
-    });
-    return result;
-  }
+  // serializationArea(keyValue, areas) {
+  //   let result = (keyValue.presentationType === 'unit') ? {} : [];
+  //   areas.forEach((area) => {
+  //     const areaValue = area.getAreaValue(keyValue.parameters || {});
+  //     if (keyValue.nestedData) {
+  //       keyValue.nestedData.forEach((nestedSection) => {
+  //         const [nestedKey, nestedKeyValue] = this.getSectionSettings(nestedSection);
+  //         const nestedArea = area.getNamedArea(nestedKeyValue.baseSection);
+  //         areaValue[nestedKey] = this.serializationArea(nestedKeyValue, nestedArea);
+  //       });
+  //     }
+  //     if (keyValue.presentationType === 'unit') result = { ...areaValue };
+  //     else result.push({ ...areaValue });
+  //   });
+  //   return result;
+  // }
 
   serializationDataSection(nameDataSection, settings) {
     if (!nameDataSection) {

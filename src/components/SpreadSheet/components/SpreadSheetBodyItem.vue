@@ -248,7 +248,7 @@ export default {
         align-items: inherit;
         height: 100%;
         width: 100%;
-        padding: 0px 2px;
+        padding: 0px 3px;
         overflow: hidden;
         user-select: none;
       }

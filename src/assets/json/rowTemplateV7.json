@@ -190,7 +190,7 @@
         "alignItems":"center","justifyContent":"center","cursor":"pointer"
       }
     },
-    {"name":"h8", "list": {"borderTop":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},
+    {"name":"h8", "list": {"borderTop":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","alignItems":"center","justifyContent":"flex-start"}},
     {
       "name":"f9",
       "list":{

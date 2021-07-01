@@ -47,6 +47,7 @@ export default {
       return {
         isFlat: true,
         isSolo: true,
+        isSingleLine: true,
       };
     },
   },
