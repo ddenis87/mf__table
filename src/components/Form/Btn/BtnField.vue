@@ -8,7 +8,7 @@
              v-on="on"
              tile plain color="black"
              @click="(event) => $emit('click', event)" @keydown="(event) => $emit('keydown', event)">
-        <v-icon  :color="iconColor">{{ icon }}</v-icon>
+        <v-icon :color="iconColor">{{ icon }}</v-icon>
       </v-btn>
     </template>
     <span class="tooltip-text tooltip-text-control"><slot></slot></span>
@@ -17,7 +17,7 @@
 
 <script>
 export default {
-  name: 'FieldButton',
+  name: 'BtnField',
   props: {
     icon: { type: String, default: '' },
     iconColor: { type: String, default: '' },
@@ -29,6 +29,6 @@ export default {
 
 <style lang="scss" scoped>
 .field-button {
-  padding-top: 10px;
+  padding-top: 3px;
 }
 </style>

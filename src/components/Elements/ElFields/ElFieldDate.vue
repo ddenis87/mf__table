@@ -195,13 +195,13 @@ export default {
             this.isEmit = true;
           return;
         }
-      if (this.isEmit) {
-        this.isDialogShow = false;
-        this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''})
-      } else {
-        this.isEmit = true;
-      }
-    },
+        if (this.isEmit) {
+          this.isDialogShow = false;
+          this.$emit('event-blur', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''})
+        } else {
+          this.isEmit = true;
+        }
+      },
 
     emitKeydown(event) { this.$emit('event-keydown', {event: event, value: (this.fieldValue) ? this.fieldValue.split('.').reverse().join('-') : ''}); },
   },

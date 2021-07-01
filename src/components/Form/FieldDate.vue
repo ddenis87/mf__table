@@ -1,6 +1,6 @@
 <template>
   <div class="field">
-    <v-text-field class="field-item date"
+    <v-text-field class="field-item date" ref="fieldInput"
                   v-bind="fieldPropsNested"
                   :rules="(isRequired) ? [rules.required] : []"
                   v-model="fieldValue"
@@ -12,29 +12,29 @@
                   @keydown.tab="evtKeydownControl"
                   @blur="evtBlur"
                   @focus="evtFocus">
-    <template v-slot:append>
-      <field-button no-tooltip
-                    icon="mdi-calendar-range"
-                    @keydown="evtOpenDialog"
-                    @click="evtOpenDialog"></field-button>
-    </template>
+      <template v-slot:append>
+        <btn-field no-tooltip
+                      icon="mdi-calendar-range"
+                      @keydown="evtOpenDialog"
+                      @click="evtOpenDialog"></btn-field>
+      </template>
     </v-text-field>
-    <v-menu class="el-field-date__dialog"
+    <v-menu class="field-item dialog"
             v-bind="dialogProps"
             v-model="isDialogShow"
             @input="evtClickOutside">
-      <div :class="`el-field-date__date-time`">
-        <div class="date">
+      <div class="dialog-date">
+        <div class="dialog-date__item">
           <v-date-picker v-model="fieldValueDate"
-                        locale="ru"
-                        first-day-of-week="1"
-                        no-title
-                        scrollable
-                        show-adjacent-months
-                        @input="evtSelectDate"></v-date-picker>
+                         locale="ru"
+                         first-day-of-week="1"
+                         no-title
+                         scrollable
+                         show-adjacent-months
+                         @input="evtSelectDate"></v-date-picker>
         </div>
-        <div class="control">
-          <el-btn is-orientation="left" @click="evtClickToday">Сегодня</el-btn>
+        <div class="dialog-date__control">
+          <btn-dialog @click="evtSelectToday">Сегодня</btn-dialog>
         </div>
       </div>
     </v-menu>
@@ -42,16 +42,19 @@
 </template>
 
 <script>
+import BtnDialog from '@/components/Form/Btn/BtnDialog.vue';
+import BtnField from '@/components/Form/Btn/BtnField.vue';
+
+import formattedDataDisplay from '@/plugins/formattedDataDisplay/formattedDataDisplay';
 import fieldModel from './FieldModel';
 import fieldProps from './FieldProps';
 import fieldComputed from './FieldComputed';
 
-import FieldButton from './FieldButton.vue';
-
 export default {
   name: 'FieldDate',
   components: {
-    FieldButton,
+    BtnField,
+    BtnDialog,
   },
   model: {
     ...fieldModel,
@@ -82,17 +85,42 @@ export default {
       };
     },
   },
+  watch: {
+    fieldValueInput() {
+      this.fieldValue = formattedDataDisplay(this.fieldValueInput, { valueType: 'date' }) || null;
+    },
+  },
   methods: {
-    evtSelectDate() {},
-    evtClickToday() {},
-    evtClickOutside() {},
-    evtOpenDialog() {},
-    evtInput() { this.$emit('input', this.fieldValue); },
+    evtClickOutside() {
+      this.$refs.fieldInput.focus();
+    },
+    evtOpenDialog(evt) {
+      if (evt.type === 'keydown' && evt.code !== 'Space') return;
+      const elementTarget = this.$refs.fieldInput.$el.getBoundingClientRect();
+      this.isDialogX = elementTarget.left;
+      this.isDialogY = elementTarget.top + 40;
+      this.isDialogShow = !this.isDialogShow;
+    },
+    evtSelectDate() {
+      this.fieldValue = (this.fieldValueDate) ? formattedDataDisplay(this.fieldValueDate, { valueType: 'date' }) : null;
+      this.isDialogShow = false;
+      this.$refs.fieldInput.focus();
+      this.evtInput();
+    },
+    evtSelectToday() {
+      this.fieldValue = new Date().toLocaleString('ru');
+      ([this.fieldValueDate] = new Date().toJSON().split('T'));
+      this.isDialogShow = false;
+      this.$refs.fieldInput.focus();
+      this.evtInput();
+    },
+    evtInput() { this.$emit('input', this.fieldValueDate); },
     evtKeydown(evt) { this.$emit('keydown:key', evt); },
     evtKeydownControl(evt) { this.$emit('keydown:control', evt); },
     evtFocus() {},
     evtBlur(evt) {
-      this.$emit('blur:input', evt);
+      evt.preventDefault();
+      if (!this.isDialogShow) this.$emit('blur:input', evt);
     },
   },
 };
@@ -100,6 +128,14 @@ export default {
 
 <style lang="scss" scoped>
 @import './Field.scss';
+
+.dialog-date {
+  background-color: white;
+  &__control {
+    padding: 14px 14px;
+    padding-top: 0px;
+  }
+}
 
 ::v-deep {
   .v-input__slot {
