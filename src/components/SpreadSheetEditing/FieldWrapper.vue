@@ -47,15 +47,23 @@ export default {
     };
   },
   computed: {
+    sourceName() {
+      const name = (this.fieldType?.includes('.')) ? this.fieldType.split('.')[1] : null;
+      return name;
+    },
     field() {
-      return this.fields[this.fieldType];
+      const fieldType = (this.fieldType?.includes('.')) ? this.fieldType.split('.')[0] : this.fieldType;
+      return this.fields[fieldType];
     },
     fieldProps() {
-      return {
+      const props = {
         isFlat: true,
         isSolo: true,
         isSingleLine: true,
       };
+      if (this.sourceName) props.relatedModelName = this.sourceName;
+      console.log(props);
+      return props;
     },
   },
   watch: {

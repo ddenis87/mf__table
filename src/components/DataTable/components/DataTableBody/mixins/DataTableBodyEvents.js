@@ -79,9 +79,6 @@ export const DataTableBodyEvents = {
           fieldValue,
           element,
         });
-          // this.mountEditingComponent(target, targetInsert, fieldOption, fieldValue);  // mountEditingComponent - in mixin Editing
-
-
       }
     },
 

@@ -73,12 +73,17 @@ export default {
     evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydownControl(evt) {
       this.evtInput();
+      console.log(evt);
+      if (evt.code === 'Escape') {
+        this.$emit('control:esc');
+        return;
+      }
       this.$emit('keydown:control', evt);
       this.clearComponent();
     },
-    evtBlur() {
+    evtBlur(evt) {
       this.evtInput();
-      this.$emit('blur:wrapper');
+      this.$emit('blur:wrapper', evt);
       this.clearComponent();
     },
   },

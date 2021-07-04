@@ -484,6 +484,32 @@ export default {
     });
   },
 
+  // ЗАПРОС ЭЛЕМЕНТА(-ОВ) ДАННЫХ ----------------------------------------
+  REQUEST_DATA_ITEM(state, option) {
+    let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName);
+    addressApi += `id=${option.id}`;
+    return new Promise((resolve, reject) => {
+      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+      axios
+        .get(addressApi)
+        .then(response => {
+          response.data.results.forEach(element => {
+            state.commit('SET_DATA', {
+              tableName: option.tableName,
+              value: element,
+            });
+            resolve(element);
+          });
+        })
+        .catch(err => {
+          reject(err);
+        })
+        .finally(() => {
+          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+        });
+    });
+  },
+  // --------------------------------------------------------------------
 
   // HISTORY DATA -------------------------------------------------------
   // ------------ -------------------------------------------------------

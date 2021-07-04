@@ -51,7 +51,6 @@ export default {
       return this.cellElement?.getAttribute('data-name').toUpperCase() || '';
     },
     fieldType() {
-      console.log(this.cellType);
       return this.cellType;
     },
   },

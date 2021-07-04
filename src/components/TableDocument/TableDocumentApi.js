@@ -10,15 +10,30 @@ function getRepresentationStore(sourceName, id) {
 class TableDocumentApi extends TableDocument {
   constructor(params) {
     super(params);
-    Object.values(this.cells).forEach((cellValue) => {
-      const { type, representationId, sourceName } = cellValue;
-      if (type !== 'field') return;
-      const representationValue = getRepresentationStore(sourceName, representationId);
-      this.setRepresentation(representationId, representationValue);
-    });
+    // Object.values(this.cells).forEach((cellValue) => {
+    //   const { type, representationId, sourceName } = cellValue;
+    //   if (type !== 'field') return;
+    //   const representationValue = getRepresentationStore(sourceName, representationId);
+    //   this.setRepresentation(representationId, representationValue);
+    // });
   }
 
   representations = new Map();
+
+  fillArea(dataArea, parameters) {
+    Object.entries(this.cells).forEach((cell) => {
+      const [, cellValue] = cell;
+      const parameterName = cellValue?.parameter || null;
+      if (!parameterName) return;
+      const parameterNameData = parameters[parameterName] || parameterName;
+      if (!parameterName || !dataArea[parameterNameData]) return;
+      cellValue.value = dataArea[parameterNameData];
+
+      if (cellValue.type && cellValue.type.includes('field')) {
+
+      }
+    });
+  }
 
   getRepresentation(key) {
     let representation = 'none';

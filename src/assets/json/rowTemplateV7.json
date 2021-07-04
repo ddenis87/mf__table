@@ -88,7 +88,7 @@
     "f5":{"style":"f5","parameter":"st1Volume21","type":"number"},
     "f6":{"style":"f6","type":"number","parameter":"st2Volume21"},
     "f7":{"style":"f7","type":"number","parameter":"st3Volume21"},
-    "f8":{"style":"f8"},
+    "f8":{"style":"f8","type":"field.organization","value":15},
     "f9":{
       "style":"f9",
       "type":"number",

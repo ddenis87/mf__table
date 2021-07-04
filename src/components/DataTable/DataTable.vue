@@ -92,6 +92,7 @@ import ElProgressBar from '@/components/Elements/ElProgressBar/ElProgressBar.vue
 import DataTableHeader from './components/DataTableHeader/DataTableHeader.vue';
 import DataTableBodyGroup from './components/DataTableBodyGroup/DataTableBodyGroup.vue';
 import DataTableBody from './components/DataTableBody/DataTableBody.vue';
+// import DataTableBody from './components/DataTableBody/DataBody.vue';
 import DataTableFooter from './components/DataTableFooter/DataTableFooter.vue';
 import DataTableEmptyData from './components/DataTableEmptyData.vue';
 

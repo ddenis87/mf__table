@@ -2,11 +2,13 @@
   <div class="field">
     <v-autocomplete ref="fieldInput"
                     class="field-item choice"
-                    v-bind="fieldPropsNested"
+                    return-object
+                    no-data-text="Значение отсутствует"
                     :rules="(isRequired) ? [rules.required] : []"
                     :items="fieldItems"
                     :item-text="itemText"
                     :item-value="itemValue"
+                    v-bind="fieldPropsNested"
                     v-model="fieldValue"
                     @click="evtClick"
                     @input="evtInput"
@@ -32,8 +34,14 @@ export default {
   props: {
     ...fieldProps,
     itemText: { type: String, default: 'display_name' },
+    items: {
+      type: Array,
+      default: () => [{
+        display_name: 'Значения отсутствуют',
+        value: null,
+      }],
+    }, // ???
     itemValue: { type: String, default: 'value' },
-    items: { type: Array, default: () => [] },
   },
   data() {
     return {
@@ -46,8 +54,7 @@ export default {
   computed: {
     ...fieldComputed,
     fieldItems() {
-      const items = [{ display_name: 'Значения отсутствуют', value: null }];
-      return items.concat(this.items);
+      return this.items;
     },
   },
   watch: {
