@@ -4,7 +4,6 @@
 /src/tests/unit/Elements
 /src/tests/unit/Profile
 /src/store
-# /src/components
 /src/components/Elements
 /src/components/DataTableSingle
 /src/components/DataTableLazy
@@ -16,5 +15,4 @@
 /src/componentsInteraction
 /src/components/TheForms
 /src/components/TheTable
-# /src/views
 /src/components/Document/ZSpreadSheet

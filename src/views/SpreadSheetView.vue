@@ -125,7 +125,8 @@ import SpreadSheetEditing from '@/components/SpreadSheetEditing/SpreadSheetEditi
 import DialogModal from '@/components/Dialogs/DialogModal.vue';
 
 import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
-import TableDocument from '@/structures/TableDocument';
+import TableDocument from '@/components/TableDocument/TableDocument';
+import TableDocumentApi from '@/components/TableDocument/TableDocumentApi';
 
 // import setting from '@/assets/json/crossSetting';
 
@@ -256,7 +257,7 @@ export default {
     openJSONFileData(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
-        const tableDocument = new TableDocument();
+        const tableDocument = new TableDocumentApi();
         tableDocument.deserialize(JSONData, this.tableDocumentTemplate, this.documentSetting);
         this.tableDocument = tableDocument;
         this.tableDocument.recalculateFormulas();

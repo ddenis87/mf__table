@@ -1,6 +1,7 @@
 <template>
   <div class="field">
-    <v-text-field class="field-item date" ref="fieldInput"
+    <v-text-field ref="fieldInput"
+                  class="field-item date"
                   v-bind="fieldPropsNested"
                   :rules="(isRequired) ? [rules.required] : []"
                   v-model="fieldValue"

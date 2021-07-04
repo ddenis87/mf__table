@@ -5,6 +5,7 @@ function formattedDataDisplay(
     formatString = '',
     valuePrefix = '',
     valueSuffix = '',
+    representations = new Map(),
   } = {},
 ) {
   let formattedValue = '';
@@ -77,6 +78,7 @@ function formattedDataDisplay(
       if (value === true || value === 1) newValue = valueTrue;
       return newValue;
     },
+    field: () => representations.get(value),
   };
   formattedValue = (TYPES[valueType]) ? TYPES[valueType]() : value;
   return `${valuePrefix}${formattedValue}${valueSuffix}`;

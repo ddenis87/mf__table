@@ -44,14 +44,14 @@ import DataTableControl from '@/components/DataTableControls/DataTableControl.vu
 
 import { ElField } from './ElField.js';
 import { ElFieldProps } from './ElFieldProps.js';
-import { DataTableControl_DataTable } from '@/componentsInteraction/DataTableControl_DataTable.js';
+import { DataTableControlDataTable } from '@/componentsInteraction/DataTableControlDataTable.js';
 
 export default {
   name: 'ElFieldHistory',
   mixins: [
     ElField,
     ElFieldProps,
-    DataTableControl_DataTable,
+    DataTableControlDataTable,
   ],
   components: {
     DialogModal,

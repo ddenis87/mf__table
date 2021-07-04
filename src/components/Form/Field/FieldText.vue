@@ -1,7 +1,7 @@
 <template>
   <div class="field">
-    <v-text-field class="field-item number"
-                  type="number"
+    <v-text-field ref="fieldInput"
+                  class="field-item text"
                   v-bind="fieldPropsNested"
                   :rules="(isRequired) ? [rules.required] : []"
                   v-model="fieldValue"
@@ -21,7 +21,7 @@ import fieldProps from './FieldProps';
 import fieldComputed from './FieldComputed';
 
 export default {
-  name: 'FieldNumber',
+  name: 'FieldText',
   model: {
     ...fieldModel,
   },
@@ -58,12 +58,6 @@ export default {
 ::v-deep {
   .v-input__slot {
     padding: 0px !important;
-  }
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    display: none;
-    -webkit-appearance: none;
-    margin: 0;
   }
 }
 </style>

@@ -8,7 +8,7 @@ import {
   getRangeSplit,
   getRangeLength,
   getRangeShift,
-} from './TableDocumentHelpers';
+} from './Helpers';
 
 import Formulas from './Formulas';
 

@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { DataTableControlDataTable } from '@/componentsInteraction/DataTableControl_DataTable';
+import { DataTableControlDataTable } from '@/componentsInteraction/DataTableControlDataTable';
 import DataTableControl from '@/components/DataTableControls/DataTableControl.vue';
 import ElFieldSearch from '@/components/Elements/ElField/ElFieldSearch.vue';
 

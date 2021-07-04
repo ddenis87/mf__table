@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import FieldWrapper from '@/components/Form/FieldWrapper.vue';
+import FieldWrapper from './FieldWrapper.vue';
 
 export default {
   name: 'SpreadSheetEditing',
@@ -89,7 +89,7 @@ export default {
     async evtFocusInput() {
       await this.$nextTick().then(() => {
         setTimeout(() => {
-          this.$refs.wrapper.$el.querySelector('.v-text-field__slot input').focus();
+          this.$refs.wrapper.$refs.field.$refs.fieldInput.focus();
         }, 100);
       });
     },

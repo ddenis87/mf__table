@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import FieldWrapper from '../components/Form/FieldWrapper.vue';
+import FieldWrapper from '../components/SpreadSheetEditing/FieldWrapper.vue';
 
 export default {
   name: 'Test',
