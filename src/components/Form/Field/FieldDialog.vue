@@ -76,12 +76,23 @@ export default {
       });
     },
     fieldItems() {
-      return this.items;
+      const fieldItemsStore = this.$store.getters['DataTable/GET_LIST_DATA']({
+        tableName: this.relatedModelName,
+      });
+      console.log(fieldItemsStore);
+      console.log(this.fieldValueInput);
+      console.log(this.fieldValue);
+      return fieldItemsStore;
     },
     componentTable() {
       if (!this.isDialogShow) return null;
       if (!this.relatedModelName) return null;
       return () => import(`@/components/TheTable/TheTable${this.relatedModelName[0].toUpperCase() + this.relatedModelName.slice('1')}`);
+    },
+  },
+  watch: {
+    fieldValueInput() {
+      this.fieldValue = (typeof this.fieldValueInput === 'object') ? this.fieldValueInput[this.itemValue] : this.fieldValueInput;
     },
   },
   mounted() {

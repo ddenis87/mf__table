@@ -150,6 +150,8 @@ class TableDocument {
     this.cellHeight = cellHeight;
   }
 
+  BASE_CLASS = TableDocument;
+
   addArea(cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) {
     const area = this.documentTemplate.getNamedArea(areaName);
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
@@ -348,7 +350,8 @@ class TableDocument {
       scripts: this.scripts,
       namedAreas: this.namedAreas,
     }));
-    return new TableDocument({
+    // const BaseClass = Object.getPrototypeOf(this);
+    return new this.BASE_CLASS({
       rangeType: this.rangeType,
       rows,
       rowCount: this.rowCount,
@@ -397,7 +400,8 @@ class TableDocument {
         range: moveRange(namedArea.range.toLowerCase(), 1, range),
       });
     });
-    return new TableDocument({
+    // const BaseClass = Object.getPrototypeOf(this);
+    return new this.BASE_CLASS({
       methodName: (getRangeType(range) === 'row') ? 'put' : 'join', // ??????
       rows,
       rowCount: Object.keys(rows).length,

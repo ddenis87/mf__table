@@ -484,12 +484,14 @@ export default {
     });
   },
 
-  // ЗАПРОС ЭЛЕМЕНТА(-ОВ) ДАННЫХ ----------------------------------------
+  // ЗАПРОС ЭЛЕМЕНТА ДАННЫХ ----------------------------------------------
   REQUEST_DATA_ITEM(state, option) {
     let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName);
+    let tokenAccess = state.rootGetters['Login/GET_USER_TOKEN_ACCESS'];
+    axios.defaults.headers.common = {'Authorization': tokenAccess};
     addressApi += `id=${option.id}`;
     return new Promise((resolve, reject) => {
-      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+      // state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
       axios
         .get(addressApi)
         .then(response => {
@@ -505,7 +507,7 @@ export default {
           reject(err);
         })
         .finally(() => {
-          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+          // state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
         });
     });
   },

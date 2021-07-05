@@ -61,6 +61,11 @@ export default {
         isSelected: true,
       };
       if (this.fieldOptions.choices) props.items = this.fieldOptions.choices;
+      if (this.fieldOptions['related_model_name']) {
+        props.relatedModelName = this.fieldOptions['related_model_name'];
+        props.itemText = 'text';
+        props.itemValue = 'id';
+      }
       console.log(this.fieldOptions);
       return props;
     },
