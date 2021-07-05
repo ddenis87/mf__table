@@ -84,6 +84,13 @@ export default {
       return () => import(`@/components/TheTable/TheTable${this.relatedModelName[0].toUpperCase() + this.relatedModelName.slice('1')}`);
     },
   },
+  mounted() {
+    const element = this.$refs.fieldInput.$el.querySelector('input');
+    setTimeout(() => {
+      element.select();
+      element.focus();
+    }, 50);
+  },
   methods: {
     evtOpenDialog() {
       this.isDialogShow = true;

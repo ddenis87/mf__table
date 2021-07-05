@@ -4,7 +4,8 @@
                ref="field"
                v-model="fieldValue"
                v-bind="fieldProps"
-               @keydown:control="evtKeydownControl"
+               @keydown:key.stop
+               @keydown:control.prevent="evtKeydownControl"
                @blur:input="evtBlur"></component>
   </div>
 </template>
@@ -30,38 +31,45 @@ export default {
     event: 'input',
   },
   props: {
-    fieldType: { type: String, default: 'string' },
+    fieldOptions: { type: Object, default: () => { type: 'string' } },
     fieldValueInput: { type: [String, Number, Date, Object], default: null },
-    isRequired: { type: Boolean, default: false },
+    // isRequired: { type: Boolean, default: false },
   },
   data() {
     return {
       fieldValue: '',
       fields: {
         string: FieldText,
-        number: FieldNumber,
+        integer: FieldNumber,
         choice: FieldChoice,
         date: FieldDate,
         field: FieldDialog,
       },
+      isEmit: false,
     };
   },
   computed: {
     field() {
-      return this.fields[this.fieldType];
+      console.log(this.fieldOptions);
+      return this.fields[this.fieldOptions.type];
     },
     fieldProps() {
-      return {
+      const props = {
         isFlat: true,
         isSolo: true,
         isSingleLine: true,
+        isSelected: true,
       };
+      if (this.fieldOptions.choices) props.items = this.fieldOptions.choices;
+      console.log(this.fieldOptions);
+      return props;
     },
   },
   watch: {
     fieldValueInput() {
       console.log(this.fieldValueInput);
       this.$nextTick().then(() => {
+        console.log(this.fieldValueInput);
         this.fieldValue = this.fieldValueInput;
       });
     },
@@ -72,8 +80,8 @@ export default {
     },
     evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydownControl(evt) {
+      this.isEmit = true;
       this.evtInput();
-      console.log(evt);
       if (evt.code === 'Escape') {
         this.$emit('control:esc');
         return;
@@ -83,7 +91,7 @@ export default {
     },
     evtBlur(evt) {
       this.evtInput();
-      this.$emit('blur:wrapper', evt);
+      if (!this.isEmit) this.$emit('blur:wrapper', evt);
       this.clearComponent();
     },
   },
@@ -91,5 +99,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.field-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 0px 0px;
+  margin-top: -1px;
+  width: 100%;
+  min-width: 80px;
+  height: 100%;
+  min-height: 22px;
+  max-height: 22px;
+  font-size: 10.5pt;
+  overflow: hidden;
+  // padding-bottom: 10px;
+  // border: thin solid black;
+}
 </style>

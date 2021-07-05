@@ -43,6 +43,13 @@ export default {
   watch: {
     fieldValueInput() { this.fieldValue = this.fieldValueInput; },
   },
+  mounted() {
+    const element = this.$refs.fieldInput.$el.querySelector('input');
+    setTimeout(() => {
+      element.select();
+      element.focus();
+    }, 50);
+  },
   methods: {
     evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydown(evt) { this.$emit('keydown:key', evt); },

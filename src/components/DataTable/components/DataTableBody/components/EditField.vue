@@ -31,11 +31,12 @@ export default {
   computed: {
     fieldProps() {
       console.log(this.propertiesComponent);
-      console.log(this.propertiesField.fieldValue);
+      console.log(this.propertiesField);
       console.log(this.element);
-      return {
-        fieldType: this.propertiesField.fieldOption.type,
+      const props = {
+        fieldOptions: this.propertiesField.fieldOption,
       };
+      return props;
     },
     fieldOption() { return this.propertiesField.fieldOption; },
     fieldsElement() {
@@ -69,6 +70,7 @@ export default {
         formData: bFormData,
       };
       this.$store.dispatch('DataTable/UPDATE_ELEMENT_FIELD', sendOption);
+      console.log(option);
       let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: (option.type == 'blur') ? 'Enter' : option.key, keyShift: option.shiftKey } });
       
       let editableElement = document.querySelector('.body-column_editing');
@@ -121,8 +123,8 @@ export default {
     },
 
     removeFormEditField() {
-      if (document.querySelector('.form-edit-field')) {
-        document.querySelector('.form-edit-field').remove();
+      if (document.querySelector('.edit-field')) {
+        document.querySelector('.edit-field').remove();
       }
     },
   },

@@ -89,11 +89,20 @@ export default {
   watch: {
     fieldValueInput() {
       this.fieldValue = formattedDataDisplay(this.fieldValueInput, { valueType: 'date' }) || null;
+      this.fieldValueDate = this.fieldValueInput || null;
     },
+  },
+  mounted() {
+    const element = this.$refs.fieldInput.$el.querySelector('input');
+    setTimeout(() => {
+      element.select();
+      element.focus();
+    }, 50);
   },
   methods: {
     evtClickOutside() {
-      this.$refs.fieldInput.focus();
+      const evt = new KeyboardEvent('keydown', { code: 'Escape' });
+      this.evtKeydownControl(evt);
     },
     evtOpenDialog(evt) {
       if (evt.type === 'keydown' && evt.code !== 'Space') return;
