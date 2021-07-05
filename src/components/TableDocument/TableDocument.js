@@ -8,6 +8,8 @@ import {
   getRangeSplit,
   getRangeLength,
   getRangeShift,
+  moveCell,
+  moveRange,
 } from './Helpers';
 
 import Formulas from './Formulas';
@@ -63,42 +65,42 @@ function getObjectOfJSON(data) {
 //   return operandsValues;
 // }
 
-function moveCell(cellName, from = 'a1', rangeLimit = 'a1:a1') {
-  const [rangeLimitFrom] = getRangeSplit(rangeLimit);
-  const { parthSymbol: fromColumn, parthDigit: fromRow } = getParseAtSymbolDigit(from);
-  const fromColumnNumber = getColumnNumberForName(fromColumn);
-  let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
-  if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
-  if (rangeLimitFromRow === '') rangeLimitFromRow = 1;
-  const rangeLimitFromColumnNumber = getColumnNumberForName(rangeLimitFromColumn);
-  const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
-  const cellColumnNumber = getColumnNumberForName(cellColumn);
-  const moveColumn = cellColumnNumber - rangeLimitFromColumnNumber + fromColumnNumber;
-  const moveRow = cellRow - rangeLimitFromRow + fromRow;
-  return `${getColumnNameForNumber(moveColumn)}${moveRow}`;
-}
+// function moveCell(cellName, from = 'a1', rangeLimit = 'a1:a1') {
+//   const [rangeLimitFrom] = getRangeSplit(rangeLimit);
+//   const { parthSymbol: fromColumn, parthDigit: fromRow } = getParseAtSymbolDigit(from);
+//   const fromColumnNumber = getColumnNumberForName(fromColumn);
+//   let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
+//   if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
+//   if (rangeLimitFromRow === '') rangeLimitFromRow = 1;
+//   const rangeLimitFromColumnNumber = getColumnNumberForName(rangeLimitFromColumn);
+//   const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
+//   const cellColumnNumber = getColumnNumberForName(cellColumn);
+//   const moveColumn = cellColumnNumber - rangeLimitFromColumnNumber + fromColumnNumber;
+//   const moveRow = cellRow - rangeLimitFromRow + fromRow;
+//   return `${getColumnNameForNumber(moveColumn)}${moveRow}`;
+// }
 
-function moveRange(range, from, rangeLimit = 'a1:a1') {
-  const [rangeLimitFrom] = getRangeSplit(rangeLimit);
-  let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
-  if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
-  if (rangeLimitFromRow === '') rangeLimitFromRow = 1;
-  const rangeType = getRangeType(range);
-  let [rangeFrom, rangeTo] = getRangeSplit(range);
-  if (rangeType === RANGE_TYPE.COLUMN) {
-    rangeFrom = getColumnNumberForName(rangeFrom);
-    rangeTo = getColumnNumberForName(rangeTo);
-  }
-  const rangeTypes = {
-    [RANGE_TYPE.ROW]: () => `${rangeFrom - rangeLimitFromRow + from}:${rangeTo - rangeLimitFromRow + from}`,
-    [RANGE_TYPE.COLUMN]: () => {
-      const rangeMoveFromColumn = rangeFrom - getColumnNumberForName(rangeLimitFromColumn) + from;
-      const rangeMoveToColumn = rangeTo - getColumnNumberForName(rangeLimitFromColumn) + from;
-      return `${getColumnNameForNumber(rangeMoveFromColumn)}:${getColumnNameForNumber(rangeMoveToColumn)}`;
-    },
-  };
-  return rangeTypes[rangeType]();
-}
+// function moveRange(range, from, rangeLimit = 'a1:a1') {
+//   const [rangeLimitFrom] = getRangeSplit(rangeLimit);
+//   let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
+//   if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
+//   if (rangeLimitFromRow === '') rangeLimitFromRow = 1;
+//   const rangeType = getRangeType(range);
+//   let [rangeFrom, rangeTo] = getRangeSplit(range);
+//   if (rangeType === RANGE_TYPE.COLUMN) {
+//     rangeFrom = getColumnNumberForName(rangeFrom);
+//     rangeTo = getColumnNumberForName(rangeTo);
+//   }
+//   const rangeTypes = {
+//     [RANGE_TYPE.ROW]: () => `${rangeFrom - rangeLimitFromRow + from}:${rangeTo - rangeLimitFromRow + from}`,
+//     [RANGE_TYPE.COLUMN]: () => {
+//       const rangeMoveFromColumn = rangeFrom - getColumnNumberForName(rangeLimitFromColumn) + from;
+//       const rangeMoveToColumn = rangeTo - getColumnNumberForName(rangeLimitFromColumn) + from;
+//       return `${getColumnNameForNumber(rangeMoveFromColumn)}:${getColumnNameForNumber(rangeMoveToColumn)}`;
+//     },
+//   };
+//   return rangeTypes[rangeType]();
+// }
 
 class TableDocument {
   constructor({

@@ -87,6 +87,7 @@ export default {
       const cell = this.cells[`${columnName}${this.source.value}`];
       const cellValue = cell.value;
       const cellType = this.getCellType(cell, columnName);
+      if (cellType.includes('field')) return cell.representation;
       formattedOption.valueType = cellType;
       const cellFormatString = this.getCellFormatString(cell, columnName);
       if (cellFormatString) formattedOption.formatString = cellFormatString;

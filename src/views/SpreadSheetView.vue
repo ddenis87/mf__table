@@ -223,7 +223,7 @@ export default {
     },
 
     createNewDocument() {
-      this.tableDocument = new TableDocument();
+      this.tableDocument = new TableDocumentApi();
       this.tableDocumentTemplate = {};
       this.$refs.SpreadSheet.createNewDocument();
       this.isGrid = true;
@@ -240,7 +240,7 @@ export default {
     openJSONFileTemplate(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONTemplate) => {
-        this.tableDocumentTemplate = new TableDocument({ JSONString: JSONTemplate });
+        this.tableDocumentTemplate = new TableDocumentApi({ JSONString: JSONTemplate });
         this.isFileTemplateDisabled = true;
         this.isFileSettingDisabled = false;
       });
