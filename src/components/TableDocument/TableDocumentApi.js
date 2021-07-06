@@ -20,6 +20,7 @@ class TableDocumentApi extends TableDocument {
   constructor(params) {
     super(params);
     Object.values(this.cells).forEach((cellValue) => {
+      console.log(cellValue);
       const { type, representationId, sourceName } = cellValue;
       if (type !== 'field') return;
       const representationValue = getRepresentationStore(sourceName, representationId);

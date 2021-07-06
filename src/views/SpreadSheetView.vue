@@ -29,7 +29,7 @@
                       @change="openJSONFileData">
         </v-file-input>
       </div>
-      <!-- <div class="item item_btn">
+      <div class="item item_btn">
         <v-menu bottom
                 :offset-y="true">
           <template v-slot:activator="{ on, attrs }">
@@ -45,11 +45,11 @@
             </v-list-item>
           </v-list>
         </v-menu>
-      </div> -->
-      <div class="item item_btn">
+      </div>
+      <!-- <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="saveDocumentData">
           <v-icon small left>mdi-cloud-download-outline</v-icon>Сохранить</v-btn>
-      </div>
+      </div> -->
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="openPrintPage">
           <v-icon small left>mdi-cloud-print-outline</v-icon>Печать</v-btn>
@@ -165,6 +165,10 @@ export default {
     // console.log(this.tableDocument);
   },
   methods: {
+    saveDocument() {
+      const JSONFormat = true;
+      apiSpreadSheet.dowloadJSONFile(JSON.stringify(this.tableDocument.getDocument()), JSONFormat);
+    },
     saveDocumentData() {
       const JSONFormat = true;
       apiSpreadSheet.dowloadJSONFile(JSON.stringify(this.tableDocument.serializationDataSection()), JSONFormat);
@@ -240,9 +244,18 @@ export default {
     openJSONFileTemplate(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONTemplate) => {
-        this.tableDocumentTemplate = new TableDocumentApi({ JSONString: JSONTemplate });
-        this.isFileTemplateDisabled = true;
-        this.isFileSettingDisabled = false;
+        const { template } = JSON.parse(JSONTemplate);
+        // console.log(template);
+        // console.log(cells);
+        if (template) {
+          this.tableDocumentTemplate = new TableDocumentApi({ JSONString: JSONTemplate });
+          this.isFileTemplateDisabled = true;
+          this.isFileSettingDisabled = false;
+        } else {
+          this.tableDocument = new TableDocumentApi({ JSONString: JSONTemplate });
+          console.log(this.tableDocument);
+          this.isFileTemplateDisabled = true;
+        }
       });
     },
     openJSONFileSetting(file) {
