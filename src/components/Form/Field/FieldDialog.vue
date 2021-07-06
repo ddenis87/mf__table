@@ -104,6 +104,7 @@ export default {
     },
   },
   mounted() {
+    if (!this.isSelected) return;
     const element = this.$refs.fieldInput.$el.querySelector('input');
     setTimeout(() => {
       element.select();
