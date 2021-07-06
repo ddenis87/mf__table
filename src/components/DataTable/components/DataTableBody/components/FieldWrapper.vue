@@ -1,5 +1,6 @@
 <template>
-  <div class="field-wrapper">
+  <div class="field-wrapper"
+       :class="[`field-wrapper_${typeRow}`, {'required': isRequired}]">
     <component :is="field"
                ref="field"
                v-model="fieldValue"
@@ -33,6 +34,8 @@ export default {
   props: {
     fieldOptions: { type: Object, default: () => { type: 'string' } },
     fieldValueInput: { type: [String, Number, Date, Object], default: null },
+    typeRow: { type: String, default: 'fixed' },
+    isSelected: { type: Boolean, default: false },
     // isRequired: { type: Boolean, default: false },
   },
   data() {
@@ -49,8 +52,12 @@ export default {
     };
   },
   computed: {
+    isRequired() {
+      // console.log(this.fieldOptions.required);
+      return this.fieldOptions.required || false;
+    },
     field() {
-      console.log(this.fieldOptions);
+      // console.log(this.fieldOptions);
       return this.fields[this.fieldOptions.type];
     },
     fieldProps() {
@@ -58,7 +65,7 @@ export default {
         isFlat: true,
         isSolo: true,
         isSingleLine: true,
-        isSelected: true,
+        isSelected: this.isSelected,
       };
       if (this.fieldOptions.choices) props.items = this.fieldOptions.choices;
       if (this.fieldOptions['related_model_name']) {
@@ -66,7 +73,6 @@ export default {
         props.itemText = 'text';
         props.itemValue = 'id';
       }
-      console.log(this.fieldOptions);
       return props;
     },
   },
@@ -94,32 +100,46 @@ export default {
         this.$emit('control:esc');
         return;
       }
-      this.$emit('keydown:control', evt);
-      this.clearComponent();
+      this.$emit('keydown:control', { event: evt, fieldKey: this.fieldOptions.value });
+      // this.clearComponent();
     },
     evtBlur(evt) {
       this.evtInput();
-      if (!this.isEmit) this.$emit('blur:wrapper', evt);
-      this.clearComponent();
+      if (!this.isEmit) this.$emit('blur:wrapper', { event: evt, fieldKey: this.fieldOptions.value });
+      // this.clearComponent();
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+// .field-wrapper {
+//   display: flex;
+//   align-items: flex-end;
+//   padding-bottom: 8px;
+//   width: 100%;
+//   min-width: 80px;
+//   height: 100%;
+//   min-height: 22px;
+//   // max-height: 22px;
+//   font-size: 10.5pt;
+//   overflow: hidden;
+//   // padding-bottom: 10px;
+//   // border: thin solid black;
+//   border-bottom: 2px solid rgba(21,101,192,.3);
+// }
+// .required {
+//   border-bottom: 2px solid rgba(255,0,0,.6);
+// }
 .field-wrapper {
-  display: flex;
-  align-items: center;
-  padding: 0px 0px;
-  margin-top: -1px;
-  width: 100%;
-  min-width: 80px;
-  height: 100%;
-  min-height: 22px;
-  max-height: 22px;
-  font-size: 10.5pt;
   overflow: hidden;
-  // padding-bottom: 10px;
-  // border: thin solid black;
+  margin: 0 3px;
+  border-bottom: 2px solid rgba(21, 101, 192, .3);
+  &_dense { margin-top: -10.5px; }
+  &_fixed { margin-top: -10px; }
+  &_auto { margin-top: -10px; }
+}
+.required {
+  border-bottom: 3px solid rgba(255, 0, 0,.6);
 }
 </style>

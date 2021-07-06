@@ -4,7 +4,8 @@ import store from '@/store';
 // import ContentEditing fro../components/DelContentEditing.vuevue';
 // import FormEditField from '../components/FormEditField.vue';
 import FormEditField from '../components/EditField.vue';
-import FormEditElement from '../components/FormEditElement.vue';
+// import FormEditElement from '../components/FormEditElement.vue';
+import FormEditElement from '../components/EditElement.vue';
 
 export const DataTableBodyEvents = {
   data() {

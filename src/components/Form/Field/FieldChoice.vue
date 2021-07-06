@@ -75,10 +75,12 @@ export default {
     evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydown(evt) { this.$emit('keydown:key', evt); },
     evtKeydownControl(evt) {
+      // evt.preventDefault();
       const isOpenCombobox = this.$refs.fieldInput.$el
         .querySelector('.v-input__slot').getAttribute('aria-expanded');
       if (isOpenCombobox === 'false') {
-        setTimeout(() => document.querySelector('.v-menu__content').remove(), 10);
+        // setTimeout(() => document.querySelector('.v-menu__content').remove(), 10);
+        this.$refs.fieldInput.isMenuActive = false;
         this.$emit('keydown:control', evt);
       }
     },

@@ -35,6 +35,7 @@ export default {
       console.log(this.element);
       const props = {
         fieldOptions: this.propertiesField.fieldOption,
+        isSelected: true,
       };
       return props;
     },
@@ -64,7 +65,7 @@ export default {
       // this.saveElementFieldInStore(option.value);
       this.saveElementFieldInStore(this.fieldValue);
 
-      let bFormData = this.buildForm(option);
+      let bFormData = this.buildForm();
       let sendOption = {
         ...this.propertiesComponent,
         id: this.element['id'],
@@ -74,7 +75,7 @@ export default {
       };
       this.$store.dispatch('DataTable/UPDATE_ELEMENT_FIELD', sendOption);
       console.log(option);
-      let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: (option.type == 'blur') ? 'Enter' : option.key, keyShift: option.shiftKey } });
+      let eventEditingAccepted = new CustomEvent('editing-accepted', { detail: { key: (option.event.type == 'blur') ? 'Enter' : option.event.key, keyShift: option.event.shiftKey } });
       
       let editableElement = document.querySelector('.body-column_editing');
       // console.log(editableElement);
@@ -114,7 +115,7 @@ export default {
       return newValue;
     },
 
-    buildForm(option) {
+    buildForm() {
       let newFormData = new FormData();
       this.fieldsElement.forEach(element => {
         if (element.value != '') 
@@ -125,7 +126,7 @@ export default {
       return newFormData;
     },
 
-    removeFormEditField() {
+    removeFormEditField() { // ???
       if (document.querySelector('.edit-field')) {
         document.querySelector('.edit-field').remove();
       }
