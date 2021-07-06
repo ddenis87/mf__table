@@ -155,7 +155,7 @@ export const DataTableBodyEvents = {
     editingCanceled() {
       // console.log('delete comp edidting');
       // Vue.delete(this.formEditField);
-      this.formEditField = null
+      this.formEditField = null;
       let editableElement = document.querySelector('.body-column_editing');
       editableElement.classList.remove('body-column_focus');
       editableElement.parentElement.classList.remove('body-row_focus');
@@ -198,6 +198,7 @@ export const DataTableBodyEvents = {
           break;
         }
       }
+      this.formEditField = null;
     },
 
 

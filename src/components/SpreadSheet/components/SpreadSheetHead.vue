@@ -174,7 +174,7 @@ export default {
         }
       }
       &-end {
-        min-width: 17px;
+        min-width: 18px;
         // border-right: $borderStyle;
         &::after {
           content: '';

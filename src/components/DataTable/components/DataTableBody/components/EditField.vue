@@ -56,6 +56,9 @@ export default {
   mounted() {
     this.fieldValue = this.propertiesField.fieldValue || null;
   },
+  beforeDestroy() {
+    console.log('destroy');
+  },
   methods: {
     editingAccept(option) {
       // this.saveElementFieldInStore(option.value);

@@ -49,7 +49,8 @@ html, body {
   font-size: 16px;
   a { text-decoration: none; }
   &::-webkit-scrollbar {
-    display: block;
+    // display: block;
+    display: none;
     width: $scrollWidth;
     height: $scrollHeight;
     border-radius: $scrollBorderRadius;

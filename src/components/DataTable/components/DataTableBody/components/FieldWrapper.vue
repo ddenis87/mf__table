@@ -79,6 +79,9 @@ export default {
       });
     },
   },
+  beforeDestroy() {
+    console.log('destroy');
+  },
   methods: {
     clearComponent() {
       this.fieldValue = null;

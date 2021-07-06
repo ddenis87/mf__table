@@ -56,13 +56,13 @@ export default {
     const relatedModelView = state[options.tableName].relatedModelView;
     const template = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1).split('}{');
     const dataItem = state[options.tableName].listData.find((item) => item.id === options.id);
-    console.log(dataItem);
+    // console.log(dataItem);
     if (!dataItem) return undefined;
     let value = relatedModelView;
     template.forEach((templateItem) => {
       value = value.replace(`{${templateItem}}`, dataItem[templateItem]);
     });
-    console.log(value);
+    // console.log(value);
     return value;
   },
 

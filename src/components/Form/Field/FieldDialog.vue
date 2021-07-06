@@ -80,10 +80,15 @@ export default {
       const fieldItemsStore = this.$store.getters['DataTable/GET_LIST_DATA']({
         tableName: this.relatedModelName,
       });
-      console.log(fieldItemsStore);
-      console.log(this.fieldValueInput);
-      console.log(this.fieldValue);
-      return fieldItemsStore;
+      const fieldItems = [];
+      fieldItemsStore.forEach((element) => {
+        const representation = this.$store.getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({
+          tableName: this.relatedModelName,
+          id: element.id,
+        });
+        fieldItems.push({ ...element, text: representation });
+      });
+      return fieldItems;
     },
     componentTable() {
       if (!this.isDialogShow) return null;
@@ -94,7 +99,6 @@ export default {
   },
   watch: {
     fieldValueInput() {
-      console.log(this.fieldValueInput);
       this.fieldValue = (typeof this.fieldValueInput === 'object'
         && this.fieldValueInput !== null) ? this.fieldValueInput[this.itemValue] : this.fieldValueInput;
     },
