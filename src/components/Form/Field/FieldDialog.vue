@@ -25,7 +25,8 @@
                  @close="evtCloseDialog">
       <component :is="componentTable"
                  :isEditableInline="false"
-                 :default-filters="filters"></component>
+                 :default-filters="filters"
+                 @row-selected="evtRowSelected"></component>
     </dialog-full>
   </div>
 </template>
@@ -87,12 +88,15 @@ export default {
     componentTable() {
       if (!this.isDialogShow) return null;
       if (!this.relatedModelName) return null;
-      return () => import(`@/components/TheTable/TheTable${this.relatedModelName[0].toUpperCase() + this.relatedModelName.slice('1')}`);
+      const sourceName = this.relatedModelName[0].toUpperCase() + this.relatedModelName.slice(1);
+      return () => import(`@/components/TheTable/TheTable${sourceName}`);
     },
   },
   watch: {
     fieldValueInput() {
-      this.fieldValue = (typeof this.fieldValueInput === 'object') ? this.fieldValueInput[this.itemValue] : this.fieldValueInput;
+      console.log(this.fieldValueInput);
+      this.fieldValue = (typeof this.fieldValueInput === 'object'
+        && this.fieldValueInput !== null) ? this.fieldValueInput[this.itemValue] : this.fieldValueInput;
     },
   },
   mounted() {
@@ -112,9 +116,26 @@ export default {
         this.isDialogShow = false;
       }, 30);
     },
+    evtRowSelected(valueObject) {
+      this.$store.dispatch('DataTable/ADDING_DATA_LINK', {
+        tableName: this.relatedModelName,
+        value: valueObject,
+      }).then(() => {
+        this.fieldValue = valueObject;
+        this.evtInput();
+        this.evtCloseDialog();
+      });
+    },
     evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydown(evt) { this.$emit('keydown:key', evt); },
-    evtKeydownControl() {},
+    evtKeydownControl(evt) {
+      const isOpenCombobox = this.$refs.fieldInput.$el
+        .querySelector('.v-input__slot').getAttribute('aria-expanded');
+      if (isOpenCombobox === 'false') {
+        setTimeout(() => document.querySelector('.v-menu__content').remove(), 10);
+        this.$emit('keydown:control', evt);
+      }
+    },
     evtFocus() {},
     evtBlur(evt) {
       evt.preventDefault();
