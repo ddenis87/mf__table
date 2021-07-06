@@ -500,8 +500,8 @@ export default {
               tableName: option.tableName,
               value: element,
             });
-            resolve(element);
           });
+          resolve();
         })
         .catch(err => {
           reject(err);

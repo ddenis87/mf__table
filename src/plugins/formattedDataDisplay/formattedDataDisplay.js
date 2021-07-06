@@ -80,7 +80,9 @@ function formattedDataDisplay(
     },
     field: () => representations.get(value),
   };
-  formattedValue = (TYPES[valueType]) ? TYPES[valueType]() : value;
+  const cellType = valueType.split('.')[0];
+  // console.log(valueType);
+  formattedValue = (TYPES[cellType]) ? TYPES[cellType]() : value;
   return `${valuePrefix}${formattedValue}${valueSuffix}`;
 }
 

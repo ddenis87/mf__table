@@ -252,7 +252,8 @@ export default {
           this.isFileTemplateDisabled = true;
           this.isFileSettingDisabled = false;
         } else {
-          this.tableDocument = new TableDocumentApi({ JSONString: JSONTemplate });
+          const temp = new TableDocumentApi({ JSONString: JSONTemplate });
+          this.tableDocument = temp;
           console.log(this.tableDocument);
           this.isFileTemplateDisabled = true;
         }
