@@ -83,7 +83,6 @@ class TableDocument {
   } = {}) {
     if (JSONString) {
       const JSONStringParse = JSON.parse(JSONString);
-      // console.log(JSONStringParse);
       ({
         template: this.template = false,
         methodName: this.methodName = null,
@@ -504,12 +503,18 @@ class TableDocument {
   }
 
   getDocument(JSONFormat = false) {
+    const cells = Object.entries(this.cells).filter((cell) => {
+      const [, cellValue] = cell;
+      // console.log(cellValue);
+      return (!Object.keys(cellValue).includes('action'));
+    });
+    console.log(Object.fromEntries(cells));
     const document = {
       rows: this.rows,
       rowCount: this.rowCount,
       columns: this.columns,
       columnCount: this.columnCount,
-      cells: this.cells,
+      cells: Object.fromEntries(cells),
       styles: this.styles,
     };
     return (JSONFormat) ? JSON.stringify(document) : document;

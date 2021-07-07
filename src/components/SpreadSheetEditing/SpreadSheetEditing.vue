@@ -72,8 +72,9 @@ export default {
   },
   methods: {
     editAccept() {
+      const cellValue = this.getCellValue();
       const option = {
-        value: this.fieldValue,
+        value: cellValue,
         cellName: this.cellName.toLowerCase(),
       };
       this.$emit('editing:accept', option);
@@ -91,6 +92,21 @@ export default {
           this.$refs.wrapper.$refs.field.$refs.fieldInput.focus();
         }, 100);
       });
+    },
+    getCellValue() {
+      console.log(this.fieldValue);
+      const valueFromType = {
+        string: () => this.fieldValue,
+        number: () => +this.fieldValue,
+        choice: () => this.fieldValue.value,
+        field: () => {
+          let result = this.fieldValue;
+          if (typeof this.fieldValue === 'object') result = this.fieldValue.id;
+          return result;
+        },
+      };
+      const type = this.fieldType.split('.')[0];
+      return valueFromType[type]();
     },
   },
 };

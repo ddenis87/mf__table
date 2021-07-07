@@ -48,7 +48,7 @@ export default {
   },
   props: {
     ...fieldProps,
-    itemText: { type: String, default: 'display_name' },
+    itemText: { type: String, default: 'text' },
     items: {
       type: Array,
       default: () => [{
@@ -56,7 +56,7 @@ export default {
         value: null,
       }],
     },
-    itemValue: { type: String, default: 'value' },
+    itemValue: { type: String, default: 'id' },
     relatedModelName: { type: String, default: null },
     filters: null,
   },
@@ -137,7 +137,6 @@ export default {
       const isOpenCombobox = this.$refs.fieldInput.$el
         .querySelector('.v-input__slot').getAttribute('aria-expanded');
       if (isOpenCombobox === 'false') {
-        // setTimeout(() => document.querySelector('.v-menu__content').remove(), 10);
         this.$refs.fieldInput.isMenuActive = false;
         this.$emit('keydown:control', evt);
       }

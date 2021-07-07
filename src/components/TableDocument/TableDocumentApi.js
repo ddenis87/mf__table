@@ -30,11 +30,23 @@ class TableDocumentApi extends TableDocument {
 
   representations = new Map();
 
-  async prepareRepresentation() {
-    await this.getRepresentationStore().then(() => {
-      console.log('before update');
-      this.cells = { ...this.cells };
-    });
+  async deserialize(data, template, settings) {
+    super.deserialize(data, template, settings);
+    this.prepareRepresentation();
+  }
+
+  editingCell(cellName, cellValue) {
+    if (this.cells[cellName]) {
+      const { type } = this.cells[cellName];
+      if (type?.includes('field')) {
+        const { parthSource: sourceName } = parseType(type);
+        const representation = store
+          .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: cellValue });
+        this.setRepresentation(cellValue, representation);
+      }
+    }
+    // console.log(cellValue);
+    super.editingCell(cellName, cellValue);
   }
 
   async getRepresentationStore() {
@@ -65,6 +77,13 @@ class TableDocumentApi extends TableDocument {
     let representation = 'none';
     if (this.representations.has(key)) representation = this.representations.get(key);
     return representation;
+  }
+
+  async prepareRepresentation() {
+    await this.getRepresentationStore().then(() => {
+      console.log('before update');
+      this.cells = { ...this.cells };
+    });
   }
 
   setRepresentation(key, value) {

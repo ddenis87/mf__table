@@ -82,12 +82,12 @@ export default {
     evtKeydownControl(evt) {
       this.evtInput();
       this.$emit('keydown:control', evt);
-      this.clearComponent();
+      // this.clearComponent();
     },
     evtBlur() {
       this.evtInput();
       this.$emit('blur:wrapper');
-      this.clearComponent();
+      // this.clearComponent();
     },
   },
 };

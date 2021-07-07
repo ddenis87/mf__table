@@ -254,8 +254,9 @@ export default {
         } else {
           const temp = new TableDocumentApi({ JSONString: JSONTemplate });
           this.tableDocument = temp;
-          console.log(this.tableDocument);
+          // console.log(this.tableDocument);
           this.isFileTemplateDisabled = true;
+          this.isGrid = false;
         }
       });
     },

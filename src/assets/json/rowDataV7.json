@@ -32,7 +32,9 @@
   },
   {
     "footerF": [
-      {}
+      {
+        "budgetclassification":3
+      }
     ]
   }
 ]
