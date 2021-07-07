@@ -16,6 +16,7 @@
                                 :rows="rows"
                                 :columns="columns"
                                 :cells="cells"
+                                :representations="representations"
                                 :set-excluded-cell="setExcludedCellsArray"
                                 :max-level-group-row="maxLevelGroupRow"
                                 :template-column-width="templateColumnWidth"
@@ -59,6 +60,7 @@ export default {
     rowsFixed: { type: Array },
     columns: { type: Array },
     cells: { type: Object },
+    representations: { type: Map, default() { return new Map(); } },
     templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
     maxLevelGroupRow: { type: Number, default: 0 },
@@ -105,6 +107,7 @@ export default {
         rows: this.rows,
         columns: this.columns,
         cells: this.cells,
+        representations: this.representations,
         templateColumnWidth: this.templateColumnWidth,
         setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
         maxLevelGroupRow: this.maxLevelGroupRow,

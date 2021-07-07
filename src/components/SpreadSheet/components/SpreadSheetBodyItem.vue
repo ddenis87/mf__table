@@ -65,6 +65,7 @@ export default {
     rows: Array,
     columns: Array,
     cells: { type: Object, default() { return {}; } },
+    representations: { type: Map, default() { return new Map(); } },
     setExcludedCell: { type: Array },
     maxLevelGroupRow: { type: Number, default: 0 },
     templateColumnWidth: { type: String, default: '' },
@@ -83,11 +84,13 @@ export default {
   methods: {
     formattedData(columnName) {
       if (!this.cells[`${columnName}${this.source.value}`]) return '';
-      const formattedOption = {};
+      const formattedOption = {
+        representations: this.representations,
+      };
       const cell = this.cells[`${columnName}${this.source.value}`];
       const cellValue = cell.value;
       const cellType = this.getCellType(cell, columnName);
-      if (cellType.includes('field')) return cell.representation;
+      // if (cellType.includes('field')) return cell.representation;
       formattedOption.valueType = cellType;
       const cellFormatString = this.getCellFormatString(cell, columnName);
       if (cellFormatString) formattedOption.formatString = cellFormatString;

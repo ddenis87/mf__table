@@ -34,6 +34,7 @@
                            :rows-fixed="tableRowsFixed"
                            :columns="tableColumns"
                            :cells="tableCells"
+                           :representations="representations"
                            :template-column-width="templateColumnWidth"
                            :max-level-group-row="maxLevelGroupRow"
                            :max-level-group-column="maxLevelGroupColumn"
@@ -78,6 +79,7 @@ export default {
     columns: { type: Object, default() { return {}; } },
     columnCount: { type: Number, default: 50 },
     cells: { type: Object, default() { return {}; } },
+    representations: { type: Map, default() { return new Map(); } },
     styles: { type: Array, default() { return []; } },
 
     cellWidth: { type: Number, default: CELL_WIDTH },

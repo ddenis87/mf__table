@@ -32,14 +32,13 @@ class TableDocumentApi extends TableDocument {
 
   async prepareRepresentation() {
     await this.getRepresentationStore().then(() => {
+      console.log('before update');
       this.cells = { ...this.cells };
     });
   }
 
   async getRepresentationStore() {
-    /* eslint-disable no-await-in-loop */
-    /* eslint-disable-next-line */
-    for (const cellValue of Object.values(this.cells)) {
+    const promises = Object.values(this.cells).map(async (cellValue) => {
       const { type, value } = cellValue;
       if (type?.includes('.') && value) {
         const { parthSource: sourceName } = parseType(type);
@@ -48,19 +47,19 @@ class TableDocumentApi extends TableDocument {
           .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value });
         this.setRepresentation(value, representation);
       }
-    }
-    /* eslint-disable no-await-in-loop */
+    });
+    await Promise.all(promises);
   }
 
-  fillArea(dataArea, parameters) {
-    super.fillArea(dataArea, parameters);
-    Object.entries(this.cells).forEach((cell) => {
-      const [, cellValue] = cell;
-      if (Object.keys(cellValue).includes('type') && cellValue.type.includes('field')) {
-        cellValue.representation = this.getRepresentation(cellValue.value);
-      }
-    });
-  }
+  // fillArea(dataArea, parameters) {
+  //   super.fillArea(dataArea, parameters);
+  //   Object.entries(this.cells).forEach((cell) => {
+  //     const [, cellValue] = cell;
+  //     if (Object.keys(cellValue).includes('type') && cellValue.type.includes('field')) {
+  //       cellValue.representation = this.getRepresentation(cellValue.value);
+  //     }
+  //   });
+  // }
 
   getRepresentation(key) {
     let representation = 'none';

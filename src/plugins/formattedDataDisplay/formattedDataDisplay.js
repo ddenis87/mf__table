@@ -78,10 +78,10 @@ function formattedDataDisplay(
       if (value === true || value === 1) newValue = valueTrue;
       return newValue;
     },
-    field: () => representations.get(value),
+    field: () => representations.get(value) || '<#ССЫЛКА>',
   };
   const cellType = valueType.split('.')[0];
-  // console.log(valueType);
+  // console.log(cellType);
   formattedValue = (TYPES[cellType]) ? TYPES[cellType]() : value;
   return `${valuePrefix}${formattedValue}${valueSuffix}`;
 }
