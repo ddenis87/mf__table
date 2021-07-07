@@ -98,6 +98,7 @@ export default {
       const valueFromType = {
         string: () => this.fieldValue,
         number: () => +this.fieldValue,
+        date: () => this.fieldValue,
         choice: () => this.fieldValue.value,
         field: () => {
           let result = this.fieldValue;

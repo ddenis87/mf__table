@@ -79,6 +79,7 @@ function formattedDataDisplay(
       return newValue;
     },
     field: () => representations.get(value) || '<#ССЫЛКА>',
+    choice: () => '',
   };
   const cellType = valueType.split('.')[0];
   // console.log(cellType);

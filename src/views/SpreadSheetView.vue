@@ -248,7 +248,7 @@ export default {
         // console.log(template);
         // console.log(cells);
         if (template) {
-          this.tableDocumentTemplate = new TableDocumentApi({ JSONString: JSONTemplate });
+          this.tableDocumentTemplate = new TableDocument({ JSONString: JSONTemplate });
           this.isFileTemplateDisabled = true;
           this.isFileSettingDisabled = false;
         } else {

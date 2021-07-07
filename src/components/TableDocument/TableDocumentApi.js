@@ -32,6 +32,7 @@ class TableDocumentApi extends TableDocument {
 
   async deserialize(data, template, settings) {
     super.deserialize(data, template, settings);
+    console.log('deserializ');
     this.prepareRepresentation();
   }
 
@@ -51,6 +52,7 @@ class TableDocumentApi extends TableDocument {
 
   async getRepresentationStore() {
     const promises = Object.values(this.cells).map(async (cellValue) => {
+      // console.log('step');
       const { type, value } = cellValue;
       if (type?.includes('.') && value) {
         const { parthSource: sourceName } = parseType(type);
@@ -87,6 +89,7 @@ class TableDocumentApi extends TableDocument {
   }
 
   setRepresentation(key, value) {
+    // console.log('set representation');
     this.representations.set(key, value);
   }
 }
