@@ -241,7 +241,7 @@ export default {
       this.fileData = [];
     },
 
-    openJSONFileTemplate(file) {
+    async openJSONFileTemplate(file) {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONTemplate) => {
         const { template } = JSON.parse(JSONTemplate);

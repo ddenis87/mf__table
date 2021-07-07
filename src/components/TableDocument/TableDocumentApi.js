@@ -9,36 +9,48 @@ function parseType(type) {
   };
 }
 
+function requestRepresentation(sourceName, value) {
+  return new Promise((resolve) => {
+    store.dispatch('DataTable/REQUEST_DATA_ITEM', {
+      tableName: sourceName,
+      id: value,
+    }).then(() => {
+      resolve();
+    });
+  });
+}
+
 class TableDocumentApi extends TableDocument {
   constructor(params) {
     super(params);
-
-    console.log(store);
+    this.prepareRepresentation();
   }
 
   BASE_CLASS = TableDocumentApi;
 
   representations = new Map();
 
-  // async requiredRepresentation() {
-  //   return new Promise((resolve) => {
-  //     Object.values(this.cells).forEach((cellValue) => {
-  //       const { type, value } = cellValue;
-  //       // console.log(type);
-  //       if (!type?.includes('.')) return;
-  //       if (!value) return;
-  //       console.log(type);
-  //       const { parthSource: sourceName } = parseType(type);
-  //       store.dispatch('DataTable/REQUEST_DATA_ITEM', {
-  //         tableName: sourceName,
-  //         id: value,
-  //       }).then(() => {
-  //         console.log(store
-  //           .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value }));
-  //       });
-  //     });
-  //   });
-  // }
+  async prepareRepresentation() {
+    await this.getRepresentationStore().then(() => {
+      this.cells = { ...this.cells };
+    });
+  }
+
+  async getRepresentationStore() {
+    /* eslint-disable no-await-in-loop */
+    /* eslint-disable-next-line */
+    for (const cellValue of Object.values(this.cells)) {
+      const { type, value } = cellValue;
+      if (type?.includes('.') && value) {
+        const { parthSource: sourceName } = parseType(type);
+        await requestRepresentation(sourceName, value);
+        const representation = store
+          .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value });
+        this.setRepresentation(value, representation);
+      }
+    }
+    /* eslint-disable no-await-in-loop */
+  }
 
   fillArea(dataArea, parameters) {
     super.fillArea(dataArea, parameters);
@@ -57,9 +69,7 @@ class TableDocumentApi extends TableDocument {
   }
 
   setRepresentation(key, value) {
-    console.log(key, value);
     this.representations.set(key, value);
-    this.cells = { ...this.cells };
   }
 }
 
