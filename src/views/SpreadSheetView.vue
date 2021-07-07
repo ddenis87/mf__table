@@ -241,9 +241,9 @@ export default {
       this.fileData = [];
     },
 
-    async openJSONFileTemplate(file) {
+    openJSONFileTemplate(file) {
       if (!file) return;
-      apiSpreadSheet.uploadJSONFile(file).then((JSONTemplate) => {
+      apiSpreadSheet.uploadJSONFile(file).then(async (JSONTemplate) => {
         const { template } = JSON.parse(JSONTemplate);
         // console.log(template);
         // console.log(cells);
@@ -252,7 +252,7 @@ export default {
           this.isFileTemplateDisabled = true;
           this.isFileSettingDisabled = false;
         } else {
-          const temp = new TableDocumentApi({ JSONString: JSONTemplate });
+          const temp = await new TableDocumentApi({ JSONString: JSONTemplate });
           this.tableDocument = temp;
           // console.log(this.tableDocument);
           this.isFileTemplateDisabled = true;

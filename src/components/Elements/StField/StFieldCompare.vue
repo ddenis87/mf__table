@@ -113,7 +113,7 @@ export default {
 .v-input {
   text-align: center;
   font-size: 14px;
-  
+  z-index: 999;
 }
 .v-text-field {
   margin-top: -3.5px;

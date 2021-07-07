@@ -25,6 +25,12 @@ class TableDocumentApi extends TableDocument {
     super(params);
     this.prepareRepresentation();
   }
+  // constructor(params) {
+  //   super(params);
+  //   (async () => {
+  //     await this.prepareRepresentation();
+  //   })();
+  // }
 
   BASE_CLASS = TableDocumentApi;
 
@@ -32,7 +38,6 @@ class TableDocumentApi extends TableDocument {
 
   async deserialize(data, template, settings) {
     super.deserialize(data, template, settings);
-    console.log('deserializ');
     this.prepareRepresentation();
   }
 
@@ -46,13 +51,11 @@ class TableDocumentApi extends TableDocument {
         this.setRepresentation(cellValue, representation);
       }
     }
-    // console.log(cellValue);
     super.editingCell(cellName, cellValue);
   }
 
   async getRepresentationStore() {
     const promises = Object.values(this.cells).map(async (cellValue) => {
-      // console.log('step');
       const { type, value } = cellValue;
       if (type?.includes('.') && value) {
         const { parthSource: sourceName } = parseType(type);
@@ -64,16 +67,6 @@ class TableDocumentApi extends TableDocument {
     });
     await Promise.all(promises);
   }
-
-  // fillArea(dataArea, parameters) {
-  //   super.fillArea(dataArea, parameters);
-  //   Object.entries(this.cells).forEach((cell) => {
-  //     const [, cellValue] = cell;
-  //     if (Object.keys(cellValue).includes('type') && cellValue.type.includes('field')) {
-  //       cellValue.representation = this.getRepresentation(cellValue.value);
-  //     }
-  //   });
-  // }
 
   getRepresentation(key) {
     let representation = 'none';
@@ -89,7 +82,6 @@ class TableDocumentApi extends TableDocument {
   }
 
   setRepresentation(key, value) {
-    // console.log('set representation');
     this.representations.set(key, value);
   }
 }
