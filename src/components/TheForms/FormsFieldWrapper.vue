@@ -1,6 +1,6 @@
 <template>
   <div class="field-wrapper"
-       :class="[`field-wrapper_${typeRow}`, {'required': isRequired}]">
+       :class="{'required': isRequired}">
     <component :is="field"
                ref="field"
                v-model="fieldValue"
@@ -16,15 +16,17 @@ import FieldText from '@/components/Form/Field/FieldText.vue';
 import FieldNumber from '@/components/Form/Field/FieldNumber.vue';
 import FieldChoice from '@/components/Form/Field/FieldChoice.vue';
 import FieldDate from '@/components/Form/Field/FieldDate.vue';
+import FieldDateTime from '@/components/Form/Field/FieldDateTime.vue';
 import FieldDialog from '@/components/Form/Field/FieldDialog.vue';
 
 export default {
-  name: 'FieldWrapper',
+  name: 'FormsFieldWrapper',
   components: {
     FieldText,
     FieldNumber,
     FieldChoice,
     FieldDate,
+    FieldDateTime,
     FieldDialog,
   },
   model: {
@@ -32,10 +34,15 @@ export default {
     event: 'input',
   },
   props: {
-    fieldOptions: { type: Object, default: () => { type: 'string' } },
+    fieldOptions: {
+      type: Object,
+      default() {
+        return { type: 'string', required: false };
+      },
+    },
     fieldValueInput: { type: [String, Number, Date, Object], default: null },
-    typeRow: { type: String, default: 'fixed' },
-    isSelected: { type: Boolean, default: false },
+    // typeRow: { type: String, default: 'fixed' },
+    // isSelected: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -45,6 +52,7 @@ export default {
         integer: FieldNumber,
         choice: FieldChoice,
         date: FieldDate,
+        datetime: FieldDateTime,
         field: FieldDialog,
       },
       isEmit: false,
@@ -58,15 +66,14 @@ export default {
       return this.fields[this.fieldOptions.type];
     },
     fieldProps() {
+      // console.log(this.fieldValueInput);
+      // this.fieldValue = this.fieldValueInput;
       const props = {
-        isFlat: true,
-        isSolo: true,
-        isSingleLine: true,
-        isSelected: this.isSelected,
+        fieldLabel: this.fieldOptions.label,
       };
       if (this.fieldOptions.choices) props.items = this.fieldOptions.choices;
-      if (this.fieldOptions['related_model_name']) {
-        props.relatedModelName = this.fieldOptions['related_model_name'];
+      if (this.fieldOptions.related_model_name) {
+        props.relatedModelName = this.fieldOptions.related_model_name;
         props.itemText = 'text';
         props.itemValue = 'id';
       }
@@ -83,34 +90,12 @@ export default {
     },
   },
   methods: {
-    evtInput() { this.$emit('input', this.fieldValue); },
-    evtKeydownControl(evt) {
-      this.isEmit = true;
-      this.evtInput();
-      if (evt.code === 'Escape') {
-        this.$emit('control:esc');
-        return;
-      }
-      this.$emit('keydown:control', { event: evt, fieldKey: this.fieldOptions.value });
-    },
-    evtBlur(evt) {
-      this.evtInput();
-      if (!this.isEmit) this.$emit('blur:wrapper', { event: evt, fieldKey: this.fieldOptions.value });
-    },
+    evtKeydownControl() {},
+    evtBlur() {},
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.field-wrapper {
-  overflow: hidden;
-  margin: 0 3px;
-  border-bottom: 2px solid rgba(21, 101, 192, .3);
-  &_dense { margin-top: -10.5px; }
-  &_fixed { margin-top: -10px; }
-  &_auto { margin-top: -10px; }
-}
-.required {
-  border-bottom: 3px solid rgba(255, 0, 0,.6);
-}
+
 </style>

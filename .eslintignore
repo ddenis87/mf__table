@@ -13,6 +13,10 @@
 /src/components/DataTableControls
 /src/components/ZDELDataTableControl
 /src/componentsInteraction
-/src/components/TheForms
+/src/components/TheForms/TheFormActualdescElement
+/src/components/TheForms/TheFormBudgetclassificationElement
+/src/components/TheForms/TheTableForm
+/src/components/TheForms/ZDELTheFormOrganizationElement
+/src/components/TheForms/TheFormOrganizationGroup
 /src/components/TheTable
 /src/components/Document/ZSpreadSheet
