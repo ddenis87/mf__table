@@ -113,7 +113,8 @@ export default {
       this.isDialogShow = !this.isDialogShow;
     },
     evtSelectDate() {
-      this.fieldValue = (this.fieldValueDate) ? formattedDataDisplay(this.fieldValueDate, { valueType: 'date' }) : null;
+      this.fieldValue = (this.fieldValueDate)
+        ? formattedDataDisplay(this.fieldValueDate, { valueType: 'date' }) : null;
       this.isDialogShow = false;
       this.$refs.fieldInput.focus();
       this.evtInput();

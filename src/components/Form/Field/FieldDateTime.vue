@@ -93,13 +93,15 @@ export default {
   },
   watch: {
     fieldValueInput() {
-      console.log(this.fieldValueInput);
-      // this.fieldValue = formattedDataDisplay(this.fieldValueInput, { valueType: 'date' }) || null;
-      // this.fieldValueDate = this.fieldValueInput || null;
+      this.fieldValue = new Date(this.fieldValueInput).toLocaleString('ru').slice(0, -3).replace(',', '') || null;
+      this.fieldValueDate = this.fieldValueInput.split('T')[0] || null;
     },
   },
   methods: {
-    evtClickOutside() {},
+    evtClickOutside() {
+      const evt = new KeyboardEvent('keydown', { code: 'Escape' });
+      this.evtKeydownControl(evt);
+    },
     evtOpenDialog(evt) {
       if (evt.type === 'keydown' && evt.code !== 'Space') return;
       const elementTarget = this.$refs.fieldInput.$el.getBoundingClientRect();
@@ -116,18 +118,19 @@ export default {
     },
     evtSelectToday() {
       this.fieldValue = new Date().toLocaleString('ru').slice(0, -3).replace(',', '');
-      console.log(new Date().toJSON());
-      // console.log(new Date().toJSON());
-      ([this.fieldValueDate] = new Date().toJSON().split('T'));
+      ([this.fieldValueDate] = new Date());
       this.isDialogShow = false;
       this.$refs.fieldInput.focus();
       this.evtInput();
     },
-    evtInput() {},
-    evtKeydown() {},
-    evtKeydownControl() {},
+    evtInput() { this.$emit('input', this.fieldValueDate); },
+    evtKeydown(evt) { this.$emit('keydown:key', evt); },
+    evtKeydownControl(evt) { this.$emit('keydown:control', evt); },
     evtFocus() {},
-    evtBlur() {},
+    evtBlur(evt) {
+      evt.preventDefault();
+      if (!this.isDialogShow) this.$emit('blur:input', evt);
+    },
   },
 };
 </script>

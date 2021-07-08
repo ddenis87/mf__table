@@ -18,6 +18,7 @@ import FieldChoice from '@/components/Form/Field/FieldChoice.vue';
 import FieldDate from '@/components/Form/Field/FieldDate.vue';
 import FieldDateTime from '@/components/Form/Field/FieldDateTime.vue';
 import FieldDialog from '@/components/Form/Field/FieldDialog.vue';
+import FieldHistory from '@/components/Form/Field/FieldHistory.vue';
 
 export default {
   name: 'FormsFieldWrapper',
@@ -28,6 +29,7 @@ export default {
     FieldDate,
     FieldDateTime,
     FieldDialog,
+    FieldHistory,
   },
   model: {
     prop: 'fieldValueInput',
@@ -41,8 +43,6 @@ export default {
       },
     },
     fieldValueInput: { type: [String, Number, Date, Object], default: null },
-    // typeRow: { type: String, default: 'fixed' },
-    // isSelected: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -54,6 +54,7 @@ export default {
         date: FieldDate,
         datetime: FieldDateTime,
         field: FieldDialog,
+        history: FieldHistory,
       },
       isEmit: false,
     };
@@ -66,10 +67,9 @@ export default {
       return this.fields[this.fieldOptions.type];
     },
     fieldProps() {
-      // console.log(this.fieldValueInput);
-      // this.fieldValue = this.fieldValueInput;
       const props = {
         fieldLabel: this.fieldOptions.label,
+        isClearable: true,
       };
       if (this.fieldOptions.choices) props.items = this.fieldOptions.choices;
       if (this.fieldOptions.related_model_name) {
@@ -77,14 +77,16 @@ export default {
         props.itemText = 'text';
         props.itemValue = 'id';
       }
+      if (this.fieldOptions.type === 'history') {
+        props.dimension = this.fieldOptions.dimension;
+        props.dimensionValue = this.fieldOptions.dimension_value;
+      }
       return props;
     },
   },
   watch: {
     fieldValueInput() {
-      console.log(this.fieldValueInput);
       this.$nextTick().then(() => {
-        console.log(this.fieldValueInput);
         this.fieldValue = this.fieldValueInput;
       });
     },

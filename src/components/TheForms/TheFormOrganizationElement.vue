@@ -4,7 +4,8 @@
       <v-container fluid>
         <v-row>
           <v-col cols="3" >
-            <forms-field-wrapper :field-options="fieldForm.registry_date"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.registry_date"
+                                 v-model="fieldFormValue.registry_date"></forms-field-wrapper>
           </v-col>
           <v-col cols="3" >
             <forms-field-wrapper :field-options="fieldForm.last_visited"
@@ -16,43 +17,52 @@
         </v-row>
         <v-row>
           <v-col cols="3">
-            <forms-field-wrapper :field-options="fieldForm.organization_type"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.organization_type"
+                                 v-model="fieldFormValue.organization_type"></forms-field-wrapper>
           </v-col>
           <v-col cols="3">
-            <forms-field-wrapper :field-options="fieldForm.institution_type"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.institution_type"
+                                 v-model="fieldFormValue.institution_type"></forms-field-wrapper>
           </v-col>
           <v-col cols="3">
-            <forms-field-wrapper :field-options="fieldForm.institution_code"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.institution_code"
+                                 v-model="fieldFormValue.institution_code"></forms-field-wrapper>
           </v-col>
           <v-col cols="3">
-            <forms-field-wrapper :field-options="fieldForm.industry_typing"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.industry_typing"
+                                 v-model="fieldFormValue.industry_typing"></forms-field-wrapper>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12">
-            <forms-field-wrapper :field-options="fieldForm.title"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.title"
+                                 v-model="fieldFormValue.title"></forms-field-wrapper>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="4">
             <forms-field-wrapper :field-options="fieldForm.inn"
-                                 v-model="inn"></forms-field-wrapper>
+                                 v-model="fieldFormValue.inn"></forms-field-wrapper>
           </v-col>
           <v-col cols="4">
-            <forms-field-wrapper :field-options="fieldForm.kpp"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.kpp"
+                                 v-model="fieldFormValue.kpp"></forms-field-wrapper>
           </v-col>
           <v-col cols="4">
-            <forms-field-wrapper :field-options="fieldForm.budget_level"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.budget_level"
+                                 v-model="fieldFormValue.budget_level"></forms-field-wrapper>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12">
-            <forms-field-wrapper :field-options="fieldForm.egrul_status"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.egrul_status"
+                                 v-model="fieldFormValue.egrul_status"></forms-field-wrapper>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12">
-            <forms-field-wrapper :field-options="fieldForm.rubpnubp_status"></forms-field-wrapper>
+            <forms-field-wrapper :field-options="fieldForm.rubpnubp_status"
+                                 v-model="fieldFormValue.rubpnubp_status"></forms-field-wrapper>
           </v-col>
         </v-row>
         <v-row>
@@ -96,88 +106,30 @@ export default {
   data() {
     return {
       tableName: 'organization',
-      fieldFormValue: {
-        // id: null,
-        // title: '',
-        // registry_date: '',
-        // last_visited: '',
-        // institution_code: '',
-        inn: '',
-        // kpp: '',
-        // organization_type: null,
-        // rubpnubp_status: null,
-        // egrul_status: null,
-        // institution_type: null,
-        // industry_typing: null,
-        // budget_level: null,
-        bk: null,
-        // parent: null,
-      },
-      inn: '',
+      fieldFormValue: {},
     };
   },
   computed: {
-    async fieldForm() {
+    fieldForm() {
       if (!this.guid) return null;
       const fieldForm = this.$store.getters['DataTable/GET_LIST_OPTIONS']({ tableName: this.tableName });
       if (this.focusedElement === null) return fieldForm;
-      await this.fillValue();
-      // console.log(fieldForm);
-      // Object.keys(fieldForm)
-      // for (const key of Object.keys(fieldForm)) {
-      //   this.fieldFormValue[key] = this.focusedElement[key];
-      // }
-      // console.log(this.fieldFormValue);
       return fieldForm;
     },
     fieldPropsHistory() {
       return {
-        lebel: 'История',
-        'related-model-name': 'actualdesc',
+        type: 'history',
+        label: 'История',
+        related_model_name: 'actualdesc',
         dimension: 'related',
-        'dimension-value': this.fieldFormValue?.id || null,
+        dimension_value: this.fieldFormValue?.id || null,
       };
     },
   },
-  async mount() {
-    // await this.$nextTick().then(() => {
-    //   Object.keys(this.fieldForm).forEach((field) => {
-    //     this.fieldFormValue[field] = this.focusedElement[field] || null;
-    //   });
-    // });
-    // setTimeout(() => this.inn = this.focusedElement.inn, 3000);
-    // console.log(this.inn);
-  //   if (this.focusedElement == null) {
-  //     let filtersStor = this.$store.getters['DataTable/GET_FILTERS']({ tableName: this.tableName, guid: this.guid });
-  //     Object.keys(this.fieldFormValue).forEach((key) => {
-  //       if (!this.fieldFormValue[key]) {
-  //         if (key in filtersStor) this.fieldFormValue[key] = filtersStor[key];
-  //       }
-  //     });
-  //   }
-  //   if (this.focusedElement == null && this.filtersForm) {
-  //     // console.log('fill filters');
-  //     Object.keys(this.filtersForm).forEach((key) => {
-  //       this.fieldFormValue[key] = this.filtersForm[key];
-  //     });
-  //   }
-  //   // this.fieldArray = Array.from(document.querySelectorAll('.table-form .el-field__item input[tabindex="1"]'));
-  // },
-  // watch: {
-  //   focusedElement() {
-  //     console.log(this.focusedElement);
-  //     this.fieldFormValue = this.focusedElement;
-  //   },
+  mounted() {
+    this.fieldFormValue = { ...this.fieldForm, ...this.focusedElement };
   },
   methods: {
-    fillValue() {
-      return new Promise((resolve) => {
-        Object.keys(this.fieldForm).forEach((field) => {
-          this.fieldFormValue[field] = this.focusedElement[field] || null;
-        });
-        resolve();
-      });
-    },
     eventFormCancel() {},
     eventFormAccept() {},
     eventAcceptKeydown() {},
