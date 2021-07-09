@@ -18,7 +18,8 @@
         <v-row>
           <v-col cols="3">
             <forms-field-wrapper :field-options="fieldForm.organization_type"
-                                 v-model="fieldFormValue.organization_type"></forms-field-wrapper>
+                                 v-model="fieldFormValue.organization_type"
+                                 @keydown:control="evtKeydownControl"></forms-field-wrapper>
           </v-col>
           <v-col cols="3">
             <forms-field-wrapper :field-options="fieldForm.institution_type"
@@ -127,12 +128,38 @@ export default {
     },
   },
   mounted() {
-    this.fieldFormValue = { ...this.fieldForm, ...this.focusedElement };
+    if (this.focusedElement) {
+      this.fieldFormValue = { ...this.fieldForm, ...this.focusedElement };
+      return;
+    }
+    Object.keys(this.fieldForm).forEach((itemKey) => {
+      this.fieldFormValue[itemKey] = null;
+    });
   },
   methods: {
-    eventFormCancel() {},
+    eventFormCancel() {
+      this.$emit('event-action-cancel');
+      this.$refs.formAction.reset();
+    },
     eventFormAccept() {},
     eventAcceptKeydown() {},
+
+    evtKeydownControl(evt) {
+      console.log(evt.target);
+    },
+
+    hasValidation() {
+      if (!this.$refs.formAction.validate()) return false;
+      let isValidate = true;
+      Object.keys(this.fieldFormValue).forEach((key) => {
+        if (this.fieldForm[key].required === true
+          && (this.fieldFormValue[key] === ''
+          || this.fieldFormValue[key] === null)) {
+          isValidate = false;
+        }
+      });
+      return isValidate;
+    },
   },
 };
 </script>

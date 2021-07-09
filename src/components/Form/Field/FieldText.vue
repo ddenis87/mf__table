@@ -40,7 +40,7 @@ export default {
     ...fieldComputed,
   },
   watch: {
-    fieldValueInput() { this.fieldValue = this.fieldValueInput; },
+    fieldValueInput() { this.fieldValue = this.fieldValueInput || ''; },
   },
   mounted() {
     if (!this.isSelected) return;

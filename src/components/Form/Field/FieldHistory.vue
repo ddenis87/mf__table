@@ -58,7 +58,7 @@ export default {
     relatedModelName: { type: String, default: null },
     filters: null,
     dimension: { type: String, default: '' },
-    dimensionValue: { type: [String, Number], default: null },
+    dimensionValue: { type: [String, Number, Object], default: null },
   },
   data() {
     return {

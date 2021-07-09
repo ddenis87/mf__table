@@ -5,8 +5,7 @@
                ref="field"
                v-model="fieldValue"
                v-bind="fieldProps"
-               @keydown:key.stop
-               @keydown:control.prevent="evtKeydownControl"
+               @keydown:control="evtKeydownControl"
                @blur:input="evtBlur"></component>
   </div>
 </template>
@@ -92,7 +91,10 @@ export default {
     },
   },
   methods: {
-    evtKeydownControl() {},
+    evtKeydownControl(evt) {
+      console.log(this.fieldValue);
+      this.$emit('keydown:control', evt);
+    },
     evtBlur() {},
   },
 };
