@@ -20,6 +20,7 @@
                       @click="evtOpenDialog"></btn-field>
       </template>
     </v-text-field>
+    <div v-if="isRequired" class="required"></div>
     <v-menu class="field-item dialog"
             v-bind="dialogProps"
             v-model="isDialogShow"

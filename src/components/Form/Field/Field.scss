@@ -5,4 +5,12 @@
   &-item {
     font-size: inherit;
   }
+
+  .required {
+    position: relative;
+    bottom: 1px;
+    width: 100%;
+    min-height: 2px;
+    border: thin solid red;
+  }
 }

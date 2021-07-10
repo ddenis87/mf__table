@@ -1,7 +1,7 @@
 <template>
   <div class="field">
     <v-autocomplete ref="fieldInput"
-                    class="field-item choice"
+                    class="field-item dialog"
                     return-object
                     no-data-text="Значение отсутствует"
                     append-icon="mdi-dots-horizontal"
@@ -20,6 +20,7 @@
                     @keydown.tab="evtKeydownControl"
                     @blur="evtBlur"
                     @focus="evtFocus"></v-autocomplete>
+    <div v-if="isRequired" class="required"></div>
     <dialog-full :is-dialog-name="dialogName"
                  :is-dialog-show="isDialogShow"
                  @close="evtCloseDialog">

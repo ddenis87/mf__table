@@ -43,11 +43,14 @@ export const DataTableControlActions = {
       return `${this.actionTitle} ${(this.typeForm == 'element') ? 'записи' : 'группы'} ${(this.isRecycleBin) ? '(помечен на удаление)' : ''}`
     },
     buildFormName() {
-      return this.tableName[0].toUpperCase() + this.tableName.slice(1) + this.typeForm[0].toUpperCase() + this.typeForm.slice(1);
+      let formName = this.tableName[0].toUpperCase() + this.tableName.slice(1);
+      if (this.typeForm === 'group') formName += this.typeForm[0].toUpperCase() + this.typeForm.slice(1);
+      // return this.tableName[0].toUpperCase() + this.tableName.slice(1) + this.typeForm[0].toUpperCase() + this.typeForm.slice(1);
+      return formName;
     },
     importComponentForm() {
       if (!this.isShowDialog) return null;
-      return () => import(`@/components/TheForms/TheForm${this.buildFormName}`);
+      return () => import(`@/components/TheForms/The${this.buildFormName}`);
     },
     isRecycleBin() { 
       return this.$store.getters[`DataTable/GET_FILTER_DEFAULT_FIELD`]({
@@ -216,25 +219,31 @@ export const DataTableControlActions = {
       })
     },
     async eventActionAccept(option) {
-      let sendOption = {
+      const sendOption = {
         tableName: this.tableName,
         guid: this.guid,
       };
-      Object.assign(sendOption, option);
-      if (sendOption.actionName == 'editing') {
-        sendOption.id = option.values.id;
-        delete sendOption.values.id;
-      }
-      let bFormData = new FormData();
-      for (let key of Object.keys(sendOption.values)) {
-        bFormData.set(`${key}`, `${sendOption.values[key]}`);
-      }
-      sendOption.formData = bFormData;
-      delete sendOption.values;
+      // Object.assign(sendOption, option);
+      // if (option.actionName == 'editing') {
+        
+      //   delete sendOption.values.id;
+      // }
+      // let bFormData = new FormData();
+      // for (let key of Object.keys(sendOption.values)) {
+      //   bFormData.set(`${key}`, `${sendOption.values[key]}`);
+      // }
+      sendOption.formData = option.form;
+      sendOption.actionName = option.actionName;
+      // sendOption.formData = bFormData;
+      // delete sendOption.values;
       sendOption.previous = true;
+      console.log(sendOption);
       this.closeDialog();
-      if (sendOption.actionName == 'editing') 
+      if (sendOption.actionName == 'editing') {
+        sendOption.id = option.form.get('id');
+        sendOption.formData.delete('id');
         this.$store.dispatch(`DataTable/UPDATE_ELEMENT`, sendOption);
+      }
       if (sendOption.actionName == 'adding') {
         await this.$store.dispatch(`DataTable/ADDING_NEW_ELEMENT`, sendOption)
           .then((id) => {

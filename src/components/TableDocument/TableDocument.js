@@ -276,10 +276,11 @@ class TableDocument {
     // получать максимальный из имеющихся, сравнивать
     // если пусстое значение и больше ничего нет, то удалять ячейку из набора ???
     let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
-    cellValues = { ...cellValues, ...{ value: cellValue } };
+    cellValues = { ...cellValues, ...{ value: cellValue || '' } };
     if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
     this.cells = { ...this.cells, ...{ [cellName]: cellValues } };
     this.recalculateFormulas();
+    console.log(this.cells);
   }
 
   executeAction(cellName) {

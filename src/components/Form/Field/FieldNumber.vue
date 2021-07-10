@@ -5,6 +5,7 @@
                   type="number"
                   v-bind="fieldPropsNested"
                   :rules="(isRequired) ? [rules.required] : []"
+                  :reverse="true"
                   v-model="fieldValue"
                   @input="evtInput"
                   @keydown="evtKeydown"
@@ -13,6 +14,7 @@
                   @keydown.tab="evtKeydownControl"
                   @blur="evtBlur"
                   @focus="evtFocus"></v-text-field>
+    <div v-if="isRequired" class="required"></div>
   </div>
 </template>
 
@@ -53,7 +55,13 @@ export default {
   },
   methods: {
     evtInput() { this.$emit('input', this.fieldValue); },
-    evtKeydown(evt) { this.$emit('keydown:key', evt); },
+    evtKeydown(evt) {
+      if (evt.code === 'ArrowUp' || evt.code === 'ArrowDown') {
+        evt.preventDefault();
+        return;
+      }
+      this.$emit('keydown:key', evt);
+    },
     evtKeydownControl(evt) { this.$emit('keydown:control', evt); },
     evtFocus() {},
     evtBlur(evt) { this.$emit('blur:input', evt); },

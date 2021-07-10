@@ -1,12 +1,12 @@
 <template>
-  <div class="field-wrapper"
-       :class="{'required': isRequired}">
+  <div class="field-wrapper">
     <component :is="field"
                ref="field"
                v-model="fieldValue"
                v-bind="fieldProps"
                @keydown:control="evtKeydownControl"
                @blur:input="evtBlur"></component>
+    <div class="line" :class="{'required': isRequired}"></div>
   </div>
 </template>
 
@@ -69,6 +69,7 @@ export default {
       const props = {
         fieldLabel: this.fieldOptions.label,
         isClearable: true,
+        isRequired: this.fieldOptions.required || false,
       };
       if (this.fieldOptions.choices) props.items = this.fieldOptions.choices;
       if (this.fieldOptions.related_model_name) {
@@ -91,11 +92,14 @@ export default {
     },
   },
   methods: {
+    evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydownControl(evt) {
-      console.log(this.fieldValue);
+      this.evtInput();
       this.$emit('keydown:control', evt);
     },
-    evtBlur() {},
+    evtBlur() {
+      this.evtInput();
+    },
   },
 };
 </script>

@@ -10,7 +10,7 @@
                     :item-value="itemValue"
                     v-bind="fieldPropsNested"
                     v-model="fieldValue"
-                    @click="evtClick"
+                    @click.stop="evtClick"
                     @input="evtInput"
                     @keydown="evtKeydown"
                     @keydown.enter="evtKeydownControl"
@@ -18,6 +18,7 @@
                     @keydown.tab="evtKeydownControl"
                     @blur="evtBlur"
                     @focus="evtFocus"></v-autocomplete>
+    <div v-if="isRequired" class="required"></div>
   </div>
 </template>
 
@@ -70,7 +71,7 @@ export default {
   },
   methods: {
     evtClick() {
-      console.log(this.$refs.fieldInput.$el.getAttribute(''));
+      // console.log(this.$refs.fieldInput.$el.getAttribute(''));
     },
     evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydown(evt) { this.$emit('keydown:key', evt); },

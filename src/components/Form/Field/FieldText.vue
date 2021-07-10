@@ -12,6 +12,7 @@
                   @keydown.tab="evtKeydownControl"
                   @blur="evtBlur"
                   @focus="evtFocus"></v-text-field>
+    <div v-if="isRequired" class="required"></div>
   </div>
 </template>
 

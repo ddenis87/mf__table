@@ -42,7 +42,7 @@ class TableDocumentApi extends TableDocument {
   }
 
   editingCell(cellName, cellValue) {
-    if (this.cells[cellName]) {
+    if (this.cells[cellName] && cellValue) {
       const { type } = this.cells[cellName];
       if (type?.includes('field')) {
         const { parthSource: sourceName } = parseType(type);

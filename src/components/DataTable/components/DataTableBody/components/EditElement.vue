@@ -172,21 +172,9 @@ export default {
       let condition = true;
       this.itemsHeader.forEach((element) => {
         if (element.required) {
-          console.log(this.fieldsElement[element.value]);
-
           if (['', undefined, null].includes(this.fieldsElement[element.value])) condition = false;
         }
       });
-      // for (let key of Object.keys(this.itemsHeader)) {
-      //   let field = this.itemsHeader[key];
-      //   if (field.required) {
-      //     if (!Object.keys(this.fieldsElement).includes(field.value)) {
-      //       return false;
-      //     } else {
-      //       if (!this.fieldsElement[field.value]) return false;
-      //     }
-      //   }
-      // }
       return condition;
     },
 
