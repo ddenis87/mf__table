@@ -78,7 +78,7 @@ export default {
   },
 
   SET_OPTIONS(state, option) {
-    console.log(option.data);
+    // console.log(option.data);
     state[option.tableName].listOptions = option.data;
     state[option.tableName].description = option.description;
     if ('parent' in option.data) {

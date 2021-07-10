@@ -43,7 +43,7 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <form-field-wrapper :field-options="fieldForm.title"
+            <form-field-wrapper :field-options="{ ...fieldForm.title, type: 'area' }"
                                  v-model="fieldFormValue.title"
                                  @keydown:control="evtKeydownField"></form-field-wrapper>
           </v-col>

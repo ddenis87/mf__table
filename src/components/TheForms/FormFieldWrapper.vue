@@ -12,6 +12,7 @@
 
 <script>
 import FieldText from '@/components/Form/Field/FieldText.vue';
+import FieldArea from '@/components/Form/Field/FieldArea.vue';
 import FieldNumber from '@/components/Form/Field/FieldNumber.vue';
 import FieldChoice from '@/components/Form/Field/FieldChoice.vue';
 import FieldDate from '@/components/Form/Field/FieldDate.vue';
@@ -23,6 +24,7 @@ export default {
   name: 'FormsFieldWrapper',
   components: {
     FieldText,
+    FieldArea,
     FieldNumber,
     FieldChoice,
     FieldDate,
@@ -48,6 +50,7 @@ export default {
       fieldValue: '',
       fields: {
         string: FieldText,
+        area: FieldArea,
         integer: FieldNumber,
         choice: FieldChoice,
         date: FieldDate,

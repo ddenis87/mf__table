@@ -119,7 +119,7 @@ export default {
     },
     evtSelectToday() {
       this.fieldValue = new Date().toLocaleString('ru').slice(0, -3).replace(',', '');
-      ([this.fieldValueDate] = new Date());
+      ([this.fieldValueDate] = new Date().toJSON().split('T'));
       this.isDialogShow = false;
       this.$refs.fieldInput.focus();
       this.evtInput();
