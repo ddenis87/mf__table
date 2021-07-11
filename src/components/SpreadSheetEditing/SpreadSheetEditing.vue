@@ -83,7 +83,10 @@ export default {
       this.$emit('editing:cancel');
     },
     evtKeydownControl(evt) {
-      if (evt.code === 'Escape') this.editCancel();
+      if (evt.code === 'Escape') {
+        this.editCancel();
+        return;
+      }
       this.editAccept();
     },
     async evtFocusInput() {

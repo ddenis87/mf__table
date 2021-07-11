@@ -258,15 +258,15 @@ export default {
     this.updateDocumentStyles(false);
   },
   methods: {
-    evtClickCell(evt) {
-      // console.log(evt);
-      this.$emit('click:cell', evt);
+    evtClickCell(options) {
+      // console.log(options);
+      this.$emit('click:cell', options);
     },
-    evtDblclickCell(evt) {
-      this.$emit('dblclick:cell', evt);
+    evtDblclickCell(options) {
+      this.$emit('dblclick:cell', options);
     },
-    evtKeydownCell(evt) {
-      this.$emit('keydown:cell', evt);
+    evtKeydownCell(options) {
+      this.$emit('keydown:cell', options);
     },
 
     scrollBodyX(scrollLeft) {

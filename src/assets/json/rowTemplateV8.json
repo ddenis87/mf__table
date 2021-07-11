@@ -1,5 +1,6 @@
 {
   "template":true,
+  "editAccess":"closedExceptOpen",
   "cells":{
     "a5":{
       "value":"<svg class='no-print' width='18' height='18'><path id='svg_1' fill='none' d='m0,0l24,0l0,24l-24,0l0,-24z'/><path fill='#ff0000' stroke='null' id='svg_2' d='m14.5,4.60786l-1.10786,-1.10786l-4.39214,4.39214l-4.39214,-4.39214l-1.10786,1.10786l4.39214,4.39214l-4.39214,4.39214l1.10786,1.10786l4.39214,-4.39214l4.39214,4.39214l1.10786,-1.10786l-4.39214,-4.39214l4.39214,-4.39214z'/></svg>",
@@ -85,16 +86,16 @@
     "f2":{"colspan":3,"style":"f2","value":"Объем бюджетных ассигнований, тыс. руб."},
     "f3":{"value":"на 2021 год\n(на очередной финансовый год)","style":"f3"},
     "f4":{"value":"3","style":"f4"},
-    "f5":{"style":"f5","parameter":"st1Volume21","type":"number"},
-    "f6":{"style":"f6","type":"number","parameter":"st2Volume21"},
-    "f7":{"style":"f7","type":"number","parameter":"st3Volume21"},
+    "f5":{"style":"f5","parameter":"st1Volume21","type":"number","isEditable":true},
+    "f6":{"style":"f6","type":"number","parameter":"st2Volume21","isEditable":true},
+    "f7":{"style":"f7","type":"number","parameter":"st3Volume21","isEditable":true},
     "f8":{"style":"f8"},
     "f9":{
       "style":"f9",
       "type":"number",
       "formatString":"minFD=2",
       "formula":"=SUM(f5:f13)",
-      "disabled":true
+      "isEditable":false
     },
     "f10":{"style":"f9"},
 
@@ -111,7 +112,7 @@
       "type":"number",
       "formatString":"minFD=2",
       "formula":"$g5 + $g6 - $g7 + $g8 + $g9 - $g10 + $g11 + $g12 - $g13",
-      "disabled":true
+      "isEditable":false
     },
     "g10":{"style":"g9"},
 
@@ -128,14 +129,14 @@
       "type":"number",
       "formatString":"minFD=2",
       "formula":"$h5 + ($h6+$h7) + $h8 + $h9+($h10 + $h11 * $h12) + $h13",
-      "disabled":true
+      "isEditable":false
     },
     "h10":{
       "style":"h9",
       "type":"number",
       "formatString":"minFD=2",
       "formula":"$f15 + $g15 + $h15",
-      "disabled":true
+      "isEditable":false
     }
   },
   "columns":{

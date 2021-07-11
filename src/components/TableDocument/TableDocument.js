@@ -14,6 +14,13 @@ import {
 
 import Formulas from './Formulas';
 
+const EDIT_ACCESS = {
+  CLOSED: 'closed',
+  CLOSED_EXCEPT_OPEN: 'closedExceptOpen',
+  OPEN: 'open',
+  // OPEN_EXCEPT_CLOSED: 'open-except-closed',
+};
+
 const CELL_WIDTH = 94;
 const CELL_HEIGHT = 22;
 const ROW_COUNT = 1000;
@@ -68,6 +75,7 @@ function getObjectOfJSON(data) {
 class TableDocument {
   constructor({
     template = false,
+    editAccess = undefined,
     methodName = null,
     rows = {},
     rowCount = ROW_COUNT,
@@ -85,6 +93,7 @@ class TableDocument {
       const JSONStringParse = JSON.parse(JSONString);
       ({
         template: this.template = false,
+        editAccess: this.editAccess = undefined,
         methodName: this.methodName = null,
         rows: this.rows = {},
         rowCount: this.rowCount = ROW_COUNT,
@@ -100,6 +109,7 @@ class TableDocument {
       return;
     }
     this.template = template;
+    this.editAccess = editAccess;
     this.methodName = methodName;
     this.rows = rows;
     this.rowCount = rowCount;
@@ -112,6 +122,8 @@ class TableDocument {
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
   }
+
+  editAccess = undefined;
 
   BASE_CLASS = TableDocument;
 
@@ -136,6 +148,13 @@ class TableDocument {
     return result;
   }
 
+  calculateSUM(range, currentCellName) {
+    const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
+    const formula = new Formulas(cellKeys.map((cellKey) => `$${cellKey}`).join(' + '), currentCellName);
+    if (formula.hasOperandsInclude(currentCellName)) return NaN;
+    return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
+  }
+
   // calculateCellValueV1(cellName) {
   //   const FUNCTION_FORMULA = {
   //     SUM: () => 'calculateSUM',
@@ -158,12 +177,12 @@ class TableDocument {
   //   return result;
   // }
 
-  checkEditAccess(cellName) {
-    if (Object.keys(this.cells).includes(cellName) && this.cells[cellName].disabled === true) return false;
-    if (!Object.keys(this.cells).includes(cellName)) return true;
-    if (Object.keys(this.cells[cellName]).includes('areaName')) return true;
-    return true;
-  }
+  // checkEditAccess(cellName) {
+  //   if (Object.keys(this.cells).includes(cellName) && this.cells[cellName].disabled === true) return false;
+  //   if (!Object.keys(this.cells).includes(cellName)) return true;
+  //   if (Object.keys(this.cells[cellName]).includes('areaName')) return true;
+  //   return true;
+  // }
 
   deleteArea(range, shiftType = null) {
     const rangeType = getRangeType(range);
@@ -230,7 +249,7 @@ class TableDocument {
     const documentSettings = getObjectOfJSON(settings);
     if (!this.documentTemplate) this.documentTemplate = documentTemplate;
     if (!this.documentSettings) this.documentSettings = documentSettings;
-
+    if (!this.editAccess) this.editAccess = this.documentTemplate.editAccess || undefined;
     documentSettings.forEach((setting) => {
       const [key, keyValue] = Object.entries(setting)[0];
       if (Object.keys(keyValue).includes('nested')) return;
@@ -527,13 +546,6 @@ class TableDocument {
     return formulasCellsSet;
   }
 
-  calculateSUM(range, currentCellName) {
-    const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
-    const formula = new Formulas(cellKeys.map((cellKey) => `$${cellKey}`).join(' + '), currentCellName);
-    if (formula.hasOperandsInclude(currentCellName)) return NaN;
-    return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
-  }
-
   // calculateSUM(range, currentCellName) {
   //   const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
   //   const formula = cellKeys.map((cellKey) => `$${cellKey}`).join(' + ');
@@ -699,6 +711,27 @@ class TableDocument {
     const script = this.scripts[scriptName];
     if (script) return script;
     return null;
+  }
+
+  hasEditing(cellName) {
+    return this.hasEditingSheet(cellName);
+  }
+
+  hasEditingCell(cellName) {
+    let isEditCell;
+    if (Object.keys(this.cells).includes(cellName)) {
+      isEditCell = this.cells[cellName].isEditable;
+    }
+    console.log(isEditCell);
+    if (this.editAccess === EDIT_ACCESS.CLOSED_EXCEPT_OPEN && !isEditCell) return false;
+    if (this.editAccess === EDIT_ACCESS.OPEN && isEditCell === false) return false;
+    if (!this.editAccess && isEditCell === false) return false;
+    return true;
+  }
+
+  hasEditingSheet(cellName) {
+    if (this.editAccess === EDIT_ACCESS.CLOSED) return false;
+    return this.hasEditingCell(cellName);
   }
 
   hasNamedArea(namedArea) {

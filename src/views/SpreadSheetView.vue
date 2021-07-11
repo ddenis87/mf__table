@@ -46,10 +46,6 @@
           </v-list>
         </v-menu>
       </div>
-      <!-- <div class="item item_btn">
-        <v-btn small dark color="blue darken-3" @click="saveDocumentData">
-          <v-icon small left>mdi-cloud-download-outline</v-icon>Сохранить</v-btn>
-      </div> -->
       <div class="item item_btn">
         <v-btn small dark color="blue darken-3" @click="openPrintPage">
           <v-icon small left>mdi-cloud-print-outline</v-icon>Печать</v-btn>
@@ -98,20 +94,13 @@
                             :is-label="isEditableCellLabel"
                             @editing:accept="acceptEditingCell"
                             @editing:cancel="cancelEditingCell"></spread-sheet-editing>
-      <!-- <spread-sheet-edit ref="SpreadSheetEditDOM"
-                         :editable-cell="editableCell"
-                         :editable-cell-event="editableCellEvent"
-                         :editable-cell-element="editableCellElement"
-                         :is-editable-cell-label="isEditableCellLabel"
-                         @editing:accept="acceptEditingCell"
-                         @editing:cancel="cancelEditingCell"></spread-sheet-edit> -->
       <spread-sheet ref="SpreadSheet"
                     v-bind="tableDocument"
                     :is-grid="isGrid"
                     :is-title="isTitle"
                     @click:cell="evtClickCell"
-                    @dblclick:cell="evtEditCell"
-                    @keydown:cell="evtEditCell"
+                    @dblclick:cell="evtDblClickCell"
+                    @keydown:cell="evtKeydownCell"
                     @scroll:body="scrollBody"></spread-sheet>
     </div>
   </div>
@@ -173,26 +162,30 @@ export default {
       const JSONFormat = true;
       apiSpreadSheet.dowloadJSONFile(JSON.stringify(this.tableDocument.serializationDataSection()), JSONFormat);
     },
-    evtClickCell(evt) {
-      const cellName = evt.target.getAttribute('data-name');
+    evtClickCell(options) {
+      const { cellName } = options;
       const selectedCell = this.tableDocument.getCell(cellName);
-      // console.log(selectedCell);
       if (Object.keys(selectedCell).includes('action')) this.tableDocument.executeAction(cellName);
       if (Object.keys(selectedCell).includes('formula')) this.tableDocument.calculateCellValue(cellName);
-      // eval(selectedCell.script); // eslint-disable-line no-eval
     },
-    evtEditCell(evt) {
-      const cellName = evt.target.getAttribute('data-name');
-      if (!this.tableDocument.checkEditAccess(cellName)) return;
+
+    evtDblClickCell(options) {
+      const { cellName } = options;
+      if (!this.tableDocument.hasEditing(cellName)) return;
       this.editableCell = this.tableDocument.getCell(cellName);
       this.editableCellType = this.tableDocument.getCellType(cellName);
-      this.editableCellEvent = evt;
-      this.editableCellElement = evt.target;
-      this.editableCellGeometry = evt.target.getBoundingClientRect();
+      this.editableCellEvent = options.evt;
+      this.editableCellElement = options.evt.target;
+      this.editableCellGeometry = options.evt.target.getBoundingClientRect();
       this.$nextTick().then(() => {
         this.$refs.SpreadSheetEditDOM.$el.focus();
       });
     },
+
+    evtKeydownCell(options) {
+      this.evtDblClickCell(options);
+    },
+
     clearEditCell() {
       // console.log(this.editableCellElement);
       if (this.editableCellElement) this.editableCellElement.focus();

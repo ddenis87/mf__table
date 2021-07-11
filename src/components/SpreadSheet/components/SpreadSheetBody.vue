@@ -123,21 +123,27 @@ export default {
   },
   methods: {
     evtDblClickBody(evt) {
-      if (evt.target.hasAttribute('data-name')) this.$emit('dblclick:cell', evt);
+      if (!evt.target.hasAttribute('data-name')) return;
+      const cellName = evt.target.getAttribute('data-name');
+      this.$emit('dblclick:cell', { evt, cellName });
     },
     evtClickBody(evt) {
-      if (evt.target.hasAttribute('data-name')) this.$emit('click:cell', evt);
-      if (evt.target.closest('button')) this.toggleRowGroup(evt.target.closest('button'));
-      if (evt.target.closest('.column-body')) {
-        const cellName = evt.target.closest('.column-body').getAttribute('data-name');
-        const cell = Object.entries(this.cells).find((item) => item[0] === cellName);
-        if (cell) {
-          const [, cellValue] = cell;
-          const isTrySelected = cellValue.noSelect || false;
-          if (isTrySelected) return;
-        }
-        this.focusCell(this.getCellNodeForName(cellName));
+      if (evt.target.closest('button')) {
+        this.toggleRowGroup(evt.target.closest('button'));
+        return;
       }
+      const target = evt.target.closest('.column-body');
+      if (!target) return;
+      if (!target.hasAttribute('data-name')) return;
+      const cellName = target.getAttribute('data-name');
+      this.$emit('click:cell', { evt, cellName });
+      const cell = Object.entries(this.cells).find((item) => item[0] === cellName);
+      if (cell) {
+        const [, cellValue] = cell;
+        const isTrySelected = cellValue.noSelect || false;
+        if (isTrySelected) return;
+      }
+      this.focusCell(this.getCellNodeForName(cellName));
     },
     evtKeydownBody(evt) {
       evt.preventDefault();
@@ -150,7 +156,10 @@ export default {
         || evt.code.includes('Digit')
         || evt.code === 'Enter'
         || evt.code === 'Delete') {
-        if (evt.target.hasAttribute('data-name')) this.$emit('keydown:cell', evt);
+        if (evt.target.hasAttribute('data-name')) {
+          const cellName = evt.target.getAttribute('data-name');
+          this.$emit('keydown:cell', { evt, cellName });
+        }
       }
     },
     evtScrollList(evt) {
