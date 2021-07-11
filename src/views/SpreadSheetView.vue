@@ -91,7 +91,7 @@
                             :cell-type="editableCellType"
                             :cell-element="editableCellElement"
                             :edit-event="editableCellEvent"
-                            :is-label="isEditableCellLabel"
+                            :is-label="isShowEditableLabel"
                             @editing:accept="acceptEditingCell"
                             @editing:cancel="cancelEditingCell"></spread-sheet-editing>
       <spread-sheet ref="SpreadSheet"
@@ -103,6 +103,9 @@
                     @keydown:cell="evtKeydownCell"
                     @scroll:body="scrollBody"></spread-sheet>
     </div>
+    <v-snackbar content-class="snack"
+                color="red darken-3"
+                v-model="isSnackMessage">{{ snackMessage }}</v-snackbar>
   </div>
 </template>
 
@@ -140,7 +143,7 @@ export default {
       editableCellEvent: null,
       editableCellElement: null,
       editableCellGeometry: null,
-      isEditableCellLabel: false,
+      isShowEditableLabel: false,
 
       isGrid: true,
       isTitle: true,
@@ -148,6 +151,10 @@ export default {
       isFileDataDisabled: true,
       isFileSettingDisabled: true,
       isShowDialog: false,
+
+      isSnackTimer: null,
+      isSnackMessage: false,
+      snackMessage: '',
     };
   },
   mounted() {
@@ -171,7 +178,10 @@ export default {
 
     evtDblClickCell(options) {
       const { cellName } = options;
-      if (!this.tableDocument.hasEditing(cellName)) return;
+      if (!this.tableDocument.hasEditing(cellName)) {
+        this.showSnackMessage('Редактирование недоступно');
+        return;
+      }
       this.editableCell = this.tableDocument.getCell(cellName);
       this.editableCellType = this.tableDocument.getCellType(cellName);
       this.editableCellEvent = options.evt;
@@ -180,6 +190,16 @@ export default {
       this.$nextTick().then(() => {
         this.$refs.SpreadSheetEditDOM.$el.focus();
       });
+    },
+
+    showSnackMessage(message) {
+      clearTimeout(this.isSnackTimer);
+      this.snackMessage = message;
+      this.isSnackMessage = true;
+      this.isSnackTimer = setTimeout(() => {
+        this.isSnackMessage = false;
+        this.snackMessage = '';
+      }, 2000);
     },
 
     evtKeydownCell(options) {
@@ -193,7 +213,7 @@ export default {
       this.editableCellType = null;
       this.editableCellEvent = null;
       this.editableCellElement = null;
-      this.isEditableCellLabel = false;
+      this.isShowEditableLabel = false;
     },
     scrollBody() { // убрать в компонент ???
       if (this.editableCellElement) {
@@ -203,12 +223,12 @@ export default {
           || this.editableCellGeometry.left < cellEdit.left - 10)
           || (this.editableCellGeometry.top > cellEdit.top
           || this.editableCellGeometry.top < cellEdit.top)) {
-          this.isEditableCellLabel = true;
+          this.isShowEditableLabel = true;
         } else {
-          this.isEditableCellLabel = false;
+          this.isShowEditableLabel = false;
         }
       } else {
-        this.isEditableCellLabel = false;
+        this.isShowEditableLabel = false;
       }
     },
     acceptEditingCell(option) {
@@ -293,7 +313,7 @@ export default {
   grid-template-rows: 60px 1fr;
   grid-template-columns: 1fr;
   max-width: 100%;
-
+  user-select: none;
   &__control-top {
     grid-area: control-top;
     display: flex;

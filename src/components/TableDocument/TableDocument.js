@@ -530,6 +530,7 @@ class TableDocument {
     });
     console.log(Object.fromEntries(cells));
     const document = {
+      editAccess: this.editAccess,
       rows: this.rows,
       rowCount: this.rowCount,
       columns: this.columns,

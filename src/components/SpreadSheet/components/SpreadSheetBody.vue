@@ -3,7 +3,11 @@
        class="spread-sheet-body"
        @click="evtClickBody"
        @dblclick="evtDblClickBody"
-       @keydown="evtKeydownBody">
+       @keydown="evtKeydownBody"
+       @mousedown="evtMousedown"
+       @mouseup="evtMouseup"
+       @mousemove="evtMousemove">
+    <div class="select-area" :style="rangeSelect"></div>
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed"
          :class="{'sheet-body-fixed_grid-off': (!isGrid && rowsFixed.length)}">
@@ -75,15 +79,39 @@ export default {
       sheetBodyItem: SpreadSheetBodyItem,
       sheetBodyGeometry: null,
       currentSelectedCellName: null,
-      currentSelectedCell: null,
-      currentCursorPosition: {
-        cellName: null,
-        cellRow: null,
-        cellColumn: null,
-      },
+      // currentSelectedCell: null,
+      // currentCursorPosition: {
+      //   cellName: null,
+      //   cellRow: null,
+      //   cellColumn: null,
+      // },
+      selectStart: null,
+      selectEnd: null,
     };
   },
   computed: {
+    rangeSelect() {
+      if (!this.selectEnd) return {};
+      if (this.selectStart === this.selectEnd) return {};
+      if (!this.selectStart || !this.selectEnd) return {};
+      let startPosition = this.selectStart.getBoundingClientRect() || null;
+      let endPosition = this.selectEnd.getBoundingClientRect() || null;
+
+      if (endPosition?.left < startPosition?.left
+        || endPosition?.top < startPosition?.top) {
+        startPosition = this.selectEnd.getBoundingClientRect() || null;
+        endPosition = this.selectStart.getBoundingClientRect() || null;
+      }
+
+      const selectPosition = {
+        left: `${startPosition?.left - 6 || -100}px`,
+        top: `${startPosition?.top - 152.5 || -100}px`,
+        width: `${(endPosition?.left - startPosition?.left) + endPosition?.width + 3 || 0}px`,
+        height: `${(endPosition?.top - startPosition?.top) + endPosition?.height + 3 || 0 }px`,
+      };
+
+      return selectPosition;
+    },
     setExcludedCellsArray() { return [].concat(...Object.values(this.setExcludedCells)); },
     widthFixedColumn() {
       let width = (CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE;
@@ -122,15 +150,17 @@ export default {
     this.sheetBodyGeometry = this.$refs.SheetBody.$el.getBoundingClientRect();
   },
   methods: {
-    evtDblClickBody(evt) {
-      if (!evt.target.hasAttribute('data-name')) return;
-      const cellName = evt.target.getAttribute('data-name');
-      this.$emit('dblclick:cell', { evt, cellName });
+    evtMousemove(evt) {
+      if (evt.buttons === 1) {
+        if (evt.target.closest('.column-body')) {
+          this.selectEnd = evt.target; // .getAttribute('data-name');
+        }
+      }
     },
-    evtClickBody(evt) {
-      if (evt.target.closest('button')) {
-        this.toggleRowGroup(evt.target.closest('button'));
-        return;
+    evtMousedown(evt) {
+      if (evt.target.closest('.column-body')) {
+        this.selectEnd = null;
+        this.selectStart = evt.target; // .getAttribute('data-name');
       }
       const target = evt.target.closest('.column-body');
       if (!target) return;
@@ -144,6 +174,35 @@ export default {
         if (isTrySelected) return;
       }
       this.focusCell(this.getCellNodeForName(cellName));
+    },
+    evtMouseup(evt) {
+      if (evt.target.closest('.column-body')) {
+        this.selectEnd = evt.target; // .getAttribute('data-name');
+      }
+    },
+
+    evtDblClickBody(evt) {
+      if (!evt.target.hasAttribute('data-name')) return;
+      const cellName = evt.target.getAttribute('data-name');
+      this.$emit('dblclick:cell', { evt, cellName });
+    },
+    evtClickBody(evt) {
+      if (evt.target.closest('button')) {
+        this.toggleRowGroup(evt.target.closest('button'));
+        // return;
+      }
+      // const target = evt.target.closest('.column-body');
+      // if (!target) return;
+      // if (!target.hasAttribute('data-name')) return;
+      // const cellName = target.getAttribute('data-name');
+      // this.$emit('click:cell', { evt, cellName });
+      // const cell = Object.entries(this.cells).find((item) => item[0] === cellName);
+      // if (cell) {
+      //   const [, cellValue] = cell;
+      //   const isTrySelected = cellValue.noSelect || false;
+      //   if (isTrySelected) return;
+      // }
+      // this.focusCell(this.getCellNodeForName(cellName));
     },
     evtKeydownBody(evt) {
       evt.preventDefault();
@@ -163,6 +222,8 @@ export default {
       }
     },
     evtScrollList(evt) {
+      this.selectStart = null;
+      this.selectEnd = null;
       this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
@@ -451,7 +512,22 @@ export default {
 
 <style lang="scss" scoped>
 @import '../SpreadSheet.scss';
+
+.select-area {
+  position: absolute;
+  left: -100px;
+  top: -100px;
+  // width: 100px;
+  // height: 60px;
+  // right: 400px;
+  // bottom: 600px;
+  border: 2px solid rgb(26, 115, 232);
+  z-index: 99;
+  background-color: rgba(26, 115, 232, .1);
+  pointer-events: none;
+}
 .spread-sheet-body {
+  position: relative;
   font-size: $bodyFontSize;
   font-weight: $bodyFontWeight;
   color: $bodyFontColor;
