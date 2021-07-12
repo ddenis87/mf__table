@@ -263,11 +263,11 @@
   "scripts":{
     "deleteRowSection1": {
       "template": "default",
-      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, 'vertical');}"
+      "script": "(cellName) => { this.deleteArea(this.getRangeByCellName(cellName), 'vertical');}"
     },
     "deleteRowSection2": {
       "template": "default",
-      "script": "(cellName) => { const range = this.getRangeByCellName(cellName); this.deleteArea(range, 'vertical');}"
+      "script": "(cellName) => { this.deleteArea(this.getRangeByCellName(cellName), 'vertical');}"
     },
     "deleteRowSection3": {
       "template": "default",
