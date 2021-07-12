@@ -90,22 +90,44 @@ export default {
       if (!this.selectEnd) return {};
       if (this.selectStart === this.selectEnd) return {};
       if (!this.selectStart || !this.selectEnd) return {};
-      let startPosition = this.selectStart.getBoundingClientRect() || null;
-      let endPosition = this.selectEnd.getBoundingClientRect() || null;
+      const startRange = {
+        left: -100, top: -100, width: 0, height: 0,
+      };
+      const endRange = {
+        left: -100, top: -100, width: 0, height: 0,
+      };
 
-      if (endPosition?.left < startPosition?.left
-        || endPosition?.top < startPosition?.top) {
-        startPosition = this.selectEnd.getBoundingClientRect() || null;
-        endPosition = this.selectStart.getBoundingClientRect() || null;
+      ({
+        left: startRange.left, top: startRange.top, width: startRange.width, height: startRange.height,
+      } = this.selectStart.getBoundingClientRect());
+      ({
+        left: endRange.left, top: endRange.top, width: endRange.width, height: endRange.height,
+      } = this.selectEnd.getBoundingClientRect());
+
+      if (endRange?.left < startRange?.left) {
+        const tLeft = startRange?.left;
+        startRange.left = endRange?.left;
+        endRange.left = tLeft;
+        const tWidth = startRange?.width;
+        startRange.width = endRange?.width;
+        endRange.width = tWidth;
+      }
+
+      if (endRange?.top < startRange?.top) {
+        const tTop = startRange?.top;
+        startRange.top = endRange?.top;
+        endRange.top = tTop;
+        const tHeight = startRange?.height;
+        startRange.height = endRange?.height;
+        endRange.height = tHeight;
       }
 
       const selectPosition = {
-        left: `${startPosition?.left - 6 || -100}px`,
-        top: `${startPosition?.top - 152.5 || -100}px`,
-        width: `${(endPosition?.left - startPosition?.left) + endPosition?.width + 3 || 0}px`,
-        height: `${(endPosition?.top - startPosition?.top) + endPosition?.height + 3 || 0 }px`,
+        left: `${startRange?.left - 6 || -100}px`,
+        top: `${startRange?.top - 152.5 || -100}px`,
+        width: `${(endRange?.left - startRange?.left) + endRange?.width + 3 || 0}px`,
+        height: `${(endRange?.top - startRange?.top) + endRange?.height + 3 || 0 }px`,
       };
-
       return selectPosition;
     },
     setExcludedCellsArray() { return [].concat(...Object.values(this.setExcludedCells)); },
