@@ -158,6 +158,18 @@ class TableDocument {
     return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
   }
 
+  copyAndPast(rangeCopy, rangePast) {
+    const {
+      parthSymbol: rangeColumn,
+      parthDigit: rangeRow,
+    } = getParseAtSymbolDigit(rangePast.split(':')[0]);
+    const copyArea = this.getAreaForRange(rangeCopy);
+    this.insertArea(
+      getColumnNumberForName(rangeColumn),
+      rangeRow,
+      copyArea,
+    );
+  }
   // calculateCellValueV1(cellName) {
   //   const FUNCTION_FORMULA = {
   //     SUM: () => 'calculateSUM',
@@ -382,7 +394,7 @@ class TableDocument {
         }
       }
       if (Object.keys(cellValueCurrent).includes('image')) {
-        console.log(this.images);
+        // console.log(this.images);
         const imageName = cellValueCurrent.image;
         const image = this.images[imageName];
         if (image) {
@@ -390,7 +402,7 @@ class TableDocument {
         }
       }
     });
-    console.log(images);
+    // console.log(images);
     const listNamedAreas = this.getListNamedAreasForRange(range);
     listNamedAreas.forEach((namedArea) => {
       namedAreas.push({

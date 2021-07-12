@@ -225,21 +225,45 @@ export default {
     },
     evtKeydownBody(evt) {
       evt.preventDefault();
+      this.hasNavigationKey(evt);
+      const setTemplateKey = ['Key', 'Numpad', 'Digit', 'Enter', 'Delete'];
+      if (!setTemplateKey.find((item) => evt.code.includes(item))) return;
+
+      if (this.hasCopy(evt)) this.$emit('range:copy', this.getSelectedRange());
+      if (this.hasPast(evt)) this.$emit('range:past', this.getSelectedRange());
+
+      if (this.hasCopy(evt) || this.hasPast(evt)) return;
+
+      if (evt.target.hasAttribute('data-name')) {
+        const cellName = evt.target.getAttribute('data-name');
+        this.$emit('keydown:cell', { evt, cellName });
+      }
+    },
+    hasNavigationKey(evt) {
       if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && evt.shiftKey === false)) this.moveCursorNext(evt.target);
       if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey === true)) this.moveCursorPrevious(evt.target);
       if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
       if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
-      if (evt.code.includes('Key')
-        || evt.code.includes('Numpad')
-        || evt.code.includes('Digit')
-        || evt.code === 'Enter'
-        || evt.code === 'Delete') {
-        if (evt.target.hasAttribute('data-name')) {
-          const cellName = evt.target.getAttribute('data-name');
-          this.$emit('keydown:cell', { evt, cellName });
-        }
-      }
     },
+    hasCopy(evt) {
+      if (evt.ctrlKey && evt.code === 'KeyC') return true;
+      return false;
+    },
+    hasPast(evt) {
+      if (evt.ctrlKey && evt.code === 'KeyV') return true;
+      return false;
+    },
+    getSelectedRange() {
+      let range = null;
+      if (this.selectStart.hasAttribute('data-name')) {
+        range = this.selectStart.getAttribute('data-name');
+      }
+      if (this.selectEnd.hasAttribute('data-name')) {
+        range += `:${this.selectEnd.getAttribute('data-name')}`;
+      }
+      return range;
+    },
+
     evtScrollList(evt) {
       this.selectStart = null;
       this.selectEnd = null;
@@ -371,40 +395,6 @@ export default {
       }
       return true;
     },
-
-    // moveCursorPreviousOld(target) {
-    //   const elementPreviousDOM = target.previousSibling;
-    //   console.log(elementPreviousDOM);
-    //   if (!elementPreviousDOM || elementPreviousDOM.closest('.column-title')) return false;
-    //   if (elementPreviousDOM.classList) {
-    //     this.focusCell(elementPreviousDOM);
-    //     return true;
-    //   }
-    //   const elementPrevious = target.previousElementSibling;
-    //   if (Object.keys(this.setExcludedCells).includes(this.currentCursorPosition.cellName)) {
-    //     this.focusCell(elementPrevious);
-    //     return true;
-    //   }
-    //   const cellName = target.getAttribute('data-name');
-    //   const { cellRow, cellColumn } = this.parseCellName(cellName);
-    //   const cellColumnNumber = this.columns.find((column) => column.name === cellColumn).value;
-    //   const cellColumnPrevious = this.columns.find((column) => column.value === cellColumnNumber - 1).name;
-    //   const cellNameJoin = Object.entries(this.setExcludedCells).find((item) => item[1].includes(`${cellColumnPrevious}${cellRow}`))[0];
-    //   this.focusCell(this.getCellNodeForName(cellNameJoin));
-    //   return true;
-    // },
-    // moveCursorUpOld(target) {
-    //   const rowPrevious = target.closest('.sheet-body__row').parentElement.previousElementSibling;
-    //   if (!rowPrevious && this.rowsFixed.length === 0) return;
-    //   if (target.closest('.sheet-body-fixed') && !rowPrevious) return;
-
-    //   const cellName = target.getAttribute('data-name');
-    //   const { cellColumn, cellRow } = this.parseCellName(cellName);
-    //   const cellPreviousName = `${cellColumn}${cellRow - 1}`;
-    //   const cellPreviousDOM = this.getCellNodeForName(cellPreviousName);
-    //   this.focusCell(cellPreviousDOM);
-    //   console.log(target);
-    // },
 
     moveCursorUp(target) {
       if (!target.parentElement.parentElement.previousElementSibling) {

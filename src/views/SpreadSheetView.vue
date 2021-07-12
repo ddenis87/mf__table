@@ -101,6 +101,8 @@
                     @click:cell="evtClickCell"
                     @dblclick:cell="evtDblClickCell"
                     @keydown:cell="evtKeydownCell"
+                    @range:copy="evtRangeCopy"
+                    @range:past="evtRangePast"
                     @scroll:body="scrollBody"></spread-sheet>
     </div>
     <v-snackbar content-class="snack"
@@ -111,7 +113,6 @@
 
 <script>
 import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
-// import SpreadSheetEdit from '@/components/SpreadSheetEdit/SpreadSheetEdit.vue';
 import SpreadSheetEditing from '@/components/SpreadSheetEditing/SpreadSheetEditing.vue';
 
 import DialogModal from '@/components/Dialogs/DialogModal.vue';
@@ -120,13 +121,10 @@ import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocument from '@/components/TableDocument/TableDocument';
 import TableDocumentApi from '@/components/TableDocument/TableDocumentApi';
 
-// import setting from '@/assets/json/crossSetting';
-
 export default {
   name: 'SpreadSheetView',
   components: {
     SpreadSheet,
-    // SpreadSheetEdit,
     SpreadSheetEditing,
     DialogModal,
   },
@@ -155,12 +153,20 @@ export default {
       isSnackTimer: null,
       isSnackMessage: false,
       snackMessage: '',
+
+      rangeCopy: null,
     };
   },
   mounted() {
     // console.log(this.tableDocument);
   },
   methods: {
+    evtRangeCopy(range) {
+      this.rangeCopy = range;
+    },
+    evtRangePast(rangePast) {
+      this.tableDocument.copyAndPast(this.rangeCopy, rangePast);
+    },
     saveDocument() {
       const JSONFormat = true;
       apiSpreadSheet.dowloadJSONFile(JSON.stringify(this.tableDocument.getDocument()), JSONFormat);
