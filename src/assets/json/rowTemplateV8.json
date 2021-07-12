@@ -3,30 +3,34 @@
   "editAccess":"closedExceptOpen",
   "cells":{
     "a5":{
-      "value":"<svg class='no-print' width='18' height='18'><path id='svg_1' fill='none' d='m0,0l24,0l0,24l-24,0l0,-24z'/><path fill='#ff0000' stroke='null' id='svg_2' d='m14.5,4.60786l-1.10786,-1.10786l-4.39214,4.39214l-4.39214,-4.39214l-1.10786,1.10786l4.39214,4.39214l-4.39214,4.39214l1.10786,1.10786l4.39214,-4.39214l4.39214,4.39214l1.10786,-1.10786l-4.39214,-4.39214l4.39214,-4.39214z'/></svg>",
+      "value":"",
       "style":"a5",
       "action":"deleteRowSection1",
       "disabled":true,
-      "noSelect":true
+      "noSelect":true,
+      "image":"delete"
     },
     "a6":{
-      "value":"<svg class='no-print' width='18' height='18'><path id='svg_1' fill='none' d='m0,0l24,0l0,24l-24,0l0,-24z'/><path fill='#ff0000' stroke='null' id='svg_2' d='m14.5,4.60786l-1.10786,-1.10786l-4.39214,4.39214l-4.39214,-4.39214l-1.10786,1.10786l4.39214,4.39214l-4.39214,4.39214l1.10786,1.10786l4.39214,-4.39214l4.39214,4.39214l1.10786,-1.10786l-4.39214,-4.39214l4.39214,-4.39214z'/></svg>",
+      "value":"",
       "style":"a6",
       "action":"deleteRowSection2",
       "disabled":true,
-      "noSelect":true
+      "noSelect":true,
+      "image":"delete"
     },
     "a7":{
-      "value":"<svg class='no-print' width='18' height='18'><path id='svg_1' fill='none' d='m0,0l24,0l0,24l-24,0l0,-24z'/><path fill='#ff0000' stroke='null' id='svg_2' d='m14.5,4.60786l-1.10786,-1.10786l-4.39214,4.39214l-4.39214,-4.39214l-1.10786,1.10786l4.39214,4.39214l-4.39214,4.39214l1.10786,1.10786l4.39214,-4.39214l4.39214,4.39214l1.10786,-1.10786l-4.39214,-4.39214l4.39214,-4.39214z'/></svg>",
+      "value":"",
       "style":"a7",
       "action":"deleteRowSection3",
       "disabled":true,
-      "noSelect":true
+      "noSelect":true,
+      "image":"delete"
     },
     "a8":{
       "style":"a8 no-print",
       "action":"addRowSection3",
-      "value":"<div style='display: flex; justify-content: center; align-items: center; color: #1E88E5; font-size: 9pt; text-decoration: underline; overflow: hidden''><svg width='18' height='18'><path fill='#00bf00' stroke='null' id='svg_1' d='m14.66669,9.80953l-4.85716,0l0,4.85716l-1.61905,0l0,-4.85716l-4.85716,0l0,-1.61905l4.85716,0l0,-4.85716l1.61905,0l0,4.85716l4.85716,0l0,1.61905z'/></svg></div>"
+      "value":"",
+      "image":"adding"
     },
     "a9":{"style":"a8"},
     "a10":{"style":"a8"},
@@ -40,7 +44,7 @@
     "b7":{"style":"b7"},
     "b8":{
       "style":"b8 no-print",
-      "value":"<div style='display: flex; justify-content: flex-end; align-items: top; color: #1E88E5; font-size: 11pt; text-decoration: underline; overflow: hidden''><div>Добавить строку</div></div>",
+      "value":"Добавить строку",
       "colspan":3,
       "action":"addRowSection3",
       "disabled":false,
@@ -175,7 +179,7 @@
     {"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","whiteSpace":"unset","alignItems":"center","textAlign":"left","borderRight":"1px solid rgba(0%, 0%, 0%)","wordWrap":"break-word","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start"},"name":"d7"},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","fontWeight":"bold"},"name":"e7"},
     {"name":"f7","list":{"backgroundColor":"rgba(0, 255, 0, .1)","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},{"name":"g7","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},{"name":"h7","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},
     {"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start","cursor":"pointer"},"name":"i7"},
-    {"list":{"fontSize":"13pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"0px solid rgba(0%, 0%, 0%)","fontWeight":"bold","alignItems":"center","cursor":"pointer"},"name":"b8"},
+    {"list":{"fontSize":"11pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"0px solid rgba(0%, 0%, 0%)","fontWeight":"bold","alignItems":"center","cursor":"pointer","color": "#1E88E5","text-decoration":"underline"},"name":"b8"},
     {"list":{"fontSize":"11pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)","fontWeight":"bold","alignItems":"center"},"name":"b9"},
     {"name":"c8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"0px solid rgba(0%, 0%, 0%)"}},
     {"name":"d8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"1px solid rgba(0%, 0%, 0%)"}},
@@ -273,5 +277,9 @@
       "template": "default",
       "script": "(cellName) => { this.addArea(cellName, 'string3', 'vertical'); }"
     }
+  },
+  "images": {
+    "delete": "<svg class='no-print' width='18' height='18'><path id='svg_1' fill='none' d='m0,0l24,0l0,24l-24,0l0,-24z'/><path fill='#ff0000' stroke='null' id='svg_2' d='m14.5,4.60786l-1.10786,-1.10786l-4.39214,4.39214l-4.39214,-4.39214l-1.10786,1.10786l4.39214,4.39214l-4.39214,4.39214l1.10786,1.10786l4.39214,-4.39214l4.39214,4.39214l1.10786,-1.10786l-4.39214,-4.39214l4.39214,-4.39214z'/></svg>",
+    "adding": "<svg width='18' height='18'><path fill='#00bf00' stroke='null' id='svg_1' d='m14.66669,9.80953l-4.85716,0l0,4.85716l-1.61905,0l0,-4.85716l-4.85716,0l0,-1.61905l4.85716,0l0,-4.85716l1.61905,0l0,4.85716l4.85716,0l0,1.61905z'/></svg>"
   }
 }

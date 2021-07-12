@@ -65,6 +65,7 @@ export default {
     columns: { type: Array },
     cells: { type: Object },
     representations: { type: Map, default() { return new Map(); } },
+    images: { type: Object, default() { return {}; } },
     templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
     maxLevelGroupRow: { type: Number, default: 0 },
@@ -79,12 +80,7 @@ export default {
       sheetBodyItem: SpreadSheetBodyItem,
       sheetBodyGeometry: null,
       currentSelectedCellName: null,
-      // currentSelectedCell: null,
-      // currentCursorPosition: {
-      //   cellName: null,
-      //   cellRow: null,
-      //   cellColumn: null,
-      // },
+
       selectStart: null,
       selectEnd: null,
     };
@@ -136,6 +132,7 @@ export default {
         columns: this.columns,
         cells: this.cells,
         representations: this.representations,
+        images: this.images,
         templateColumnWidth: this.templateColumnWidth,
         setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
         maxLevelGroupRow: this.maxLevelGroupRow,

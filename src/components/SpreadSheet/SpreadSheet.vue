@@ -35,6 +35,7 @@
                            :columns="tableColumns"
                            :cells="tableCells"
                            :representations="representations"
+                           :images="images"
                            :template-column-width="templateColumnWidth"
                            :max-level-group-row="maxLevelGroupRow"
                            :max-level-group-column="maxLevelGroupColumn"
@@ -81,7 +82,7 @@ export default {
     cells: { type: Object, default() { return {}; } },
     representations: { type: Map, default() { return new Map(); } },
     styles: { type: Array, default() { return []; } },
-
+    images: { type: Object, default() { return {}; } },
     cellWidth: { type: Number, default: CELL_WIDTH },
     cellHeight: { type: Number, default: CELL_HEIGHT },
     isPrintMode: { type: Boolean, default: false },

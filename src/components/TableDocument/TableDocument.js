@@ -84,6 +84,7 @@ class TableDocument {
     cells = {},
     styles = [],
     scripts = {},
+    images = {},
     namedAreas = [],
     cellWidth = CELL_WIDTH,
     cellHeight = CELL_HEIGHT,
@@ -102,6 +103,7 @@ class TableDocument {
         cells: this.cells = {},
         styles: this.styles = [],
         scripts: this.scripts = {},
+        images: this.images = {},
         namedAreas: this.namedAreas = [],
         cellWidth: this.cellWidth = CELL_WIDTH,
         cellHeight: this.cellHeight = CELL_HEIGHT,
@@ -118,6 +120,7 @@ class TableDocument {
     this.cells = cells;
     this.styles = styles;
     this.scripts = scripts;
+    this.images = images;
     this.namedAreas = namedAreas;
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
@@ -324,13 +327,14 @@ class TableDocument {
 
   getAreaCopy() {
     const {
-      rows, columns, cells, styles, scripts, namedAreas,
+      rows, columns, cells, styles, scripts, images, namedAreas,
     } = JSON.parse(JSON.stringify({
       rows: this.rows,
       columns: this.columns,
       cells: this.cells,
       styles: this.styles,
       scripts: this.scripts,
+      images: this.images,
       namedAreas: this.namedAreas,
     }));
     // const BaseClass = Object.getPrototypeOf(this);
@@ -343,6 +347,7 @@ class TableDocument {
       cells,
       styles,
       scripts,
+      images,
       namedAreas,
     });
   }
@@ -354,6 +359,7 @@ class TableDocument {
     const styles = [];
     const namedAreas = [];
     const scripts = {};
+    const images = {};
     const cellsInRange = this.getCellsInRange(range);
     cellsInRange.forEach((cell) => {
       const [cellNameCurrent, cellValueCurrent] = cell;
@@ -375,7 +381,16 @@ class TableDocument {
           scripts[actionName] = this.scripts[actionName];
         }
       }
+      if (Object.keys(cellValueCurrent).includes('image')) {
+        console.log(this.images);
+        const imageName = cellValueCurrent.image;
+        const image = this.images[imageName];
+        if (image) {
+          images[imageName] = this.images[imageName];
+        }
+      }
     });
+    console.log(images);
     const listNamedAreas = this.getListNamedAreasForRange(range);
     listNamedAreas.forEach((namedArea) => {
       namedAreas.push({
@@ -393,6 +408,7 @@ class TableDocument {
       cells,
       styles,
       scripts,
+      images,
       namedAreas,
     });
   }
@@ -755,6 +771,7 @@ class TableDocument {
       cells: insertCells,
       styles: insertStyles,
       scripts: areaScripts,
+      images: areaImages,
       namedAreas: insertNamedAreas,
     } = area;
 
@@ -813,6 +830,7 @@ class TableDocument {
     this.columns = { ...this.columns, ...columns };
     this.cells = { ...this.cells, ...cells };
     this.scripts = { ...this.scripts, ...areaScripts };
+    this.images = { ...this.images, ...areaImages };
     this.namedAreas = [...this.namedAreas, ...namedAreas];
     this.rowCount = this.getLastRow();
     this.columnCount = this.getLastColumn();

@@ -40,7 +40,8 @@
           ]"
           :data-name="`${column.name}${source.name}`"
           :tabindex="columnIndex">
-        <div class="content" v-html="formattedData(column.name, source)"></div>
+        <div v-if="hasImg(column.name)" class="content" v-html="getImg(column.name)"></div>
+        <div v-else class="content" v-text="formattedData(column.name, source)"></div>
       </div>
     </template>
   </div>
@@ -66,6 +67,7 @@ export default {
     columns: Array,
     cells: { type: Object, default() { return {}; } },
     representations: { type: Map, default() { return new Map(); } },
+    images: { type: Object, default() { return {}; } },
     setExcludedCell: { type: Array },
     maxLevelGroupRow: { type: Number, default: 0 },
     templateColumnWidth: { type: String, default: '' },
@@ -82,6 +84,17 @@ export default {
   computed: {
   },
   methods: {
+    hasImg(columnName) {
+      const cellName = `${columnName}${this.source.value}`;
+      if (!this.cells[cellName]) return false;
+      if (!Object.keys(this.cells[cellName]).includes('image')) return false;
+      return true;
+    },
+    getImg(columnName) {
+      const cellName = `${columnName}${this.source.value}`;
+      // console.log(this.images);
+      return this.images[this.cells[cellName].image];
+    },
     formattedData(columnName) {
       if (!this.cells[`${columnName}${this.source.value}`]) return '';
       const formattedOption = {
