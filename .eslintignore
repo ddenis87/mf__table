@@ -9,7 +9,7 @@
 /src/components/DataTableLazy
 /src/components/DataTable
 /src/components/DataHistory
-/src/components/DataFilter
+/src/components/DataFilter/DataFilterExtended
 /src/components/DataTableControls
 /src/components/ZDELDataTableControl
 /src/componentsInteraction

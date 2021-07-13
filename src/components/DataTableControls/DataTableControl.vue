@@ -29,7 +29,7 @@
                       width="600"
                       @close-dialog="isShowDialogFilter = false">
       <component :is="importComponentFilter"
-                 :table-name="tableName"
+                 :source-name="tableName"
                  :guid="guid"
                  :is-open="isShowDialogFilter"
                  @close-dialog="isShowDialogFilter = false"

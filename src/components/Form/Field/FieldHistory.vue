@@ -9,10 +9,6 @@
                   @click:append="evtOpenDialog"
                   @keydown.stop.enter="evtKeydownControl"
                   @blur="evtBlur">
-      <!-- <div class="el-field__anchor" tabindex="-1"></div> -->
-      <!-- <template v-slot:append>
-        <el-btn-icon-small icon="mdi-history" @click="evtOpenDialog">Открыть историю изменений</el-btn-icon-small>
-      </template> -->
       <template v-slot:progress>
         <v-progress-linear v-if="isLoadingData"
                            indeterminate

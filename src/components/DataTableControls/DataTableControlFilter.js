@@ -20,7 +20,8 @@ export const DataTableControlFilter = {
     },
     importComponentFilter() {
       if (this.guid)
-        return () => import('@/components/DataFilter/DataFilterExtended/DataFilterExtended.vue');
+        // return () => import('@/components/DataFilter/DataFilterExtended/DataFilterExtended.vue');
+        return () => import('@/components/DataFilter/FilterExtended/FilterExtended.vue');
       return null;
     },
   },

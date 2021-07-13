@@ -41,6 +41,11 @@ const DELETE_MODE = {
   ROW: 'row',
 };
 
+const INSERT_MODE = {
+  FULL: 'full',
+  DATA_ONLY: 'dataOnly',
+};
+
 const RETURN_FORMAT = {
   OBJECT: 'object',
   ENTRIES: 'entries',
@@ -168,6 +173,8 @@ class TableDocument {
       getColumnNumberForName(rangeColumn),
       rangeRow,
       copyArea,
+      undefined,
+      INSERT_MODE.DATA_ONLY,
     );
   }
   // calculateCellValueV1(cellName) {
@@ -771,7 +778,7 @@ class TableDocument {
     return rezult;
   }
 
-  insertArea(numberColumn, numberRow, area, shiftType = null) {
+  insertArea(numberColumn, numberRow, area, shiftType = null, insertMode = INSERT_MODE.FULL) {
     // console.log(area);
     const rows = {};
     const columns = {};
@@ -815,9 +822,14 @@ class TableDocument {
       const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(currentCellName);
       const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
 
+      if (insertMode === INSERT_MODE.DATA_ONLY) {
+        if (!this.cells[shiftCellName]) this.cells[shiftCellName] = {};
+        this.cells[shiftCellName].value = insertCells[currentCellName].value;
+        return; // next loop
+      }
       rows[shiftRow] = insertRows[currentRow];
       columns[shiftColumn] = insertColumns[currentColumn];
-      cells[shiftCellName] = insertCells[currentCellName];
+      cells[shiftCellName] = insertCells[currentCellName] || {};
     });
 
     insertStyles.forEach((insertStyle) => {
