@@ -29,6 +29,10 @@
 |||range: String ||Array: [rangeFrom, rangeTo]
 ||getRangeType
 |||range: String||RANGE_TYPE
+||moveCell
+|||cellName: String <br>from: String <br>rangeLimit: String
+||moveRange
+|||cellName: String <br>from: String <br>rangeLimit: String
 
 #### [Tests](https://git.digitatl.ru/DDenis87/mf__table/-/blob/main/src/structures/__tests__/TableDocumentHelpers.spec.js)
 

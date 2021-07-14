@@ -26,12 +26,13 @@
            :style="shiftTitle"><div class="content">{{ source.value }}</div></div>
     </template>
     <template v-for="(column, columnIndex) in columns">
+      
       <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
           :key="`body-${source.value}-${column.value}`"
           class="column column-body"
           :class="[
-            (cells[`${column.name}${source.value}`])
-              ? cells[`${column.name}${source.value}`].style : '',
+            (hasCell(column.name, source.value))
+              ? getCellStyle(column.name, source.value) : '',
             (!isGrid) ? 'column-body_grid-off' : '',
           ]"
           :style="[
@@ -40,8 +41,17 @@
           ]"
           :data-name="`${column.name}${source.name}`"
           :tabindex="columnIndex">
-        <div v-if="hasImg(column.name)" class="content" v-html="getImg(column.name)"></div>
-        <div v-else class="content" v-text="formattedData(column.name, source)"></div>
+            <div v-if="hasImg(column.name)" class="content" v-html="getImg(column.name)"></div>
+            <div v-else
+                 class="content">
+              {{ formattedData(column.name) }}
+              <v-tooltip right >
+                <template v-slot:activator="{ on, attrs }">
+                  <div v-if="hasCellInvalid(column.name)" class="content_invalid" v-on="on" v-bind="attrs"></div>
+                </template>
+                <div class="tooltip-text_invalid">{{ 'Error' }}</div>
+              </v-tooltip>
+            </div>
       </div>
     </template>
   </div>
@@ -109,6 +119,27 @@ export default {
       if (cellFormatString) formattedOption.formatString = cellFormatString;
       return formattedData(cellValue, formattedOption);
     },
+    hasCell(column) {
+      const cellName = `${column}${this.source.value}`;
+      return (this.cells[cellName]) || false;
+    },
+    hasCellInvalid(column) {
+      const cellName = `${column}${this.source.value}`;
+      if (!this.hasCell(column, this.source.value)) return false;
+      if (!Object.keys(this.cells[cellName]).includes('invalid')) return false;
+      console.log(cellName);
+      return true;
+    },
+    getCellInvalidMessage(column) {
+      const cellName = `${column}${this.source.value}`;
+      return this.cells[cellName]?.invalid || 'Unknown error';
+    },
+
+    getCellStyle(column) {
+      const cellName = `${column}${this.source.value}`;
+      return this.cells[cellName].style || '';
+    },
+
     getCellType(cell, columnName) {
       const cellType = cell.type
         || this.source.type
@@ -258,7 +289,6 @@ export default {
       outline: none;
       cursor: cell;
       background-color: $backgroundColorbody;
-
       .content {
         display: flex;
         justify-content: inherit;
@@ -268,6 +298,21 @@ export default {
         padding: 0px 3px;
         overflow: hidden;
         user-select: none;
+        &_invalid {
+          content: '';
+          position: absolute;
+          top: 0px;
+          right: 0px;
+          width: 18px;
+          height: 18px;
+          // background-color: #E53935;
+          background: linear-gradient(45deg, rgba(0,0,0,0) 70%,#E53935 50% );
+          // cursor: default;
+          z-index: 81;
+        }
+        &-tooltip_invalid {
+          background-color: grey;
+        }
       }
       &::after {
         content: '';

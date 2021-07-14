@@ -78,6 +78,15 @@ html, body {
     color: rgba(0, 0, 0, .87);
     background-color: rgba(255, 255, 255, 1);
   }
+  &_invalid {
+    width: 100%;
+    height: 100%;
+    border: thin solid rgba(128, 128, 128, .6);
+    border-left: 5px solid #E53935;
+    border-radius: 5px;
+    padding: 2px 5px;
+    background-color: rgba(255, 255, 255, 1);
+  }
 }
 .snack {
     display: flex;

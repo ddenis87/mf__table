@@ -126,18 +126,18 @@
     "h4":{"value":"5","style":"h4"},
     "h5":{"style":"h5","type":"number","parameter":"st1Volume23"},
     "h6":{"style":"h6","type":"number","parameter":"st2Volume23"},
-    "h7":{"style":"h7","type":"number","parameter":"st3Volume23"},
-    "h8":{"style":"h8","type":"date","value":"2021-07-07"},
+    "h7":{"style":"h7","type":"number","formatString":"minFD=2","parameter":"st3Volume23"},
+    "h8":{"style":"h8","type":"date","value":"hello","isEditable":true},
     "h9":{
       "style":"h9",
-      "type":"number",
+      "type":"string",
       "formatString":"minFD=2",
       "formula":"$h5 + ($h6+$h7) + $h8 + $h9+($h10 + $h11 * $h12) + $h13",
       "isEditable":false
     },
     "h10":{
       "style":"h9",
-      "type":"number",
+      "type":"string",
       "formatString":"minFD=2",
       "formula":"$f15 + $g15 + $h15",
       "isEditable":false

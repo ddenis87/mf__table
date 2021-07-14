@@ -40,6 +40,7 @@ describe('FormattedDataDisplay', () => {
     const type = { valueType: 'date' };
     it('Value 1   - 12.04.2021 -> 12.04.2021', () => expect(formattedDataDisplay('12.04.2021', { ...type })).toBe('12.04.2021'));
     it('Value 2   - 2021-04-12 -> 12.04.2021', () => expect(formattedDataDisplay('2021-04-12', { ...type })).toBe('12.04.2021'));
+    it('Value 3   - hello      -> hello', () => expect(formattedDataDisplay('hello', { ...type })).toBe('hello'));
     describe('Format string:', () => {
       const formatString_1 = { formatString: 'd=2-digit$m=short$y=numeric' };
       const formatString_2 = { formatString: 'd=2-digit$m=long' };

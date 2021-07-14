@@ -52,6 +52,7 @@ function formattedDataDisplay(
     },
     date: () => {
       if (!value) return '';
+      if (new Date(value).toDateString() === 'Invalid Date') return value;
       const prepareValue = value.split('.').reverse().join('-');
       const formattedOption = {};
       const formattedOptionKey = {

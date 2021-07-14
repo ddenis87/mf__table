@@ -65,6 +65,24 @@ function getObjectOfJSON(data) {
   return (typeof data === 'string') ? JSON.parse(data) : data;
 }
 
+function valueValidateType(value, type) {
+  if (!value && typeof type !== 'boolean') return true;
+  const validate = {
+    string: (v) => (typeof v === 'string'),
+    number: (v) => (typeof v === 'number'),
+    integer: (v) => (typeof v === 'number'),
+    float: (v) => (typeof v === 'number'),
+    boolean: (v) => (typeof v === 'boolean'),
+    date: (v) => (new Date(v).toDateString() !== 'Invalid Date'),
+    datetime: (v) => (new Date(v).toDateString() !== 'Invalid Date'),
+    field: () => true,
+    choice: () => true,
+  };
+  return validate[type](value);
+}
+// function hasString(value) {
+
+// }
 // function getOperandsSet(formula) {
 //   return formula.replace(REG_OPERATORS, '').split('$').splice(1);
 // }
@@ -316,6 +334,7 @@ class TableDocument {
   editingCell(cellName, cellValue) { // проверять существует строка/столбец
     // получать максимальный из имеющихся, сравнивать
     // если пусстое значение и больше ничего нет, то удалять ячейку из набора ???
+    this.valueValidate(cellValue, cellName);
     let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
     cellValues = { ...cellValues, ...{ value: cellValue || '' } };
     if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
@@ -817,7 +836,7 @@ class TableDocument {
     }
 
     Object.entries(insertCells).forEach((cell) => {
-      const [currentCellName] = cell;
+      const [currentCellName, currentCellValue] = cell;
       const shiftCellName = moveCell(currentCellName, `${getColumnNameForNumber(numberColumn)}${numberRow}`);
       const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(currentCellName);
       const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
@@ -827,9 +846,15 @@ class TableDocument {
         this.cells[shiftCellName].value = insertCells[currentCellName].value;
         return; // next loop
       }
+
+      area.valueValidate(currentCellValue.value || '', currentCellName);
+      // this.valueValidate(currentCellValue.value || '', area.getCellType(currentCellName));
+
       rows[shiftRow] = insertRows[currentRow];
       columns[shiftColumn] = insertColumns[currentColumn];
       cells[shiftCellName] = insertCells[currentCellName] || {};
+      const validateType = area.valueValidate(currentCellValue.value || '', currentCellName);
+      if (validateType !== true) cells[shiftCellName].invalid = validateType;
     });
 
     insertStyles.forEach((insertStyle) => {
@@ -930,6 +955,17 @@ class TableDocument {
   updateCellValue(cellName, cellValue) {
     this.cells[cellName].value = cellValue;
     this.cells = { ...this.cells, ...{ [cellName]: this.cells[cellName] } };
+  }
+
+  valueValidate(value, cellName) {
+    const cellType = this.getCellTypeClean(cellName);
+    const validateType = valueValidateType(value, cellType);
+    // console.log(cellName, cellType, value, validateType || 'Error type');
+    return validateType || 'Значение не соответствует типу ячейки';
+  }
+
+  getCellTypeClean(cellName) {
+    return this.getCellType(cellName).split('.')[0];
   }
 }
 
