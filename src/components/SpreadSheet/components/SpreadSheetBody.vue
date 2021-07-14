@@ -7,6 +7,8 @@
        @mousedown="evtMousedown"
        @mouseup="evtMouseup"
        @mousemove="evtMousemove">
+       <input type="text" ref="copyInput" v-model="copyText" />
+       <input type="text" ref="pasteInput" contenteditable="true" v-model="pasteText" />
     <div class="select-area" :style="rangeSelect"></div>
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed"
@@ -83,6 +85,9 @@ export default {
 
       selectStart: null,
       selectEnd: null,
+
+      copyText: null,
+      pasteText: null,
     };
   },
   computed: {
@@ -224,16 +229,16 @@ export default {
       // this.focusCell(this.getCellNodeForName(cellName));
     },
     evtKeydownBody(evt) {
-      evt.preventDefault();
       this.hasNavigationKey(evt);
       const setTemplateKey = ['Key', 'Numpad', 'Digit', 'Enter', 'Delete'];
       if (!setTemplateKey.find((item) => evt.code.includes(item))) return;
 
-      if (this.hasCopy(evt)) this.$emit('range:copy', this.getSelectedRange());
-      if (this.hasPast(evt)) this.$emit('range:past', this.getSelectedRange());
+      // if (this.hasCopy(evt)) this.$emit('range:copy', this.getSelectedRange());
+      // if (this.hasPast(evt)) this.$emit('range:past', this.getSelectedRange());
 
       if (this.hasCopy(evt) || this.hasPast(evt)) return;
-
+      evt.preventDefault();
+      console.log(evt.target.hasAttribute('data-name'));
       if (evt.target.hasAttribute('data-name')) {
         const cellName = evt.target.getAttribute('data-name');
         this.$emit('keydown:cell', { evt, cellName });
@@ -246,11 +251,47 @@ export default {
       if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
     },
     hasCopy(evt) {
-      if (evt.ctrlKey && evt.code === 'KeyC') return true;
+      if (evt.ctrlKey && evt.code === 'KeyC') {
+        const cellName = evt.target.getAttribute('data-name');
+        const cellValue = this.cells[cellName].value;
+        this.copyText = cellValue;
+        this.$refs.copyInput.select();
+        this.$nextTick().then(() => {
+          document.execCommand('copy');
+        });
+        // navigator.clipboard.writeText(cellValue);
+        // console.log(this.$refs.copyInput);
+        // this.copyText = cellValue;
+        // this.$nextTick();
+        // // this.$refs.copyInput.focus();
+        // this.$refs.copyInput.select();
+        // // this.$refs.copyInput.setSelectionRange(1, 10);
+        // document.execCommand('copy');
+        return true;
+      }
       return false;
     },
     hasPast(evt) {
-      if (evt.ctrlKey && evt.code === 'KeyV') return true;
+      // console.log(document.execCommand('paste'));
+      if (evt.ctrlKey && evt.code === 'KeyV') {
+        this.$refs.pasteInput.focus();
+        this.$nextTick().then(() => {
+          console.log('paste');
+          document.execCommand('paste');
+        });
+        // navigator.clipboard.readText()
+        //   .then((clipText) => {
+        //     this.pasteText = clipText;
+        //   });
+        // const cellName = evt.target.getAttribute('data-name');
+        // this.$refs.pasteInput.focus();
+        // this.$refs.pasteInput.select();
+        // this.$nextTick().then(() => {
+        //   document.execCommand('paste');
+        // });
+        // setTimeout(() => document.execCommand('paste'), 300);
+        return true;
+      }
       return false;
     },
     getSelectedRange() {

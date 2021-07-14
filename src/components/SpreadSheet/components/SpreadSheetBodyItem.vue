@@ -26,7 +26,7 @@
            :style="shiftTitle"><div class="content">{{ source.value }}</div></div>
     </template>
     <template v-for="(column, columnIndex) in columns">
-      
+
       <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
           :key="`body-${source.value}-${column.value}`"
           class="column column-body"
@@ -43,15 +43,8 @@
           :tabindex="columnIndex">
             <div v-if="hasImg(column.name)" class="content" v-html="getImg(column.name)"></div>
             <div v-else
-                 class="content">
-              {{ formattedData(column.name) }}
-              <v-tooltip right >
-                <template v-slot:activator="{ on, attrs }">
-                  <div v-if="hasCellInvalid(column.name)" class="content_invalid" v-on="on" v-bind="attrs"></div>
-                </template>
-                <div class="tooltip-text_invalid">{{ 'Error' }}</div>
-              </v-tooltip>
-            </div>
+                 class="content"
+                 v-html="formattedData(column.name)"></div>
       </div>
     </template>
   </div>
@@ -106,11 +99,13 @@ export default {
       return this.images[this.cells[cellName].image];
     },
     formattedData(columnName) {
-      if (!this.cells[`${columnName}${this.source.value}`]) return '';
+      // const cellName = `${columnName}${this.source.value}`;
+      const cell = this.hasCell(columnName);
+      if (!cell) return '';
       const formattedOption = {
         representations: this.representations,
       };
-      const cell = this.cells[`${columnName}${this.source.value}`];
+      // const cell = this.cells[`${columnName}${this.source.value}`];
       const cellValue = cell.value;
       const cellType = this.getCellType(cell, columnName);
       // if (cellType.includes('field')) return cell.representation;
@@ -123,17 +118,17 @@ export default {
       const cellName = `${column}${this.source.value}`;
       return (this.cells[cellName]) || false;
     },
-    hasCellInvalid(column) {
-      const cellName = `${column}${this.source.value}`;
-      if (!this.hasCell(column, this.source.value)) return false;
-      if (!Object.keys(this.cells[cellName]).includes('invalid')) return false;
-      console.log(cellName);
-      return true;
-    },
-    getCellInvalidMessage(column) {
-      const cellName = `${column}${this.source.value}`;
-      return this.cells[cellName]?.invalid || 'Unknown error';
-    },
+    // hasCellInvalid(column) {
+    //   const cellName = `${column}${this.source.value}`;
+    //   if (!this.hasCell(column, this.source.value)) return false;
+    //   if (!Object.keys(this.cells[cellName]).includes('invalid')) return false;
+    //   console.log(cellName);
+    //   return true;
+    // },
+    // getCellInvalidMessage(column) {
+    //   const cellName = `${column}${this.source.value}`;
+    //   return this.cells[cellName]?.invalid || 'Unknown error';
+    // },
 
     getCellStyle(column) {
       const cellName = `${column}${this.source.value}`;

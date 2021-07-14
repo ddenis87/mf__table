@@ -41,10 +41,10 @@ const DELETE_MODE = {
   ROW: 'row',
 };
 
-const INSERT_MODE = {
-  FULL: 'full',
-  DATA_ONLY: 'dataOnly',
-};
+// const INSERT_MODE = {
+//   FULL: 'full',
+//   DATA_ONLY: 'dataOnly',
+// };
 
 const RETURN_FORMAT = {
   OBJECT: 'object',
@@ -181,20 +181,20 @@ class TableDocument {
     return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
   }
 
-  copyAndPast(rangeCopy, rangePast) {
-    const {
-      parthSymbol: rangeColumn,
-      parthDigit: rangeRow,
-    } = getParseAtSymbolDigit(rangePast.split(':')[0]);
-    const copyArea = this.getAreaForRange(rangeCopy);
-    this.insertArea(
-      getColumnNumberForName(rangeColumn),
-      rangeRow,
-      copyArea,
-      undefined,
-      INSERT_MODE.DATA_ONLY,
-    );
-  }
+  // copyAndPast(rangeCopy, rangePast) {
+  //   const {
+  //     parthSymbol: rangeColumn,
+  //     parthDigit: rangeRow,
+  //   } = getParseAtSymbolDigit(rangePast.split(':')[0]);
+  //   const copyArea = this.getAreaForRange(rangeCopy);
+  //   this.insertArea(
+  //     getColumnNumberForName(rangeColumn),
+  //     rangeRow,
+  //     copyArea,
+  //     undefined,
+  //     INSERT_MODE.DATA_ONLY,
+  //   );
+  // }
   // calculateCellValueV1(cellName) {
   //   const FUNCTION_FORMULA = {
   //     SUM: () => 'calculateSUM',
@@ -797,7 +797,7 @@ class TableDocument {
     return rezult;
   }
 
-  insertArea(numberColumn, numberRow, area, shiftType = null, insertMode = INSERT_MODE.FULL) {
+  insertArea(numberColumn, numberRow, area, shiftType = null) { // , insertMode = INSERT_MODE.FULL) {
     // console.log(area);
     const rows = {};
     const columns = {};
@@ -836,25 +836,25 @@ class TableDocument {
     }
 
     Object.entries(insertCells).forEach((cell) => {
-      const [currentCellName, currentCellValue] = cell;
+      const [currentCellName] = cell;
       const shiftCellName = moveCell(currentCellName, `${getColumnNameForNumber(numberColumn)}${numberRow}`);
       const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(currentCellName);
       const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
 
-      if (insertMode === INSERT_MODE.DATA_ONLY) {
-        if (!this.cells[shiftCellName]) this.cells[shiftCellName] = {};
-        this.cells[shiftCellName].value = insertCells[currentCellName].value;
-        return; // next loop
-      }
+      // if (insertMode === INSERT_MODE.DATA_ONLY) {
+      //   if (!this.cells[shiftCellName]) this.cells[shiftCellName] = {};
+      //   this.cells[shiftCellName].value = insertCells[currentCellName].value;
+      //   return; // next loop
+      // }
 
-      area.valueValidate(currentCellValue.value || '', currentCellName);
+      // area.valueValidate(currentCellValue.value || '', currentCellName);
       // this.valueValidate(currentCellValue.value || '', area.getCellType(currentCellName));
 
       rows[shiftRow] = insertRows[currentRow];
       columns[shiftColumn] = insertColumns[currentColumn];
       cells[shiftCellName] = insertCells[currentCellName] || {};
-      const validateType = area.valueValidate(currentCellValue.value || '', currentCellName);
-      if (validateType !== true) cells[shiftCellName].invalid = validateType;
+      // const validateType = area.valueValidate(currentCellValue.value || '', currentCellName);
+      // if (validateType !== true) cells[shiftCellName].invalid = validateType;
     });
 
     insertStyles.forEach((insertStyle) => {
