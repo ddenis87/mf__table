@@ -65,7 +65,7 @@ function getObjectOfJSON(data) {
   return (typeof data === 'string') ? JSON.parse(data) : data;
 }
 
-function valueValidateType(value, type) {
+function valueValidateType(value = '', type = 'string') {
   if (!value && typeof type !== 'boolean') return true;
   const validate = {
     string: (v) => (typeof v === 'string'),
@@ -80,6 +80,13 @@ function valueValidateType(value, type) {
   };
   return validate[type](value);
 }
+
+function valueValidate(cellName, cellValue) {
+  const cellType = cellValue?.type || 'string';
+  const validateType = valueValidateType(cellValue.value, cellType.split('.')[0]);
+  return validateType || 'Значение не соответствует типу ячейки';
+}
+
 // function hasString(value) {
 
 // }
@@ -487,16 +494,12 @@ class TableDocument {
   }
 
   getCell(cellName) {
-    let cell = {};
-    if (Object.keys(this.cells).includes(cellName)) {
-      cell = this.cells[cellName];
-    }
-    return cell;
+    return this.cells[cellName] || {};
   }
 
-  getCellObject(cellName) {
-    return this.cells[cellName] || undefined;
-  }
+  // getCellObject(cellName) {
+  //   return this.cells[cellName] || undefined;
+  // }
 
   getCellParameter(cellName, cellParameter) {
     if (!this.cells[cellName]) return null;
@@ -512,9 +515,13 @@ class TableDocument {
   getCellType(cellName) {
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
     return this.cells[cellName]?.type
-      || this.columns[cellColumn]?.type
-      || this.rows[cellRow]?.type
+      || this.getColumnType(cellColumn)
+      || this.getRowType(cellRow)
       || 'string';
+  }
+
+  getCellTypeClean(cellName) {
+    return this.getCellType(cellName).split('.')[0];
   }
 
   getCellValueForFormula(cellName) {
@@ -537,6 +544,12 @@ class TableDocument {
       [RETURN_FORMAT.OBJECT]: () => Object.fromEntries(cells),
     };
     return formatRezult[returnFormat]();
+  }
+
+  getColumn(columnName) {
+    let columnNameText = columnName;
+    if (+columnName) columnNameText = getColumnNameForNumber(columnName);
+    return this.columns[columnNameText] || {};
   }
 
   getColumnKeysInRange(range) {
@@ -574,6 +587,10 @@ class TableDocument {
       },
     };
     return columnSet[type]();
+  }
+
+  getColumnType(columnName) {
+    return this.getColumn(columnName).type || undefined;
   }
 
   getDocument(JSONFormat = false) {
@@ -733,6 +750,14 @@ class TableDocument {
     return rangeEdge[rangeType]();
   }
 
+  getRow(rowName) {
+    return this.rows[rowName] || {};
+  }
+
+  getRowType(rowName) {
+    return this.getRow(rowName).type || undefined;
+  }
+
   getRowKeysInRange(range) {
     const type = getRangeType(range);
     const rowKeys = [];
@@ -799,13 +824,8 @@ class TableDocument {
 
   insertArea(numberColumn, numberRow, area, shiftType = null) { // , insertMode = INSERT_MODE.FULL) {
     // console.log(area);
-    const rows = {};
-    const columns = {};
-    const cells = {};
     const namedAreas = [];
     const {
-      rows: insertRows,
-      columns: insertColumns,
       cells: insertCells,
       styles: insertStyles,
       scripts: areaScripts,
@@ -841,20 +861,9 @@ class TableDocument {
       const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(currentCellName);
       const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
 
-      // if (insertMode === INSERT_MODE.DATA_ONLY) {
-      //   if (!this.cells[shiftCellName]) this.cells[shiftCellName] = {};
-      //   this.cells[shiftCellName].value = insertCells[currentCellName].value;
-      //   return; // next loop
-      // }
-
-      // area.valueValidate(currentCellValue.value || '', currentCellName);
-      // this.valueValidate(currentCellValue.value || '', area.getCellType(currentCellName));
-
-      rows[shiftRow] = insertRows[currentRow];
-      columns[shiftColumn] = insertColumns[currentColumn];
-      cells[shiftCellName] = insertCells[currentCellName] || {};
-      // const validateType = area.valueValidate(currentCellValue.value || '', currentCellName);
-      // if (validateType !== true) cells[shiftCellName].invalid = validateType;
+      this.writeColumn(shiftColumn, area.getColumn(currentColumn));
+      this.writeRow(shiftRow, area.getRow(currentRow));
+      this.writeCell(shiftCellName, area.getCell(currentCellName));
     });
 
     insertStyles.forEach((insertStyle) => {
@@ -875,9 +884,6 @@ class TableDocument {
       if (!this.hasNamedArea(namedArea)) namedAreas.push(namedArea);
     });
 
-    this.rows = { ...this.rows, ...rows };
-    this.columns = { ...this.columns, ...columns };
-    this.cells = { ...this.cells, ...cells };
     this.scripts = { ...this.scripts, ...areaScripts };
     this.images = { ...this.images, ...areaImages };
     this.namedAreas = [...this.namedAreas, ...namedAreas];
@@ -886,6 +892,28 @@ class TableDocument {
 
     shiftInsert[shiftType]();
     // console.log(this);
+  }
+
+  writeColumn(columnName, columnValue) {
+    let columnNameText = columnName;
+    if (+columnName) columnNameText = getColumnNameForNumber(columnName);
+    this.columns = { ...this.columns, [columnNameText]: columnValue };
+  }
+
+  writeRow(rowName, rowValue) {
+    this.rows = { ...this.rows, [rowName]: rowValue };
+  }
+  
+  writeCell(cellName, cellValue) {
+    const validate = valueValidate(cellName, cellValue);
+    if (validate !== true) console.log(`%c ${cellName} - %c ${validate}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
+    this.cells = { ...this.cells, [cellName]: cellValue };
+  }
+
+  writeNamedArea() {
+    const namedArea = {};
+
+    if (!this.hasNamedArea(namedArea)) this.namedAreas.push(namedArea);
   }
 
   getSectionSettings(sectionName) {
@@ -955,17 +983,6 @@ class TableDocument {
   updateCellValue(cellName, cellValue) {
     this.cells[cellName].value = cellValue;
     this.cells = { ...this.cells, ...{ [cellName]: this.cells[cellName] } };
-  }
-
-  valueValidate(value, cellName) {
-    const cellType = this.getCellTypeClean(cellName);
-    const validateType = valueValidateType(value, cellType);
-    // console.log(cellName, cellType, value, validateType || 'Error type');
-    return validateType || 'Значение не соответствует типу ячейки';
-  }
-
-  getCellTypeClean(cellName) {
-    return this.getCellType(cellName).split('.')[0];
   }
 }
 
