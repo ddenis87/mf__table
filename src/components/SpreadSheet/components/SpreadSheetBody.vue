@@ -229,15 +229,16 @@ export default {
       // this.focusCell(this.getCellNodeForName(cellName));
     },
     evtKeydownBody(evt) {
-      this.hasNavigationKey(evt);
-      const setTemplateKey = ['Key', 'Numpad', 'Digit', 'Enter', 'Delete'];
+      evt.preventDefault();
+      if (this.hasNavigationKey(evt)) return;
+      const setTemplateKey = ['Key', 'Numpad', 'Digit', 'Enter', 'Delete', 'Space'];
       if (!setTemplateKey.find((item) => evt.code.includes(item))) return;
 
       // if (this.hasCopy(evt)) this.$emit('range:copy', this.getSelectedRange());
       // if (this.hasPast(evt)) this.$emit('range:past', this.getSelectedRange());
 
       if (this.hasCopy(evt) || this.hasPast(evt)) return;
-      evt.preventDefault();
+      // evt.preventDefault();
       console.log(evt.target.hasAttribute('data-name'));
       if (evt.target.hasAttribute('data-name')) {
         const cellName = evt.target.getAttribute('data-name');
@@ -249,50 +250,65 @@ export default {
       if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey === true)) this.moveCursorPrevious(evt.target);
       if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
       if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
+      return evt.code.includes('Arrow');
     },
+
     hasCopy(evt) {
-      if (evt.ctrlKey && evt.code === 'KeyC') {
-        const cellName = evt.target.getAttribute('data-name');
-        const cellValue = this.cells[cellName].value;
-        this.copyText = cellValue;
-        this.$refs.copyInput.select();
-        this.$nextTick().then(() => {
-          document.execCommand('copy');
-        });
-        // navigator.clipboard.writeText(cellValue);
-        // console.log(this.$refs.copyInput);
-        // this.copyText = cellValue;
-        // this.$nextTick();
-        // // this.$refs.copyInput.focus();
-        // this.$refs.copyInput.select();
-        // // this.$refs.copyInput.setSelectionRange(1, 10);
-        // document.execCommand('copy');
-        return true;
-      }
-      return false;
+      const cellName = evt.target.getAttribute('data-name');
+      if (!cellName) return false;
+      if (!(evt.ctrlKey && evt.code === 'KeyC')) return false;
+      this.$emit('buffer:copy', cellName);
+      return true;
+
+      // return false;
+      // if (evt.ctrlKey && evt.code === 'KeyC') {
+      //   const cellName = evt.target.getAttribute('data-name');
+      //   const cellValue = this.cells[cellName].value;
+      //   this.copyText = cellValue;
+      //   this.$refs.copyInput.select();
+      //   this.$nextTick().then(() => {
+      //     document.execCommand('copy');
+      //   });
+      // navigator.clipboard.writeText(cellValue);
+      // console.log(this.$refs.copyInput);
+      // this.copyText = cellValue;
+      // this.$nextTick();
+      // // this.$refs.copyInput.focus();
+      // this.$refs.copyInput.select();
+      // // this.$refs.copyInput.setSelectionRange(1, 10);
+      // document.execCommand('copy');
+      //   return true;
+      // }
+      // return false;
     },
     hasPast(evt) {
+      const cellName = evt.target.getAttribute('data-name');
+      if (!cellName) return false;
+      if (!(evt.ctrlKey && evt.code === 'KeyV')) return false;
+      this.$emit('buffer:paste', cellName);
+      return true;
+
       // console.log(document.execCommand('paste'));
-      if (evt.ctrlKey && evt.code === 'KeyV') {
-        this.$refs.pasteInput.focus();
-        this.$nextTick().then(() => {
-          console.log('paste');
-          document.execCommand('paste');
-        });
-        // navigator.clipboard.readText()
-        //   .then((clipText) => {
-        //     this.pasteText = clipText;
-        //   });
-        // const cellName = evt.target.getAttribute('data-name');
-        // this.$refs.pasteInput.focus();
-        // this.$refs.pasteInput.select();
-        // this.$nextTick().then(() => {
-        //   document.execCommand('paste');
-        // });
-        // setTimeout(() => document.execCommand('paste'), 300);
-        return true;
-      }
-      return false;
+      // if (evt.ctrlKey && evt.code === 'KeyV') {
+      //   this.$refs.pasteInput.focus();
+      //   this.$nextTick().then(() => {
+      //     console.log('paste');
+      //     document.execCommand('paste');
+      //   });
+      // navigator.clipboard.readText()
+      //   .then((clipText) => {
+      //     this.pasteText = clipText;
+      //   });
+      // const cellName = evt.target.getAttribute('data-name');
+      // this.$refs.pasteInput.focus();
+      // this.$refs.pasteInput.select();
+      // this.$nextTick().then(() => {
+      //   document.execCommand('paste');
+      // });
+      // setTimeout(() => document.execCommand('paste'), 300);
+      //   return true;
+      // }
+      // return false;
     },
     getSelectedRange() {
       let range = null;

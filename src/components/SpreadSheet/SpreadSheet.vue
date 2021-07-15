@@ -47,8 +47,8 @@
                            @click:cell="evtClickCell"
                            @dblclick:cell="evtDblclickCell"
                            @keydown:cell="evtKeydownCell"
-                           @range:copy="evtRangeCopy"
-                           @range:past="evtRangePast"
+                           @buffer:copy="evtBufferCopy"
+                           @buffer:paste="evtBufferPaste"
                            @toggle-row-group="toggleRowGroup"
                            @scroll-body-x="scrollBodyX"></spread-sheet-body>
       </div>
@@ -272,11 +272,11 @@ export default {
       console.log(options);
       this.$emit('keydown:cell', options);
     },
-    evtRangeCopy(range) {
-      this.$emit('range:copy', range);
+    evtBufferCopy(cellName) {
+      this.$emit('buffer:copy', cellName);
     },
-    evtRangePast(range) {
-      this.$emit('range:past', range);
+    evtBufferPaste(cellName) {
+      this.$emit('buffer:paste', cellName);
     },
     scrollBodyX(scrollLeft) {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;

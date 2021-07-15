@@ -341,7 +341,7 @@ class TableDocument {
   editingCell(cellName, cellValue) { // проверять существует строка/столбец
     // получать максимальный из имеющихся, сравнивать
     // если пусстое значение и больше ничего нет, то удалять ячейку из набора ???
-    this.valueValidate(cellValue, cellName);
+    // this.valueValidate(cellValue, cellName);
     let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
     cellValues = { ...cellValues, ...{ value: cellValue || '' } };
     if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
@@ -903,7 +903,7 @@ class TableDocument {
   writeRow(rowName, rowValue) {
     this.rows = { ...this.rows, [rowName]: rowValue };
   }
-  
+
   writeCell(cellName, cellValue) {
     const validate = valueValidate(cellName, cellValue);
     if (validate !== true) console.log(`%c ${cellName} - %c ${validate}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');

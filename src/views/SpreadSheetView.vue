@@ -101,8 +101,8 @@
                     @click:cell="evtClickCell"
                     @dblclick:cell="evtDblClickCell"
                     @keydown:cell="evtKeydownCell"
-                    @range:copy="evtRangeCopy"
-                    @range:past="evtRangePast"
+                    @buffer:copy="evtBufferCopy"
+                    @buffer:paste="evtBufferPaste"
                     @scroll:body="scrollBody"></spread-sheet>
     </div>
     <v-snackbar content-class="snack"
@@ -120,6 +120,7 @@ import DialogModal from '@/components/Dialogs/DialogModal.vue';
 import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocument from '@/components/TableDocument/TableDocument';
 import TableDocumentApi from '@/components/TableDocument/TableDocumentApi';
+import Buffer from '@/plugins/copyAndPaste';
 
 export default {
   name: 'SpreadSheetView',
@@ -161,11 +162,12 @@ export default {
     // console.log(this.tableDocument);
   },
   methods: {
-    evtRangeCopy(range) {
-      this.rangeCopy = range;
+    evtBufferCopy(cellName) {
+      Buffer.copy(this.tableDocument.getCell(cellName).value);
     },
-    evtRangePast(rangePast) {
-      this.tableDocument.copyAndPast(this.rangeCopy, rangePast);
+    async evtBufferPaste(cellName) {
+      const pasteValue = await Buffer.paste();
+      this.tableDocument.editingCell(cellName, pasteValue);
     },
     saveDocument() {
       const JSONFormat = true;
