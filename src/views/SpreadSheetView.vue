@@ -166,6 +166,10 @@ export default {
       Buffer.copy(this.tableDocument.getCell(cellName).value);
     },
     async evtBufferPaste(cellName) {
+      if (!this.tableDocument.hasEditing(cellName)) {
+        this.showSnackMessage('Редактирование недоступно');
+        return;
+      }
       const pasteValue = await Buffer.paste();
       this.tableDocument.editingCell(cellName, pasteValue);
     },

@@ -18,7 +18,6 @@ const EDIT_ACCESS = {
   CLOSED: 'closed',
   CLOSED_EXCEPT_OPEN: 'closedExceptOpen',
   OPEN: 'open',
-  // OPEN_EXCEPT_CLOSED: 'open-except-closed',
 };
 
 const CELL_WIDTH = 94;
@@ -26,13 +25,12 @@ const CELL_HEIGHT = 22;
 const ROW_COUNT = 1000;
 const COLUMNS_COUNT = 26;
 
-// const REG_OPERATORS = /[+-/*)(% ]/g;
-
 const CELL_ATTRIBUTES = {
   VALUE: 'value',
   FORMULA: 'formula',
-  ACTION: 'action',
+  SCRIPTS: 'scripts',
   PARAMETER: 'parameter',
+
 };
 
 const DELETE_MODE = {
@@ -41,25 +39,11 @@ const DELETE_MODE = {
   ROW: 'row',
 };
 
-// const INSERT_MODE = {
-//   FULL: 'full',
-//   DATA_ONLY: 'dataOnly',
-// };
-
 const RETURN_FORMAT = {
   OBJECT: 'object',
   ENTRIES: 'entries',
   KEYS: 'keys',
 };
-
-// function fillingFormula(operandsValues, formula) {
-//   let fillFormula = formula;
-//   Object.entries(operandsValues).forEach((operand) => {
-//     const [operandName, operandValue] = operand;
-//     fillFormula = fillFormula.replace(`$${operandName}`, operandValue);
-//   });
-//   return fillFormula;
-// }
 
 function getObjectOfJSON(data) {
   return (typeof data === 'string') ? JSON.parse(data) : data;
@@ -78,29 +62,8 @@ function valueValidateType(value = '', type = 'string') {
     field: () => true,
     choice: () => true,
   };
-  return validate[type](value);
+  return validate[type.split('.')[0]](value) || 'Значение не соответствует типу ячейки';
 }
-
-function valueValidate(cellName, cellValue) {
-  const cellType = cellValue?.type || 'string';
-  const validateType = valueValidateType(cellValue.value, cellType.split('.')[0]);
-  return validateType || 'Значение не соответствует типу ячейки';
-}
-
-// function hasString(value) {
-
-// }
-// function getOperandsSet(formula) {
-//   return formula.replace(REG_OPERATORS, '').split('$').splice(1);
-// }
-
-// function getOperandsValues(operandsSet) {
-//   const operandsValues = {};
-//   operandsSet.forEach((operand) => {
-//     operandsValues[operand] = ` +this.getCellValueForFormula('${operand}')`;
-//   });
-//   return operandsValues;
-// }
 
 class TableDocument {
   constructor({
@@ -187,49 +150,6 @@ class TableDocument {
     if (formula.hasOperandsInclude(currentCellName)) return NaN;
     return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
   }
-
-  // copyAndPast(rangeCopy, rangePast) {
-  //   const {
-  //     parthSymbol: rangeColumn,
-  //     parthDigit: rangeRow,
-  //   } = getParseAtSymbolDigit(rangePast.split(':')[0]);
-  //   const copyArea = this.getAreaForRange(rangeCopy);
-  //   this.insertArea(
-  //     getColumnNumberForName(rangeColumn),
-  //     rangeRow,
-  //     copyArea,
-  //     undefined,
-  //     INSERT_MODE.DATA_ONLY,
-  //   );
-  // }
-  // calculateCellValueV1(cellName) {
-  //   const FUNCTION_FORMULA = {
-  //     SUM: () => 'calculateSUM',
-  //   };
-  //   const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
-  //   if (cellFormula[0] === '=') {
-  //     const [functionName, functionParameters] = cellFormula.slice(1, -1).split('(');
-  //     const evalFunction = `this.${FUNCTION_FORMULA[functionName]()}('${functionParameters}','${cellName}')`;
-  //     console.log(evalFunction);
-  //     const result = eval(evalFunction); // eslint-disable-line no-eval
-  //     this.updateCellValue(cellName, result);
-  //     return result;
-  //   }
-  //   const operandsSet = getOperandsSet(cellFormula);
-  //   if (operandsSet.includes(cellName)) { this.updateCellValue(cellName, NaN); return NaN; }
-  //   const operandsValues = getOperandsValues(operandsSet);
-  //   const fillFormula = fillingFormula(operandsValues, cellFormula);
-  //   const result = eval(fillFormula); // eslint-disable-line no-eval
-  //   this.updateCellValue(cellName, result);
-  //   return result;
-  // }
-
-  // checkEditAccess(cellName) {
-  //   if (Object.keys(this.cells).includes(cellName) && this.cells[cellName].disabled === true) return false;
-  //   if (!Object.keys(this.cells).includes(cellName)) return true;
-  //   if (Object.keys(this.cells[cellName]).includes('areaName')) return true;
-  //   return true;
-  // }
 
   deleteArea(range, shiftType = null) {
     const rangeType = getRangeType(range);
@@ -351,9 +271,11 @@ class TableDocument {
   }
 
   executeAction(cellName) {
-    const actionName = this.getCellParameter(cellName, CELL_ATTRIBUTES.ACTION);
-    const { script } = this.getScript(actionName);
-    const actionFunction = eval(script); // eslint-disable-line no-eval
+    const scripts = this.getCellParameter(cellName, CELL_ATTRIBUTES.SCRIPTS);
+    if (!(scripts && Object.keys(scripts).includes('action'))) return;
+    const { action } = this.getScripts(scripts.action);
+
+    const actionFunction = eval(action); // eslint-disable-line no-eval
 
     actionFunction(cellName);
     this.recalculateFormulas();
@@ -618,18 +540,6 @@ class TableDocument {
     return formulasCellsSet;
   }
 
-  // calculateSUM(range, currentCellName) {
-  //   const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
-  //   const formula = cellKeys.map((cellKey) => `$${cellKey}`).join(' + ');
-  //   const operandsSet = getOperandsSet(formula);
-  //   if (operandsSet.includes(currentCellName)) { this.updateCellValue(currentCellName, NaN); return NaN; }
-  //   const operandsValues = getOperandsValues(operandsSet);
-  //   const fillFormula = fillingFormula(operandsValues, formula);
-  //   const result = eval(fillFormula); // eslint-disable-line no-eval
-  //   // this.updateCellValue(cellName, result);
-  //   return result;
-  // }
-
   getLastColumn() {
     const columns = [0];
     Object.keys(this.columns).forEach((column) => columns.push(+getColumnNumberForName(column)));
@@ -787,7 +697,7 @@ class TableDocument {
     return rowSet[type]();
   }
 
-  getScript(scriptName) {
+  getScripts(scriptName) {
     const script = this.scripts[scriptName];
     if (script) return script;
     return null;
@@ -802,7 +712,7 @@ class TableDocument {
     if (Object.keys(this.cells).includes(cellName)) {
       isEditCell = this.cells[cellName].isEditable;
     }
-    console.log(isEditCell);
+    // console.log(isEditCell);
     if (this.editAccess === EDIT_ACCESS.CLOSED_EXCEPT_OPEN && !isEditCell) return false;
     if (this.editAccess === EDIT_ACCESS.OPEN && isEditCell === false) return false;
     if (!this.editAccess && isEditCell === false) return false;
@@ -905,8 +815,7 @@ class TableDocument {
   }
 
   writeCell(cellName, cellValue) {
-    const validate = valueValidate(cellName, cellValue);
-    if (validate !== true) console.log(`%c ${cellName} - %c ${validate}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
+    this.valueValidate(cellName, cellValue);
     this.cells = { ...this.cells, [cellName]: cellValue };
   }
 
@@ -983,6 +892,23 @@ class TableDocument {
   updateCellValue(cellName, cellValue) {
     this.cells[cellName].value = cellValue;
     this.cells = { ...this.cells, ...{ [cellName]: this.cells[cellName] } };
+  }
+
+  valueValidate(cellName, cellValue) {
+    const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
+    const cellType = cellValue?.type
+      || this.getRowType(cellRow)
+      || this.getColumnType(cellColumn)
+      || 'string';
+    const validateType = valueValidateType(cellValue.value, cellType);
+    let validateCustom = true;
+    const { scripts } = cellValue;
+    if (scripts && Object.keys(scripts).includes('validate')) {
+      const validateFunction = eval(scripts.validate); // eslint-disable-line no-eval
+      validateCustom = validateFunction(cellValue.value);
+    }
+    if (validateType !== true) console.log(`%c ${cellName} - %c Type - ${validateType}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
+    if (validateCustom !== true) console.log(`%c ${cellName} - %c Custom - ${validateCustom}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
   }
 }
 

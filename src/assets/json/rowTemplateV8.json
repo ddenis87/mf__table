@@ -5,7 +5,9 @@
     "a5":{
       "value":"",
       "style":"a5",
-      "action":"deleteRowSection1",
+      "scripts": {
+        "action":"deleteRowSection1"
+      },
       "disabled":true,
       "noSelect":true,
       "image":"delete"
@@ -13,7 +15,9 @@
     "a6":{
       "value":"",
       "style":"a6",
-      "action":"deleteRowSection2",
+      "scripts": {
+        "action":"deleteRowSection2"
+      },
       "disabled":true,
       "noSelect":true,
       "image":"delete"
@@ -21,14 +25,18 @@
     "a7":{
       "value":"",
       "style":"a7",
-      "action":"deleteRowSection3",
+      "scripts": {
+        "action":"deleteRowSection3"
+      },
       "disabled":true,
       "noSelect":true,
       "image":"delete"
     },
     "a8":{
       "style":"a8 no-print",
-      "action":"addRowSection3",
+      "scripts": {
+        "action":"addRowSection3"
+      },
       "value":"",
       "image":"adding"
     },
@@ -92,7 +100,15 @@
     "f4":{"value":"3","style":"f4"},
     "f5":{"style":"f5","parameter":"st1Volume21","type":"number","isEditable":true},
     "f6":{"style":"f6","type":"number","parameter":"st2Volume21","isEditable":true},
-    "f7":{"style":"f7","type":"number","parameter":"st3Volume21","isEditable":true},
+    "f7":{
+      "style":"f7",
+      "type":"number",
+      "parameter":"st3Volume21",
+      "isEditable":true,
+      "scripts": {
+        "validate":"(v) => v > 0 || 'Число должно быть больше 0'"
+      }
+    },
     "f8":{"style":"f8"},
     "f9":{
       "style":"f9",
@@ -127,7 +143,15 @@
     "h5":{"style":"h5","type":"number","parameter":"st1Volume23"},
     "h6":{"style":"h6","type":"number","parameter":"st2Volume23"},
     "h7":{"style":"h7","type":"number","formatString":"minFD=2","parameter":"st3Volume23"},
-    "h8":{"style":"h8","type":"date","value":"hello","isEditable":true},
+    "h8":{
+      "style":"h8",
+      "type":"date",
+      "value":"hello",
+      "isEditable":true,
+      "scripts": {
+        "validate":"(v) => (new Date(v).toString() !== 'Invalid Date') || 'Значение должно быть датой'"
+      }
+    },
     "h9":{
       "style":"h9",
       "type":"string",

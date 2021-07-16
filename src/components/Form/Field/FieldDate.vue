@@ -90,7 +90,7 @@ export default {
   watch: {
     fieldValueInput() {
       this.fieldValue = formattedDataDisplay(this.fieldValueInput, { valueType: 'date' }) || null;
-      this.fieldValueDate = (new Date(this.fieldValueInput) !== 'Invalid Date') ? this.fieldValueInput : null;
+      this.fieldValueDate = (new Date(this.fieldValueInput).toString() !== 'Invalid Date') ? this.fieldValueInput : null;
     },
   },
   mounted() {
@@ -107,6 +107,7 @@ export default {
       this.evtKeydownControl(evt);
     },
     evtOpenDialog(evt) {
+      // console.log(this.fieldValueDate);
       if (evt.type === 'keydown' && evt.code !== 'Space') return;
       const elementTarget = this.$refs.fieldInput.$el.getBoundingClientRect();
       this.isDialogX = elementTarget.left;
