@@ -30,7 +30,8 @@ const CELL_ATTRIBUTES = {
   FORMULA: 'formula',
   SCRIPTS: 'scripts',
   PARAMETER: 'parameter',
-
+  ACTION: 'action',
+  VALIDATE: 'validate',
 };
 
 const DELETE_MODE = {
@@ -123,6 +124,14 @@ class TableDocument {
 
   BASE_CLASS = TableDocument;
 
+  actionCell(cellName) {
+    const scripts = this.getCellParameter(cellName, CELL_ATTRIBUTES.SCRIPTS);
+    if (!scripts) return;
+    if (Object.keys(scripts).includes(CELL_ATTRIBUTES.ACTION)) this.executeAction(cellName);
+    const formula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+    if (formula) this.calculateCellValue(cellName);
+  }
+
   addArea(cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) {
     const area = this.documentTemplate.getNamedArea(areaName);
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
@@ -137,10 +146,12 @@ class TableDocument {
     const formula = new Formulas(cellFormula, cellName);
     if (formula.hasOperandsInclude(cellName)) {
       this.updateCellValue(cellName, NaN);
+      // this.writeCell(cellName, NaN);
       return NaN;
     }
     const result = eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
     this.updateCellValue(cellName, result);
+    // this.writeCell(cellName, result);
     return result;
   }
 
@@ -262,10 +273,13 @@ class TableDocument {
     // получать максимальный из имеющихся, сравнивать
     // если пусстое значение и больше ничего нет, то удалять ячейку из набора ???
     // this.valueValidate(cellValue, cellName);
+
     let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
     cellValues = { ...cellValues, ...{ value: cellValue || '' } };
     if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
-    this.cells = { ...this.cells, ...{ [cellName]: cellValues } };
+    
+    this.writeCell(cellName, cellValues);
+    // this.cells = { ...this.cells, ...{ [cellName]: cellValues } };
     this.recalculateFormulas();
     console.log(this.cells);
   }
@@ -273,9 +287,10 @@ class TableDocument {
   executeAction(cellName) {
     const scripts = this.getCellParameter(cellName, CELL_ATTRIBUTES.SCRIPTS);
     if (!(scripts && Object.keys(scripts).includes('action'))) return;
-    const { action } = this.getScripts(scripts.action);
 
-    const actionFunction = eval(action); // eslint-disable-line no-eval
+    const action = this.getScripts(scripts.action);
+    const { script } = action;
+    const actionFunction = eval(script); // eslint-disable-line no-eval
 
     actionFunction(cellName);
     this.recalculateFormulas();
@@ -341,13 +356,24 @@ class TableDocument {
       const cellStyles = this.getCellStyles(cellNameCurrent);
       if (cellStyles) styles.push(cellStyles);
 
-      if (Object.keys(cellValueCurrent).includes('action')) {
-        const actionName = cellValueCurrent.action;
-        const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
-        if (script) {
-          scripts[actionName] = this.scripts[actionName];
+      if (Object.keys(cellValueCurrent).includes('scripts')) {
+        const scriptList = cellValueCurrent.scripts;
+        if (Object.keys(scriptList).includes('action')) {
+          const actionName = scriptList.action;
+          const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
+          if (script) {
+            scripts[actionName] = this.scripts[actionName];
+          }
         }
       }
+      // if (Object.keys(cellValueCurrent).includes('action')) {
+      //   const actionName = cellValueCurrent.action;
+      //   const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
+      //   if (script) {
+      //     scripts[actionName] = this.scripts[actionName];
+      //   }
+      // }
+
       if (Object.keys(cellValueCurrent).includes('image')) {
         // console.log(this.images);
         const imageName = cellValueCurrent.image;
@@ -793,7 +819,7 @@ class TableDocument {
       };
       if (!this.hasNamedArea(namedArea)) namedAreas.push(namedArea);
     });
-
+    console.log(areaScripts);
     this.scripts = { ...this.scripts, ...areaScripts };
     this.images = { ...this.images, ...areaImages };
     this.namedAreas = [...this.namedAreas, ...namedAreas];
@@ -815,8 +841,11 @@ class TableDocument {
   }
 
   writeCell(cellName, cellValue) {
-    this.valueValidate(cellName, cellValue);
-    this.cells = { ...this.cells, [cellName]: cellValue };
+    const value = cellValue;
+    if (!this.valueValidate(cellName, cellValue)) {
+      value.value = null;
+    }
+    this.cells = { ...this.cells, [cellName]: value };
   }
 
   writeNamedArea() {
@@ -891,7 +920,8 @@ class TableDocument {
 
   updateCellValue(cellName, cellValue) {
     this.cells[cellName].value = cellValue;
-    this.cells = { ...this.cells, ...{ [cellName]: this.cells[cellName] } };
+    this.writeCell(cellName, this.cells[cellName]);
+    // this.cells = { ...this.cells, ...{ [cellName]: this.cells[cellName] } };
   }
 
   valueValidate(cellName, cellValue) {
@@ -909,6 +939,7 @@ class TableDocument {
     }
     if (validateType !== true) console.log(`%c ${cellName} - %c Type - ${validateType}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
     if (validateCustom !== true) console.log(`%c ${cellName} - %c Custom - ${validateCustom}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
+    return (validateType === true && validateCustom === true);
   }
 }
 

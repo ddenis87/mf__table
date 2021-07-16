@@ -183,9 +183,10 @@ export default {
     },
     evtClickCell(options) {
       const { cellName } = options;
-      const selectedCell = this.tableDocument.getCell(cellName);
-      if (Object.keys(selectedCell).includes('action')) this.tableDocument.executeAction(cellName);
-      if (Object.keys(selectedCell).includes('formula')) this.tableDocument.calculateCellValue(cellName);
+      if (cellName) this.tableDocument.actionCell(cellName);
+      // const selectedCell = this.tableDocument.getCell(cellName);
+      // if (Object.keys(selectedCell).includes('action')) this.tableDocument.executeAction(cellName);
+      // if (Object.keys(selectedCell).includes('formula')) this.tableDocument.calculateCellValue(cellName);
     },
 
     evtDblClickCell(options) {
@@ -279,7 +280,7 @@ export default {
         } else {
           const temp = await new TableDocumentApi({ JSONString: JSONTemplate });
           this.tableDocument = temp;
-          // console.log(this.tableDocument);
+          console.log(this.tableDocument);
           this.isFileTemplateDisabled = true;
           this.isGrid = false;
         }

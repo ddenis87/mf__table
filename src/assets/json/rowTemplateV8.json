@@ -54,7 +54,9 @@
       "style":"b8 no-print",
       "value":"Добавить строку",
       "colspan":3,
-      "action":"addRowSection3",
+      "scripts": {
+        "action":"addRowSection3"
+      },
       "disabled":false,
       "noSelect":true
     },
