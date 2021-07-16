@@ -95,7 +95,7 @@ export default {
   watch: {
     fieldValueInput() {
       this.fieldValue = new Date(this.fieldValueInput).toLocaleString('ru').slice(0, -3).replace(',', '') || null;
-      this.fieldValueDate = this.fieldValueInput?.split('T')[0] || null;
+      this.fieldValueDate = (new Date(this.fieldValueInput) !== 'Invalid Date') ? this.fieldValueInput?.split('T')[0] : null;
     },
   },
   methods: {

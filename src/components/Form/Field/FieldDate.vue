@@ -90,7 +90,7 @@ export default {
   watch: {
     fieldValueInput() {
       this.fieldValue = formattedDataDisplay(this.fieldValueInput, { valueType: 'date' }) || null;
-      this.fieldValueDate = this.fieldValueInput || null;
+      this.fieldValueDate = (new Date(this.fieldValueInput) !== 'Invalid Date') ? this.fieldValueInput : null;
     },
   },
   mounted() {
