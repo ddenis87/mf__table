@@ -143,12 +143,12 @@
     "h3":{"value":"на 2023 год\n(на второй год планового периода)","style":"h3"},
     "h4":{"value":"5","style":"h4"},
     "h5":{"style":"h5","type":"number","parameter":"st1Volume23"},
-    "h6":{"style":"h6","type":"number","parameter":"st2Volume23"},
+    "h6":{"style":"h6","type":"number","parameter":"st2Volume23","formatString":"minFD=2$color=true"},
     "h7":{"style":"h7","type":"number","formatString":"minFD=2","parameter":"st3Volume23"},
     "h8":{
       "style":"h8",
       "type":"date",
-      "value":"hello",
+      "value":"2012-07-17",
       "isEditable":true,
       "scripts": {
         "validate":"(v) => (new Date(v).toString() !== 'Invalid Date') || 'Значение должно быть датой'"
@@ -156,14 +156,14 @@
     },
     "h9":{
       "style":"h9",
-      "type":"string",
+      "type":"number",
       "formatString":"minFD=2",
       "formula":"$h5 + ($h6+$h7) + $h8 + $h9+($h10 + $h11 * $h12) + $h13",
       "isEditable":false
     },
     "h10":{
       "style":"h9",
-      "type":"string",
+      "type":"number",
       "formatString":"minFD=2",
       "formula":"$f15 + $g15 + $h15",
       "isEditable":false

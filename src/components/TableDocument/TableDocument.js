@@ -277,11 +277,11 @@ class TableDocument {
     let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
     cellValues = { ...cellValues, ...{ value: cellValue || '' } };
     if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
-    
+
     this.writeCell(cellName, cellValues);
     // this.cells = { ...this.cells, ...{ [cellName]: cellValues } };
     this.recalculateFormulas();
-    console.log(this.cells);
+    // console.log(this.cells);
   }
 
   executeAction(cellName) {
@@ -302,7 +302,7 @@ class TableDocument {
       const parameterName = cellValue?.parameter || null;
       if (!parameterName) return;
       const parameterNameData = parameters[parameterName] || parameterName;
-      if (!parameterName || !dataArea[parameterNameData]) return;
+      if (!parameterName || !Object.keys(dataArea).includes(parameterNameData)) return;
       cellValue.value = dataArea[parameterNameData];
     });
   }
@@ -819,7 +819,7 @@ class TableDocument {
       };
       if (!this.hasNamedArea(namedArea)) namedAreas.push(namedArea);
     });
-    console.log(areaScripts);
+    // console.log(areaScripts);
     this.scripts = { ...this.scripts, ...areaScripts };
     this.images = { ...this.images, ...areaImages };
     this.namedAreas = [...this.namedAreas, ...namedAreas];
@@ -845,7 +845,7 @@ class TableDocument {
     if (!this.valueValidate(cellName, cellValue)) {
       value.value = null;
     }
-    this.cells = { ...this.cells, [cellName]: value };
+    this.cells = { ...this.cells, [cellName]: value }; // возвращать результаты валидации
   }
 
   writeNamedArea() {

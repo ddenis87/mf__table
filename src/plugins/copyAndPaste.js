@@ -5,6 +5,6 @@ export default {
 
   async paste() {
     const pasteValue = await navigator.clipboard.readText();
-    return pasteValue;
+    return (+pasteValue) ? +pasteValue : pasteValue;
   },
 };

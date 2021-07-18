@@ -47,7 +47,8 @@
 import BtnDialog from '@/components/Form/Btn/BtnDialog.vue';
 import BtnField from '@/components/Form/Btn/BtnField.vue';
 
-import formattedDataDisplay from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+// import formattedDataDisplay from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+import display from '@/plugins/formattingView/formattingView';
 import fieldModel from './FieldModel';
 import fieldProps from './FieldProps';
 import fieldComputed from './FieldComputed';
@@ -89,7 +90,8 @@ export default {
   },
   watch: {
     fieldValueInput() {
-      this.fieldValue = formattedDataDisplay(this.fieldValueInput, { valueType: 'date' }) || null;
+      // this.fieldValue = formattedDataDisplay(this.fieldValueInput, { valueType: 'date' }) || null;
+      this.fieldValue = display.formate(this.fieldValueInput, { type: 'date' }) || null;
       this.fieldValueDate = (new Date(this.fieldValueInput).toString() !== 'Invalid Date') ? this.fieldValueInput : null;
     },
   },
@@ -115,8 +117,10 @@ export default {
       this.isDialogShow = !this.isDialogShow;
     },
     evtSelectDate() {
+      // this.fieldValue = (this.fieldValueDate)
+      //   ? formattedDataDisplay(this.fieldValueDate, { valueType: 'date' }) : null;
       this.fieldValue = (this.fieldValueDate)
-        ? formattedDataDisplay(this.fieldValueDate, { valueType: 'date' }) : null;
+        ? display.formate(this.fieldValueDate, { type: 'date' }) : null;
       this.isDialogShow = false;
       this.$refs.fieldInput.focus();
       this.evtInput();

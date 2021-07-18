@@ -4,6 +4,7 @@
     'spread-sheet-print': isPrintMode,
   }">
     <div class="sheet"
+         :class="{'sheet_noTitle': !isTitle}"
         :style="templateSheet">
       <div class="sheet__angle" v-show="isTitle"></div>
       <div class="sheet__head">
@@ -226,10 +227,18 @@ export default {
       return prepareCells;
     },
     templateSheet() {
-      return {
-        'grid-template-columns': `${(CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE}px 1fr`,
-        'grid-template-rows': `${(this.cellHeight * this.maxLevelGroupColumn) + this.cellHeight}px 1fr`,
+      const shiftTop = (CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE;
+      const shiftLeft = (this.cellHeight * this.maxLevelGroupColumn) + this.cellHeight;
+      const style = {
+        'grid-template-columns': `${shiftTop}px 1fr`,
+        'grid-template-rows': `${shiftLeft}px 1fr`,
       };
+      const shift = {
+      //   'margin-top': `-${shiftLeft}px`,
+        'margin-left': `-${shiftTop}px`,
+      };
+      if (!this.isTitle) Object.assign(style, shift);
+      return style;
     },
     templateTableWidth() {
       let templateTableWidth = 0;
@@ -269,7 +278,7 @@ export default {
       this.$emit('dblclick:cell', options);
     },
     evtKeydownCell(options) {
-      console.log(options);
+      // console.log(options);
       this.$emit('keydown:cell', options);
     },
     evtBufferCopy(cellName) {
@@ -497,6 +506,11 @@ export default {
     grid-template-areas: "angle head" "body body";
     height: 100%;
     box-sizing: border-box;
+    &_noTitle {
+      grid-template-areas: "body";
+      .sheet__angle { display: none; }
+      .sheet__head { display: none; }
+    }
     &__angle {
       grid-area: angle;
       border: thin solid grey;

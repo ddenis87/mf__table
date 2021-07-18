@@ -76,7 +76,7 @@ class TableDocumentApi extends TableDocument {
 
   async prepareRepresentation() {
     await this.getRepresentationStore().then(() => {
-      console.log('before update');
+      // console.log('before update');
       this.cells = { ...this.cells };
     });
   }

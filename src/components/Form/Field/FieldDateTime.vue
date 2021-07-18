@@ -47,7 +47,8 @@
 import BtnDialog from '@/components/Form/Btn/BtnDialog.vue';
 import BtnField from '@/components/Form/Btn/BtnField.vue';
 
-import formattedDataDisplay from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+// import formattedDataDisplay from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+import display from '@/plugins/formattingView/formattingView';
 import fieldModel from './FieldModel';
 import fieldProps from './FieldProps';
 import fieldComputed from './FieldComputed';
@@ -112,7 +113,7 @@ export default {
     },
     evtSelectDate() {
       this.fieldValue = (this.fieldValueDate)
-        ? `${formattedDataDisplay(this.fieldValueDate, { valueType: 'date' })} 00:00` : null;
+        ? `${display.formate(this.fieldValueDate, { valueType: 'date' })} 00:00` : null;
       this.isDialogShow = false;
       this.$refs.fieldInput.focus();
       this.evtInput();

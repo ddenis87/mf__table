@@ -146,6 +146,7 @@ export default {
 
       isGrid: true,
       isTitle: true,
+      // isPrintMode: false,
       isFileTemplateDisabled: false,
       isFileDataDisabled: true,
       isFileSettingDisabled: true,
@@ -163,6 +164,7 @@ export default {
   },
   methods: {
     evtBufferCopy(cellName) {
+      console.log(this.tableDocument.getCell(cellName).value);
       Buffer.copy(this.tableDocument.getCell(cellName).value);
     },
     async evtBufferPaste(cellName) {
@@ -304,7 +306,7 @@ export default {
         this.tableDocument.recalculateFormulas();
         this.isFileDataDisabled = true;
         this.isGrid = false;
-        console.log(this.tableDocument);
+        // console.log(this.tableDocument);
       });
     },
     openPrintPage() {

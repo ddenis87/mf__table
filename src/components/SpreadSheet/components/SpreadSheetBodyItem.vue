@@ -51,7 +51,8 @@
 </template>
 
 <script>
-import formattedData from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+// import formattedData from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+import display from '@/plugins/formattingView/formattingView';
 import {
   CELL_TYPE_DEFAULT,
 } from '../SpreadSheetConst';
@@ -99,21 +100,35 @@ export default {
       return this.images[this.cells[cellName].image];
     },
     formattedData(columnName) {
-      // const cellName = `${columnName}${this.source.value}`;
       const cell = this.hasCell(columnName);
       if (!cell) return '';
-      const formattedOption = {
-        representations: this.representations,
-      };
-      // const cell = this.cells[`${columnName}${this.source.value}`];
-      const cellValue = cell.value;
-      const cellType = this.getCellType(cell, columnName);
-      // if (cellType.includes('field')) return cell.representation;
-      formattedOption.valueType = cellType;
-      const cellFormatString = this.getCellFormatString(cell, columnName);
-      if (cellFormatString) formattedOption.formatString = cellFormatString;
-      return formattedData(cellValue, formattedOption);
+      if (!Object.keys(cell).includes('value')) return '';
+      // console.log(this.representations);
+      // if (!cell.value) return '';
+      // const options = {
+      //   type: cell.type,
+      //   formatString: cell.formatString,
+      //   representations: this.representations,
+      // };
+      // console.log(options);
+      return display.formate(cell.value, { ...cell, representations: this.representations });
     },
+    // formattedData(columnName) {
+    //   // const cellName = `${columnName}${this.source.value}`;
+    //   const cell = this.hasCell(columnName);
+    //   if (!cell) return '';
+    //   const formattedOption = {
+    //     representations: this.representations,
+    //   };
+    //   // const cell = this.cells[`${columnName}${this.source.value}`];
+    //   const cellValue = cell.value;
+    //   const cellType = this.getCellType(cell, columnName);
+    //   // if (cellType.includes('field')) return cell.representation;
+    //   formattedOption.valueType = cellType;
+    //   const cellFormatString = this.getCellFormatString(cell, columnName);
+    //   if (cellFormatString) formattedOption.formatString = cellFormatString;
+    //   return formattedData(cellValue, formattedOption);
+    // },
     hasCell(column) {
       const cellName = `${column}${this.source.value}`;
       return (this.cells[cellName]) || false;
@@ -153,6 +168,7 @@ export default {
       const templateRow = {
         'grid-template-rows': `${height || '22'}px`,
       };
+      // console.log(this.templateColumnWidth);
       if (this.printMode) {
         templateRow['grid-template-columns'] = this.templateColumnWidth;
       } else if (this.maxLevelGroupRow === 0) {
