@@ -4,6 +4,7 @@
                ref="field"
                v-bind="fieldProps"
                v-model="fieldValue"
+               @input="evtInput"
                @keydown:control="evtKeydownControl"
                @blur:input="evtBlur"></component>
   </div>
@@ -12,17 +13,21 @@
 <script>
 import FieldText from '@/components/Form/Field/FieldText.vue';
 import FieldNumber from '@/components/Form/Field/FieldNumber.vue';
+import FieldNumberRange from '@/components/Form/Field/FieldNumberRange.vue';
 import FieldChoice from '@/components/Form/Field/FieldChoice.vue';
 import FieldDate from '@/components/Form/Field/FieldDate.vue';
 import FieldDateTime from '@/components/Form/Field/FieldDateTime.vue';
 import FieldDialog from '@/components/Form/Field/FieldDialog.vue';
 import FieldCompare from '@/components/Form/Field/FieldCompare.vue';
 
+import FIELD_MODE from './FilterExtended';
+
 export default {
   name: 'FilterFieldWrapper',
   components: {
     FieldText,
     FieldNumber,
+    FieldNumberRange,
     FieldChoice,
     FieldDate,
     FieldDateTime,
@@ -34,13 +39,14 @@ export default {
     event: 'input',
   },
   props: {
+    fieldValueInput: { type: [String, Number, Date, Array, Object], default: null },
     fieldOptions: {
       type: Object,
       default() {
         return { type: 'string', required: false };
       },
     },
-    fieldValueInput: { type: [String, Number, Date, Object], default: null },
+    fieldMode: { type: String, default: FIELD_MODE.SINGLE },
   },
   data() {
     return {
@@ -48,6 +54,7 @@ export default {
       fields: {
         string: FieldText,
         integer: FieldNumber,
+        integerRange: FieldNumberRange,
         compare: FieldCompare,
         choice: FieldChoice,
         date: FieldDate,
@@ -58,7 +65,8 @@ export default {
   },
   computed: {
     field() {
-      return this.fields[this.fieldOptions.type];
+      const type = `${this.fieldOptions.type}${this.fieldMode}`;
+      return this.fields[type];
     },
     fieldProps() {
       const props = {
@@ -80,13 +88,17 @@ export default {
   },
   watch: {
     fieldValueInput() {
-      console.log(this.fieldValueInput);
+      // console.log(this.fieldValueInput);
     },
+  },
+  mounted() {
+    setTimeout(() => this.evtInput(), 500);
   },
   methods: {
     evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydownControl(evt) {
-      // evt.preventDefault();
+      evt.preventDefault();
+      if (evt.code === 'Escape') return;
       this.evtInput();
       this.$emit('keydown:control', evt);
     },

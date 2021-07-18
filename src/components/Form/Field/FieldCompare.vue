@@ -64,12 +64,14 @@ export default {
       return this.fieldMap[this.typeField]();
     },
   },
-  mounted() {
+  async mounted() {
     this.fieldValue = this.fieldMap[this.typeField]()[0].id;
+    // await this.$nextTick();
+    this.evtInput();
   },
   methods: {
     evtClick() {},
-    evtInput() {},
+    evtInput() { this.$emit('input', this.fieldValue); },
     evtKeydown(evt) { this.$emit('keydown:key', evt); },
     evtKeydownControl(evt) {
       const isOpenCombobox = this.$refs.fieldInput.$el

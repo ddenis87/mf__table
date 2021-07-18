@@ -6,11 +6,16 @@
     <div class="item item__compare">
       <filter-field-wrapper ref="fieldCompare"
                             :field-options="fieldOptionsCompare"
+                            v-model="valueCompare"
+                            @input="evtInput"
                             @keydown:control="evtKeydownControl"></filter-field-wrapper>
     </div>
     <div class="item item__data">
       <filter-field-wrapper ref="fieldInput"
                             :field-options="fieldOptions.value"
+                            :field-mode="fieldMode"
+                            v-model="valueField"
+                            @input="evtInput"
                             @keydown:control="evtKeydownControl"></filter-field-wrapper>
     </div>
   </div>
@@ -18,6 +23,7 @@
 
 <script>
 import FilterFieldWrapper from './FilterFieldWrapper.vue';
+import FIELD_MODE from './FilterExtended';
 
 export default {
   name: 'FilterExtended',
@@ -29,7 +35,13 @@ export default {
   },
   data() {
     return {
+      valueCompare: null,
+      valueField: null,
+      valuesField: null,
+
       isFilterOn: false,
+
+      fieldMode: FIELD_MODE.SINGLE,
     };
   },
   computed: {
@@ -43,7 +55,27 @@ export default {
   },
   methods: {
     toggleFilter() {},
+    evtInput() {
+      console.log(this.valueCompare);
+      const compare = this.getCompareKey();
+      if (this.valueCompare === 'between') this.fieldMode = FIELD_MODE.RANGE;
+      else this.fieldMode = FIELD_MODE.SINGLE;
+      if (!this.valueField) { console.log('emit "clear:key"'); return; }
+      this.valuesField = this.valueField;
+      if (!Array.isArray(this.valuesField)) this.valuesField = [this.valuesField];
+
+      let compareValue = compare;
+      this.valuesField.forEach((value) => {
+        compareValue = compareValue.replace('{$value}', this.getCompareValue(value));
+      });
+
+      // const value = this.getCompareValue();
+      // const compareValue = compare.replace('{$value}', value);
+
+      console.log(compareValue);
+    },
     evtKeydownControl(evt) {
+      if (evt.code === 'Escape') return;
       if (evt.target.closest('.item__compare') && !evt.shiftKey) {
         const nextElement = this.$refs.fieldInput.$el.querySelector('input');
         nextElement.dispatchEvent(new Event('click'));
@@ -58,6 +90,30 @@ export default {
         previousElement.dispatchEvent(new Event('click'));
         previousElement.focus();
       }
+    },
+    getCompareKey() {
+      const { key } = this.fieldOptions;
+      const compareKey = {
+        equally: () => `&${key}={$value}`,
+        moreOrEqually: () => `&${key}__gte={$value}`,
+        lessOrEqually: () => `&${key}__lte={$value}`,
+        inList: () => `&${key}__in={$value}`,
+        contains: () => `&${key}__contains={$value}`,
+        between: () => `&${key}__gte={$value}&${key}__lte={$value}`,
+      };
+      return compareKey[this.valueCompare]();
+    },
+    getCompareValue(value) {
+      const valueType = {
+        string: (v) => v,
+        integer: (v) => v,
+        date: (v) => v,
+        datetime: (v) => v,
+        boolean: (v) => v,
+        choice: (v) => v.value,
+        field: (v) => v.id,
+      };
+      return valueType[this.fieldOptions.value.type](value);
     },
   },
 };

@@ -51,8 +51,6 @@ export default {
       }
       nextField.dispatchEvent(new Event('click'));
       nextField.focus();
-      // evt.target.closest('.filter-extended-item').nextElementSibling;
-      // console.log(nextItem.querySelector('.item__compare input'));
     },
   },
 };
@@ -61,6 +59,7 @@ export default {
 <style lang="scss" scoped>
 .filter-extended {
   padding: 0px;
+  padding-top: 10px;
   z-index: 999;
   .control {
     display: flex;
