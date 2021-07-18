@@ -1,7 +1,6 @@
 image: node:latest
 stages:
     - install
-    # - test
     - build
     - deploy
 
@@ -16,14 +15,6 @@ step-install:
         # - npm run build
     tags:
         - install
-
-# step-test:
-#     script:
-#         - npm install -g @vue/cli@latest
-#         - npm install
-#         - npm run test
-#     tags:
-#         - test
 
 step-build:
     script:
