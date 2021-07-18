@@ -17,13 +17,13 @@ step-install:
     tags:
         - install
 
-step-test:
-    script:
-        - npm install -g @vue/cli@latest
-        - npm install
-        - npm run test
-    tags:
-        - test
+# step-test:
+#     script:
+#         - npm install -g @vue/cli@latest
+#         - npm install
+#         - npm run test
+#     tags:
+#         - test
 
 step-build:
     script:

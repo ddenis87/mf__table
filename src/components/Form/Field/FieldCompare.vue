@@ -11,7 +11,14 @@
                     :item-value="itemValue"
                     v-bind="fieldPropsNested"
                     v-model="fieldValue"
-                    @click.stop></v-autocomplete>
+                    @click.stop
+                    @input="evtInput"
+                    @keydown="evtKeydown"
+                    @keydown.enter="evtKeydownControl"
+                    @keydown.esc="evtKeydownControl"
+                    @keydown.tab="evtKeydownControl"
+                    @blur="evtBlur"
+                    @focus="evtFocus"></v-autocomplete>
   </div>
 </template>
 
@@ -54,13 +61,28 @@ export default {
   computed: {
     ...fieldComputed,
     fieldItems() {
-      console.log(this.type);
-      console.log(this.typeField);
       return this.fieldMap[this.typeField]();
     },
   },
   mounted() {
-    this.fieldValue = this.fieldMap[this.typeField]().id;
+    this.fieldValue = this.fieldMap[this.typeField]()[0].id;
+  },
+  methods: {
+    evtClick() {},
+    evtInput() {},
+    evtKeydown(evt) { this.$emit('keydown:key', evt); },
+    evtKeydownControl(evt) {
+      const isOpenCombobox = this.$refs.fieldInput.$el
+        .querySelector('.v-input__slot').getAttribute('aria-expanded');
+      if (isOpenCombobox === 'false') {
+        this.$refs.fieldInput.isMenuActive = false;
+        this.$emit('keydown:control', evt);
+      }
+    },
+    evtFocus() {},
+    evtBlur(evt) {
+      this.$emit('blur:input', evt);
+    },
   },
 };
 </script>

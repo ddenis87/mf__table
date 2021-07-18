@@ -36,7 +36,7 @@
                          @input="evtSelectDate"></v-date-picker>
         </div>
         <div class="dialog-date__control">
-          <btn-dialog @click="evtSelectToday">Сегодня</btn-dialog>
+          <btn-form @click="evtSelectToday">Сегодня</btn-form>
         </div>
       </div>
     </v-menu>
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import BtnDialog from '@/components/Form/Btn/BtnDialog.vue';
+import BtnForm from '@/components/Form/Btn/BtnForm.vue';
 import BtnField from '@/components/Form/Btn/BtnField.vue';
 
 // import formattedDataDisplay from '@/plugins/formattedDataDisplay/formattedDataDisplay';
@@ -57,7 +57,7 @@ export default {
   name: 'FieldDate',
   components: {
     BtnField,
-    BtnDialog,
+    BtnForm,
   },
   model: {
     ...fieldModel,

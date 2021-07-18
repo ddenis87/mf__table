@@ -2,19 +2,24 @@
   <div class="filter-extended">
     <div class="body">
       <div v-for="item in listFields" :key="item.key">
-        <filter-extended-item :field-options="item"></filter-extended-item>
+        <filter-extended-item :field-options="item"
+                              @keydown:control="evtKeydownControl"></filter-extended-item>
       </div>
     </div>
-    <div class="control"></div>
+    <div class="control">
+      <btn-form height="24">Сбросить все</btn-form>
+      <btn-form height="24">Применить</btn-form>
+    </div>
   </div>
 </template>
 
 <script>
+import BtnForm from '@/components/Form/Btn/BtnForm.vue';
 import FilterExtendedItem from './FilterExtendedItem.vue';
 
 export default {
   name: 'FilterExtended',
-  components: { FilterExtendedItem },
+  components: { FilterExtendedItem, BtnForm },
   props: {
     sourceName: { type: String, default: null },
     guid: { type: String, default: null },
@@ -36,17 +41,33 @@ export default {
       return listFields;
     },
   },
+  methods: {
+    evtKeydownControl(evt) {
+      let nextItem = evt.target.closest('.filter-extended-item').parentElement.nextElementSibling;
+      let nextField = nextItem.querySelector('.item__compare input');
+      if (evt.shiftKey) {
+        nextItem = evt.target.closest('.filter-extended-item').parentElement.previousElementSibling;
+        nextField = nextItem.querySelector('.item__data input');
+      }
+      nextField.dispatchEvent(new Event('click'));
+      nextField.focus();
+      // evt.target.closest('.filter-extended-item').nextElementSibling;
+      // console.log(nextItem.querySelector('.item__compare input'));
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 .filter-extended {
-  padding: 10px 0px;
-  // border: thin solid green;
+  padding: 0px;
   z-index: 999;
   .control {
-    padding-bottom: 5px;
-    border-bottom: thin solid rgba(128, 128, 128, .4);
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    padding: 5px 11px;
+    border-top: thin solid rgba(128, 128, 128, .4);
   }
 }
 </style>

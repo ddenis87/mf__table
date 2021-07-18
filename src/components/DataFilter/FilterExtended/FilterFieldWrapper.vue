@@ -3,7 +3,9 @@
     <component :is="field"
                ref="field"
                v-bind="fieldProps"
-               v-model="fieldValue"></component>
+               v-model="fieldValue"
+               @keydown:control="evtKeydownControl"
+               @blur:input="evtBlur"></component>
   </div>
 </template>
 
@@ -64,7 +66,7 @@ export default {
         fieldLabel: this.fieldOptions.label,
         isClearable: true,
       };
-
+      if (this.fieldOptions.isClearable === false) props.isClearable = this.fieldOptions.isClearable;
       if (this.fieldOptions.choices) props.items = this.fieldOptions.choices;
       if (this.fieldOptions.related_model_name) {
         props.relatedModelName = this.fieldOptions.related_model_name;
@@ -72,6 +74,22 @@ export default {
         props.itemValue = 'id';
       }
       return props;
+    },
+  },
+  watch: {
+    fieldValueInput() {
+      console.log(this.fieldValueInput);
+    },
+  },
+  methods: {
+    evtInput() { this.$emit('input', this.fieldValue); },
+    evtKeydownControl(evt) {
+      // evt.preventDefault();
+      this.evtInput();
+      this.$emit('keydown:control', evt);
+    },
+    evtBlur() {
+      this.evtInput();
     },
   },
 };

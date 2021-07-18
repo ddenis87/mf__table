@@ -11,16 +11,17 @@
 
 <script>
 export default {
-  name: 'BtnDialog',
+  name: 'BtnForm',
   props: {
     height: { type: String, default: '22' },
+    isSmall: { type: Boolean, default: true },
   },
   computed: {
     btnProps() {
       return {
         depressed: true,
         dark: true,
-        small: true,
+        small: this.isSmall,
         color: 'blue darken-1',
         height: this.height,
       };

@@ -4,10 +4,14 @@
       <v-checkbox hide-details v-model="isFilterOn" @change="toggleFilter"></v-checkbox>
     </div>
     <div class="item item__compare">
-      <filter-field-wrapper :field-options="fieldOptionsCompare"></filter-field-wrapper>
+      <filter-field-wrapper ref="fieldCompare"
+                            :field-options="fieldOptionsCompare"
+                            @keydown:control="evtKeydownControl"></filter-field-wrapper>
     </div>
     <div class="item item__data">
-      <filter-field-wrapper :field-options="fieldOptions.value"></filter-field-wrapper>
+      <filter-field-wrapper ref="fieldInput"
+                            :field-options="fieldOptions.value"
+                            @keydown:control="evtKeydownControl"></filter-field-wrapper>
     </div>
   </div>
 </template>
@@ -33,11 +37,28 @@ export default {
       return {
         type: 'compare',
         typeField: this.fieldOptions.value.type,
+        isClearable: false,
       };
     },
   },
   methods: {
     toggleFilter() {},
+    evtKeydownControl(evt) {
+      if (evt.target.closest('.item__compare') && !evt.shiftKey) {
+        const nextElement = this.$refs.fieldInput.$el.querySelector('input');
+        nextElement.dispatchEvent(new Event('click'));
+        nextElement.focus();
+      }
+      if (evt.target.closest('.item__compare') && evt.shiftKey) this.$emit('keydown:control', evt);
+
+      if (evt.target.closest('.item__data') && !evt.shiftKey) this.$emit('keydown:control', evt);
+
+      if (evt.target.closest('.item__data') && evt.shiftKey) {
+        const previousElement = this.$refs.fieldCompare.$el.querySelector('input');
+        previousElement.dispatchEvent(new Event('click'));
+        previousElement.focus();
+      }
+    },
   },
 };
 </script>
