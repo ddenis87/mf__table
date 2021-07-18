@@ -17,6 +17,7 @@ step-install:
         - install
 
 step-build:
+    stage: build
     script:
         - npm install -g @vue/cli@latest
         - npm install
