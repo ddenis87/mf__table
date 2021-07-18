@@ -66,7 +66,9 @@ export default {
         fieldLabel: this.fieldOptions.label,
         isClearable: true,
       };
-      if (this.fieldOptions.isClearable === false) props.isClearable = this.fieldOptions.isClearable;
+      if (this.fieldOptions.isClearable === false) {
+        props.isClearable = this.fieldOptions.isClearable;
+      }
       if (this.fieldOptions.choices) props.items = this.fieldOptions.choices;
       if (this.fieldOptions.related_model_name) {
         props.relatedModelName = this.fieldOptions.related_model_name;

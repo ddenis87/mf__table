@@ -18,7 +18,8 @@ module.exports = {
     "template-curly-spacing" : "off",
     "indent": ["error", 2, {
       "ignoredNodes": ["TemplateLiteral"]
-    }]
+    }],
+    'max-len': 'off'
   },
   overrides: [
     {
