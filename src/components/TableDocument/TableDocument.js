@@ -13,6 +13,7 @@ import {
 } from './Helpers';
 
 import Formulas from './Formulas';
+import ValueValidate from './Errors';
 
 const EDIT_ACCESS = {
   CLOSED: 'closed',
@@ -840,13 +841,25 @@ class TableDocument {
     this.rows = { ...this.rows, [rowName]: rowValue };
   }
 
-  writeCell(cellName, cellValue) {
+  writeCell(cellName, cellValue, isErrorStop = false) {
     const value = cellValue;
-    if (!this.valueValidate(cellName, cellValue)) {
-      value.value = null;
+    try {
+      this.valueValidate(cellName, cellValue);
+      this.cells = { ...this.cells, [cellName]: value };
+    } catch (err) {
+      console.log(err.name, err.message);
+      if (isErrorStop) return;
+      delete value.value;
+      this.cells = { ...this.cells, [cellName]: value };
     }
-    this.cells = { ...this.cells, [cellName]: value }; // возвращать результаты валидации
   }
+  // writeCell(cellName, cellValue) {
+  //   const value = cellValue;
+  //   if (!this.valueValidate(cellName, cellValue)) {
+  //     value.value = null;
+  //   }
+  //   this.cells = { ...this.cells, [cellName]: value }; // возвращать результаты валидации
+  // }
 
   writeNamedArea() {
     const namedArea = {};
@@ -937,9 +950,14 @@ class TableDocument {
       const validateFunction = eval(scripts.validate); // eslint-disable-line no-eval
       validateCustom = validateFunction(cellValue.value);
     }
-    if (validateType !== true) console.log(`%c ${cellName} - %c Type - ${validateType}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
-    if (validateCustom !== true) console.log(`%c ${cellName} - %c Custom - ${validateCustom}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
-    return (validateType === true && validateCustom === true);
+    // if (validateType !== true) console.log(`%c ${cellName} - %c Type - ${validateType}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
+    // if (validateCustom !== true) console.log(`%c ${cellName} - %c Custom - ${validateCustom}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
+    // if (validateType !== true) throw new Error(`${cellName} - ${validateType}`);
+    // if (validateCustom !== true) throw new Error(`${cellName} - ${validateCustom}`);
+    if (validateType !== true || validateCustom !== true) {
+      throw new ValueValidate(cellName, [validateType, validateCustom]);
+    }
+    // return (validateType === true && validateCustom === true);
   }
 }
 

@@ -25,12 +25,6 @@ class TableDocumentApi extends TableDocument {
     super(params);
     this.prepareRepresentation();
   }
-  // constructor(params) {
-  //   super(params);
-  //   (async () => {
-  //     await this.prepareRepresentation();
-  //   })();
-  // }
 
   BASE_CLASS = TableDocumentApi;
 
