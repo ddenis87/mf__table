@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import formattedData from '@/plugins/formattedDataDisplay/formattedDataDisplay';
+import display from '@/plugins/formattingView/formattingView';
 import {
   CELL_TYPE_DEFAULT,
 } from '../SpreadSheetConst';
@@ -52,16 +52,22 @@ export default {
   },
   methods: {
     formattedData(columnName) {
-      if (!this.cells[`${columnName}${this.source.value}`]) return '';
-      const formattedOption = {};
-      const cell = this.cells[`${columnName}${this.source.value}`];
-      const cellValue = cell.value;
-      const cellType = this.getCellType(cell, columnName);
-      formattedOption.valueType = cellType;
-      const cellFormatString = this.getCellFormatString(cell, columnName);
-      if (cellFormatString) formattedOption.formatString = cellFormatString;
-      return formattedData(cellValue, formattedOption);
+      const cell = this.hasCell(columnName);
+      if (!cell) return '';
+      if (!Object.keys(cell).includes('value')) return '';
+      return display.formate(cell.value, { ...cell, representations: this.representations });
     },
+    // formattedData(columnName) {
+    //   if (!this.cells[`${columnName}${this.source.value}`]) return '';
+    //   const formattedOption = {};
+    //   const cell = this.cells[`${columnName}${this.source.value}`];
+    //   const cellValue = cell.value;
+    //   const cellType = this.getCellType(cell, columnName);
+    //   formattedOption.valueType = cellType;
+    //   const cellFormatString = this.getCellFormatString(cell, columnName);
+    //   if (cellFormatString) formattedOption.formatString = cellFormatString;
+    //   return formattedData(cellValue, formattedOption);
+    // },
     getCellType(cell, columnName) {
       const cellType = cell.type
         || this.source.type

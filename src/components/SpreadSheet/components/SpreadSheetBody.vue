@@ -145,7 +145,7 @@ export default {
       for (let i = 0; i < this.rowsFixed.length; i += 1) {
         heightBodyFixed += this.rowsFixed[i].height;
       }
-      console.log(this.maxLevelGroupColumn * (22 + 1));
+      // console.log(this.maxLevelGroupColumn * (22 + 1));
       if (!this.isTitle) heightBodyFixed -= (this.maxLevelGroupColumn || 1 * (22));
       return {
         height: `calc(100vh - ${heightBodyFixed}px)`,
