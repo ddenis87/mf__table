@@ -473,7 +473,7 @@ class TableDocument {
     return this.getCellType(cellName).split('.')[0];
   }
 
-  getCellValueForFormula(cellName) {
+  getCellValueForFormula(cellName) { // ???
     if (this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA)) return this.calculateCellValue(cellName);
     const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
     return +cellValue || 0;
