@@ -14,6 +14,7 @@ import {
 
 import Formulas from './Formulas';
 import ValueValidate from './Errors';
+import ExceptionCellValidation from './ExceptionsCellValidation';
 
 const EDIT_ACCESS = {
   CLOSED: 'closed',
@@ -838,7 +839,7 @@ class TableDocument {
     //   if (message === true) return;
     //   console.log(`%c ${message}`, 'color: red; font: Tahoma;');
     // });
-  
+
     // console.log('finality');
     insertStyles.forEach((insertStyle) => {
       const styles = this.styles.find((style) => style.name === insertStyle.name);
@@ -898,7 +899,7 @@ class TableDocument {
     //   delete value.value;
     //   // throw new ValueValidate(err.name, ['WriteCell']);
     //   throw err;
-    // } 
+    // }
   }
   // writeCell(cellName, cellValue) {
   //   const value = cellValue;
@@ -1018,7 +1019,7 @@ class TableDocument {
     // if (validateType !== true) throw new Error(`${cellName} - ${validateType}`);
     // if (validateCustom !== true) throw new Error(`${cellName} - ${validateCustom}`);
     if (validateType !== true || validateCustom !== true) {
-      throw new ValueValidate(cellName, [validateType, validateCustom]);
+      throw new ExceptionCellValidation(cellName, [validateType, validateCustom]);
     }
     // return (validateType === true && validateCustom === true);
   }

@@ -1,5 +1,6 @@
 import store from '@/store/index';
 import TableDocument from './TableDocument';
+// import ValueValidate from './Errors';
 
 function parseType(type) {
   const [parthType, parthSource] = type.split('.');
@@ -31,8 +32,15 @@ class TableDocumentApi extends TableDocument {
   representations = new Map();
 
   async deserialize(data, template, settings) {
-    super.deserialize(data, template, settings);
-    this.prepareRepresentation();
+    try {
+      super.deserialize(data, template, settings);
+    // } catch (err) {
+    //   console.log(err);
+    //   throw new ValueValidate('TableDocumentApi', err);
+    // }
+    } finally {
+      await this.prepareRepresentation();
+    }
   }
 
   editingCell(cellName, cellValue) {
@@ -69,10 +77,9 @@ class TableDocumentApi extends TableDocument {
   }
 
   async prepareRepresentation() {
-    await this.getRepresentationStore().then(() => {
-      // console.log('before update');
-      this.cells = { ...this.cells };
-    });
+    await this.getRepresentationStore(); // .then(() => {
+    this.cells = { ...this.cells };
+    // });
   }
 
   setRepresentation(key, value) {

@@ -297,27 +297,41 @@ export default {
       });
     },
 
-    openJSONFileData(file) {
+    async openJSONFileData(file) {
       if (!file) return;
-      apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
-        const tableDocument = new TableDocumentApi();
-        try {
-          tableDocument.deserialize(JSONData, this.tableDocumentTemplate, this.documentSetting);
-        } catch (err) {
-          console.log(err);
-          // console.log(err.name);
-          // err.messages.forEach((message) => {
-          //   if (message === true) return;
-          //   console.log(`%c  ${message}`, 'color: red; font: Tahoma;');
-          // });
-        } finally {
-          this.tableDocument = tableDocument;
-          this.tableDocument.recalculateFormulas();
-          this.isFileDataDisabled = true;
-          this.isGrid = false;
-        }
-        // console.log(this.tableDocument);
-      });
+      const JSONFile = await apiSpreadSheet.uploadJSONFile(file);
+      console.log('file upload');
+      const tableDocument = new TableDocumentApi();
+      try {
+        await tableDocument.deserialize(JSONFile, this.tableDocumentTemplate, this.documentSetting);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        this.tableDocument = tableDocument;
+        this.tableDocument.recalculateFormulas();
+        this.isFileDataDisabled = true;
+        this.isGrid = false;
+      }
+      // apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
+      //   const tableDocument = new TableDocumentApi();
+      //   // try {
+      //   tableDocument.deserialize(JSONData, this.tableDocumentTemplate, this.documentSetting);
+      //   // } catch (err) {
+      //   //   console.log(err);
+      //   //   // console.log(err.name);
+      //   //   // err.messages.forEach((message) => {
+      //   //   //   if (message === true) return;
+      //   //   //   console.log(`%c  ${message}`, 'color: red; font: Tahoma;');
+      //   //   // });
+      //   // }
+      //   // } finally {
+      //   this.tableDocument = tableDocument;
+      //   this.tableDocument.recalculateFormulas();
+      //   this.isFileDataDisabled = true;
+      //   this.isGrid = false;
+      //   // }
+      //   // console.log(this.tableDocument);
+      // }).catch((err) => console.log(err));
     },
     openPrintPage() {
       localStorage.setItem('SpreadSheetTableDocument', this.tableDocument.getDocument(true));
