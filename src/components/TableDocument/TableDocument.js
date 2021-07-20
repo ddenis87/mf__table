@@ -229,6 +229,7 @@ class TableDocument {
     if (!this.documentTemplate) this.documentTemplate = documentTemplate;
     if (!this.documentSettings) this.documentSettings = documentSettings;
     if (!this.editAccess) this.editAccess = this.documentTemplate.editAccess || undefined;
+    const deserializeError = [];
     documentSettings.forEach((setting) => {
       const [key, keyValue] = Object.entries(setting)[0];
       if (Object.keys(keyValue).includes('nested')) return;
@@ -236,12 +237,21 @@ class TableDocument {
       const dataSectionItems = dataSection[key];
       if (Array.isArray(dataSectionItems)) {
         dataSectionItems.forEach((dataSectionItem) => {
-          this.deserializeArea(key, dataSectionItem);
+          try {
+            this.deserializeArea(key, dataSectionItem);
+          } catch (err) {
+            deserializeError.push(err);
+          }
         });
         return;
       }
-      this.deserializeArea(key, dataSectionItems);
+      try {
+        this.deserializeArea(key, dataSectionItems);
+      } catch (err) {
+        deserializeError.push(err);
+      }
     });
+    if (deserializeError.length) throw new ValueValidate('deserialize', deserializeError);
   }
 
   deserializeArea(key, dataItem) {
@@ -263,11 +273,17 @@ class TableDocument {
     } = keyValue;
     const area = this.documentTemplate.getNamedArea(templateSectionName);
 
-    insertMethods[insertMethod](dataItem, area, parameters);
-    if (!nestedData) return;
-    nestedData.forEach((nestedDataKey) => {
-      if (Object.keys(dataItem).includes(nestedDataKey)) this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
-    });
+    try {
+      insertMethods[insertMethod](dataItem, area, parameters);
+    } finally {
+      if (nestedData) {
+        nestedData.forEach((nestedDataKey) => {
+          if (Object.keys(dataItem).includes(nestedDataKey)) {
+            this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
+          }
+        });
+      }
+    }
   }
 
   editingCell(cellName, cellValue) { // проверять существует строка/столбец
@@ -791,7 +807,7 @@ class TableDocument {
       areaShift = this.getAreaForRange(rangeShift);
       this.deleteRange(rangeShift);
     }
-
+    const errorCell = [];
     Object.entries(insertCells).forEach((cell) => {
       const [currentCellName] = cell;
       const shiftCellName = moveCell(currentCellName, `${getColumnNameForNumber(numberColumn)}${numberRow}`);
@@ -800,9 +816,30 @@ class TableDocument {
 
       this.writeColumn(shiftColumn, area.getColumn(currentColumn));
       this.writeRow(shiftRow, area.getRow(currentRow));
-      this.writeCell(shiftCellName, area.getCell(currentCellName));
+      // console.log(shiftCellName, 'before writeCell');
+      try {
+        this.writeCell(shiftCellName, area.getCell(currentCellName));
+      } catch (err) {
+        err.messages.forEach((message) => {
+          errorCell.push(`${err.name} - ${message}`);
+        });
+      }
+      // console.log(shiftCellName, 'after writeCell');
+      // catch (err) {
+      //   console.log(err.name);
+      //   err.messages.forEach((message) => {
+      //     if (message === true) return;
+      //     console.log(`%c ${message}`, 'color: red; font: Tahoma;');
+      //   });
+      // }
     });
-
+    // console.log(err.name);
+    // err.messages.forEach((message) => {
+    //   if (message === true) return;
+    //   console.log(`%c ${message}`, 'color: red; font: Tahoma;');
+    // });
+  
+    // console.log('finality');
     insertStyles.forEach((insertStyle) => {
       const styles = this.styles.find((style) => style.name === insertStyle.name);
       if (!styles) this.styles.push(insertStyle);
@@ -828,6 +865,7 @@ class TableDocument {
     this.columnCount = this.getLastColumn();
 
     shiftInsert[shiftType]();
+    if (errorCell.length) throw new ValueValidate('insertArea', errorCell);
     // console.log(this);
   }
 
@@ -845,13 +883,22 @@ class TableDocument {
     const value = cellValue;
     try {
       this.valueValidate(cellName, cellValue);
-      this.cells = { ...this.cells, [cellName]: value };
+      // this.cells = { ...this.cells, [cellName]: value };
     } catch (err) {
-      console.log(err.name, err.message);
-      if (isErrorStop) return;
       delete value.value;
-      this.cells = { ...this.cells, [cellName]: value };
+      throw err;
+    } finally {
+      // console.log(cellName, 'finality writeCell');
+      if (!isErrorStop) {
+        this.cells = { ...this.cells, [cellName]: value };
+      }
     }
+    // catch (err) {
+    //   // console.log(cellName, err.name, err.messages);
+    //   delete value.value;
+    //   // throw new ValueValidate(err.name, ['WriteCell']);
+    //   throw err;
+    // } 
   }
   // writeCell(cellName, cellValue) {
   //   const value = cellValue;
@@ -880,14 +927,30 @@ class TableDocument {
     const numberLastRow = this.getLastRow();
     const numberNewColumn = this.getLastColumnInRow(numberLastRow) + 1;
     areaCopy.fillArea(dataArea, parameters);
+    // try {
     this.insertArea(numberNewColumn, numberLastRow, areaCopy);
+    // } catch (err) {
+    //   console.log(err.name);
+    //   err.messages.forEach((message) => {
+    //     if (message === true) return;
+    //     console.log(`%c ${message}`, 'color: red; font: Tahoma;');
+    //   });
+    // }
   }
 
   putArea(dataArea, area, parameters) {
     const areaCopy = area.getAreaCopy();
     const numberNewRow = this.getLastRow() + 1;
     areaCopy.fillArea(dataArea, parameters);
+    // try {
     this.insertArea(1, numberNewRow, areaCopy);
+    // } catch (err) {
+    //   console.log(err.name);
+    //   err.messages.forEach((message) => {
+    //     if (message === true) return;
+    //     console.log(`%c  ${message}`, 'color: red; font: Tahoma;');
+    //   });
+    // }
   }
 
   recalculateFormulas() {

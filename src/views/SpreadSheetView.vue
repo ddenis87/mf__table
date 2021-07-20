@@ -301,11 +301,21 @@ export default {
       if (!file) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONData) => {
         const tableDocument = new TableDocumentApi();
-        tableDocument.deserialize(JSONData, this.tableDocumentTemplate, this.documentSetting);
-        this.tableDocument = tableDocument;
-        this.tableDocument.recalculateFormulas();
-        this.isFileDataDisabled = true;
-        this.isGrid = false;
+        try {
+          tableDocument.deserialize(JSONData, this.tableDocumentTemplate, this.documentSetting);
+        } catch (err) {
+          console.log(err);
+          // console.log(err.name);
+          // err.messages.forEach((message) => {
+          //   if (message === true) return;
+          //   console.log(`%c  ${message}`, 'color: red; font: Tahoma;');
+          // });
+        } finally {
+          this.tableDocument = tableDocument;
+          this.tableDocument.recalculateFormulas();
+          this.isFileDataDisabled = true;
+          this.isGrid = false;
+        }
         // console.log(this.tableDocument);
       });
     },
