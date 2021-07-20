@@ -15,7 +15,7 @@ $fontSize: 16px;
 $borderStyle: thin solid grey;
 
 $backgroundColorTitle: rgb(240, 240, 240); //#dadce0;
-$backgroundColorbody: white;
+$backgroundColorBody: white;
 
 $headFontSize: 0.75em;
 $headFontWeight: bold;
@@ -30,6 +30,7 @@ $bodyGridColor: thin solid rgba(0, 0, 0, .12);
 $bodyGridColorOff: thin solid rgba(255, 255, 255, 0);
 
 $bodyGridAutoRow: minmax(22px, 22px);
+$bodyGridRow: 22px;
 
 $borderRadius: 0px 0px 4px 0px;
 $boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2),

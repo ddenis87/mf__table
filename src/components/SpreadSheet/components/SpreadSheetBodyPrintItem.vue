@@ -118,7 +118,6 @@ export default {
       white-space: nowrap;
       outline: none;
       cursor: cell;
-      background-color: $backgroundColorbody;
 
       .content {
         display: flex;
@@ -128,6 +127,7 @@ export default {
         width: 100%;
         padding: 0px 2px;
         overflow: hidden;
+        background-color: $backgroundColorBody;
         .active-element {
           display: none;
         }

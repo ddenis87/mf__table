@@ -299,7 +299,7 @@ export default {
       white-space: nowrap;
       outline: none;
       cursor: cell;
-      background-color: $backgroundColorbody;
+      background-color: $backgroundColorBody;
       .content {
         display: flex;
         justify-content: inherit;
