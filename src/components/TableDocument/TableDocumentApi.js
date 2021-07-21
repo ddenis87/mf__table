@@ -34,10 +34,6 @@ class TableDocumentApi extends TableDocument {
   async deserialize(data, template, settings) {
     try {
       super.deserialize(data, template, settings);
-    // } catch (err) {
-    //   console.log(err);
-    //   throw new ValueValidate('TableDocumentApi', err);
-    // }
     } finally {
       await this.prepareRepresentation();
     }

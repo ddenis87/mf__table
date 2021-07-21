@@ -10,10 +10,10 @@ import {
   getRangeShift,
   moveCell,
   moveRange,
-} from './Helpers';
+} from './TableDocumentHelpers';
 
 import Formulas from './Formulas';
-import ValueValidate from './Errors';
+// import ValueValidate from './Errors';
 import ExceptionCellValidation from './ExceptionsCellValidation';
 
 const EDIT_ACCESS = {
@@ -241,7 +241,7 @@ class TableDocument {
           try {
             this.deserializeArea(key, dataSectionItem);
           } catch (err) {
-            deserializeError.push(err);
+            deserializeError.push(err.getException());
           }
         });
         return;
@@ -249,10 +249,10 @@ class TableDocument {
       try {
         this.deserializeArea(key, dataSectionItems);
       } catch (err) {
-        deserializeError.push(err);
+        deserializeError.push(err.getException());
       }
     });
-    if (deserializeError.length) throw new ValueValidate('deserialize', deserializeError);
+    if (deserializeError.length) throw new ExceptionCellValidation('deserialize', deserializeError);
   }
 
   deserializeArea(key, dataItem) {
@@ -821,9 +821,10 @@ class TableDocument {
       try {
         this.writeCell(shiftCellName, area.getCell(currentCellName));
       } catch (err) {
-        err.messages.forEach((message) => {
-          errorCell.push(`${err.name} - ${message}`);
-        });
+        // err.messages.forEach((message) => {
+        // errorCell.push(`${err.name} - ${message}`);
+        errorCell.push(err.getException());
+        // });
       }
       // console.log(shiftCellName, 'after writeCell');
       // catch (err) {
@@ -866,7 +867,8 @@ class TableDocument {
     this.columnCount = this.getLastColumn();
 
     shiftInsert[shiftType]();
-    if (errorCell.length) throw new ValueValidate('insertArea', errorCell);
+    // if (errorCell.length) throw new ValueValidate('insertArea', errorCell);
+    if (errorCell.length) throw new ExceptionCellValidation('insertArea', errorCell);
     // console.log(this);
   }
 
@@ -928,30 +930,14 @@ class TableDocument {
     const numberLastRow = this.getLastRow();
     const numberNewColumn = this.getLastColumnInRow(numberLastRow) + 1;
     areaCopy.fillArea(dataArea, parameters);
-    // try {
     this.insertArea(numberNewColumn, numberLastRow, areaCopy);
-    // } catch (err) {
-    //   console.log(err.name);
-    //   err.messages.forEach((message) => {
-    //     if (message === true) return;
-    //     console.log(`%c ${message}`, 'color: red; font: Tahoma;');
-    //   });
-    // }
   }
 
   putArea(dataArea, area, parameters) {
     const areaCopy = area.getAreaCopy();
     const numberNewRow = this.getLastRow() + 1;
     areaCopy.fillArea(dataArea, parameters);
-    // try {
     this.insertArea(1, numberNewRow, areaCopy);
-    // } catch (err) {
-    //   console.log(err.name);
-    //   err.messages.forEach((message) => {
-    //     if (message === true) return;
-    //     console.log(`%c  ${message}`, 'color: red; font: Tahoma;');
-    //   });
-    // }
   }
 
   recalculateFormulas() {

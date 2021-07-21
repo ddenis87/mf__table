@@ -15,4 +15,11 @@ export default class ExceptionCellValidation {
     }
     if (!Array.isArray(messages)) this.messages.push(messages);
   }
+
+  getException() {
+    return {
+      source: this.source,
+      messages: this.messages,
+    };
+  }
 }
