@@ -5,8 +5,7 @@
        @dblclick="evtDblClickBody"
        @keydown="evtKeydownBody"
        @mousedown="evtMousedown"
-       @mouseup="evtMouseup"
-       @mousemove="evtMousemove">
+       >
     <div class="select-area" :style="rangeSelect"></div>
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed"
@@ -221,14 +220,14 @@ export default {
       }
     },
     evtKeydownBody(evt) {
-      evt.preventDefault();
       if (this.hasNavigationKey(evt)) return;
       const setTemplateKey = ['Key', 'Numpad', 'Digit', 'Enter', 'Delete', 'Space'];
       if (!setTemplateKey.find((item) => evt.code.includes(item))) return;
 
       if (this.hasCopy(evt) || this.hasPast(evt)) return;
-
+      if (evt.ctrlKey) return;
       console.log(evt.target);
+      evt.preventDefault();
       if (evt.target.hasAttribute('data-name')) {
         const cellName = evt.target.getAttribute('data-name');
         this.$emit('keydown:cell', { evt, cellName });

@@ -252,7 +252,7 @@ class TableDocument {
         deserializeError.push(err.getMessage());
       }
     });
-    if (deserializeError.length) throw new TableDocumentValidationCellError('deserialize', deserializeError);
+    if (deserializeError.length) throw new TableDocumentValidationCellError('deserialize', null, deserializeError);
   }
 
   deserializeArea(key, dataItem) {
@@ -868,7 +868,7 @@ class TableDocument {
 
     shiftInsert[shiftType]();
     // if (errorCell.length) throw new ValueValidate('insertArea', errorCell);
-    if (errorCell.length) throw new TableDocumentValidationCellError('insertArea', errorCell);
+    if (errorCell.length) throw new TableDocumentValidationCellError('insertArea', null, errorCell);
     // console.log(this);
   }
 
@@ -989,23 +989,24 @@ class TableDocument {
 
   valueValidate(cellName, cellValue) {
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
-    const cellType = cellValue?.type
+    const { type: cellType, value: checkValue } = cellValue;
+    const checkType = cellType
       || this.getRowType(cellRow)
       || this.getColumnType(cellColumn)
       || 'string';
-    const validateType = valueValidateType(cellValue.value, cellType);
+    const validateType = valueValidateType(checkValue, checkType);
     let validateCustom = true;
     const { scripts } = cellValue;
     if (scripts && Object.keys(scripts).includes('validate')) {
       const validateFunction = eval(scripts.validate); // eslint-disable-line no-eval
-      validateCustom = validateFunction(cellValue.value);
+      validateCustom = validateFunction(checkValue);
     }
     // if (validateType !== true) console.log(`%c ${cellName} - %c Type - ${validateType}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
     // if (validateCustom !== true) console.log(`%c ${cellName} - %c Custom - ${validateCustom}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
     // if (validateType !== true) throw new Error(`${cellName} - ${validateType}`);
     // if (validateCustom !== true) throw new Error(`${cellName} - ${validateCustom}`);
     if (validateType !== true || validateCustom !== true) {
-      throw new TableDocumentValidationCellError(cellName, [validateType, validateCustom]);
+      throw new TableDocumentValidationCellError(cellName, checkValue, [validateType, validateCustom]);
     }
     // return (validateType === true && validateCustom === true);
   }

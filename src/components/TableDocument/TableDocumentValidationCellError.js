@@ -1,7 +1,8 @@
 export default class TableDocumentValidationCellError {
-  constructor(source, messages) {
+  constructor(source, value, messages) {
     this.name = this.constructor.name;
     this.source = source;
+    this.value = value;
     this.addingMessage(messages);
   }
 
@@ -19,6 +20,7 @@ export default class TableDocumentValidationCellError {
   getMessage() {
     return {
       source: this.source,
+      value: this.value,
       messages: this.messages,
     };
   }
