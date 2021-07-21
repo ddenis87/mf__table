@@ -267,6 +267,12 @@ export default {
     &-title {
       padding-top: 1px;
       width: 60px;
+      // border-left: thin solid grey;
+      // border-right: thin solid grey;
+      // border-top: px solid rgb(240, 240, 240);
+      // border-bottom: thin solid $backgroundColorTitle;
+      // background-color: $backgroundColorTitle;
+      // overflow: hidden;
       z-index: 400;
       &::after {
         content: '';
@@ -287,9 +293,11 @@ export default {
         height: 100%;
         width: 100%;
         box-sizing: border-box;
+        // border-bottom: thin solid $backgroundColorTitle;
         background-color: $backgroundColorTitle;
         overflow: hidden;
         user-select: none;
+        z-index: 401;
       }
     }
     &-body {

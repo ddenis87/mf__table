@@ -1,4 +1,4 @@
-export default class ExceptionCellValidation {
+export default class TableDocumentValidationCellError {
   constructor(source, messages) {
     this.name = this.constructor.name;
     this.source = source;
@@ -16,7 +16,7 @@ export default class ExceptionCellValidation {
     if (!Array.isArray(messages)) this.messages.push(messages);
   }
 
-  getException() {
+  getMessage() {
     return {
       source: this.source,
       messages: this.messages,

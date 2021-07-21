@@ -228,6 +228,7 @@ export default {
 
       if (this.hasCopy(evt) || this.hasPast(evt)) return;
 
+      console.log(evt.target);
       if (evt.target.hasAttribute('data-name')) {
         const cellName = evt.target.getAttribute('data-name');
         this.$emit('keydown:cell', { evt, cellName });

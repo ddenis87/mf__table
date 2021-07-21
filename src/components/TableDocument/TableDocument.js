@@ -14,7 +14,7 @@ import {
 
 import Formulas from './Formulas';
 // import ValueValidate from './Errors';
-import ExceptionCellValidation from './ExceptionsCellValidation';
+import TableDocumentValidationCellError from './TableDocumentValidationCellError';
 
 const EDIT_ACCESS = {
   CLOSED: 'closed',
@@ -241,7 +241,7 @@ class TableDocument {
           try {
             this.deserializeArea(key, dataSectionItem);
           } catch (err) {
-            deserializeError.push(err.getException());
+            deserializeError.push(err.getMessage());
           }
         });
         return;
@@ -249,10 +249,10 @@ class TableDocument {
       try {
         this.deserializeArea(key, dataSectionItems);
       } catch (err) {
-        deserializeError.push(err.getException());
+        deserializeError.push(err.getMessage());
       }
     });
-    if (deserializeError.length) throw new ExceptionCellValidation('deserialize', deserializeError);
+    if (deserializeError.length) throw new TableDocumentValidationCellError('deserialize', deserializeError);
   }
 
   deserializeArea(key, dataItem) {
@@ -823,7 +823,7 @@ class TableDocument {
       } catch (err) {
         // err.messages.forEach((message) => {
         // errorCell.push(`${err.name} - ${message}`);
-        errorCell.push(err.getException());
+        errorCell.push(err.getMessage());
         // });
       }
       // console.log(shiftCellName, 'after writeCell');
@@ -868,7 +868,7 @@ class TableDocument {
 
     shiftInsert[shiftType]();
     // if (errorCell.length) throw new ValueValidate('insertArea', errorCell);
-    if (errorCell.length) throw new ExceptionCellValidation('insertArea', errorCell);
+    if (errorCell.length) throw new TableDocumentValidationCellError('insertArea', errorCell);
     // console.log(this);
   }
 
@@ -1005,7 +1005,7 @@ class TableDocument {
     // if (validateType !== true) throw new Error(`${cellName} - ${validateType}`);
     // if (validateCustom !== true) throw new Error(`${cellName} - ${validateCustom}`);
     if (validateType !== true || validateCustom !== true) {
-      throw new ExceptionCellValidation(cellName, [validateType, validateCustom]);
+      throw new TableDocumentValidationCellError(cellName, [validateType, validateCustom]);
     }
     // return (validateType === true && validateCustom === true);
   }

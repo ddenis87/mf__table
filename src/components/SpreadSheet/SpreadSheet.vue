@@ -433,7 +433,7 @@ export default {
           left: '0px',
           top: '0px',
           right: '-1px',
-          bottom: '-1px',
+          bottom: '-0.6px',
           'z-index': '80',
         },
       };
@@ -444,7 +444,7 @@ export default {
       }
       if (listKeys.includes('borderBottom')) {
         pseudoBorder.list.borderBottom = style.list.borderBottom;
-        pseudoBorder.list.bottom = `-${(1 * +style.list.borderBottom[0])}px`;
+        // pseudoBorder.list.bottom = `-${(1 * +style.list.borderBottom[0])}px`;
       }
       if (listKeys.includes('borderLeft')) {
         pseudoBorder.list.left = `-${(1 * +style.list.borderLeft[0])}px`;
