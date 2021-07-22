@@ -40,6 +40,7 @@
             fixedCell(column, columnIndex)
           ]"
           :data-name="`${column.name}${source.name}`"
+          :data-tooltip="getTooltip(column.name)"
           :tabindex="columnIndex">
             <div v-if="hasImg(column.name)" class="content" v-html="getImg(column.name)"></div>
             <div v-else
@@ -94,10 +95,18 @@ export default {
       if (!Object.keys(this.cells[cellName]).includes('image')) return false;
       return true;
     },
+    getCellName(columnName) {
+      return `${columnName}${this.source.value}`;
+    },
     getImg(columnName) {
       const cellName = `${columnName}${this.source.value}`;
       // console.log(this.images);
       return this.images[this.cells[cellName].image];
+    },
+    getTooltip(columnName) {
+      // const cellName = this.getCellName(columnName);
+      // if (this.hasCell(columnName))
+      return this.hasCell(columnName)?.title || '';
     },
     formattedData(columnName) {
       const cell = this.hasCell(columnName);

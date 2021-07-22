@@ -5,7 +5,9 @@
        @dblclick="evtDblClickBody"
        @keydown="evtKeydownBody"
        @mousedown="evtMousedown"
-       >
+       @mouseover="evtMouseover"
+       @mouseout="evtMouseout">
+       <tooltip v-bind="propsTooltip"></tooltip>
     <div class="select-area" :style="rangeSelect"></div>
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed"
@@ -47,6 +49,7 @@
 </template>
 
 <script>
+import Tooltip from '@/components/Form/Tooltip/Tooltip.vue';
 import SpreadSheetBodyItem from './SpreadSheetBodyItem.vue';
 
 import {
@@ -58,6 +61,7 @@ export default {
   name: 'SpreadSheetBody',
   components: {
     SpreadSheetBodyItem,
+    Tooltip,
   },
   props: {
     rows: { type: Array },
@@ -83,6 +87,14 @@ export default {
 
       selectStart: null,
       selectEnd: null,
+
+      propsTooltip: {
+        isShow: false,
+        position: {
+          left: -100,
+          top: -100,
+        },
+      },
     };
   },
   computed: {
@@ -178,6 +190,31 @@ export default {
     this.sheetBodyGeometry = this.$refs.SheetBody.$el.getBoundingClientRect();
   },
   methods: {
+    evtMouseover(evt) {
+      const titleText = evt.target.closest('.column-body')?.getAttribute('data-tooltip');
+      if (titleText) {
+        const targetPosition = evt.target.closest('.column-body').getBoundingClientRect();
+        this.propsTooltip = {
+          text: titleText,
+          isShow: true,
+          position: {
+            left: targetPosition.left,
+            top: targetPosition.top + 42,
+          },
+        };
+      }
+    },
+    evtMouseout() {
+      if (!this.propsTooltip.isShow) return;
+      this.propsTooltip = {
+        text: '',
+        isShow: false,
+        position: {
+          left: -100,
+          top: -100,
+        },
+      };
+    },
     evtMousemove(evt) {
       if (evt.buttons === 1) {
         if (evt.target.closest('.column-body')) {

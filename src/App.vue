@@ -1,16 +1,5 @@
 <template>
   <v-app class="app">
-    <!-- <div class="app__bar">
-      <app-bar></app-bar>
-    </div>
-
-    <div class="app__bar-nav">
-      <app-bar-nav></app-bar-nav>
-    </div>
-
-    <div class="app__content">
-      <router-view/>
-    </div> -->
     <component :is="layout">
       <router-view/>
     </component>
@@ -76,7 +65,7 @@ html, body {
   }
   &-body {
     color: rgba(0, 0, 0, .87);
-    background-color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, 1) !important;
   }
   &_invalid {
     width: 100%;

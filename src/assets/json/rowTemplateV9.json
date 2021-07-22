@@ -128,7 +128,7 @@
     "g5":{"style":"g5","parameter":"st1Volume22","type":"number"},
     "g6":{"style":"g6","type":"number","parameter":"st2Volume22"},
     "g7":{"style":"g7","type":"number","parameter":"st3Volume22"},
-    "g8":{"style":"g8","type":"choice"},
+    "g8":{"style":"g8","type":"choice","title":"Тут должны быть choice"},
     "g9":{
       "style":"g9",
       "type":"number",
