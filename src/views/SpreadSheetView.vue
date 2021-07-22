@@ -305,7 +305,7 @@ export default {
       try {
         await tableDocument.deserialize(JSONFile, this.tableDocumentTemplate, this.documentSetting);
       } catch (err) {
-        console.log(err.getMessage());
+        console.log(err);
       } finally {
         this.tableDocument = tableDocument;
         this.tableDocument.recalculateFormulas();

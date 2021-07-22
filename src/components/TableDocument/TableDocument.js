@@ -14,6 +14,7 @@ import {
 
 import Formulas from './Formulas';
 // import ValueValidate from './Errors';
+import TableDocumentDeserializeError from './TableDocumentDeserializeError';
 import TableDocumentValidationCellError from './TableDocumentValidationCellError';
 
 const EDIT_ACCESS = {
@@ -124,7 +125,7 @@ class TableDocument {
 
   editAccess = undefined;
 
-  BASE_CLASS = TableDocument;
+  BASE_CLASS = TableDocument; // заменить на BaseClass = this.constructor
 
   actionCell(cellName) {
     const scripts = this.getCellParameter(cellName, CELL_ATTRIBUTES.SCRIPTS);
@@ -241,7 +242,9 @@ class TableDocument {
           try {
             this.deserializeArea(key, dataSectionItem);
           } catch (err) {
-            deserializeError.push(err.getMessage());
+            // console.log(err);
+            deserializeError.push(...err);
+            // deserializeError.push(err.getMessage());
           }
         });
         return;
@@ -249,10 +252,11 @@ class TableDocument {
       try {
         this.deserializeArea(key, dataSectionItems);
       } catch (err) {
-        deserializeError.push(err.getMessage());
+        deserializeError.push(...err);
       }
     });
-    if (deserializeError.length) throw new TableDocumentValidationCellError('deserialize', null, deserializeError);
+    // if (deserializeError.length) throw new TableDocumentValidationCellError('deserialize', deserializeError);
+    if (deserializeError.length) throw new TableDocumentDeserializeError('deserialize', deserializeError);
   }
 
   deserializeArea(key, dataItem) {
@@ -274,17 +278,25 @@ class TableDocument {
     } = keyValue;
     const area = this.documentTemplate.getNamedArea(templateSectionName);
 
-    try {
-      insertMethods[insertMethod](dataItem, area, parameters);
-    } finally {
-      if (nestedData) {
-        nestedData.forEach((nestedDataKey) => {
-          if (Object.keys(dataItem).includes(nestedDataKey)) {
-            this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
-          }
-        });
-      }
+    // try {
+    //   insertMethods[insertMethod](dataItem, area, parameters);
+    // } finally {
+    //   if (nestedData) {
+    //     nestedData.forEach((nestedDataKey) => {
+    //       if (Object.keys(dataItem).includes(nestedDataKey)) {
+    //         this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
+    //       }
+    //     });
+    //   }
+    // }
+    if (nestedData) {
+      nestedData.forEach((nestedDataKey) => {
+        if (Object.keys(dataItem).includes(nestedDataKey)) {
+          this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
+        }
+      });
     }
+    insertMethods[insertMethod](dataItem, area, parameters);
   }
 
   editingCell(cellName, cellValue) { // проверять существует строка/столбец
@@ -315,6 +327,7 @@ class TableDocument {
   }
 
   fillArea(dataArea, parameters) {
+    // const validationCellError = [];
     Object.entries(this.cells).forEach((cell) => {
       const [, cellValue] = cell;
       const parameterName = cellValue?.parameter || null;
@@ -322,7 +335,14 @@ class TableDocument {
       const parameterNameData = parameters[parameterName] || parameterName;
       if (!parameterName || !Object.keys(dataArea).includes(parameterNameData)) return;
       cellValue.value = dataArea[parameterNameData];
+      // try {
+      //   this.writeCell(cellName, cellValue);
+      // } catch (err) {
+      //   validationCellError.push(err.getMessage());
+      // }
+      // cellValue.value = dataArea[parameterNameData];
     });
+    // if (validationCellError.length) throw validationCellError;
   }
 
   getAreaCopy() {
@@ -338,7 +358,7 @@ class TableDocument {
       namedAreas: this.namedAreas,
     }));
     // const BaseClass = Object.getPrototypeOf(this);
-    return new this.BASE_CLASS({
+    return new this.BASE_CLASS({ // заменить BASE_CLASS на this.constructor.name
       rangeType: this.rangeType,
       rows,
       rowCount: this.rowCount,
@@ -868,7 +888,9 @@ class TableDocument {
 
     shiftInsert[shiftType]();
     // if (errorCell.length) throw new ValueValidate('insertArea', errorCell);
-    if (errorCell.length) throw new TableDocumentValidationCellError('insertArea', null, errorCell);
+    // console.log(errorCell);
+    // if (errorCell.length) throw new TableDocumentValidationCellError('insertArea', null, null, errorCell);
+    if (errorCell.length) throw errorCell;
     // console.log(this);
   }
 
@@ -929,15 +951,21 @@ class TableDocument {
     const areaCopy = area.getAreaCopy();
     const numberLastRow = this.getLastRow();
     const numberNewColumn = this.getLastColumnInRow(numberLastRow) + 1;
+    // try {
     areaCopy.fillArea(dataArea, parameters);
+    // } finally {
     this.insertArea(numberNewColumn, numberLastRow, areaCopy);
+    // }
   }
 
   putArea(dataArea, area, parameters) {
     const areaCopy = area.getAreaCopy();
     const numberNewRow = this.getLastRow() + 1;
+    // try {
     areaCopy.fillArea(dataArea, parameters);
+    // } finally {
     this.insertArea(1, numberNewRow, areaCopy);
+    // }
   }
 
   recalculateFormulas() {
@@ -1006,7 +1034,17 @@ class TableDocument {
     // if (validateType !== true) throw new Error(`${cellName} - ${validateType}`);
     // if (validateCustom !== true) throw new Error(`${cellName} - ${validateCustom}`);
     if (validateType !== true || validateCustom !== true) {
-      throw new TableDocumentValidationCellError(cellName, checkValue, [validateType, validateCustom]);
+      throw new TableDocumentValidationCellError(cellName, checkType, checkValue, [validateType, validateCustom]);
+      // throw new TableDocumentValidationCellError(
+      //   cellName,
+      //   [{
+      //     value: checkValue,
+      //     messages: [
+      //       { type: 'Type', message: validateType },
+      //       { type: 'Custom', message: validateCustom },
+      //     ],
+      //   }],
+      // );
     }
     // return (validateType === true && validateCustom === true);
   }

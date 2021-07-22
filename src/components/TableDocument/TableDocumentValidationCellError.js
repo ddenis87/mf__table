@@ -1,27 +1,23 @@
-export default class TableDocumentValidationCellError {
-  constructor(source, value, messages) {
-    this.name = this.constructor.name;
-    this.source = source;
-    this.value = value;
-    this.addingMessage(messages);
+import TableDocumentError from './TableDocumentError';
+
+export default class TableDocumentValidationCellError extends TableDocumentError {
+  constructor(sourceName, sourceType, value, messages) {
+    super(sourceName);
+    this.sourceType = sourceType;
+    if (value) this.value = value;
+    this.addingMessages(messages);
   }
 
   messages = [];
 
-  addingMessage(messages) {
-    if (Array.isArray(messages)) {
-      messages.forEach((message) => {
-        if (message !== true) this.messages.push(message);
-      });
-    }
-    if (!Array.isArray(messages)) this.messages.push(messages);
+  addingMessages(messages) {
+    this.messages = messages;
+    if (!Array.isArray(messages)) this.messages = [messages];
+    this.messages = this.messages.filter((message) => message !== true);
   }
 
   getMessage() {
-    return {
-      source: this.source,
-      value: this.value,
-      messages: this.messages,
-    };
+    const BaseClass = this.constructor;
+    return new BaseClass(this.sourceName, this.sourceType, this.value, this.messages);
   }
 }
