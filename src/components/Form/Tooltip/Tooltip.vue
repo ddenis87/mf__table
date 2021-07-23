@@ -1,11 +1,10 @@
 <template>
   <v-tooltip right
+             content-class="tooltip-box tooltip-box_body"
              v-bind="positionTooltip"
              v-model="isShow"
              @click="evtClose"
-             @mouseover="evtClose">
-    <div class="tooltip-text tooltip-text-body">{{ text }}</div>
-  </v-tooltip>
+             @mouseover="evtClose">{{ text }}</v-tooltip>
 </template>
 
 <script>
@@ -18,7 +17,6 @@ export default {
   },
   computed: {
     positionTooltip() {
-      // console.log(this.position);
       return {
         'position-x': this.position.left,
         'position-y': this.position.top,
@@ -34,5 +32,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>

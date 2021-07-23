@@ -3,7 +3,6 @@
     <component :is="layout">
       <router-view/>
     </component>
-
   </v-app>
 </template>
 
@@ -27,6 +26,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import './scss/tooltip.scss';
+
 $scrollWidth: 8px;
 $scrollHeight: 8px;
 $scrollBorderRadius: 4px;
@@ -38,7 +39,6 @@ html, body {
   font-size: 16px;
   a { text-decoration: none; }
   &::-webkit-scrollbar {
-    // display: block;
     display: none;
     width: $scrollWidth;
     height: $scrollHeight;
@@ -49,45 +49,15 @@ html, body {
     }
   }
 }
-.tooltip-text {
-  display: block;
-  padding: 2px 6px;
-  width: 100%;
-  height: 100%;
-  border: thin solid rgba(0, 0, 0, .87);
-  border-radius: 4px;
-  font-size: .875rem;
-  line-height: 1.5;
 
-  &-control {
-    background-color: rgba(0, 0, 0, .87);
-    color: rgba(255, 255, 255, 1);
-  }
-  &-body {
-    color: rgba(0, 0, 0, .87);
-    background-color: rgba(255, 255, 255, 1) !important;
-  }
-  &_invalid {
-    width: 100%;
-    height: 100%;
-    border: thin solid rgba(128, 128, 128, .6);
-    border-left: 5px solid #E53935;
-    border-radius: 5px;
-    padding: 2px 5px;
-    background-color: rgba(255, 255, 255, 1);
-  }
-}
 .snack {
     display: flex;
     justify-content: center;
-    // text-align: center;
-    // font-size: 1.2em;
+    white-space: pre-line;
   }
 
   @media print {
     html, body {
-      // min-width: 100% !important;
-      // max-width: 100% !important;
       overflow: auto !important;
     }
   }

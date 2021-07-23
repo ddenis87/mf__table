@@ -13,7 +13,13 @@
       "baseSection":"string1",
       "methodName":"put",
       "presentationType":"multiple",
-      "parameters": {}
+      "parameters": {
+        "st1IndicatorName":"st1IndicatorName",
+        "st1AnalyticalCode":"st1AnalyticalCode",
+        "st1Volume21":"st1Volume21",
+        "st1Volume22":"st1Volume22",
+        "st1Volume23":"st1Volume23"
+      }
     }
   },
   {
@@ -22,7 +28,13 @@
       "baseSection":"string2",
       "methodName":"put",
       "presentationType":"multiple",
-      "parameters": {}
+      "parameters": {
+        "st2IndicatorName":"st2IndicatorName",
+        "st2AnalyticalCode":"st2AnalyticalCode",
+        "st2Volume21":"st2Volume21",
+        "st2Volume22":"st2Volume22",
+        "st2Volume23":"st2Volume23"
+      }
     }
   },
   {
@@ -31,7 +43,13 @@
       "baseSection":"string3",
       "methodName":"put",
       "presentationType":"multiple",
-      "parameters": {}
+      "parameters": {
+        "st3IndicatorName":"st3IndicatorName",
+        "st3AnalyticalCode":"st3AnalyticalCode",
+        "st3Volume21":"st3Volume21",
+        "st3Volume22":"st3Volume22",
+        "st3Volume23":"st3Volume23"
+      }
     }
   },
   {
@@ -40,7 +58,9 @@
       "baseSection":"footerR",
       "methodName":"put",
       "presentationType":"multiple",
-      "parameters": {}
+      "parameters": {
+        "organization":"organization"
+      }
     }
   },
   {
@@ -49,7 +69,9 @@
       "baseSection":"footerF",
       "methodName":"put",
       "presentationType":"multiple",
-      "parameters": {}
+      "parameters": {
+        "budgetclassification":"budgetclassification"
+      }
     }
   }
 ]

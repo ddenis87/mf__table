@@ -27,7 +27,7 @@ class TableDocumentApi extends TableDocument {
     this.prepareRepresentation();
   }
 
-  BASE_CLASS = TableDocumentApi;
+  // BASE_CLASS = TableDocumentApi; // заменить на this.constructor
 
   representations = new Map();
 
@@ -35,7 +35,7 @@ class TableDocumentApi extends TableDocument {
     try {
       super.deserialize(data, template, settings);
     } finally {
-      await this.prepareRepresentation();
+      this.prepareRepresentation();
     }
   }
 

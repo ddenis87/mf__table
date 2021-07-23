@@ -16,8 +16,16 @@ export default class TableDocumentValidationCellError extends TableDocumentError
     this.messages = this.messages.filter((message) => message !== true);
   }
 
-  getMessage() {
+  getMessages() {
     const BaseClass = this.constructor;
     return new BaseClass(this.sourceName, this.sourceType, this.value, this.messages);
+  }
+
+  getMessagesText() {
+    let text = '';
+    this.messages.forEach((item) => {
+      text += `${item} \n`;
+    });
+    return text;
   }
 }

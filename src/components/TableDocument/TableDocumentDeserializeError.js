@@ -14,7 +14,7 @@ export default class TableDocumentDeserializeError extends TableDocumentError {
     if (!Array.isArray(messages)) messagesList = [messages];
     messagesList.forEach((messageItem) => {
       if (!this[messageItem.name]) this[messageItem.name] = [];
-      this[messageItem.name].push(messageItem.getMessage());
+      this[messageItem.name].push(messageItem.getMessages());
     });
   }
 }

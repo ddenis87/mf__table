@@ -13,7 +13,6 @@ import {
 } from './TableDocumentHelpers';
 
 import Formulas from './Formulas';
-// import ValueValidate from './Errors';
 import TableDocumentDeserializeError from './TableDocumentDeserializeError';
 import TableDocumentValidationCellError from './TableDocumentValidationCellError';
 
@@ -53,7 +52,7 @@ function getObjectOfJSON(data) {
   return (typeof data === 'string') ? JSON.parse(data) : data;
 }
 
-function valueValidateType(value = '', type = 'string') {
+function validateCellValueType(value = '', type = 'string') {
   if (!value && typeof type !== 'boolean') return true;
   const validate = {
     string: (v) => (typeof v === 'string'),
@@ -123,9 +122,9 @@ class TableDocument {
     this.cellHeight = cellHeight;
   }
 
-  editAccess = undefined;
+  BaseClass = this.constructor;
 
-  BASE_CLASS = TableDocument; // заменить на BaseClass = this.constructor
+  editAccess = undefined;
 
   actionCell(cellName) {
     const scripts = this.getCellParameter(cellName, CELL_ATTRIBUTES.SCRIPTS);
@@ -226,93 +225,150 @@ class TableDocument {
 
   deserialize(data, template, settings) {
     const documentData = getObjectOfJSON(data);
-    const documentTemplate = getObjectOfJSON(template);
-    const documentSettings = getObjectOfJSON(settings);
-    if (!this.documentTemplate) this.documentTemplate = documentTemplate;
-    if (!this.documentSettings) this.documentSettings = documentSettings;
-    if (!this.editAccess) this.editAccess = this.documentTemplate.editAccess || undefined;
     const deserializeError = [];
-    documentSettings.forEach((setting) => {
-      const [key, keyValue] = Object.entries(setting)[0];
-      if (Object.keys(keyValue).includes('nested')) return;
-      const dataSection = documentData.find((item) => Object.keys(item).includes(key));
-      const dataSectionItems = dataSection[key];
-      if (Array.isArray(dataSectionItems)) {
-        dataSectionItems.forEach((dataSectionItem) => {
-          try {
-            this.deserializeArea(key, dataSectionItem);
-          } catch (err) {
-            // console.log(err);
-            deserializeError.push(...err);
-            // deserializeError.push(err.getMessage());
-          }
-        });
-        return;
-      }
-      try {
-        this.deserializeArea(key, dataSectionItems);
-      } catch (err) {
-        deserializeError.push(...err);
-      }
+    this.setDeserializeSettings(template, settings);
+    this.documentSettings.forEach((setting) => {
+      const [sectionKey, sectionValue] = Object.entries(setting)[0];
+      if (Object.keys(sectionValue).includes('nested')) return;
+      let sectionData = documentData
+        .find((item) => Object.keys(item).includes(sectionKey))[sectionKey];
+      if (!Array.isArray(sectionData)) sectionData = [sectionData];
+      sectionData.forEach((sectionDataItem) => {
+        try {
+          this.deserializeArea(sectionValue, sectionDataItem);
+        } catch (err) {
+          deserializeError.push(...err);
+        }
+      });
     });
-    // if (deserializeError.length) throw new TableDocumentValidationCellError('deserialize', deserializeError);
-    if (deserializeError.length) throw new TableDocumentDeserializeError('deserialize', deserializeError);
+    if (deserializeError.length) {
+      throw new TableDocumentDeserializeError('deserialize', deserializeError);
+    }
   }
 
-  deserializeArea(key, dataItem) {
+  deserializeArea(sectionValue, sectionDataItem) {
     const insertMethods = {
-      put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
-      join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
+      put: (areaInsert) => { this.putArea(areaInsert); },
+      join: (areaInsert) => { this.joinArea(areaInsert); },
     };
-
-    if (Array.isArray(dataItem)) {
-      dataItem.forEach((item) => {
-        this.deserializeArea(key, item);
+    if (Array.isArray(sectionDataItem)) {
+      sectionDataItem.forEach((item) => {
+        this.deserializeArea(sectionValue, item);
       });
       return;
     }
-
-    const [, keyValue] = Object.entries(this.documentSettings.find((setting) => Object.keys(setting).includes(key)))[0];
-    const {
-      templateSectionName, methodName: insertMethod, parameters, nestedData,
-    } = keyValue;
-    const area = this.documentTemplate.getNamedArea(templateSectionName);
-
-    // try {
-    //   insertMethods[insertMethod](dataItem, area, parameters);
-    // } finally {
-    //   if (nestedData) {
-    //     nestedData.forEach((nestedDataKey) => {
-    //       if (Object.keys(dataItem).includes(nestedDataKey)) {
-    //         this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
-    //       }
-    //     });
-    //   }
-    // }
-    if (nestedData) {
-      nestedData.forEach((nestedDataKey) => {
-        if (Object.keys(dataItem).includes(nestedDataKey)) {
-          this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
-        }
-      });
+    let area = null;
+    area = this.documentTemplate
+      .getNamedArea(sectionValue.templateSectionName)
+      .getAreaCopy();
+    try {
+      area.fillArea(sectionDataItem, sectionValue.parameters);
+    } finally {
+      insertMethods[sectionValue.methodName](area);
     }
-    insertMethods[insertMethod](dataItem, area, parameters);
+    const { nestedData } = sectionValue;
+    if (!nestedData) return;
+    nestedData.forEach((nestedDataKey) => {
+      if (!Object.keys(sectionDataItem).includes(nestedDataKey)) return;
+      const sectionValueNested = this.getSectionSettings(nestedDataKey);
+      this.deserializeArea(sectionValueNested, sectionDataItem[nestedDataKey]);
+    });
   }
 
-  editingCell(cellName, cellValue) { // проверять существует строка/столбец
-    // получать максимальный из имеющихся, сравнивать
-    // если пусстое значение и больше ничего нет, то удалять ячейку из набора ???
-    // this.valueValidate(cellValue, cellName);
+  // deserialize(data, template, settings) {
+  //   const documentData = getObjectOfJSON(data);
+  //   const documentTemplate = getObjectOfJSON(template);
+  //   const documentSettings = getObjectOfJSON(settings);
+  //   if (!this.documentTemplate) this.documentTemplate = documentTemplate;
+  //   if (!this.documentSettings) this.documentSettings = documentSettings;
+  //   if (!this.editAccess) this.editAccess = this.documentTemplate.editAccess || undefined;
+  //   const deserializeError = [];
+  //   documentSettings.forEach((setting) => {
+  //     const [key, keyValue] = Object.entries(setting)[0];
+  //     if (Object.keys(keyValue).includes('nested')) return;
+  //     const dataSection = documentData.find((item) => Object.keys(item).includes(key));
+  //     const dataSectionItems = dataSection[key];
+  //     if (Array.isArray(dataSectionItems)) {
+  //       dataSectionItems.forEach((dataSectionItem) => {
+  //         try {
+  //           this.deserializeArea(key, dataSectionItem);
+  //         } catch (err) {
+  //           // console.log(err);
+  //           deserializeError.push(...err);
+  //           // deserializeError.push(err.getMessage());
+  //         }
+  //       });
+  //       return;
+  //     }
+  //     try {
+  //       this.deserializeArea(key, dataSectionItems);
+  //     } catch (err) {
+  //       deserializeError.push(...err);
+  //     }
+  //   });
+  //   // if (deserializeError.length) throw new TableDocumentValidationCellError('deserialize', deserializeError);
+  //   if (deserializeError.length) throw new TableDocumentDeserializeError('deserialize', deserializeError);
+  // }
 
-    let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
-    cellValues = { ...cellValues, ...{ value: cellValue || '' } };
-    if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
+  // deserializeArea(key, dataItem) {
+  //   const insertMethods = {
+  //     put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
+  //     join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
+  //   };
 
-    this.writeCell(cellName, cellValues);
-    // this.cells = { ...this.cells, ...{ [cellName]: cellValues } };
+  //   if (Array.isArray(dataItem)) {
+  //     dataItem.forEach((item) => {
+  //       this.deserializeArea(key, item);
+  //     });
+  //     return;
+  //   }
+
+  //   const [, keyValue] = Object.entries(this.documentSettings.find((setting) => Object.keys(setting).includes(key)))[0];
+  //   const {
+  //     templateSectionName, methodName: insertMethod, parameters, nestedData,
+  //   } = keyValue;
+  //   const area = this.documentTemplate.getNamedArea(templateSectionName);
+
+  //   // try {
+  //   //   insertMethods[insertMethod](dataItem, area, parameters);
+  //   // } finally {
+  //   //   if (nestedData) {
+  //   //     nestedData.forEach((nestedDataKey) => {
+  //   //       if (Object.keys(dataItem).includes(nestedDataKey)) {
+  //   //         this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
+  //   //       }
+  //   //     });
+  //   //   }
+  //   // }
+  //   if (nestedData) {
+  //     nestedData.forEach((nestedDataKey) => {
+  //       if (Object.keys(dataItem).includes(nestedDataKey)) {
+  //         this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
+  //       }
+  //     });
+  //   }
+  //   insertMethods[insertMethod](dataItem, area, parameters);
+  // }
+
+  editingCell(cellName, cellValue) {
+    this.writeCellValue(cellName, cellValue);
     this.recalculateFormulas();
-    // console.log(this.cells);
   }
+
+  // editingCell(cellName, cellValue) { // проверять существует строка/столбец
+  //   // получать максимальный из имеющихся, сравнивать
+  //   // если пусстое значение и больше ничего нет, то удалять ячейку из набора ???
+  //   // this.valueValidate(cellValue, cellName);
+
+  //   let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
+  //   cellValues = { ...cellValues, ...{ value: cellValue || '' } };
+  //   if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
+
+  //   this.writeCell(cellName, cellValues);
+  //   // this.cells = { ...this.cells, ...{ [cellName]: cellValues } };
+  //   this.recalculateFormulas();
+  //   // console.log(this.cells);
+  // }
 
   executeAction(cellName) {
     const scripts = this.getCellParameter(cellName, CELL_ATTRIBUTES.SCRIPTS);
@@ -326,24 +382,41 @@ class TableDocument {
     this.recalculateFormulas();
   }
 
-  fillArea(dataArea, parameters) {
-    // const validationCellError = [];
+  fillArea(data, parameters) {
+    const errorValidation = [];
     Object.entries(this.cells).forEach((cell) => {
-      const [, cellValue] = cell;
-      const parameterName = cellValue?.parameter || null;
-      if (!parameterName) return;
-      const parameterNameData = parameters[parameterName] || parameterName;
-      if (!parameterName || !Object.keys(dataArea).includes(parameterNameData)) return;
-      cellValue.value = dataArea[parameterNameData];
-      // try {
-      //   this.writeCell(cellName, cellValue);
-      // } catch (err) {
-      //   validationCellError.push(err.getMessage());
-      // }
-      // cellValue.value = dataArea[parameterNameData];
+      const [cellName, cellAttribute] = cell;
+      const { parameter: cellParameter } = cellAttribute;
+      if (!cellParameter) return;
+      if (!Object.keys(parameters).includes(cellParameter)) return;
+      const cellValue = data[parameters[cellParameter]];
+      try {
+        this.writeCellValue(cellName, cellValue);
+      } catch (err) {
+        errorValidation.push(err);
+      }
     });
-    // if (validationCellError.length) throw validationCellError;
+    if (errorValidation.length) throw errorValidation;
   }
+  
+  // fillArea(dataArea, parameters) {
+  //   // const validationCellError = [];
+  //   Object.entries(this.cells).forEach((cell) => {
+  //     const [, cellValue] = cell;
+  //     const parameterName = cellValue?.parameter || null;
+  //     if (!parameterName) return;
+  //     const parameterNameData = parameters[parameterName] || parameterName;
+  //     if (!parameterName || !Object.keys(dataArea).includes(parameterNameData)) return;
+  //     cellValue.value = dataArea[parameterNameData];
+  //     // try {
+  //     //   this.writeCell(cellName, cellValue);
+  //     // } catch (err) {
+  //     //   validationCellError.push(err.getMessage());
+  //     // }
+  //     // cellValue.value = dataArea[parameterNameData];
+  //   });
+  //   // if (validationCellError.length) throw validationCellError;
+  // }
 
   getAreaCopy() {
     const {
@@ -357,8 +430,7 @@ class TableDocument {
       images: this.images,
       namedAreas: this.namedAreas,
     }));
-    // const BaseClass = Object.getPrototypeOf(this);
-    return new this.BASE_CLASS({ // заменить BASE_CLASS на this.constructor.name
+    return new this.BaseClass({
       rangeType: this.rangeType,
       rows,
       rowCount: this.rowCount,
@@ -429,8 +501,7 @@ class TableDocument {
         range: moveRange(namedArea.range.toLowerCase(), 1, range),
       });
     });
-    // const BaseClass = Object.getPrototypeOf(this);
-    return new this.BASE_CLASS({
+    return new this.BaseClass({
       methodName: (getRangeType(range) === 'row') ? 'put' : 'join', // ??????
       rows,
       rowCount: Object.keys(rows).length,
@@ -483,10 +554,6 @@ class TableDocument {
     return this.cells[cellName] || {};
   }
 
-  // getCellObject(cellName) {
-  //   return this.cells[cellName] || undefined;
-  // }
-
   getCellParameter(cellName, cellParameter) {
     if (!this.cells[cellName]) return null;
     return this.cells[cellName][cellParameter] || null;
@@ -506,11 +573,11 @@ class TableDocument {
       || 'string';
   }
 
-  getCellTypeClean(cellName) {
-    return this.getCellType(cellName).split('.')[0];
-  }
+  // getCellTypeClean(cellName) {
+  //   return this.getCellType(cellName).split('.')[0];
+  // }
 
-  getCellValueForFormula(cellName) { // ???
+  getCellValueForFormula(cellName) { // ??? use in Formula class
     if (this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA)) return this.calculateCellValue(cellName);
     const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
     return +cellValue || 0;
@@ -667,6 +734,10 @@ class TableDocument {
     return namedAreas;
   }
 
+  getNamedAreas() {
+    return this.namedAreas;
+  }
+
   getRangeByAreaName(areaName) {
     const range = [];
     if (!areaName) return null;
@@ -761,10 +832,20 @@ class TableDocument {
     return rowSet[type]();
   }
 
+  getSectionSettings(sectionName) {
+    const sectionSettings = this.documentSettings
+      .find((setting) => Object.keys(setting).includes(sectionName));
+    return Object.values(sectionSettings)[0];
+  }
+
   getScripts(scriptName) {
     const script = this.scripts[scriptName];
     if (script) return script;
     return null;
+  }
+
+  getStyles() {
+    return this.styles;
   }
 
   hasEditing(cellName) {
@@ -776,7 +857,6 @@ class TableDocument {
     if (Object.keys(this.cells).includes(cellName)) {
       isEditCell = this.cells[cellName].isEditable;
     }
-    // console.log(isEditCell);
     if (this.editAccess === EDIT_ACCESS.CLOSED_EXCEPT_OPEN && !isEditCell) return false;
     if (this.editAccess === EDIT_ACCESS.OPEN && isEditCell === false) return false;
     if (!this.editAccess && isEditCell === false) return false;
@@ -796,15 +876,14 @@ class TableDocument {
     return rezult;
   }
 
-  insertArea(numberColumn, numberRow, area, shiftType = null) { // , insertMode = INSERT_MODE.FULL) {
-    // console.log(area);
+  insertArea(numberColumn, numberRow, area, shiftType = null) {
     const namedAreas = [];
     const {
       cells: insertCells,
-      styles: insertStyles,
+      // styles: insertStyles,
       scripts: areaScripts,
       images: areaImages,
-      namedAreas: insertNamedAreas,
+      // namedAreas: insertNamedAreas,
     } = area;
 
     let rangeShift = null;
@@ -828,7 +907,6 @@ class TableDocument {
       areaShift = this.getAreaForRange(rangeShift);
       this.deleteRange(rangeShift);
     }
-    const errorCell = [];
     Object.entries(insertCells).forEach((cell) => {
       const [currentCellName] = cell;
       const shiftCellName = moveCell(currentCellName, `${getColumnNameForNumber(numberColumn)}${numberRow}`);
@@ -837,49 +915,12 @@ class TableDocument {
 
       this.writeColumn(shiftColumn, area.getColumn(currentColumn));
       this.writeRow(shiftRow, area.getRow(currentRow));
-      // console.log(shiftCellName, 'before writeCell');
-      try {
-        this.writeCell(shiftCellName, area.getCell(currentCellName));
-      } catch (err) {
-        // err.messages.forEach((message) => {
-        // errorCell.push(`${err.name} - ${message}`);
-        errorCell.push(err.getMessage());
-        // });
-      }
-      // console.log(shiftCellName, 'after writeCell');
-      // catch (err) {
-      //   console.log(err.name);
-      //   err.messages.forEach((message) => {
-      //     if (message === true) return;
-      //     console.log(`%c ${message}`, 'color: red; font: Tahoma;');
-      //   });
-      // }
-    });
-    // console.log(err.name);
-    // err.messages.forEach((message) => {
-    //   if (message === true) return;
-    //   console.log(`%c ${message}`, 'color: red; font: Tahoma;');
-    // });
-
-    // console.log('finality');
-    insertStyles.forEach((insertStyle) => {
-      const styles = this.styles.find((style) => style.name === insertStyle.name);
-      if (!styles) this.styles.push(insertStyle);
+      this.writeCell(shiftCellName, area.getCell(currentCellName));
     });
 
-    const moveRangeNamedArea = {
-      [RANGE_TYPE.ROW]: (range) => moveRange(range, numberRow),
-      [RANGE_TYPE.COLUMN]: (range) => moveRange(range, numberColumn),
-    };
-    insertNamedAreas.forEach((insertNamedArea) => {
-      const insertNamedAreaType = getRangeType(insertNamedArea.range);
-      const namedArea = {
-        name: insertNamedArea.name,
-        range: moveRangeNamedArea[insertNamedAreaType](insertNamedArea.range),
-      };
-      if (!this.hasNamedArea(namedArea)) namedAreas.push(namedArea);
-    });
-    // console.log(areaScripts);
+    this.writeStyles(area.getStyles());
+    this.writeNamedArea(area.getNamedAreas());
+
     this.scripts = { ...this.scripts, ...areaScripts };
     this.images = { ...this.images, ...areaImages };
     this.namedAreas = [...this.namedAreas, ...namedAreas];
@@ -887,11 +928,20 @@ class TableDocument {
     this.columnCount = this.getLastColumn();
 
     shiftInsert[shiftType]();
-    // if (errorCell.length) throw new ValueValidate('insertArea', errorCell);
-    // console.log(errorCell);
-    // if (errorCell.length) throw new TableDocumentValidationCellError('insertArea', null, null, errorCell);
-    if (errorCell.length) throw errorCell;
-    // console.log(this);
+  }
+
+  writeCell(cellName, cellValue) {
+    this.cells = { ...this.cells, [cellName]: cellValue };
+  }
+
+  writeCellValue(cellName, cellValue, isErrorStop = false) {
+    const cellAttribute = this.getCell(cellName);
+    try {
+      this.validateCellValue(cellName, { ...cellAttribute, value: cellValue });
+      cellAttribute.value = cellValue;
+    } finally {
+      if (!isErrorStop) this.writeCell(cellName, cellAttribute);
+    }
   }
 
   writeColumn(columnName, columnValue) {
@@ -900,73 +950,63 @@ class TableDocument {
     this.columns = { ...this.columns, [columnNameText]: columnValue };
   }
 
+  writeNamedArea(namedAreasArea, numberRow, numberColumn) {
+    const moveRangeDirection = {
+      [RANGE_TYPE.ROW]: (range) => moveRange(range, numberRow),
+      [RANGE_TYPE.COLUMN]: (range) => moveRange(range, numberColumn),
+    };
+    namedAreasArea.forEach((namedAreaItem) => {
+      const rangeType = getRangeType(namedAreaItem.range);
+      const namedArea = {
+        name: namedAreaItem.name,
+        range: moveRangeDirection[rangeType](namedAreaItem.range),
+      };
+      if (!this.hasNamedArea(namedArea)) this.namedAreas.push(namedArea);
+    });
+  }
+
   writeRow(rowName, rowValue) {
     this.rows = { ...this.rows, [rowName]: rowValue };
   }
-
-  writeCell(cellName, cellValue, isErrorStop = false) {
-    const value = cellValue;
-    try {
-      this.valueValidate(cellName, cellValue);
-      // this.cells = { ...this.cells, [cellName]: value };
-    } catch (err) {
-      delete value.value;
-      throw err;
-    } finally {
-      // console.log(cellName, 'finality writeCell');
-      if (!isErrorStop) {
-        this.cells = { ...this.cells, [cellName]: value };
-      }
-    }
-    // catch (err) {
-    //   // console.log(cellName, err.name, err.messages);
-    //   delete value.value;
-    //   // throw new ValueValidate(err.name, ['WriteCell']);
-    //   throw err;
-    // }
-  }
-  // writeCell(cellName, cellValue) {
-  //   const value = cellValue;
-  //   if (!this.valueValidate(cellName, cellValue)) {
-  //     value.value = null;
-  //   }
-  //   this.cells = { ...this.cells, [cellName]: value }; // возвращать результаты валидации
-  // }
-
-  writeNamedArea() {
-    const namedArea = {};
-
-    if (!this.hasNamedArea(namedArea)) this.namedAreas.push(namedArea);
-  }
-
-  getSectionSettings(sectionName) {
-    const sectionSettings = this.documentSettings.find((setting) => {
-      const [sectionKey] = Object.keys(setting);
-      return sectionKey === sectionName;
+  
+  writeStyles(stylesArea) {
+    stylesArea.forEach((styleItem) => {
+      const styles = this.styles.find((style) => style.name === styleItem.name);
+      if (!styles) this.styles.push(styleItem);
     });
-    return Object.entries(sectionSettings)[0];
   }
 
-  joinArea(dataArea, area, parameters) {
-    const areaCopy = area.getAreaCopy();
+  joinArea(area) {
     const numberLastRow = this.getLastRow();
     const numberNewColumn = this.getLastColumnInRow(numberLastRow) + 1;
-    // try {
-    areaCopy.fillArea(dataArea, parameters);
-    // } finally {
-    this.insertArea(numberNewColumn, numberLastRow, areaCopy);
-    // }
+    this.insertArea(numberNewColumn, numberLastRow, area);
   }
 
-  putArea(dataArea, area, parameters) {
-    const areaCopy = area.getAreaCopy();
+  // joinArea(dataArea, area, parameters) {
+  //   const areaCopy = area.getAreaCopy();
+  //   const numberLastRow = this.getLastRow();
+  //   const numberNewColumn = this.getLastColumnInRow(numberLastRow) + 1;
+  //   // try {
+  //   areaCopy.fillArea(dataArea, parameters);
+  //   // } finally {
+  //   this.insertArea(numberNewColumn, numberLastRow, areaCopy);
+  //   // }
+  // }
+
+  putArea(area) {
     const numberNewRow = this.getLastRow() + 1;
-    // try {
-    areaCopy.fillArea(dataArea, parameters);
-    // } finally {
-    this.insertArea(1, numberNewRow, areaCopy);
-    // }
+    this.insertArea(1, numberNewRow, area);
   }
+
+  // putArea(dataArea, area, parameters) {
+  //   const areaCopy = area.getAreaCopy();
+  //   const numberNewRow = this.getLastRow() + 1;
+  //   // try {
+  //   areaCopy.fillArea(dataArea, parameters);
+  //   // } finally {
+  //   this.insertArea(1, numberNewRow, areaCopy);
+  //   // }
+  // }
 
   recalculateFormulas() {
     const formulasCellsSet = this.getFormularsCellsSet();
@@ -1009,44 +1049,34 @@ class TableDocument {
     return (keyValue.presentationType === 'unit') ? { ...areaValue } : [{ ...areaValue }];
   }
 
+  setDeserializeSettings(template, settings) {
+    this.documentTemplate = getObjectOfJSON(template);
+    this.documentSettings = getObjectOfJSON(settings);
+    this.editAccess = this.documentTemplate.editAccess || undefined;
+  }
+
   updateCellValue(cellName, cellValue) {
     this.cells[cellName].value = cellValue;
     this.writeCell(cellName, this.cells[cellName]);
-    // this.cells = { ...this.cells, ...{ [cellName]: this.cells[cellName] } };
   }
 
-  valueValidate(cellName, cellValue) {
+  validateCellValue(cellName, cellValue) {
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
     const { type: cellType, value: checkValue } = cellValue;
     const checkType = cellType
       || this.getRowType(cellRow)
       || this.getColumnType(cellColumn)
       || 'string';
-    const validateType = valueValidateType(checkValue, checkType);
+    const validateType = validateCellValueType(checkValue, checkType);
     let validateCustom = true;
     const { scripts } = cellValue;
     if (scripts && Object.keys(scripts).includes('validate')) {
-      const validateFunction = eval(scripts.validate); // eslint-disable-line no-eval
-      validateCustom = validateFunction(checkValue);
+      const validateCellValueCustom = eval(scripts.validate); // eslint-disable-line no-eval
+      validateCustom = validateCellValueCustom(checkValue);
     }
-    // if (validateType !== true) console.log(`%c ${cellName} - %c Type - ${validateType}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
-    // if (validateCustom !== true) console.log(`%c ${cellName} - %c Custom - ${validateCustom}`, 'color: green; font: Tahoma;', 'color: red; font: Tahoma;');
-    // if (validateType !== true) throw new Error(`${cellName} - ${validateType}`);
-    // if (validateCustom !== true) throw new Error(`${cellName} - ${validateCustom}`);
     if (validateType !== true || validateCustom !== true) {
       throw new TableDocumentValidationCellError(cellName, checkType, checkValue, [validateType, validateCustom]);
-      // throw new TableDocumentValidationCellError(
-      //   cellName,
-      //   [{
-      //     value: checkValue,
-      //     messages: [
-      //       { type: 'Type', message: validateType },
-      //       { type: 'Custom', message: validateCustom },
-      //     ],
-      //   }],
-      // );
     }
-    // return (validateType === true && validateCustom === true);
   }
 }
 

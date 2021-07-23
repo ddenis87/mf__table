@@ -169,11 +169,16 @@ export default {
     },
     async evtBufferPaste(cellName) {
       if (!this.tableDocument.hasEditing(cellName)) {
-        this.showSnackMessage('Редактирование недоступно');
         return;
       }
       const pasteValue = await Buffer.paste();
-      this.tableDocument.editingCell(cellName, pasteValue);
+      console.log(pasteValue);
+      try {
+        this.tableDocument.editingCell(cellName, pasteValue);
+      } catch (err) {
+        console.log(err);
+        this.showSnackMessage(err.getMessagesText());
+      }
     },
     saveDocument() {
       const JSONFormat = true;
@@ -194,7 +199,7 @@ export default {
     evtDblClickCell(options) {
       const { cellName } = options;
       if (!this.tableDocument.hasEditing(cellName)) {
-        this.showSnackMessage('Редактирование недоступно');
+        // this.showSnackMessage('Редактирование недоступно');
         return;
       }
       this.editableCell = this.tableDocument.getCell(cellName);
@@ -247,8 +252,14 @@ export default {
       }
     },
     acceptEditingCell(option) {
-      this.tableDocument.editingCell(option.cellName, option.value);
-      this.clearEditCell();
+      try {
+        this.tableDocument.editingCell(option.cellName, option.value);
+      } catch (err) {
+        console.log(err);
+        this.showSnackMessages(err.getMessageText());
+      } finally {
+        this.clearEditCell();
+      }
     },
     cancelEditingCell() {
       this.clearEditCell();
