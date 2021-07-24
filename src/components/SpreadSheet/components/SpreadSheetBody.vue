@@ -191,18 +191,20 @@ export default {
   },
   methods: {
     evtMouseover(evt) {
-      const titleText = evt.target.closest('.column-body')?.getAttribute('data-tooltip');
-      if (titleText) {
-        const targetPosition = evt.target.closest('.column-body').getBoundingClientRect();
-        this.propsTooltip = {
-          text: titleText,
-          isShow: true,
-          position: {
-            left: targetPosition.left,
-            top: targetPosition.top + 42,
-          },
-        };
-      }
+      setTimeout(() => {
+        const titleText = evt.target.closest('.column-body')?.getAttribute('data-tooltip');
+        if (titleText) {
+          const targetPosition = evt.target.closest('.column-body').getBoundingClientRect();
+          this.propsTooltip = {
+            text: titleText,
+            isShow: true,
+            position: {
+              left: targetPosition.right,
+              top: targetPosition.top,
+            },
+          };
+        }
+      }, 300);
     },
     evtMouseout() {
       if (!this.propsTooltip.isShow) return;
@@ -253,7 +255,8 @@ export default {
     },
     evtClickBody(evt) {
       if (evt.target.closest('button')) {
-        this.toggleRowGroup(evt.target.closest('button'));
+        const rowName = evt.target.closest('button').getAttribute('data-row-name');
+        this.toggleRowGroup(+rowName);
       }
     },
     evtKeydownBody(evt) {
@@ -512,14 +515,15 @@ export default {
       return true;
     },
 
-    toggleRowGroup(target) {
-      this.$emit('toggle-row-group', {
-        value: +target.getAttribute('data-row-parent'),
-        index: +target.getAttribute('data-row-index'),
-        count: +target.getAttribute('data-row-count'),
-        status: !!target.getAttribute('data-row-status'),
-        target,
-      });
+    toggleRowGroup(rowName) {
+      this.$emit('toggle-row-group', rowName);
+      // this.$emit('toggle-row-group', {
+      //   value: +target.getAttribute('data-row-parent'),
+      // index: +target.getAttribute('data-row-index'),
+      // count: +target.getAttribute('data-row-count'),
+      // status: !!target.getAttribute('data-row-status'),
+      // target,
+      // });
     },
 
     getCellNodeForName(cellName) {

@@ -1,18 +1,32 @@
 <template>
   <div class="sheet-body__row"
        :style="gridRow">
-    <div v-show="isTitle"
-           class="column column-title"
+    <template v-if="isTitle">
+      <div v-for="(level, levelIndex) in maxLevelGroupRow"
+           class="column column-group"
+           :class="getGroupClass(level)"
+           :key="levelIndex"
+           :style="getGroupStyle(level)">
+        <spread-sheet-btn-group v-if="hasGroup(level)"
+                                :data-row-name="rowName">
+          {{ btnGroupStatusImg }}
+        </spread-sheet-btn-group>
+      </div>
+      <div class="column column-title"
            :style="shiftTitle">
-      <span class="content">{{ source.value }}</span>
-    </div>
+        <span class="content">{{ rowName }}</span>
+      </div>
+    </template>
 
     <template v-for="(column, columnIndex) in columns">
       <div v-if="hasExcludedCell(column.name)"
-           :key="`body-${getCellName(column.name)}`"
            class="column column-body"
+           :key="`body-${getCellName(column.name)}`"
            :class="getCellClass(column.name)"
-           :style="getCellGeometry(source, column, columnIndex)">
+           :style="[
+            getCellGeometry(column.name, columnIndex),
+            fixedCell(column, columnIndex),
+           ]">
         <div v-if="hasImg(column.name)" class="content" v-html="getImg(column.name)"></div>
         <div v-else
               class="content"
@@ -20,71 +34,20 @@
       </div>
     </template>
   </div>
-  <!-- <div :key="`body-row-${source.value}`"
-       class="sheet-body__row"
-       :style="templateRow(source.height)">
-    <template v-if="!printMode">
-      <div v-show="isTitle"
-           v-for="level in maxLevelGroupRow"
-           :key="`${source.value}-${level}`"
-           class="column column-group"
-           :class="{
-             'line-start': (setOpenGroupRows.includes(source.value) && source.rowLevel === level - 1),
-             'line': (source.parent && level <= source.rowLevel),
-             'line-end': (getEndGroup(index, level) && level <= source.rowLevel),
-           }"
-           :style="getStyleGroup(level)">
-        <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
-                                :data-row-index="index"
-                                :data-row-parent="source.value"
-                                :data-row-count="source.rowGroup - 1"
-                                :data-row-status="source.openGroup">
-          {{ (setOpenGroupRows.includes(source.value)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
-        </spread-sheet-btn-group>
-      </div>
-      <div v-show="isTitle"
-           class="column column-title"
-           :style="shiftTitle"><div class="content">{{ source.value }}</div></div>
-    </template>
-    <template v-for="(column, columnIndex) in columns">
-
-      <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
-          :key="`body-${source.value}-${column.value}`"
-          class="column column-body"
-          :class="[
-            (hasCell(column.name, source.value))
-              ? getCellStyle(column.name, source.value) : '',
-            (!isGrid) ? 'column-body_grid-off' : '',
-          ]"
-          :style="[
-            getCellGeometry(source, column, columnIndex),
-            fixedCell(column, columnIndex)
-          ]"
-          :data-name="`${column.name}${source.name}`"
-          :tabindex="columnIndex">
-            <div v-if="hasImg(column.name)" class="content" v-html="getImg(column.name)"></div>
-            <div v-else
-                 class="content"
-                 v-html="formattedData(column.name)"></div>
-      </div>
-    </template>
-  </div> -->
 </template>
 
 <script>
-// import formattedData from '@/plugins/formattedDataDisplay/formattedDataDisplay';
 import display from '@/plugins/formattingView/formattingView';
 import {
-  CELL_TYPE_DEFAULT,
   CELL_HEIGHT,
 } from '../SpreadSheetConst';
 
-// import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
+import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
 export default {
   name: 'SpreadSheetBodyItem',
   components: {
-    // SpreadSheetBtnGroup,
+    SpreadSheetBtnGroup,
   },
   props: {
     index: { type: Number }, // ????
@@ -104,10 +67,18 @@ export default {
   },
   data() {
     return {
-      shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
+      shiftTitle: {
+        left: `${20 * this.maxLevelGroupRow}px`,
+        'border-top': `thin solid ${(this.index === 0) ? 'rgba(0,0,0,0)' : 'unset'}`,
+      },
+      rowName: this.source.value,
     };
   },
   computed: {
+    btnGroupStatusImg() {
+      return (this.setOpenGroupRows.includes(this.rowName))
+        ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline';
+    },
     templateColumnTitle() {
       let tempalteColumnTitle = `60px ${this.templateColumnWidth}`;
       if (this.maxLevelGroupRow !== 0) {
@@ -128,97 +99,12 @@ export default {
   mounted() {
   },
   methods: {
-    hasImg(columnName) {
-      const cellName = this.getCellName(columnName);
-      if (!this.cells[cellName]) return false;
-      if (!Object.keys(this.cells[cellName]).includes('image')) return false;
-      return true;
-    },
-    hasExcludedCell(columnName) {
-      const cellName = this.getCellName(columnName);
-      if (this.setExcludedCell.includes(cellName)) return false;
-      return true;
-    },
-    getImg(columnName) {
-      const cellName = this.getCellName(columnName);
-      // console.log(this.images);
-      return this.images[this.cells[cellName].image];
-    },
     formattedData(columnName) {
       const cell = this.hasCell(columnName);
       if (!cell) return '';
       if (!Object.keys(cell).includes('value')) return '';
       return display.formate(cell.value, { ...cell, representations: this.representations });
     },
-    // formattedData(columnName) {
-    //   // const cellName = `${columnName}${this.source.value}`;
-    //   const cell = this.hasCell(columnName);
-    //   if (!cell) return '';
-    //   const formattedOption = {
-    //     representations: this.representations,
-    //   };
-    //   // const cell = this.cells[`${columnName}${this.source.value}`];
-    //   const cellValue = cell.value;
-    //   const cellType = this.getCellType(cell, columnName);
-    //   // if (cellType.includes('field')) return cell.representation;
-    //   formattedOption.valueType = cellType;
-    //   const cellFormatString = this.getCellFormatString(cell, columnName);
-    //   if (cellFormatString) formattedOption.formatString = cellFormatString;
-    //   return formattedData(cellValue, formattedOption);
-    // },
-    hasCell(columnName) {
-      const cellName = this.getCellName(columnName);
-      return this.cells[cellName] || false;
-    },
-    // hasCellInvalid(column) {
-    //   const cellName = `${column}${this.source.value}`;
-    //   if (!this.hasCell(column, this.source.value)) return false;
-    //   if (!Object.keys(this.cells[cellName]).includes('invalid')) return false;
-    //   console.log(cellName);
-    //   return true;
-    // },
-    // getCellInvalidMessage(column) {
-    //   const cellName = `${column}${this.source.value}`;
-    //   return this.cells[cellName]?.invalid || 'Unknown error';
-    // },
-    getCellName(columnName) {
-      return `${columnName}${this.source.value}`;
-    },
-    getCellClass(columnName) {
-      // const cellName = this.getCellName(columnName);
-      if (!this.hasCell(columnName)) return null;
-      if (!Object.keys(this.hasCell(columnName)).includes('style')) return null;
-      return this.hasCell(columnName).style;
-    },
-
-    getCellType(cell, columnName) {
-      const cellType = cell.type
-        || this.source.type
-        || this.columns.find((column) => column.name === columnName).type
-        || CELL_TYPE_DEFAULT;
-      return cellType;
-    },
-    // getCellFormatString(cell, columnName) {
-    //   const cellFormatString = cell.formatString
-    //     || this.source.formatString
-    //     || this.columns.find((column) => column.name === columnName).formatString
-    //     || null;
-    //   return cellFormatString;
-    // },
-    // templateRow(height) {
-    //   const templateRow = {
-    //     'grid-template-rows': `${height || '22'}px`,
-    //   };
-    //   // console.log(this.templateColumnWidth);
-    //   if (this.printMode) {
-    //     templateRow['grid-template-columns'] = this.templateColumnWidth;
-    //   } else if (this.maxLevelGroupRow === 0) {
-    //     templateRow['grid-template-columns'] = `60px ${this.templateColumnWidth}`;
-    //   } else {
-    //     templateRow['grid-template-columns'] = `repeat(${this.maxLevelGroupRow}, minmax(20px, 20px)) 60px ${this.templateColumnWidth}`;
-    //   }
-    //   return templateRow;
-    // },
     fixedCell(column, columnIndex) {
       const fixed = {};
       if (column.fixed) {
@@ -229,12 +115,38 @@ export default {
           fixed.left += this.columns[i].width;
         }
         fixed.left += 'px';
-        // if (!this.columns[columnIndex + 1].fixed) fixed['border-right'] = '3px solid rgba(0, 0, 0, .3)';
         if (!this.columns[columnIndex + 1].fixed && !this.isGrid) fixed['box-shadow'] = '2px 0px 0px rgba(0, 0, 0, .2)';
+        if (columnIndex === 0) fixed['padding-left'] = '0px';
       }
       return fixed;
     },
-    getEndGroup(indexRow, currentLevel) {
+    getCellClass(columnName) {
+      if (!this.hasCell(columnName)) return null;
+      if (!Object.keys(this.hasCell(columnName)).includes('style')) return null;
+      return this.hasCell(columnName).style;
+    },
+    getCellGeometry(columnName, columnIndex) {
+      const cellGeometry = {};
+      if (this.hasCell(columnName)) {
+        const {
+          'grid-column-start': columnStart,
+          'grid-column-end': columnEnd,
+          height,
+        } = this.hasCell(columnName);
+        cellGeometry['grid-column-start'] = +columnStart + columnIndex;
+        cellGeometry['grid-column-end'] = +columnEnd + columnIndex;
+        cellGeometry.height = `${height}px`;
+      } else {
+        cellGeometry['grid-column-start'] = columnIndex + (this.maxLevelGroupRow + 2);
+        cellGeometry['grid-column-end'] = (columnIndex + (this.maxLevelGroupRow + 2)) + 1;
+      }
+      return cellGeometry;
+    },
+    getCellName(columnName) {
+      return `${columnName}${this.rowName}`;
+    },
+    getEndGroup(currentLevel) {
+      const indexRow = this.index;
       if (this.rows[indexRow].parent
         && !this.rows[indexRow].rowLevel <= currentLevel
         && (!this.rows[indexRow + 1]?.parent
@@ -242,27 +154,43 @@ export default {
         && this.rows[indexRow + 1].rowLevel <= currentLevel - 1) return true;
       return false;
     },
-    getStyleGroup(level) {
+    getGroupClass(level) {
+      const { rowLevel, parent: rowParent } = this.source;
+      const groupClass = [];
+      if (this.setOpenGroupRows.includes(this.rowName) && rowLevel === level - 1) {
+        groupClass.push('line-start');
+      }
+      if (rowParent && level <= rowLevel) groupClass.push('line');
+      if (this.getEndGroup(level) && level <= rowLevel) groupClass.push('line-end');
+      return groupClass;
+    },
+    getGroupStyle(level) {
       return {
         left: `${20 * (+level - 1)}px`,
       };
     },
-    isRowGroupLevel(row, level) {
-      return (Object.keys(row).includes('rowGroup') && (row.rowLevel + 1) === level);
+    getImg(columnName) {
+      const cellName = this.getCellName(columnName);
+      return this.images[this.cells[cellName].image];
     },
-    getCellGeometry(row, column, columnIndex) {
-      const cellGeometry = {};
-      const cellName = `${column.name}${row.value}`;
-      if (this.cells[cellName]) {
-        cellGeometry['grid-column-start'] = this.cells[cellName]['grid-column-start'] + columnIndex;
-        cellGeometry['grid-column-end'] = this.cells[cellName]['grid-column-end'] + columnIndex;
-        cellGeometry.height = `${this.cells[cellName].height}px`;
-        // cellGeometry['z-index'] = 1;
-      } else {
-        cellGeometry['grid-column-start'] = columnIndex + (this.printMode) ? 0 : (this.maxLevelGroupRow + 2);
-        cellGeometry['grid-column-end'] = (columnIndex + ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2))) + 1;
-      }
-      return cellGeometry;
+    hasCell(columnName) {
+      const cellName = this.getCellName(columnName);
+      return this.cells[cellName] || false;
+    },
+    hasExcludedCell(columnName) {
+      const cellName = this.getCellName(columnName);
+      if (this.setExcludedCell.includes(cellName)) return false;
+      return true;
+    },
+    hasGroup(level) {
+      return (Object.keys(this.source).includes('rowGroup')
+        && (this.source.rowLevel + 1) === level);
+    },
+    hasImg(columnName) {
+      const cellName = this.getCellName(columnName);
+      if (!this.cells[cellName]) return false;
+      if (!Object.keys(this.cells[cellName]).includes('image')) return false;
+      return true;
     },
   },
 };
@@ -272,45 +200,55 @@ export default {
 @import '../SpreadSheet.scss';
 
 .sheet-body__row {
+  position: relative;
   display: grid;
   grid-row: $bodyGridRow;
   .column {
     position: relative;
     display: inline-flex;
     &-title, &-group {
+      position: sticky;
+      justify-content: center;
+      align-items: center;
       background-color: $backgroundColorTitle;
       z-index: 500;
     }
     &-title {
-      position: sticky;
-      justify-content: center;
-      align-items: center;
       font-size: 0.75em;
       font-weight: bold;
       color: $bodyFontColorTitle;
-      border-left: thin solid grey;
-      border-right: thin solid grey;
-      border-bottom: thin solid grey;
+      border-top: thin solid grey;
       cursor: default;
-    }
-
-    &-body {
-      padding: 0px 3px;
-      line-height: $bodyLineHeight;
-      white-space: nowrap;
-      outline: none;
-      // border-right: thin solid black;
-      border-bottom: $bodyGridColor;
-      background-color: unset;
-      // box-shadow: inset -1px 0px 0px rgba(0, 0, 0, .12);
       &::after {
         position: absolute;
         content: '';
+        left: 0px;
+        top: -1px;
+        right: -0px;
+        bottom: -1px;
+        border-left: thin solid grey;
+        border-right: thin solid grey;
+        border-bottom: thin solid grey;
+      }
+    }
+
+    &-body {
+      padding: 0px 0px;
+      padding-left: 1px;
+      padding-top: 1px;
+      line-height: $bodyLineHeight;
+      white-space: nowrap;
+      outline: none;
+      // background-color: white;
+      &::after { // grid vertical horizontal
+        position: absolute;
+        content: '';
+        left: 0px;
         top: 0px;
         bottom: -1px;
         right: -1px;
-        left: 0px;
         border-right: $bodyGridColor;
+        border-bottom: $bodyGridColor;
       }
     }
 
@@ -320,183 +258,45 @@ export default {
       align-items: inherit;
       height: 100%;
       width: 100%;
+      background-color: white;
       overflow: hidden;
       user-select: none;
     }
   }
+
+  .line-start {
+    &::before {
+      content: '';
+      position: absolute;
+      top: calc(50% + 6px);
+      height: 50%;
+      border-left: 1px solid #3F3F3F;
+    }
+  }
+  .line {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0px;
+      width: 1px;
+      height: 100%;
+      border-left: 1px solid #3F3F3F;
+    }
+  }
+  .line-end {
+    &::before {
+      content: '';
+      position: absolute;
+      left: 9.5px;
+      bottom: -1px;
+      top: 0px;
+      width: 8px;
+      height: 100%;
+      border-left: 1px solid #3F3F3F;
+      border-bottom: 1px solid #3F3F3F;
+      background-color: unset;
+      z-index: 9999;
+    }
+  }
 }
 </style>
-
-// <style lang="scss" scoped>
-// @import '../SpreadSheet.scss';
-
-// .sheet-body__row {
-//   position: relative;
-//   display: grid;
-//   grid-auto-rows: $bodyGridAutoRow;
-//   .column {
-//     position: relative;
-//     display: inline-flex;
-//     align-items: flex-end;
-//     &-stop {
-//       position: sticky;
-//       top: 0px;
-//     }
-//     &-group, &-title {
-//       position: sticky;
-//       justify-content: center;
-//       font-size: 0.75em;
-//       font-weight: bold;
-//       color: $bodyFontColorTitle;
-//       cursor: default;
-//     }
-
-//     &-group {
-//       padding-top: 2px;
-//       display: flex;
-//       justify-content: center;
-//       align-items: center;
-//       left: 0px;
-//       width: 20px;
-//       background-color: $backgroundColorTitle;
-//       z-index: 500;
-//       &:first-child {
-//         box-shadow:  inset 1px 0px 0px grey;
-//       }
-//     }
-
-//     &-title {
-//       padding-top: 1px;
-//       width: 60px;
-//       z-index: 400;
-//       &::after {
-//         content: '';
-//         position: absolute;
-//         left: 0px;
-//         top: 0px;
-//         right: 0px;
-//         bottom: -1px;
-//         border-left: thin solid grey;
-//         border-right: thin solid grey;
-//         border-bottom: thin solid grey;
-//         z-index: 401;
-//       }
-//       .content {
-//         display: flex;
-//         justify-content: center;
-//         align-items: center;
-//         height: 100%;
-//         width: 100%;
-//         box-sizing: border-box;
-//         background-color: $backgroundColorTitle;
-//         overflow: hidden;
-//         user-select: none;
-//       }
-//     }
-//     &-body {
-//       width: 100%;
-//       box-sizing: border-box;
-//       line-height: $bodyLineHeight;
-//       white-space: nowrap;
-//       outline: none;
-//       cursor: cell;
-//       background-color: $backgroundColorbody;
-//       .content {
-//         display: flex;
-//         justify-content: inherit;
-//         align-items: inherit;
-//         height: 100%;
-//         width: 100%;
-//         padding: 0px 3px;
-//         overflow: hidden;
-//         user-select: none;
-//         &_invalid {
-//           content: '';
-//           position: absolute;
-//           top: 0px;
-//           right: 0px;
-//           width: 18px;
-//           height: 18px;
-//           // background-color: #E53935;
-//           background: linear-gradient(45deg, rgba(0,0,0,0) 70%,#E53935 50% );
-//           // cursor: default;
-//           z-index: 81;
-//         }
-//         &-tooltip_invalid {
-//           background-color: grey;
-//         }
-//       }
-//       &::after {
-//         content: '';
-//         position: absolute;
-//         left: 0px;
-//         top: 0px;
-//         right: -1px;
-//         bottom: -1px;
-//         border-right: $bodyGridColor;
-//         border-bottom: $bodyGridColor;
-//         z-index: 80;
-//       }
-//       &_grid-off {
-//         &::after {
-//           content: '';
-//           position: absolute;
-//           left: 0px;
-//           top: 0px;
-//           right: 0px;
-//           bottom: -1px;
-//           border-right: $bodyGridColorOff;
-//           border-bottom: $bodyGridColorOff;
-//           z-index: 80;
-//         }
-//       }
-//     }
-//   }
-//   .line-start {
-//     &::before {
-//       content: '';
-//       position: absolute;
-//       top: calc(50% + 6px);
-//       height: 50%;
-//       border-left: 1px solid #3F3F3F;
-//     }
-//   }
-//   .line {
-//     &::before {
-//       content: '';
-//       position: absolute;
-//       top: 0px;
-//       width: 1px;
-//       height: 100%;
-//       border-left: 1px solid #3F3F3F;
-//     }
-//   }
-//   .line-end {
-//     &::before {
-//       content: '';
-//       position: absolute;
-//       left: 9.5px;
-//       bottom: -1px;
-//       top: 0px;
-//       width: 8px;
-//       height: 100%;
-//       border-left: 1px solid #3F3F3F;
-//       border-bottom: 1px solid #3F3F3F;
-//       background-color: unset;
-//       z-index: 9999;
-//     }
-//   }
-//   .selected {
-//     &::before {
-//       content: '';
-//       position: absolute;
-//       top: 0px;
-//       bottom: -1px;
-//       left: 0px;
-//       right: -1px;
-//       border: 1px solid #1a73e8;
-//       z-index: 199;
-//     }
-//   }
-// }
-// </style>

@@ -157,8 +157,8 @@ export default {
       for (let i = 1; i < this.rowCount + 1; i += 1) {
         const rowItem = {
           value: i,
-          name: i,
-          display_name: i,
+          // name: i,
+          // display_name: i,
           height: this.cellHeight,
           rowLevel: this.getRowLevel(`${i}`),
         };
@@ -292,12 +292,18 @@ export default {
       this.$emit('scroll:body');
     },
 
-    toggleRowGroup(rowGroup) {
-      if (this.setOpenGroupRows.includes(rowGroup.value)) {
-        this.recursiveClosingRowGroup(rowGroup.value);
-        this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowGroup.value), 1);
+    // toggleRowGroup(rowGroup) {
+    toggleRowGroup(rowName) {
+      // console.log(rowName, this.setOpenGroupRows);
+      // if (this.setOpenGroupRows.includes(rowGroup.value)) {
+      if (this.setOpenGroupRows.includes(rowName)) {
+        // this.recursiveClosingRowGroup(rowGroup.value);
+        this.recursiveClosingRowGroup(rowName);
+        // this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowGroup.value), 1);
+        this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowName), 1);
       } else {
-        this.setOpenGroupRows.push(rowGroup.value);
+        // this.setOpenGroupRows.push(rowGroup.value);
+        this.setOpenGroupRows.push(rowName);
       }
     },
 

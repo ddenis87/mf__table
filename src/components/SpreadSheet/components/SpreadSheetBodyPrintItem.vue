@@ -57,17 +57,10 @@ export default {
       if (!Object.keys(cell).includes('value')) return '';
       return display.formate(cell.value, { ...cell, representations: this.representations });
     },
-    // formattedData(columnName) {
-    //   if (!this.cells[`${columnName}${this.source.value}`]) return '';
-    //   const formattedOption = {};
-    //   const cell = this.cells[`${columnName}${this.source.value}`];
-    //   const cellValue = cell.value;
-    //   const cellType = this.getCellType(cell, columnName);
-    //   formattedOption.valueType = cellType;
-    //   const cellFormatString = this.getCellFormatString(cell, columnName);
-    //   if (cellFormatString) formattedOption.formatString = cellFormatString;
-    //   return formattedData(cellValue, formattedOption);
-    // },
+    hasCell(column) {
+      const cellName = `${column}${this.source.value}`;
+      return (this.cells[cellName]) || false;
+    },
     getCellType(cell, columnName) {
       const cellType = cell.type
         || this.source.type

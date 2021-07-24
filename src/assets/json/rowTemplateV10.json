@@ -1,0 +1,311 @@
+{
+  "template":true,
+  "editAccess":"closedExceptOpen",
+  "cells":{
+    "a5":{
+      "value":"",
+      "style":"a5",
+      "scripts": {
+        "action":"deleteRowSection1"
+      },
+      "disabled":true,
+      "noSelect":true,
+      "image":"delete"
+    },
+    "a6":{
+      "value":"",
+      "style":"a6",
+      "scripts": {
+        "action":"deleteRowSection2"
+      },
+      "disabled":true,
+      "noSelect":true,
+      "image":"delete"
+    },
+    "a7":{
+      "value":"",
+      "style":"a7",
+      "scripts": {
+        "action":"deleteRowSection3"
+      },
+      "disabled":true,
+      "noSelect":true,
+      "image":"delete"
+    },
+    "a8":{
+      "style":"a8 no-print",
+      "scripts": {
+        "action":"addRowSection3"
+      },
+      "value":"",
+      "image":"adding"
+    },
+    "a9":{"style":"a8"},
+    "a10":{"style":"a8"},
+
+    "b1":{"colspan":5,"style":"b1","value":"1.1. Аналитическое распределение объема бюджетных ассигнований на предоставление субсидий федеральным государственным учреждениям на финансовое обеспечение выполнения государственного задания на оказание государственных услуг (выполнение работ)"},
+    "b2":{"colspan":3,"style":"b2","value":"Наименование показателя","rowspan":2},
+    "b3":{"style":"b3"},
+    "b4":{"colspan":3,"style":"b4","value":"1"},
+    "b5":{"colspan":3,"style":"b5","parameter":"st1IndicatorName"},
+    "b6":{"style":"b6"},
+    "b7":{"style":"b7"},
+    "b8":{
+      "style":"b8 no-print",
+      "value":"Добавить строку",
+      "colspan":3,
+      "scripts": {
+        "action":"addRowSection3"
+      },
+      "disabled":false,
+      "noSelect":true
+    },
+    "b9":{"value":"Итоги","colspan":3,"style":"b9"},
+    "b10":{"value":"Итоги итогов","colspan":3,"style":"b9"},
+
+    "c1":{"style":"c1"},
+    "c2":{"style":"c2"},
+    "c3":{"style":"c3"},
+    "c4":{"style":"c4"},
+    "c5":{"style":"c5"},
+    "c6":{"colspan":2,"style":"c6","parameter":"st2IndicatorName"},
+    "c7":{"style":"c7"},
+    "c8":{"style":"c8"},
+    "c9":{"style":"c8"},
+    "c10":{"style":"c8"},
+
+    "d1":{"style":"d1"},
+    "d2":{"style":"d2"},
+    "d3":{"style":"d3"},
+    "d4":{"style":"d4"},
+    "d5":{"style":"d5"},
+    "d6":{"style":"d6"},
+    "d7":{"style":"d7","parameter":"st3IndicatorName"},
+    "d8":{"style":"d8"},
+    "d9":{"style":"d9"},
+    "d10":{"style":"d9"},
+
+    "e1":{"style":"e1"},
+    "e2":{"style":"e2","value":"Аналитический код","rowspan":2},
+    "e3":{"style":"e3"},
+    "e4":{"value":"2","style":"e4"},
+    "e5":{"style":"e5","parameter":"st1AnalyticalCode"},
+    "e6":{"style":"e6","parameter":"st2AnalyticalCode"},
+    "e7":{"style":"e7","parameter":"st3AnalyticalCode"},
+    "e8":{"style":"e8","type":"field.organization","parameter":"organization","colspan":2,"isEditable":true},
+    "e9":{"style":"e9"},
+    "e10":{"style":"e10","type":"field.budgetclassification","parameter":"budgetclassification","colspan":3,"isEditable":true},
+
+    "f1":{"style":"f1"},
+    "f2":{"colspan":3,"style":"f2","value":"Объем бюджетных ассигнований, тыс. руб."},
+    "f3":{"value":"на 2021 год\n(на очередной финансовый год)","style":"f3"},
+    "f4":{"value":"3","style":"f4"},
+    "f5":{"style":"f5","parameter":"st1Volume21","type":"number","isEditable":true},
+    "f6":{"style":"f6","type":"number","parameter":"st2Volume21","isEditable":true},
+    "f7":{
+      "style":"f7",
+      "type":"number",
+      "parameter":"st3Volume21",
+      "isEditable":true,
+      "scripts": {
+        "validate":"(v) => v > 0 || 'Число должно быть больше 0'"
+      }
+    },
+    "f8":{"style":"f8"},
+    "f9":{
+      "style":"f9",
+      "type":"number",
+      "formatString":"minFD=2",
+      "formula":"=SUM(f5:f13)",
+      "isEditable":false
+    },
+    "f10":{"style":"f9"},
+
+    "g1":{"style":"g1"},
+    "g2":{"style":"g2"},
+    "g3":{"value":"на 2022 год\n(на первый год планового периода)","style":"g3"},
+    "g4":{"value":"4","style":"g4"},
+    "g5":{"style":"g5","parameter":"st1Volume22","type":"number"},
+    "g6":{"style":"g6","type":"number","parameter":"st2Volume22"},
+    "g7":{"style":"g7","type":"number","parameter":"st3Volume22"},
+    "g8":{"style":"g8","type":"choice","title":"Тут должны быть choice"},
+    "g9":{
+      "style":"g9",
+      "type":"number",
+      "formatString":"minFD=2",
+      "formula":"$g5 + $g6 - $g7 + $g8 + $g9 - $g10 + $g11 + $g12 - $g13",
+      "isEditable":false
+    },
+    "g10":{"style":"g9"},
+
+    "h1":{"style":"h1"},
+    "h2":{"style":"h2"},
+    "h3":{"value":"на 2023 год\n(на второй год планового периода)","style":"h3"},
+    "h4":{"value":"5","style":"h4"},
+    "h5":{"style":"h5","type":"number","parameter":"st1Volume23"},
+    "h6":{"style":"h6","type":"number","parameter":"st2Volume23","formatString":"minFD=2$color=true"},
+    "h7":{"style":"h7","type":"number","formatString":"minFD=2","parameter":"st3Volume23"},
+    "h8":{
+      "style":"h8",
+      "type":"date",
+      "value":"2012-07-17",
+      "isEditable":true,
+      "scripts": {
+        "validate":"(v) => (new Date(v).toString() !== 'Invalid Date') || 'Значение должно быть датой'"
+      }
+    },
+    "h9":{
+      "style":"h9",
+      "type":"number",
+      "formatString":"minFD=2",
+      "formula":"$h5 + ($h6+$h7) + $h8 + $h9+($h10 + $h11 * $h12) + $h13",
+      "isEditable":false
+    },
+    "h10":{
+      "style":"h9",
+      "type":"number",
+      "formatString":"minFD=2",
+      "formula":"$f15 + $g15 + $h15",
+      "isEditable":false
+    }
+  },
+  "columns":{
+    "a":{"width":22},
+    "b":{"width":13},
+    "c":{"width":12},
+    "d":{"width":615},
+    "e":{"width":76},
+    "f":{"width":84},
+    "g":{"width":83},
+    "h":{"width":84}
+  },
+  "styles":[
+    {"list":{"whiteSpace":"unset","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"flex-start","textAlign":"left","wordWrap":"break-word","fontSize":"11pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start","fontWeight":"bold"},"name":"b1"},
+    {"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"c1"},
+    {"name":"d1","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},
+    {"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"e1"},
+    {"name":"f1","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},{"list":{"fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","textAlign":"left","justifyContent":"flex-start"},"name":"g1"},{"list":{"fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","textAlign":"left","justifyContent":"flex-start"},"name":"h1"},{"name":"i1","list":{"fontSize":"10pt"}},
+    {"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"11pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold","justifyContent":"denter"},"name":"b2"},{"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"c2"},{"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"d2"},{"list":{"whiteSpace":"unset","alignItems":"center","textAlign":"center","wordWrap":"break-word","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold"},"name":"e2"},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold","justifyContent":"center"},"name":"f2"},
+    {"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"g2"},{"name":"h2","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start"},"name":"i2"},{"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"b3"},{"name":"c3","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},{"name":"d3","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},{"name":"e3","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},{"list":{"whiteSpace":"unset","alignItems":"center","textAlign":"left","wordWrap":"break-word","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"11pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold"},"name":"f3"},
+    {"name":"g3","list":{"whiteSpace":"unset","alignItems":"center","textAlign":"left","wordWrap":"break-word","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"11pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold"}},
+    {"name":"h3","list":{"whiteSpace":"unset","alignItems":"center","textAlign":"left","wordWrap":"break-word","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"11pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold"}},{"name":"i3","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start"}},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold","justifyContent":"center"},"name":"b4"},{"name":"c4","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},{"name":"d4","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","fontWeight":"bold"},"name":"e4"},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","fontWeight":"bold"},"name":"f4"},{"name":"g4","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","fontWeight":"bold"}},{"name":"h4","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold","justifyContent":"center"}},
+    {"name":"i4","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start"}},{"list":{"whiteSpace":"unset","alignItems":"center","textAlign":"left","wordWrap":"break-word","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold"},"name":"b5"},{"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"c5"},{"name":"d5","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"}},{"list":{"whiteSpace":"unset","alignItems":"center","textAlign":"center","wordWrap":"break-word","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold"},"name":"e5"},
+    {"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","whiteSpace":"unset","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","wordWrap":"break-word","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","backgroundColor":"rgba(0, 255, 0, .1)"},"name":"f5"},
+    {"name":"g5","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","whiteSpace":"unset","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","wordWrap":"break-word","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},
+    {"name":"h5","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","whiteSpace":"unset","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","wordWrap":"break-word","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},
+    {"name":"i5","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start","cursor":"pointer"}},
+    {"name":"b6","list":{"fontSize":"10pt","textAlign":"left","justifyContent":"flex-start"}},
+    {"name":"c6","list":{"whiteSpace":"unset","alignItems":"center","textAlign":"left","wordWrap":"break-word","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold"}},{"list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif"},"name":"d6"},{"name":"e6","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","fontWeight":"bold","justifyContent":"center"}},
+    {"list":{"backgroundColor":"rgba(0, 255, 0, .1)","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"},"name":"f6"},
+    {"name":"g6","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},
+    {"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderBottom":"1px solid rgba(0%, 0%, 0%)","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"},"name":"h6"},
+    {"name":"i6","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start","cursor":"pointer"}},
+    {"name":"b7","list":{"fontSize":"10pt"}},
+    {"name":"c7","list":{"fontSize":"10pt","textAlign":"left","justifyContent":"flex-start"}},
+    {"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","borderBottom":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","whiteSpace":"unset","alignItems":"center","textAlign":"left","borderRight":"1px solid rgba(0%, 0%, 0%)","wordWrap":"break-word","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"flex-start"},"name":"d7"},{"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center","fontWeight":"bold"},"name":"e7"},
+    {"name":"f7","list":{"backgroundColor":"rgba(0, 255, 0, .1)","borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},{"name":"g7","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},{"name":"h7","list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontFamily":"\u0027Times New Roman\u0027, sans-serif","alignItems":"center","textAlign":"center","borderRight":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","borderTop":"1px solid rgba(0%, 0%, 0%)","justifyContent":"center"}},
+    {"list":{"borderLeft":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","textAlign":"left","justifyContent":"flex-start","cursor":"pointer"},"name":"i7"},
+    {"list":{"fontSize":"11pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"0px solid rgba(0%, 0%, 0%)","fontWeight":"bold","alignItems":"center","cursor":"pointer","color": "#1E88E5","text-decoration":"underline"},"name":"b8"},
+    {"list":{"fontSize":"11pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)","fontWeight":"bold","alignItems":"center"},"name":"b9"},
+    {"name":"c8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"0px solid rgba(0%, 0%, 0%)"}},
+    {"name":"d8","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"1px solid rgba(0%, 0%, 0%)"}},
+    {"name":"d9","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"}},
+    {"name":"e8","list":{"backgroundColor":"rgba(0, 255, 0, .1)","fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"1px solid rgba(0%, 0%, 0%)","alignItems":"center"}},
+    {"name":"e9","list":{"fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"}},
+    {"name":"e10","list":{"backgroundColor":"rgba(0, 255, 0, .1)","fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","borderTop":"2px solid rgba(0%, 0%, 0%)"}},
+    {
+      "name":"f8",
+      "list":{
+        "borderTop":"1px solid rgba(0%, 0%, 0%)","alignItems":"center","justifyContent":"flex-end"
+      }
+    },
+    {
+      "name":"a8",
+      "list":{
+        "alignItems":"center","justifyContent":"center","cursor":"pointer"
+      }
+    },
+    {"name":"h8", "list": {"borderTop":"1px solid rgba(0%, 0%, 0%)","fontSize":"10pt","fontFamily":"\u0027Calibri\u0027, sans-serif","alignItems":"center","justifyContent":"flex-start"}},
+    {
+      "name":"f9",
+      "list":{
+        "fontSize":"11pt",
+        "fontFamily":"\u0027Calibri\u0027, sans-serif",
+        "borderTop":"2px solid rgba(0%, 0%, 0%)","alignItems":"center","justifyContent":"flex-end",
+        "fontWeight":"bold",
+        "padding": "0px 3px"
+      }
+    },
+    {
+      "name":"g8",
+      "list":{
+        "borderTop":"1px solid rgba(0%, 0%, 0%)","alignItems":"center","justifyContent":"flex-end"
+      }
+    },
+    {
+      "name":"g9",
+      "list":{
+        "fontSize":"11pt",
+        "fontFamily":"\u0027Calibri\u0027, sans-serif",
+        "borderTop":"2px solid rgba(0%, 0%, 0%)","alignItems":"center","justifyContent":"flex-end",
+        "fontWeight":"bold",
+        "padding": "0px 3px"
+      }
+    },
+    {
+      "name":"h9",
+      "list":{
+        "fontSize":"11pt",
+        "fontFamily":"\u0027Calibri\u0027, sans-serif",
+        "borderTop":"2px solid rgba(0%, 0%, 0%)","alignItems":"center","justifyContent":"flex-end",
+        "fontWeight":"bold",
+        "padding": "0px 3px"
+      }
+    },
+    {"list":{"alignItems":"flex-start","justifyContent":"flex-start","cursor":"pointer"},"name":"a5"},
+    {"list":{"alignItems":"flex-start","justifyContent":"flex-start","cursor":"pointer"},"name":"a6"},
+    {"list":{"alignItems":"flex-start","justifyContent":"flex-start","cursor":"pointer"},"name":"a7"}
+  ],
+  "rows":{
+    "1":{"height":77},
+    "2":{"height":22},
+    "3":{"height":93},
+    "4":{"height":22},
+    "5":{"height":47},
+    "6":{"height":46},
+    "7":{"height":54},
+    "8":{"height":28},
+    "9":{"height":22},
+    "10":{"height":22}
+  },
+  "namedAreas":[
+    {"name":"string2","range":"6:6"},
+    {"name":"string1","range":"5:5"},
+    {"name":"string3","range":"7:7"},
+    {"name":"headerR","range":"1:4"},
+    {"name":"footerR","range":"8:8"},
+    {"name":"footerF","range":"9:10"}
+  ],
+  "scripts":{
+    "deleteRowSection1": {
+      "template": "default",
+      "script": "(cellName) => { this.deleteArea(this.getRangeByCellName(cellName), 'vertical');}"
+    },
+    "deleteRowSection2": {
+      "template": "default",
+      "script": "(cellName) => { this.deleteArea(this.getRangeByCellName(cellName), 'vertical');}"
+    },
+    "deleteRowSection3": {
+      "template": "default",
+      "script": "(cellName) => { this.deleteArea(this.getRangeByCellName(cellName), 'vertical'); }"
+    },
+    "addRowSection3": {
+      "template": "default",
+      "script": "(cellName) => { this.addArea(cellName, 'string3', 'vertical'); }"
+    }
+  },
+  "images": {
+    "delete": "<svg class='no-print' width='18' height='18'><path id='svg_1' fill='none' d='m0,0l24,0l0,24l-24,0l0,-24z'/><path fill='#ff0000' stroke='null' id='svg_2' d='m14.5,4.60786l-1.10786,-1.10786l-4.39214,4.39214l-4.39214,-4.39214l-1.10786,1.10786l4.39214,4.39214l-4.39214,4.39214l1.10786,1.10786l4.39214,-4.39214l4.39214,4.39214l1.10786,-1.10786l-4.39214,-4.39214l4.39214,-4.39214z'/></svg>",
+    "adding": "<svg width='18' height='18'><path fill='#00bf00' stroke='null' id='svg_1' d='m14.66669,9.80953l-4.85716,0l0,4.85716l-1.61905,0l0,-4.85716l-4.85716,0l0,-1.61905l4.85716,0l0,-4.85716l1.61905,0l0,4.85716l4.85716,0l0,1.61905z'/></svg>"
+  }
+}

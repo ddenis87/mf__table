@@ -1,33 +1,26 @@
 <template>
   <div :key="`body-row-${source.value}`"
        class="sheet-body__row"
-       :style="templateRow(source.height)">
-    <template v-if="!printMode">
-      <div v-show="isTitle"
-           v-for="level in maxLevelGroupRow"
-           :key="`${source.value}-${level}`"
+       :style="gridRow">
+    <template v-if="isTitle">
+      <div v-for="(level, levelIndex) in maxLevelGroupRow"
            class="column column-group"
-           :class="{
-             'line-start': (setOpenGroupRows.includes(source.value) && source.rowLevel === level - 1),
-             'line': (source.parent && level <= source.rowLevel),
-             'line-end': (getEndGroup(index, level) && level <= source.rowLevel),
-           }"
-           :style="getStyleGroup(level)">
-        <spread-sheet-btn-group v-if="isRowGroupLevel(source, level)"
-                                :data-row-index="index"
-                                :data-row-parent="source.value"
-                                :data-row-count="source.rowGroup - 1"
-                                :data-row-status="source.openGroup">
-          {{ (setOpenGroupRows.includes(source.value)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+           :key="levelIndex"
+           :class="getGroupStyle(level)"
+           :style="getGroupStyle(level)">
+        <spread-sheet-btn-group v-if="hasGroup(level)"
+                                :data-row-name="rowName">
+          {{ btnGroupStatusImg }}
         </spread-sheet-btn-group>
       </div>
-      <div v-show="isTitle"
-           class="column column-title"
-           :style="shiftTitle"><div class="content">{{ source.value }}</div></div>
+      <div class="column column-title"
+           :style="shiftTitle">
+        <div class="content">{{ rowName }}</div>
+      </div>
     </template>
-    <template v-for="(column, columnIndex) in columns">
 
-      <div v-if="!setExcludedCell.includes(`${column.name}${source.value}`)"
+    <template v-for="(column, columnIndex) in columns">
+      <div v-if="hasExcludedCell(column.name)"
           :key="`body-${source.value}-${column.value}`"
           class="column column-body"
           :class="[
@@ -39,13 +32,16 @@
             getCellGeometry(source, column, columnIndex),
             fixedCell(column, columnIndex)
           ]"
-          :data-name="`${column.name}${source.name}`"
+          :data-name="`${column.name}${source.value}`"
           :data-tooltip="getTooltip(column.name)"
           :tabindex="columnIndex">
             <div v-if="hasImg(column.name)" class="content" v-html="getImg(column.name)"></div>
             <div v-else
                  class="content"
+                 :class="{'content_tooltip': hasTooltip(column.name)}"
                  v-html="formattedData(column.name)"></div>
+            <div v-if="hasTooltip(column.name)"
+                 class="content_tooltip"></div>
       </div>
     </template>
   </div>
@@ -55,6 +51,7 @@
 // import formattedData from '@/plugins/formattedDataDisplay/formattedDataDisplay';
 import display from '@/plugins/formattingView/formattingView';
 import {
+  CELL_HEIGHT,
   CELL_TYPE_DEFAULT,
 } from '../SpreadSheetConst';
 
@@ -84,16 +81,49 @@ export default {
   data() {
     return {
       shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
+      rowName: this.source.value,
     };
   },
   computed: {
+    btnGroupStatusImg() {
+      return (this.setOpenGroupRows.includes(this.rowName))
+        ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline';
+    },
+    templateColumnTitle() {
+      let tempalteColumnTitle = `60px ${this.templateColumnWidth}`;
+      if (this.maxLevelGroupRow !== 0) {
+        tempalteColumnTitle = `repeat(${this.maxLevelGroupRow}, minmax(20px, 20px))
+                               60px
+                               ${this.templateColumnWidth}`;
+      }
+      return tempalteColumnTitle;
+    },
+    gridRow() {
+      const gridRow = {
+        'grid-template-rows': `${this.source.height || CELL_HEIGHT}px`,
+        'grid-template-columns': this.templateColumnTitle,
+      };
+      return gridRow;
+    },
   },
   methods: {
+    hasExcludedCell(columnName) {
+      const cellName = this.getCellName(columnName);
+      if (this.setExcludedCell.includes(cellName)) return false;
+      return true;
+    },
+    hasGroup(level) {
+      return (Object.keys(this.source).includes('rowGroup')
+        && (this.source.rowLevel + 1) === level);
+    },
     hasImg(columnName) {
       const cellName = `${columnName}${this.source.value}`;
       if (!this.cells[cellName]) return false;
       if (!Object.keys(this.cells[cellName]).includes('image')) return false;
       return true;
+    },
+    hasTooltip(columnName) {
+      return (this.hasCell(columnName)?.title) || false;
     },
     getCellName(columnName) {
       return `${columnName}${this.source.value}`;
@@ -104,56 +134,18 @@ export default {
       return this.images[this.cells[cellName].image];
     },
     getTooltip(columnName) {
-      // const cellName = this.getCellName(columnName);
-      // if (this.hasCell(columnName))
       return this.hasCell(columnName)?.title || '';
     },
     formattedData(columnName) {
       const cell = this.hasCell(columnName);
       if (!cell) return '';
       if (!Object.keys(cell).includes('value')) return '';
-      // console.log(this.representations);
-      // if (!cell.value) return '';
-      // const options = {
-      //   type: cell.type,
-      //   formatString: cell.formatString,
-      //   representations: this.representations,
-      // };
-      // console.log(options);
       return display.formate(cell.value, { ...cell, representations: this.representations });
     },
-    // formattedData(columnName) {
-    //   // const cellName = `${columnName}${this.source.value}`;
-    //   const cell = this.hasCell(columnName);
-    //   if (!cell) return '';
-    //   const formattedOption = {
-    //     representations: this.representations,
-    //   };
-    //   // const cell = this.cells[`${columnName}${this.source.value}`];
-    //   const cellValue = cell.value;
-    //   const cellType = this.getCellType(cell, columnName);
-    //   // if (cellType.includes('field')) return cell.representation;
-    //   formattedOption.valueType = cellType;
-    //   const cellFormatString = this.getCellFormatString(cell, columnName);
-    //   if (cellFormatString) formattedOption.formatString = cellFormatString;
-    //   return formattedData(cellValue, formattedOption);
-    // },
     hasCell(column) {
       const cellName = `${column}${this.source.value}`;
       return (this.cells[cellName]) || false;
     },
-    // hasCellInvalid(column) {
-    //   const cellName = `${column}${this.source.value}`;
-    //   if (!this.hasCell(column, this.source.value)) return false;
-    //   if (!Object.keys(this.cells[cellName]).includes('invalid')) return false;
-    //   console.log(cellName);
-    //   return true;
-    // },
-    // getCellInvalidMessage(column) {
-    //   const cellName = `${column}${this.source.value}`;
-    //   return this.cells[cellName]?.invalid || 'Unknown error';
-    // },
-
     getCellStyle(column) {
       const cellName = `${column}${this.source.value}`;
       return this.cells[cellName].style || '';
@@ -173,11 +165,20 @@ export default {
         || null;
       return cellFormatString;
     },
+    getGroupClass(level) {
+      const { rowLevel, parent: rowParent } = this.source;
+      const groupClass = [];
+      if (this.setOpenGroupRows.includes(this.rowName) && rowLevel === level - 1) {
+        groupClass.push('line-start');
+      }
+      if (rowParent && level <= rowLevel) groupClass.push('line');
+      if (this.getEndGroup(level) && level <= rowLevel) groupClass.push('line-end');
+      return groupClass;
+    },
     templateRow(height) {
       const templateRow = {
         'grid-template-rows': `${height || '22'}px`,
       };
-      // console.log(this.templateColumnWidth);
       if (this.printMode) {
         templateRow['grid-template-columns'] = this.templateColumnWidth;
       } else if (this.maxLevelGroupRow === 0) {
@@ -197,7 +198,6 @@ export default {
           fixed.left += this.columns[i].width;
         }
         fixed.left += 'px';
-        // if (!this.columns[columnIndex + 1].fixed) fixed['border-right'] = '3px solid rgba(0, 0, 0, .3)';
         if (!this.columns[columnIndex + 1].fixed && !this.isGrid) fixed['box-shadow'] = '2px 0px 0px rgba(0, 0, 0, .2)';
       }
       return fixed;
@@ -210,7 +210,7 @@ export default {
         && this.rows[indexRow + 1].rowLevel <= currentLevel - 1) return true;
       return false;
     },
-    getStyleGroup(level) {
+    getGroupStyle(level) {
       return {
         left: `${20 * (+level - 1)}px`,
       };
@@ -276,12 +276,6 @@ export default {
     &-title {
       padding-top: 1px;
       width: 60px;
-      // border-left: thin solid grey;
-      // border-right: thin solid grey;
-      // border-top: px solid rgb(240, 240, 240);
-      // border-bottom: thin solid $backgroundColorTitle;
-      // background-color: $backgroundColorTitle;
-      // overflow: hidden;
       z-index: 400;
       &::after {
         content: '';
@@ -302,7 +296,6 @@ export default {
         height: 100%;
         width: 100%;
         box-sizing: border-box;
-        // border-bottom: thin solid $backgroundColorTitle;
         background-color: $backgroundColorTitle;
         overflow: hidden;
         user-select: none;
@@ -326,21 +319,19 @@ export default {
         padding: 0px 3px;
         overflow: hidden;
         user-select: none;
-        &_invalid {
+        &_tooltip {
           content: '';
           position: absolute;
           top: 0px;
           right: 0px;
-          width: 18px;
-          height: 18px;
-          // background-color: #E53935;
-          background: linear-gradient(45deg, rgba(0,0,0,0) 70%,#E53935 50% );
-          // cursor: default;
+          width: 10px;
+          height: 10px;
+          background: linear-gradient(45deg, rgba(0,0,0,0) 65%,#f5a338 50%);
           z-index: 81;
         }
-        &-tooltip_invalid {
-          background-color: grey;
-        }
+        // &-tooltip_invalid {
+        //   background-color: grey;
+        // }
       }
       &::after {
         content: '';

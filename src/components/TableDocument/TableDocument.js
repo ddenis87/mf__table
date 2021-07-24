@@ -398,7 +398,7 @@ class TableDocument {
     });
     if (errorValidation.length) throw errorValidation;
   }
-  
+
   // fillArea(dataArea, parameters) {
   //   // const validationCellError = [];
   //   Object.entries(this.cells).forEach((cell) => {
@@ -968,7 +968,7 @@ class TableDocument {
   writeRow(rowName, rowValue) {
     this.rows = { ...this.rows, [rowName]: rowValue };
   }
-  
+
   writeStyles(stylesArea) {
     stylesArea.forEach((styleItem) => {
       const styles = this.styles.find((style) => style.name === styleItem.name);
