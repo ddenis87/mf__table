@@ -235,8 +235,9 @@ class TableDocument {
       if (!Array.isArray(sectionData)) sectionData = [sectionData];
       sectionData.forEach((sectionDataItem) => {
         try {
-          this.deserializeArea(sectionValue, sectionDataItem);
+          this.deserializeArea(sectionKey, sectionDataItem);
         } catch (err) {
+          console.log(err);
           deserializeError.push(...err);
         }
       });
@@ -246,14 +247,16 @@ class TableDocument {
     }
   }
 
-  deserializeArea(sectionValue, sectionDataItem) {
+  deserializeArea(sectionKey, sectionDataItem) {
+    console.log(sectionDataItem);
+    const sectionValue = this.getSectionSettings(sectionKey);
     const insertMethods = {
       put: (areaInsert) => { this.putArea(areaInsert); },
       join: (areaInsert) => { this.joinArea(areaInsert); },
     };
     if (Array.isArray(sectionDataItem)) {
       sectionDataItem.forEach((item) => {
-        this.deserializeArea(sectionValue, item);
+        this.deserializeArea(sectionKey, item);
       });
       return;
     }
@@ -270,8 +273,7 @@ class TableDocument {
     if (!nestedData) return;
     nestedData.forEach((nestedDataKey) => {
       if (!Object.keys(sectionDataItem).includes(nestedDataKey)) return;
-      const sectionValueNested = this.getSectionSettings(nestedDataKey);
-      this.deserializeArea(sectionValueNested, sectionDataItem[nestedDataKey]);
+      this.deserializeArea(nestedDataKey, sectionDataItem[nestedDataKey]);
     });
   }
 

@@ -101,10 +101,17 @@ export default {
     };
   },
   computed: {
+    // maxLevelGroupRow() {
+    //   const maxLevelGroup = [0];
+    //   this.prepareRows.filter((row) => Object.keys(row).includes('parent')).forEach((row) => {
+    //     maxLevelGroup.push(row.rowLevel);
+    //   });
+    //   return Math.max(...maxLevelGroup);
+    // },
     maxLevelGroupRow() {
       const maxLevelGroup = [0];
-      this.prepareRows.filter((row) => Object.keys(row).includes('parent')).forEach((row) => {
-        maxLevelGroup.push(row.rowLevel);
+      this.prepareRows.filter((row) => Object.keys(row).includes('level')).forEach((row) => {
+        maxLevelGroup.push(row.level);
       });
       return Math.max(...maxLevelGroup);
     },
@@ -116,7 +123,7 @@ export default {
       return Math.max(...maxLevelGroup);
     },
     tableColumns() {
-      // console.log('table columns');
+      // console.log(this.setOpenGroupColumns);
       return this.prepareColumns.filter((column) => this.setOpenGroupColumns.includes(column.parent) || !column.parent);
     },
     prepareColumns() {
@@ -146,10 +153,53 @@ export default {
       return prepareColumns;
     },
     tableRows() {
-      // console.log('table rows');
-      return this.prepareRows.filter((row) => ((this.setOpenGroupRows.includes(+row.parent)
-        || !row.parent) && !row.fixed));
+      const rows = [];
+      let showLevel = 0;
+      for (let i = 0; i < this.prepareRows.length; i += 1) {
+        const { level } = this.prepareRows[i];
+        if (level === showLevel) {
+          rows.push(this.prepareRows[i]);
+        }
+        if (level < showLevel) {
+          showLevel = level;
+          rows.push(this.prepareRows[i]);
+        }
+        if (this.setOpenGroupRows.includes(this.prepareRows[i].value)) {
+          showLevel = level + 1;
+        }
+      }
+      return rows;
     },
+    // tableRows() {
+    //   // console.log('table rows');
+    //   return this.prepareRows.filter((row) => ((this.setOpenGroupRows.includes(+row.parent)
+    //     || !row.parent) && !row.fixed));
+    // },
+    // prepareRows() {
+    //   // console.log('prepare rows');
+    //   const prepareRows = [];
+    //   const rowsKeys = Object.keys(this.rows);
+    //   for (let i = 1; i < this.rowCount + 1; i += 1) {
+    //     const rowItem = {
+    //       value: i,
+    //       // name: i,
+    //       // display_name: i,
+    //       height: this.cellHeight,
+    //       rowLevel: this.getRowLevel(`${i}`),
+    //     };
+    //     if (rowsKeys.includes(`${i}`)) {
+    //       Object.assign(rowItem, { ...this.rows[i] });
+    //       if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
+    //         rowItem.openGroup = false;
+    //       }
+    //       prepareRows.push(rowItem);
+    //     } else {
+    //       prepareRows.push(rowItem);
+    //     }
+    //   }
+    //   // console.log(prepareRows);
+    //   return prepareRows;
+    // },
     prepareRows() {
       // console.log('prepare rows');
       const prepareRows = [];
@@ -157,22 +207,19 @@ export default {
       for (let i = 1; i < this.rowCount + 1; i += 1) {
         const rowItem = {
           value: i,
-          // name: i,
-          // display_name: i,
           height: this.cellHeight,
-          rowLevel: this.getRowLevel(`${i}`),
+          level: 0,
         };
         if (rowsKeys.includes(`${i}`)) {
           Object.assign(rowItem, { ...this.rows[i] });
-          if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
-            rowItem.openGroup = false;
-          }
+          // if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
+          //   rowItem.openGroup = false;
+          // }
           prepareRows.push(rowItem);
         } else {
           prepareRows.push(rowItem);
         }
       }
-      // console.log(prepareRows);
       return prepareRows;
     },
     tableRowsFixed() {
@@ -292,29 +339,58 @@ export default {
       this.$emit('scroll:body');
     },
 
-    // toggleRowGroup(rowGroup) {
     toggleRowGroup(rowName) {
-      // console.log(rowName, this.setOpenGroupRows);
-      // if (this.setOpenGroupRows.includes(rowGroup.value)) {
       if (this.setOpenGroupRows.includes(rowName)) {
-        // this.recursiveClosingRowGroup(rowGroup.value);
-        this.recursiveClosingRowGroup(rowName);
-        // this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowGroup.value), 1);
         this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowName), 1);
+        for (let i = rowName + 1; i < this.prepareRows.length; i += 1) {
+          if (this.prepareRows[i].level > this.prepareRows[rowName].level) {
+            if (this.setOpenGroupRows.findIndex((element) => element === i) !== -1) {
+              this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
+            }
+          }
+          if (this.prepareRows[i].level < this.prepareRows[rowName].level) return;
+        }
       } else {
-        // this.setOpenGroupRows.push(rowGroup.value);
         this.setOpenGroupRows.push(rowName);
       }
     },
 
-    recursiveClosingRowGroup(rowParent) {
-      this.prepareRows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
-        if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
-          this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
-        }
-        this.recursiveClosingRowGroup(item.value);
-      });
-    },
+    // recursiveClosingRowGroup(rowParent) {
+    //   this.prepareRows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
+    //     if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
+    //       this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
+    //     }
+    //     this.recursiveClosingRowGroup(item.value);
+    //   });
+    // },
+    // recursiveClosingRowGroup(rowName) {
+    //   const currentLevel = this.prepareRows[rowName].level;
+    //   // console.log(rowParent);
+    //   // console.log(this.setOpenGroupRows.findIndex((element) => element === rowParent));
+    //   this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === rowName), 1);
+    //   for (let i = rowName + 1; i < this.prepareRows.length; i += 1) {
+    //     console.log(this.prepareRows[i].level, '>=', currentLevel);
+    //     if (this.prepareRows[i].level >= currentLevel) {
+    //       this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
+    //     }
+    //     if (this.prepareRows[i].level < currentLevel) return;
+    //   //   if (this.prepareRows[i].level > currentLevel) {
+    //   //     if (this.setOpenGroupRows.findIndex((element) => element === i) !== -1) {
+    //   //       this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
+    //   //     }
+    //   //   }
+    //   //   if (this.prepareRows[i].level < currentLevel) {
+    //   //     // this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
+    //   //     return;
+    //   //   }
+    //   }
+    //   // this.prepareRows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
+    //   //   if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
+    //   //     this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
+    //   //   }
+    //   //   this.recursiveClosingRowGroup(item.value);
+    //   // });
+    // },
 
     toggleColumnGroup(columnGroup) {
       console.log(columnGroup);

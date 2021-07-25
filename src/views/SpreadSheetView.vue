@@ -78,11 +78,14 @@
         <v-btn small dark color="blue darken-3" @click="insertColumn">
           <v-icon small left>mdi-cloud-print-outline</v-icon>Test button</v-btn>
       </div> -->
-      <dialog-modal :is-dialog-show="isShowDialog"
-                    is-dialog-name="Ошибка">
-        <v-card>
-          <v-card-text>Файл не является шаблоном или в шаблоне ошибка</v-card-text>
-        </v-card>
+      <dialog-modal is-dialog-name="Ошибка"
+                    :opacity="0"
+                    :is-dialog-show="isDialogMessageShow"
+                    :is-control="true"
+                    :is-accept="{ isShow: false }"
+                    :is-cancel="{ isShow: true, text: 'Закрыть' }"
+                    @dialog:cancel="closeDialogMessage">
+        <span>{{ isDialogMessageText }}</span>
       </dialog-modal>
     </div>
     <div class="spread-sheet-view__table">
@@ -150,7 +153,9 @@ export default {
       isFileTemplateDisabled: false,
       isFileDataDisabled: true,
       isFileSettingDisabled: true,
-      isShowDialog: false,
+
+      isDialogMessageShow: false,
+      isDialogMessageText: '',
 
       isSnackTimer: null,
       isSnackMessage: false,
@@ -222,6 +227,14 @@ export default {
       }, 2000);
     },
 
+    showDialogMessage(message) {
+      this.isDialogMessageShow = true;
+      this.isDialogMessageText = message;
+    },
+    closeDialogMessage() {
+      this.isDialogMessageShow = false;
+      this.isDialogMessageText = null;
+    },
     evtKeydownCell(options) {
       this.evtDblClickCell(options);
     },
@@ -256,7 +269,8 @@ export default {
         this.tableDocument.editingCell(option.cellName, option.value);
       } catch (err) {
         console.log(err);
-        this.showSnackMessages(err.getMessageText());
+        // this.showSnackMessage(err.getMessagesText());
+        this.showDialogMessage(err.getMessagesText());
       } finally {
         this.clearEditCell();
       }

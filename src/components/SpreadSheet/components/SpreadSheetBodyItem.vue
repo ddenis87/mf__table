@@ -6,7 +6,7 @@
       <div v-for="(level, levelIndex) in maxLevelGroupRow"
            class="column column-group"
            :key="levelIndex"
-           :class="getGroupStyle(level)"
+           :class="getGroupClass(level)"
            :style="getGroupStyle(level)">
         <spread-sheet-btn-group v-if="hasGroup(level)"
                                 :data-row-name="rowName">
@@ -112,9 +112,14 @@ export default {
       if (this.setExcludedCell.includes(cellName)) return false;
       return true;
     },
+    // hasGroup(level) {
+    //   return (Object.keys(this.source).includes('rowGroup')
+    //     && (this.source.rowLevel + 1) === level);
+    // },
     hasGroup(level) {
-      return (Object.keys(this.source).includes('rowGroup')
-        && (this.source.rowLevel + 1) === level);
+      // console.log(level, this.source.level + 1);
+      return (Object.keys(this.source).includes('isGroup')
+        && (this.source.level + 1) === level);
     },
     hasImg(columnName) {
       const cellName = `${columnName}${this.source.value}`;
@@ -166,12 +171,12 @@ export default {
       return cellFormatString;
     },
     getGroupClass(level) {
-      const { rowLevel, parent: rowParent } = this.source;
+      const { level: rowLevel } = this.source;
       const groupClass = [];
       if (this.setOpenGroupRows.includes(this.rowName) && rowLevel === level - 1) {
         groupClass.push('line-start');
       }
-      if (rowParent && level <= rowLevel) groupClass.push('line');
+      if (level <= rowLevel) groupClass.push('line');
       if (this.getEndGroup(level) && level <= rowLevel) groupClass.push('line-end');
       return groupClass;
     },
@@ -202,12 +207,18 @@ export default {
       }
       return fixed;
     },
-    getEndGroup(indexRow, currentLevel) {
-      if (this.rows[indexRow].parent
-        && !this.rows[indexRow].rowLevel <= currentLevel
-        && (!this.rows[indexRow + 1]?.parent
-          || this.rows[indexRow + 1]?.parent !== this.rows[indexRow].parent)
-        && this.rows[indexRow + 1].rowLevel <= currentLevel - 1) return true;
+    // getEndGroup(indexRow, currentLevel) {
+    //   if (this.rows[indexRow].parent
+    //     && !this.rows[indexRow].rowLevel <= currentLevel
+    //     && (!this.rows[indexRow + 1]?.parent
+    //       || this.rows[indexRow + 1]?.parent !== this.rows[indexRow].parent)
+    //     && this.rows[indexRow + 1].rowLevel <= currentLevel - 1) return true;
+    //   return false;
+    // },
+    getEndGroup(currentLevel) {
+      const indexRow = this.index;
+      if ((this.rows[indexRow + 1].level !== this.source.level)
+        && this.rows[indexRow + 1].level <= currentLevel - 1) return true;
       return false;
     },
     getGroupStyle(level) {
@@ -216,7 +227,8 @@ export default {
       };
     },
     isRowGroupLevel(row, level) {
-      return (Object.keys(row).includes('rowGroup') && (row.rowLevel + 1) === level);
+      return ((Object.keys(row).includes('rowGroup') || Object.keys(row).includes('isGroup'))
+        && (row.rowLevel + 1) === level);
     },
     getCellGeometry(row, column, columnIndex) {
       const cellGeometry = {};
