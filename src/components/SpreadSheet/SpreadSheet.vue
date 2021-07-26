@@ -164,7 +164,7 @@ export default {
           showLevel = level;
           rows.push(this.prepareRows[i]);
         }
-        if (this.setOpenGroupRows.includes(this.prepareRows[i].value)) {
+        if (this.setOpenGroupRows.includes(this.prepareRows[i].value) && showLevel === level) {
           showLevel = level + 1;
         }
       }
@@ -212,14 +212,8 @@ export default {
         };
         if (rowsKeys.includes(`${i}`)) {
           Object.assign(rowItem, { ...this.rows[i] });
-          // if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
-          //   rowItem.openGroup = false;
         }
         prepareRows.push(rowItem);
-        // } else {
-        // prepareRows.push(rowItem);
-        // }
-        // if (Object.keys(rowItem).includes('isOpen')) this.prepareOpenGroup(i);
       }
       return prepareRows;
     },
@@ -355,17 +349,18 @@ export default {
     toggleRowGroup(rowName) {
       if (this.setOpenGroupRows.includes(rowName)) {
         this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowName), 1);
-        for (let i = rowName + 1; i < this.prepareRows.length; i += 1) {
-          if (this.prepareRows[i].level > this.prepareRows[rowName].level) {
-            if (this.setOpenGroupRows.findIndex((element) => element === i) !== -1) {
-              this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
-            }
-          }
-          if (this.prepareRows[i].level < this.prepareRows[rowName].level) return;
-        }
+        // for (let i = rowName + 1; i < this.prepareRows.length; i += 1) {
+        //   if (this.prepareRows[i].level > this.prepareRows[rowName].level) {
+        //     if (this.setOpenGroupRows.findIndex((element) => element === i) !== -1) {
+        //       this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
+        //     }
+        //   }
+        //   if (this.prepareRows[i].level < this.prepareRows[rowName].level) return;
+        // }
       } else {
         this.setOpenGroupRows.push(rowName);
       }
+      console.log(this.setOpenGroupRows);
     },
 
     // recursiveClosingRowGroup(rowParent) {
