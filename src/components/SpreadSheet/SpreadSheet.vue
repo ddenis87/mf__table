@@ -6,7 +6,11 @@
     <div class="sheet"
          :class="{'sheet_noTitle': !isTitle}"
         :style="templateSheet">
-      <div class="sheet__angle" v-show="isTitle"></div>
+      <div class="sheet__angle" v-show="isTitle">
+        <!-- <div class="sheet__angle" v-show="isTitle">
+          <spread-sheet-angle></spread-sheet-angle>
+        </div> -->
+      </div>
       <div class="sheet__head">
         <spread-sheet-head ref="SheetHead"
                           v-if="!isPrintMode"

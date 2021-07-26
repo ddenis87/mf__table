@@ -80,11 +80,13 @@ export default {
   },
   data() {
     return {
-      shiftTitle: { left: `${20 * this.maxLevelGroupRow}px` },
       rowName: this.source.value,
     };
   },
   computed: {
+    shiftTitle() {
+      return { left: `${20 * this.maxLevelGroupRow}px` };
+    },
     btnGroupStatusImg() {
       return (this.setOpenGroupRows.includes(this.rowName))
         ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline';
