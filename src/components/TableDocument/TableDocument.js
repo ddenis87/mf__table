@@ -14,6 +14,7 @@ import {
 
 import Formulas from './Formulas';
 import TableDocumentDeserializeError from './TableDocumentDeserializeError';
+import TableDocumentGroupsRowsError from './TableDocumentGroupsRowsError';
 import TableDocumentValidationCellError from './TableDocumentValidationCellError';
 
 const EDIT_ACCESS = {
@@ -237,7 +238,8 @@ class TableDocument {
         try {
           this.deserializeArea(sectionKey, sectionDataItem);
         } catch (err) {
-          console.log(err);
+          if (err instanceof TableDocumentGroupsRowsError) throw err;
+          // console.log(err instanceof TableDocumentGroupsRowsError);
           deserializeError.push(...err);
         }
       });
@@ -248,7 +250,6 @@ class TableDocument {
   }
 
   deserializeArea(sectionKey, sectionDataItem) {
-    console.log(sectionDataItem);
     const sectionValue = this.getSectionSettings(sectionKey);
     const insertMethods = {
       put: (areaInsert) => { this.putArea(areaInsert); },
@@ -916,7 +917,7 @@ class TableDocument {
       const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
 
       this.writeColumn(shiftColumn, area.getColumn(currentColumn));
-      this.writeRow(shiftRow, area.getRow(currentRow));
+      this.updateRow(shiftRow, area.getRow(currentRow));
       this.writeCell(shiftCellName, area.getCell(currentCellName));
     });
 
@@ -967,8 +968,24 @@ class TableDocument {
     });
   }
 
-  writeRow(rowName, rowValue) {
+  updateRow(rowName, rowValue) {
+    // console.log(rowValue);
+    this.setRowGroup(rowName, rowValue.level || 0);
     this.rows = { ...this.rows, [rowName]: rowValue };
+  }
+
+  setRowGroup(rowName, level) {
+    const lastRow = this.getRow(this.getLastRow());
+    const levelGroupLastRow = lastRow.level || 0;
+    const levelGroupAddingRow = level;
+    if (levelGroupAddingRow > levelGroupLastRow + 1) {
+      console.log('error');
+      throw new TableDocumentGroupsRowsError(
+        'setRowGroup',
+        'Уровень строки превышает уровень активной группировки',
+      );
+    }
+    if (levelGroupAddingRow === levelGroupLastRow + 1) lastRow.isGroup = true;
   }
 
   writeStyles(stylesArea) {

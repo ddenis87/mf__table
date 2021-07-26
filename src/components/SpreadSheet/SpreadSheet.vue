@@ -201,7 +201,7 @@ export default {
     //   return prepareRows;
     // },
     prepareRows() {
-      // console.log('prepare rows');
+      console.log('prepare rows');
       const prepareRows = [];
       const rowsKeys = Object.keys(this.rows);
       for (let i = 1; i < this.rowCount + 1; i += 1) {
@@ -214,11 +214,12 @@ export default {
           Object.assign(rowItem, { ...this.rows[i] });
           // if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
           //   rowItem.openGroup = false;
-          // }
-          prepareRows.push(rowItem);
-        } else {
-          prepareRows.push(rowItem);
         }
+        prepareRows.push(rowItem);
+        // } else {
+        // prepareRows.push(rowItem);
+        // }
+        // if (Object.keys(rowItem).includes('isOpen')) this.prepareOpenGroup(i);
       }
       return prepareRows;
     },
@@ -305,6 +306,18 @@ export default {
   watch: {
     cells() {
       this.setExcludedCells = {};
+    },
+    rows() {
+      const rowsOpen = Object.entries(this.rows).filter((row) => {
+        const [, rowValue] = row;
+        return Object.keys(rowValue).includes('isOpen');
+      });
+      // console.log(rowsOpen);
+      rowsOpen.forEach((row) => {
+        const [rowName] = row;
+        this.setOpenGroupRows.push(+rowName);
+      });
+      // console.log(Object.entries(this.rows).filter((row) => Object.keys(rowValue).includes('isOpen')));
     },
     styles() {
       this.updateDocumentStyles();
@@ -461,6 +474,10 @@ export default {
       return level;
     },
 
+    prepareOpenGroup(rowName) {
+      if (this.setOpenGroupRows.includes(rowName)) return;
+      this.setOpenGroupRows.push(rowName);
+    },
     parseCellName(cellName) {
       return {
         cellNameColumn: cellName.replace(/[0-9]/g, ''),
@@ -557,17 +574,11 @@ export default {
     },
 
     // public methods ---------
-    createNewDocument() {
+    newDocument() {
       this.setOpenGroupColumns = [];
       this.setOpenGroupRows = [];
       this.setExcludedCells = {};
-      this.updateDocumentStyles(false);
     },
-    // pFocusCellByCellName(option) {
-    //   if (Object.keys(option).includes('cellName')) {
-    //     this.$refs.SpreadSheetBody.focusCellByCellName(option.cellName);
-    //   }
-    // },
     // ------ ------- ---------
   },
 };

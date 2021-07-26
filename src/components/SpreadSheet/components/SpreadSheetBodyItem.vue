@@ -3,9 +3,9 @@
        class="sheet-body__row"
        :style="gridRow">
     <template v-if="isTitle">
-      <div v-for="(level, levelIndex) in maxLevelGroupRow"
+      <div v-for="level in maxLevelGroupRow"
            class="column column-group"
-           :key="levelIndex"
+           :key="`${source.value}-${level}`"
            :class="getGroupClass(level)"
            :style="getGroupStyle(level)">
         <spread-sheet-btn-group v-if="hasGroup(level)"
@@ -29,7 +29,7 @@
             (!isGrid) ? 'column-body_grid-off' : '',
           ]"
           :style="[
-            getCellGeometry(source, column, columnIndex),
+            getCellGeometry(column.name, columnIndex),
             fixedCell(column, columnIndex)
           ]"
           :data-name="`${column.name}${source.value}`"
@@ -52,7 +52,7 @@
 import display from '@/plugins/formattingView/formattingView';
 import {
   CELL_HEIGHT,
-  CELL_TYPE_DEFAULT,
+  // CELL_TYPE_DEFAULT,
 } from '../SpreadSheetConst';
 
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
@@ -156,20 +156,20 @@ export default {
       return this.cells[cellName].style || '';
     },
 
-    getCellType(cell, columnName) {
-      const cellType = cell.type
-        || this.source.type
-        || this.columns.find((column) => column.name === columnName).type
-        || CELL_TYPE_DEFAULT;
-      return cellType;
-    },
-    getCellFormatString(cell, columnName) {
-      const cellFormatString = cell.formatString
-        || this.source.formatString
-        || this.columns.find((column) => column.name === columnName).formatString
-        || null;
-      return cellFormatString;
-    },
+    // getCellType(cell, columnName) {
+    //   const cellType = cell.type
+    //     || this.source.type
+    //     || this.columns.find((column) => column.name === columnName).type
+    //     || CELL_TYPE_DEFAULT;
+    //   return cellType;
+    // },
+    // getCellFormatString(cell, columnName) {
+    //   const cellFormatString = cell.formatString
+    //     || this.source.formatString
+    //     || this.columns.find((column) => column.name === columnName).formatString
+    //     || null;
+    //   return cellFormatString;
+    // },
     getGroupClass(level) {
       const { level: rowLevel } = this.source;
       const groupClass = [];
@@ -217,29 +217,50 @@ export default {
     // },
     getEndGroup(currentLevel) {
       const indexRow = this.index;
-      if ((this.rows[indexRow + 1].level !== this.source.level)
-        && this.rows[indexRow + 1].level <= currentLevel - 1) return true;
+      if ((this.rows[indexRow + 1]?.level !== this.source.level)
+        && this.rows[indexRow + 1]?.level <= currentLevel - 1) return true;
       return false;
     },
     getGroupStyle(level) {
-      return {
+      const groupStyle = {
         left: `${20 * (+level - 1)}px`,
       };
+      // if (!this.rows[this.index + 1]) groupStyle['box-shadow'] = 'inset 0px -1px 0px grey';
+      // if (!this.rows[this.index + 1]) groupStyle['border-bottom'] = 'thin solid grey';
+      return groupStyle;
     },
     isRowGroupLevel(row, level) {
       return ((Object.keys(row).includes('rowGroup') || Object.keys(row).includes('isGroup'))
         && (row.rowLevel + 1) === level);
     },
-    getCellGeometry(row, column, columnIndex) {
+    // getCellGeometry(row, column, columnIndex) {
+    //   const cellGeometry = {};
+    //   const cellName = `${column.name}${row.value}`;
+    //   if (this.cells[cellName]) {
+    //     cellGeometry['grid-column-start'] = this.cells[cellName]['grid-column-start'] + columnIndex;
+    //     cellGeometry['grid-column-end'] = this.cells[cellName]['grid-column-end'] + columnIndex;
+    //     cellGeometry.height = `${this.cells[cellName].height}px`;
+    //   } else {
+    //     cellGeometry['grid-column-start'] = columnIndex + (this.printMode) ? 0 : (this.maxLevelGroupRow + 2);
+    //     cellGeometry['grid-column-end'] = (columnIndex + ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2))) + 1;
+    //   }
+    //   return cellGeometry;
+    // },
+    getCellGeometry(columnName, columnIndex) {
       const cellGeometry = {};
-      const cellName = `${column.name}${row.value}`;
-      if (this.cells[cellName]) {
-        cellGeometry['grid-column-start'] = this.cells[cellName]['grid-column-start'] + columnIndex;
-        cellGeometry['grid-column-end'] = this.cells[cellName]['grid-column-end'] + columnIndex;
-        cellGeometry.height = `${this.cells[cellName].height}px`;
+      if (this.hasCell(columnName)) {
+        const {
+          'grid-column-start': columnStart,
+          'grid-column-end': columnEnd,
+          height,
+        } = this.hasCell(columnName);
+        // console.log(columnStart, columnEnd);
+        cellGeometry['grid-column-start'] = +columnStart + columnIndex;
+        cellGeometry['grid-column-end'] = +columnEnd + columnIndex;
+        cellGeometry.height = `${height}px`;
       } else {
-        cellGeometry['grid-column-start'] = columnIndex + (this.printMode) ? 0 : (this.maxLevelGroupRow + 2);
-        cellGeometry['grid-column-end'] = (columnIndex + ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2))) + 1;
+        cellGeometry['grid-column-start'] = columnIndex + (this.maxLevelGroupRow + 2);
+        cellGeometry['grid-column-end'] = (columnIndex + (this.maxLevelGroupRow + 2)) + 1;
       }
       return cellGeometry;
     },
@@ -253,7 +274,8 @@ export default {
 .sheet-body__row {
   position: relative;
   display: grid;
-  grid-auto-rows: $bodyGridAutoRow;
+  grid-row: $bodyGridAutoRow;
+  // grid-auto-rows: $bodyGridAutoRow;
   .column {
     position: relative;
     display: inline-flex;
@@ -282,6 +304,18 @@ export default {
       z-index: 500;
       &:first-child {
         box-shadow:  inset 1px 0px 0px grey;
+      }
+      &::after {
+        position: absolute;
+        content: '';
+        left: 0px;
+        bottom: -1px;
+        // top: 0px;
+        right: 0px;
+        background-color: unset;
+        border-bottom: thin solid grey;
+        user-select: none;
+        // box-shadow:  inset 0px -1px 0px grey;
       }
     }
 

@@ -5,30 +5,36 @@
         <v-btn small dark color="blue darken-3" @click="createNewDocument">
           <v-icon small left>mdi-file-table-outline</v-icon>Новый документ</v-btn>
       </div>
-      <div class="item item_btn item_file">
-        <v-file-input dense
-                      label="Открыть шаблон"
-                      :disabled="isFileTemplateDisabled"
-                      v-model="fileTemplate"
-                      @change="openJSONFileTemplate">
-        </v-file-input>
-      </div>
-      <div class="item item_btn item_file">
-        <v-file-input dense
-                      label="Открыть настройки"
-                      :disabled="isFileSettingDisabled"
-                      v-model="fileSetting"
-                      @change="openJSONFileSetting">
-        </v-file-input>
-      </div>
-      <div class="item item_btn item_file">
-        <v-file-input dense
-                      label="Открыть данные"
-                      :disabled="isFileDataDisabled"
-                      v-model="fileData"
-                      @change="openJSONFileData">
-        </v-file-input>
-      </div>
+      <v-form class="form-file" ref="FormFile">
+        <div class="item item_btn item_file">
+          <v-file-input dense
+                        truncate-length="16"
+                        label="Открыть шаблон"
+                        v-model="fileTemplate"
+                        :disabled="isFileTemplateDisabled"
+                        @change="openJSONFileTemplate">
+          </v-file-input>
+        </div>
+        <div class="item item_btn item_file">
+          <v-file-input dense
+                        truncate-length="16"
+                        label="Открыть настройки"
+                        v-model="fileSetting"
+                        :disabled="isFileSettingDisabled"
+                        @change="openJSONFileSetting">
+          </v-file-input>
+        </div>
+        <div class="item item_btn item_file">
+          <v-file-input dense
+                        truncate-length="16"
+                        label="Открыть данные"
+                        v-model="fileData"
+                        :disabled="isFileDataDisabled"
+                        @change="openJSONFileData">
+          </v-file-input>
+        </div>
+      </v-form>
+
       <div class="item item_btn">
         <v-menu bottom
                 :offset-y="true">
@@ -85,7 +91,7 @@
                     :is-accept="{ isShow: false }"
                     :is-cancel="{ isShow: true, text: 'Закрыть' }"
                     @dialog:cancel="closeDialogMessage">
-        <span>{{ isDialogMessageText }}</span>
+        <span class="dialog-message">{{ isDialogMessageText }}</span>
       </dialog-modal>
     </div>
     <div class="spread-sheet-view__table">
@@ -124,6 +130,8 @@ import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocument from '@/components/TableDocument/TableDocument';
 import TableDocumentApi from '@/components/TableDocument/TableDocumentApi';
 import Buffer from '@/plugins/copyAndPaste';
+
+import TableDocumentGroupsRowsError from '../components/TableDocument/TableDocumentGroupsRowsError';
 
 export default {
   name: 'SpreadSheetView',
@@ -177,12 +185,13 @@ export default {
         return;
       }
       const pasteValue = await Buffer.paste();
-      console.log(pasteValue);
+      // console.log(pasteValue);
       try {
         this.tableDocument.editingCell(cellName, pasteValue);
       } catch (err) {
-        console.log(err);
-        this.showSnackMessage(err.getMessagesText());
+        // console.log(err);
+        this.showDialogMessage(err.getMessagesText());
+        // this.showSnackMessage(err.getMessagesText());
       }
     },
     saveDocument() {
@@ -279,30 +288,32 @@ export default {
       this.clearEditCell();
     },
 
-    createNewDocument() {
-      this.tableDocument = new TableDocumentApi();
-      this.tableDocumentTemplate = {};
-      this.$refs.SpreadSheet.createNewDocument();
+    async createNewDocument() {
+      this.$refs.SpreadSheet.newDocument();
+      await this.$nextTick();
+      this.tableDocument = new TableDocument();
       this.isGrid = true;
 
       this.isFileTemplateDisabled = false;
       this.isFileDataDisabled = true;
       this.isFileSettingDisabled = true;
 
-      this.fileTemplate = [];
-      this.fileSetting = [];
-      this.fileData = [];
+      this.fileTemplate = undefined;
+      this.fileSetting = undefined;
+      this.fileData = undefined;
+      this.$refs.FormFile.reset();
     },
 
     openJSONFileTemplate(file) {
-      if (!file) return;
+      console.log(file);
+      if (file === null || Object.keys(file).includes('length')) return;
       apiSpreadSheet.uploadJSONFile(file).then(async (JSONTemplate) => {
         const { template } = JSON.parse(JSONTemplate);
         // console.log(template);
         // console.log(cells);
         if (template) {
           this.tableDocumentTemplate = new TableDocument({ JSONString: JSONTemplate });
-          this.isFileTemplateDisabled = true;
+          // this.isFileTemplateDisabled = true;
           this.isFileSettingDisabled = false;
         } else {
           const temp = await new TableDocumentApi({ JSONString: JSONTemplate });
@@ -314,27 +325,30 @@ export default {
       });
     },
     openJSONFileSetting(file) {
-      if (!file) return;
+      if (file === null || Object.keys(file).includes('length')) return;
       apiSpreadSheet.uploadJSONFile(file).then((JSONSetting) => {
         this.documentSetting = JSONSetting;
-        this.isFileSettingDisabled = true;
+        // this.isFileSettingDisabled = true;
         this.isFileDataDisabled = false;
       });
     },
 
     async openJSONFileData(file) {
-      if (!file) return;
+      if (file === null || Object.keys(file).includes('length')) return;
       const JSONFile = await apiSpreadSheet.uploadJSONFile(file);
       console.log('file upload');
       const tableDocument = new TableDocumentApi();
       try {
         await tableDocument.deserialize(JSONFile, this.tableDocumentTemplate, this.documentSetting);
       } catch (err) {
+        if (err instanceof TableDocumentGroupsRowsError) {
+          this.showDialogMessage(err.getMessagesText());
+        }
         console.log(err);
       } finally {
         this.tableDocument = tableDocument;
         this.tableDocument.recalculateFormulas();
-        this.isFileDataDisabled = true;
+        // this.isFileDataDisabled = true;
         this.isGrid = false;
       }
     },
@@ -366,6 +380,9 @@ export default {
     padding: 5px;
     padding-left: 18px;
     z-index: 100;
+    .form-file {
+      display: flex;
+    }
     .item {
       padding-right: 20px;
       &_btn {
@@ -386,7 +403,9 @@ export default {
     z-index: 50;
   }
 }
-
+.dialog-message {
+  white-space: pre-line;
+}
 @media print {
   .spread-sheet-view {
     grid-template-areas: "table";

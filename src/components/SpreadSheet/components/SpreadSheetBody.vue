@@ -274,6 +274,7 @@ export default {
       }
     },
     hasNavigationKey(evt) {
+      evt.preventDefault();
       if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && evt.shiftKey === false)) this.moveCursorNext(evt.target);
       if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey === true)) this.moveCursorPrevious(evt.target);
       if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
