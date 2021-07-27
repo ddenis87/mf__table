@@ -21,9 +21,9 @@
                                 :rows="rows"
                                 :columns="columns"
                                 :cells="cells"
-                                :representations="representations"
+                                :set-representations="representations"
                                 :set-excluded-cell="setExcludedCellsArray"
-                                :max-level-group-row="maxLevelGroupRow"
+                                :max-row-grouping-level="maxLevelGroupRow"
                                 :template-column-width="templateColumnWidth"
                                 :is-grid="isGrid"></spread-sheet-body-item>
         <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
@@ -174,14 +174,14 @@ export default {
         rows: this.rows,
         columns: this.columns,
         cells: this.cells,
-        representations: this.representations,
+        setRepresentations: this.representations,
         images: this.images,
         templateColumnWidth: this.templateColumnWidth,
         setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
-        maxLevelGroupRow: this.maxLevelGroupRow,
+        maxRowGroupingLevel: this.maxLevelGroupRow,
         setOpenGroupRows: this.setOpenGroupRows,
-        isGrid: this.isGrid,
-        isTitle: this.isTitle,
+        isShowGrid: this.isGrid,
+        isShowTitle: this.isTitle,
       };
     },
   },
