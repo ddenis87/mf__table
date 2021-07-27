@@ -42,13 +42,13 @@
                            :representations="representations"
                            :images="images"
                            :template-column-width="templateColumnWidth"
-                           :max-level-group-row="maxLevelGroupRow"
-                           :max-level-group-column="maxLevelGroupColumn"
+                           :max-row-grouping-level="maxLevelGroupRow"
+                           :max-column-grouping-level="maxLevelGroupColumn"
                            :set-excluded-cells="setExcludedCells"
                            :template-table-width="templateTableWidth"
                            :set-open-group-rows="setOpenGroupRows"
-                           :is-grid="isGrid"
-                           :is-title="isTitle"
+                           :is-show-grid="isGrid"
+                           :is-show-title="isTitle"
                            @click:cell="evtClickCell"
                            @dblclick:cell="evtDblclickCell"
                            @keydown:cell="evtKeydownCell"
@@ -160,8 +160,8 @@ export default {
       const rows = [];
       let showLevel = 0;
       for (let i = 0; i < this.prepareRows.length; i += 1) {
-        const { level } = this.prepareRows[i];
-        if (level === showLevel) {
+        const { level, fixed } = this.prepareRows[i];
+        if (level === showLevel && !fixed) {
           rows.push(this.prepareRows[i]);
         }
         if (level < showLevel) {

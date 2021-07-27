@@ -67,7 +67,7 @@ export default {
     isShowTitle: { type: Boolean, default: true },
     maxRowGroupingLevel: { type: Number, default: 0 },
     rows: Array, // ????
-    setExcludedCell: { type: Array },
+    setExcludedCells: { type: Array },
     setOpenGroupRows: { type: Array, default() { return []; } },
     setRepresentations: { type: Map, default() { return new Map(); } },
     source: { type: Object, default() { return {}; } }, // is one Row
@@ -110,7 +110,7 @@ export default {
   methods: {
     checkCellExclusion(columnName) {
       const cellName = this.getCellName(columnName);
-      if (this.setExcludedCell.includes(cellName)) return false;
+      if (this.setExcludedCells.includes(cellName)) return false;
       return true;
     },
 

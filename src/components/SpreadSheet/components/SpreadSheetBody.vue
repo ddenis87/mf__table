@@ -7,41 +7,34 @@
        @mousedown="evtMousedown"
        @mouseover="evtMouseover"
        @mouseout="evtMouseout">
-       <tooltip v-bind="propsTooltip"></tooltip>
-    <div class="select-area" :style="rangeSelect"></div>
+    <tooltip v-bind="propsTooltip"></tooltip>
+
+    <div class="select-area"
+         :style="rangeSelect"></div>
+
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed"
-         :class="{'sheet-body-fixed_grid-off': (!isGrid && rowsFixed.length)}">
+         :class="classBodyFixed">
       <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
-           class="sheet-body-fixed__item"
+           class="sheet-body-fixed__wrapper"
            :key="rowFixedIndex"
-           :style="{width: `${templateTableWidth}px`, position: 'relative'}">
+           :style="styleWrapRow">
         <spread-sheet-body-item :index="rowFixedIndex"
                                 :source="rowFixed"
-                                :rows="rows"
-                                :columns="columns"
-                                :cells="cells"
-                                :set-representations="representations"
-                                :set-excluded-cell="setExcludedCellsArray"
-                                :max-row-grouping-level="maxLevelGroupRow"
-                                :template-column-width="templateColumnWidth"
-                                :is-grid="isGrid"></spread-sheet-body-item>
-        <div class="sheet-body-fixed__item_end" :key="`end-${rowFixedIndex}`"></div>
+                                v-bind="propsItemBodyFixed"></spread-sheet-body-item>
+        <div class="sheet-body-fixed__wrapper_end"></div>
       </div>
     </div>
+
     <virtual-list ref="SheetBody"
                   class="sheet-body"
-                  :style="[
-                    heightVirtualList,
-                    widthVirtualList,
-                    {'overflow-y': 'auto', 'position': 'relative',}
-                  ]"
-                  :wrap-style="{width: `${templateTableWidth}px`, position: 'relative'}"
+                  :style="styleBody"
+                  :wrap-style="styleWrapRow"
                   :keeps="120"
                   :data-key="'value'"
                   :data-sources="rows"
                   :data-component="sheetBodyItem"
-                  :extra-props="extraPropsComponent"
+                  :extra-props="propsItemBody"
                   @scroll="evtScrollList"
                   @resized="evtResizedList">
     </virtual-list>
@@ -72,12 +65,12 @@ export default {
     images: { type: Object, default() { return {}; } },
     templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
-    maxLevelGroupRow: { type: Number, default: 0 },
-    maxLevelGroupColumn: { type: Number, default: 0 },
+    maxRowGroupingLevel: { type: Number, default: 0 },
+    maxColumnGroupingLevel: { type: Number, default: 0 },
     setExcludedCells: { type: Object, default() { return {}; } },
     setOpenGroupRows: { type: Array, default() { return []; } },
-    isGrid: { type: Boolean, default: true },
-    isTitle: { type: Boolean, default: true },
+    isShowGrid: { type: Boolean, default: true },
+    isShowTitle: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -98,6 +91,55 @@ export default {
     };
   },
   computed: {
+    classBodyFixed() {
+      const classNamed = [];
+      if (this.rowsFixed.length && !this.isShowGrid) classNamed.push('sheet-body-fixed_grid-off');
+      return classNamed;
+    },
+
+    propsItem() {
+      return {
+        columns: this.columns,
+        rows: this.rows,
+        cells: this.cells,
+        'set-representations': this.representations,
+        'set-excluded-cells': [].concat(...Object.values(this.setExcludedCells)),
+        'max-row-grouping-level': this.maxRowGroupingLevel,
+        'template-column-width': this.templateColumnWidth,
+        'is-show-grid': this.isShowGrid,
+      };
+    },
+
+    propsItemBodyFixed() {
+      return {
+        ...this.propsItem,
+      };
+    },
+
+    propsItemBody() {
+      return {
+        ...this.propsItem,
+        'set-open-group-rows': this.setOpenGroupRows,
+        images: this.images,
+        'is-show-titile': this.isShowTitle,
+      };
+    },
+
+    styleBody() {
+      return [
+        this.heightVirtualList,
+        this.widthVirtualList,
+        { 'overflow-y': 'auto', position: 'relative' },
+      ];
+    },
+
+    styleWrapRow() {
+      return {
+        position: 'relative',
+        width: `${this.templateTableWidth}px`,
+      };
+    },
+
     rangeSelect() {
       if (!this.selectEnd) return {};
       if (this.selectStart === this.selectEnd) return {};
@@ -142,54 +184,107 @@ export default {
       };
       return selectPosition;
     },
-    setExcludedCellsArray() { return [].concat(...Object.values(this.setExcludedCells)); },
-    widthFixedColumn() {
-      let width = (CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE;
-      this.columns.forEach((column) => {
-        if (column.fixed) width += column.width;
-      });
-      // console.log(width);
-      return width;
-    },
+
     heightVirtualList() {
-      let heightBodyFixed = 156 + (this.maxLevelGroupColumn * (22 + 1));
+      let heightBodyFixed = 156 + (this.maxColumnGroupingLevel * (22 + 1));
       for (let i = 0; i < this.rowsFixed.length; i += 1) {
         heightBodyFixed += this.rowsFixed[i].height;
       }
-      // console.log(this.maxLevelGroupColumn * (22 + 1));
-      if (!this.isTitle) heightBodyFixed -= (this.maxLevelGroupColumn || 1 * (22));
+      if (!this.isShowTitle) heightBodyFixed -= (this.maxColumnGroupingLevel || 1 * (22));
       return {
         height: `calc(100vh - ${heightBodyFixed}px)`,
       };
     },
+
+    widthFixedArea() {
+      let width = (CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE;
+      this.columns.forEach((column) => {
+        if (column.fixed) width += column.width;
+      });
+      return width;
+    },
+
     widthVirtualList() {
-      const title = (this.isTitle) ? 0 : (this.maxLevelGroupRow || 1 * 22) + 38;
+      const title = (this.isShowTitle) ? 0 : (this.maxLevelGroupRow || 1 * 22) + 38;
       const width = {
         width: `calc(100vw - 10px + ${title}px)`,
       };
       return width;
     },
-    extraPropsComponent() {
-      return {
-        rows: this.rows,
-        columns: this.columns,
-        cells: this.cells,
-        setRepresentations: this.representations,
-        images: this.images,
-        templateColumnWidth: this.templateColumnWidth,
-        setExcludedCell: [].concat(...Object.values(this.setExcludedCells)),
-        maxRowGroupingLevel: this.maxLevelGroupRow,
-        setOpenGroupRows: this.setOpenGroupRows,
-        isShowGrid: this.isGrid,
-        isShowTitle: this.isTitle,
-      };
-    },
+
   },
   mounted() {
     if ('ontouchstart' in window) { console.log('touch screen'); }
     this.sheetBodyGeometry = this.$refs.SheetBody.$el.getBoundingClientRect();
   },
   methods: {
+    evtClickBody(evt) {
+      if (evt.target.closest('button')) {
+        const rowName = evt.target.closest('button').getAttribute('data-row-name');
+        this.toggleRowGroup(+rowName);
+      }
+    },
+
+    evtDblClickBody(evt) {
+      if (!evt.target.hasAttribute('data-name')) return;
+      const cellName = evt.target.getAttribute('data-name');
+      this.$emit('dblclick:cell', { evt, cellName });
+    },
+    
+    evtKeydownBody(evt) {
+      if (this.isNavigationKey(evt)) return;
+      const setTemplateKey = ['Key', 'Numpad', 'Digit', 'Enter', 'Delete', 'Space'];
+      if (!setTemplateKey.find((item) => evt.code.includes(item))) return;
+
+      if (this.isCopyKey(evt) || this.isPasteKey(evt)) return;
+      if (evt.ctrlKey) return;
+      console.log(evt.target);
+      evt.preventDefault();
+      if (evt.target.hasAttribute('data-name')) {
+        const cellName = evt.target.getAttribute('data-name');
+        this.$emit('keydown:cell', { evt, cellName });
+      }
+    },
+
+    evtMousedown(evt) {
+      if (evt.target.closest('.column-body')) {
+        this.selectEnd = null;
+        this.selectStart = evt.target;
+      }
+      const target = evt.target.closest('.column-body');
+      if (!target) return;
+      if (!target.hasAttribute('data-name')) return;
+      const cellName = target.getAttribute('data-name');
+      this.$emit('click:cell', { evt, cellName });
+      const cell = Object.entries(this.cells).find((item) => item[0] === cellName);
+      if (cell) {
+        const [, cellValue] = cell;
+        const isTrySelected = cellValue.noSelect || false;
+        if (isTrySelected) return;
+      }
+      this.focusCell(this.getCellNodeForName(cellName));
+    },
+
+    evtMousemove(evt) {
+      if (evt.buttons === 1) {
+        if (evt.target.closest('.column-body')) {
+          this.selectEnd = evt.target;
+        }
+      }
+    },
+
+    evtMouseout() {
+      if (!this.propsTooltip.isShow) return;
+      this.propsTooltip = {
+        text: '',
+        isShow: false,
+        position: {
+          left: -100,
+          top: -100,
+        },
+      };
+    },
+
     evtMouseover(evt) {
       setTimeout(() => {
         const titleText = evt.target.closest('.column-body')?.getAttribute('data-tooltip');
@@ -206,113 +301,13 @@ export default {
         }
       }, 300);
     },
-    evtMouseout() {
-      if (!this.propsTooltip.isShow) return;
-      this.propsTooltip = {
-        text: '',
-        isShow: false,
-        position: {
-          left: -100,
-          top: -100,
-        },
-      };
-    },
-    evtMousemove(evt) {
-      if (evt.buttons === 1) {
-        if (evt.target.closest('.column-body')) {
-          this.selectEnd = evt.target; // .getAttribute('data-name');
-        }
-      }
-    },
-    evtMousedown(evt) {
-      if (evt.target.closest('.column-body')) {
-        this.selectEnd = null;
-        this.selectStart = evt.target; // .getAttribute('data-name');
-      }
-      const target = evt.target.closest('.column-body');
-      if (!target) return;
-      if (!target.hasAttribute('data-name')) return;
-      const cellName = target.getAttribute('data-name');
-      this.$emit('click:cell', { evt, cellName });
-      const cell = Object.entries(this.cells).find((item) => item[0] === cellName);
-      if (cell) {
-        const [, cellValue] = cell;
-        const isTrySelected = cellValue.noSelect || false;
-        if (isTrySelected) return;
-      }
-      this.focusCell(this.getCellNodeForName(cellName));
-    },
+
     evtMouseup(evt) {
       if (evt.target.closest('.column-body')) {
         this.selectEnd = evt.target; // .getAttribute('data-name');
       }
     },
 
-    evtDblClickBody(evt) {
-      if (!evt.target.hasAttribute('data-name')) return;
-      const cellName = evt.target.getAttribute('data-name');
-      this.$emit('dblclick:cell', { evt, cellName });
-    },
-    evtClickBody(evt) {
-      if (evt.target.closest('button')) {
-        const rowName = evt.target.closest('button').getAttribute('data-row-name');
-        this.toggleRowGroup(+rowName);
-      }
-    },
-    evtKeydownBody(evt) {
-      if (this.hasNavigationKey(evt)) return;
-      const setTemplateKey = ['Key', 'Numpad', 'Digit', 'Enter', 'Delete', 'Space'];
-      if (!setTemplateKey.find((item) => evt.code.includes(item))) return;
-
-      if (this.hasCopy(evt) || this.hasPast(evt)) return;
-      if (evt.ctrlKey) return;
-      console.log(evt.target);
-      evt.preventDefault();
-      if (evt.target.hasAttribute('data-name')) {
-        const cellName = evt.target.getAttribute('data-name');
-        this.$emit('keydown:cell', { evt, cellName });
-      }
-    },
-    hasNavigationKey(evt) {
-      evt.preventDefault();
-      if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && evt.shiftKey === false)) this.moveCursorNext(evt.target);
-      if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey === true)) this.moveCursorPrevious(evt.target);
-      if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
-      if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
-      return evt.code.includes('Arrow');
-    },
-
-    hasCopy(evt) {
-      const cellName = evt.target.getAttribute('data-name');
-      if (!cellName) return false;
-      if (!(evt.ctrlKey && evt.code === 'KeyC')) return false;
-      this.$emit('buffer:copy', cellName);
-      return true;
-    },
-    hasPast(evt) {
-      const cellName = evt.target.getAttribute('data-name');
-      if (!cellName) return false;
-      if (!(evt.ctrlKey && evt.code === 'KeyV')) return false;
-      this.$emit('buffer:paste', cellName);
-      return true;
-    },
-    // getSelectedRange() {
-    //   let range = null;
-    //   if (this.selectStart.hasAttribute('data-name')) {
-    //     range = this.selectStart.getAttribute('data-name');
-    //   }
-    //   if (this.selectEnd.hasAttribute('data-name')) {
-    //     range += `:${this.selectEnd.getAttribute('data-name')}`;
-    //   }
-    //   return range;
-    // },
-
-    evtScrollList(evt) {
-      this.selectStart = null;
-      this.selectEnd = null;
-      this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
-      this.$emit('scroll-body-x', evt.target.scrollLeft);
-    },
     evtResizedList() {
       if (!this.currentSelectedCellName) return;
       const cellSelectedNode = this.getCellNodeForName(this.currentSelectedCellName);
@@ -324,10 +319,53 @@ export default {
       }
     },
 
+    evtScrollList(evt) {
+      this.selectStart = null;
+      this.selectEnd = null;
+      this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
+      this.$emit('scroll-body-x', evt.target.scrollLeft);
+    },
+
+    isCopyKey(evt) {
+      const cellName = evt.target.getAttribute('data-name');
+      if (!cellName) return false;
+      if (!(evt.ctrlKey && evt.code === 'KeyC')) return false;
+      this.$emit('buffer:copy', cellName);
+      return true;
+    },
+
+    isNavigationKey(evt) {
+      evt.preventDefault();
+      if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && !evt.shiftKey)) this.moveCursorNext(evt.target);
+      if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey)) this.moveCursorPrevious(evt.target);
+      if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
+      if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
+      return evt.code.includes('Arrow');
+    },
+
+    isPasteKey(evt) {
+      const cellName = evt.target.getAttribute('data-name');
+      if (!cellName) return false;
+      if (!(evt.ctrlKey && evt.code === 'KeyV')) return false;
+      this.$emit('buffer:paste', cellName);
+      return true;
+    },
+
+    // getSelectedRange() {
+    //   let range = null;
+    //   if (this.selectStart.hasAttribute('data-name')) {
+    //     range = this.selectStart.getAttribute('data-name');
+    //   }
+    //   if (this.selectEnd.hasAttribute('data-name')) {
+    //     range += `:${this.selectEnd.getAttribute('data-name')}`;
+    //   }
+    //   return range;
+    // },
+
     focusCell(target) {
-      if (target.getBoundingClientRect().left < this.widthFixedColumn) {
-        this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
-        this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedColumn - target.getBoundingClientRect().left) + 5;
+      if (target.getBoundingClientRect().left < this.widthFixedArea) {
+        this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 5;
+        this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 5;
       }
       const geometryVirtualScroll = target.closest('.spread-sheet-body').getBoundingClientRect();
       if (target.getBoundingClientRect().right > geometryVirtualScroll.right) {
@@ -338,9 +376,6 @@ export default {
       target.focus();
       this.selectedCell(target.getAttribute('data-name'));
     },
-    // focusCellByCellName(cellName) {
-    //   this.focusCell(this.getCellNodeForName(cellName));
-    // },
 
     selectedCell(cellName) {
       const cellNode = this.getCellNodeForName(cellName);
@@ -356,28 +391,99 @@ export default {
       this.currentSelectedCellName = cellName;
     },
 
+    toggleRowGroup(rowName) {
+      this.$emit('toggle-row-group', rowName);
+    },
+
+    parseCellName(cellName) {
+      return {
+        cellColumn: cellName.replace(/[0-9]/g, ''),
+        cellRow: +cellName.replace(/[A-z]/g, ''),
+      };
+    },
+    // -----------------------
+    hasElement(target, direction) {
+      if (direction === 'previous') {
+        if (!target.previousSibling) return false;
+        if (target.previousSibling.nodeName === 'DIV'
+          && target.previousSibling.closest('.column-title')) return false;
+      }
+      if (direction === 'next') {
+        if (!target.nextSibling) return false;
+        if (!target.nextElementSibling) return false;
+      }
+      if (direction === 'up') {
+        if (!target.parentElement.parentElement.previousSibling
+          && !target.closest('.sheet-body')?.previousSibling) return false;
+      }
+      if (direction === 'down') {
+        if (!target.parentElement.parentElement.nextSibling
+          && !target.closest('.sheet-body-fixed')?.nextSibling) return false;
+      }
+      return true;
+    },
+
+    getCellNodeForName(cellName) {
+      return this.$refs.TableBody.querySelector(`[data-name="${cellName}"]`);
+    },
+
+    getExpectedCellName(target, direction) {
+      const currentCellName = target.getAttribute('data-name');
+      let { cellRow, cellColumn } = this.parseCellName(currentCellName);
+      if (direction === 'next') {
+        cellColumn = this.columns[this.columns.findIndex((item) => item.name === cellColumn) + 1].name;
+      }
+      if (direction === 'previous') {
+        cellColumn = this.columns[this.columns.findIndex((item) => item.name === cellColumn) - 1].name;
+      }
+      if (direction === 'up') {
+        cellRow -= 1;
+        while (cellRow > 1) {
+          if (this.rows.find((row) => row.value === cellRow)
+            || this.rowsFixed.find((row) => row.value === cellRow)) break;
+          cellRow -= 1;
+        }
+      }
+      if (direction === 'down') {
+        cellRow += 1;
+        while (cellRow < this.rows.length) {
+          if (this.rows.find((row) => row.value === cellRow)
+            || this.rowsFixed.find((row) => row.value === cellRow)) {
+            if (!this.setExcludedCells[currentCellName]?.includes(`${cellColumn}${cellRow}`)) {
+              break;
+            }
+          }
+          cellRow += 1;
+        }
+      }
+      return `${cellColumn}${cellRow}`;
+    },
+
     getMergedCellName(target, direction) {
       const mergedCellName = Object.entries(this.setExcludedCells)
         .find((item) => item[1].includes(this.getExpectedCellName(target, direction)))[0];
-      console.log(mergedCellName);
       return mergedCellName;
     },
-    getExpectedCellName(target, direction) {
-      const currentCellName = target.getAttribute('data-name');
-      const { cellRow, cellColumn } = this.parseCellName(currentCellName);
-      let column = cellColumn;
-      let row = cellRow;
-      if (direction === 'next') {
-        column = this.columns[this.columns.findIndex((item) => item.name === cellColumn) + 1].name;
-      }
-      if (direction === 'previous') {
-        column = this.columns[this.columns.findIndex((item) => item.name === cellColumn) - 1].name;
-      }
-      if (direction === 'up') row += 1;
-      if (direction === 'down') row -= 1;
 
-      return `${column}${row}`;
+    moveCursorDown(target) {
+      if (!this.hasElement(target, 'down')) return false;
+      const expectedCellName = this.getExpectedCellName(target, 'down');
+      const expectedCell = this.getCellNodeForName(expectedCellName);
+      if (expectedCell) {
+        this.shiftBodyScrollDown(expectedCell);
+        this.focusCell(expectedCell);
+        return true;
+      }
+      const mergedCellName = this.getMergedCellName(target, 'down');
+      const mergedCell = this.getCellNodeForName(mergedCellName);
+      if (mergedCell) {
+        this.shiftBodyScrollDown(mergedCell);
+        this.focusCell(mergedCell);
+        return true;
+      }
+      return false;
     },
+
     moveCursorNext(target) {
       if (!this.hasElement(target, 'next')) return false;
       if (target.nextSibling.nodeName === 'DIV') {
@@ -403,138 +509,41 @@ export default {
       return true;
     },
 
-    hasElement(target, direction) {
-      if (direction === 'previous') {
-        if (!target.previousSibling) return false;
-        if (target.previousSibling.nodeName === 'DIV'
-          && target.previousSibling.closest('.column-title')) return false;
-      }
-      if (direction === 'next') {
-        if (!target.nextSibling) return false;
-        if (!target.nextElementSibling) return false;
-      }
-      return true;
-    },
-
     moveCursorUp(target) {
-      if (!target.parentElement.parentElement.previousElementSibling) {
-        if (!target.closest('.sheet-body') || !target.closest('.sheet-body').previousElementSibling) return false;
+      if (!this.hasElement(target, 'up')) return false;
+      const expectedCellName = this.getExpectedCellName(target, 'up');
+      const expectedCell = this.getCellNodeForName(expectedCellName);
+      if (expectedCell) {
+        this.shiftBodyScrollUp(expectedCell);
+        this.focusCell(expectedCell);
+        return true;
       }
-      const cellName = target.getAttribute('data-name');
-      const { cellColumn } = this.parseCellName(cellName);
-      let { cellRow } = this.parseCellName(cellName);
-      let cellNamePrevious = `${cellColumn}${cellRow - 1}`;
-      // let cellNamePrevious = this.getExpectedCellName(target, 'up');
-
-      let geometryBody = target.closest('.spread-sheet-body').getBoundingClientRect();
-      if (!geometryBody) {
-        geometryBody = target.closest('.spread-sheet-fixed').getBoundingClientRect();
+      const mergedCellName = this.getMergedCellName(target, 'up');
+      const mergedCell = this.getCellNodeForName(mergedCellName);
+      if (mergedCell) {
+        this.shiftBodyScrollUp(mergedCell);
+        this.focusCell(mergedCell);
+        return true;
       }
-      let geometryPreviousNode = this.getCellNodeForName(cellNamePrevious);
-      if (geometryPreviousNode) {
-        // console.log(geometryPreviousNode.getBoundingClientRect().top, ' - ', geometryBody.top + 10);
-        if (geometryPreviousNode.getBoundingClientRect().top < geometryBody.top + 10) {
-          const delta = (geometryBody.top + 10) - geometryPreviousNode.getBoundingClientRect().top;
-          // console.log(delta);
-          this.$refs.SheetBody.$el.scrollTop -= delta + 12;
-        }
-        this.focusCell(geometryPreviousNode);
-      } else {
-        // console.log(this.rows[this.rows.findIndex((row) => row.value === cellRow) - 1]);
-        if (!this.rows[this.rows.findIndex((row) => row.value === cellRow) - 1]) return false;
-        cellRow = this.rows[this.rows.findIndex((row) => row.value === cellRow) - 1].value;
-        cellNamePrevious = `${cellColumn}${cellRow}`;
-        geometryPreviousNode = this.getCellNodeForName(cellNamePrevious);
-        if (geometryPreviousNode) {
-          // console.log(geometryPreviousNode.getBoundingClientRect().top, ' - ', geometryBody.top + 10);
-          if (geometryPreviousNode.getBoundingClientRect().top < geometryBody.top + 10) {
-            const delta = (geometryBody.top + 10) - geometryPreviousNode.getBoundingClientRect().top;
-            // console.log(delta);
-            this.$refs.SheetBody.$el.scrollTop -= delta + 12;
-          }
-          this.focusCell(geometryPreviousNode);
-        } else {
-          // console.log(cellNamePrevious);
-          const cellNameJoin = Object.entries(this.setExcludedCells)
-            .find((item) => item[1].includes(cellNamePrevious))[0];
-          geometryPreviousNode = this.getCellNodeForName(cellNameJoin);
-          // console.log(geometryPreviousNode.getBoundingClientRect().top, ' - ', geometryBody.top + 10);
-          if (geometryPreviousNode.getBoundingClientRect().top < geometryBody.top + 10) {
-            const delta = (geometryBody.top + 10) - geometryPreviousNode.getBoundingClientRect().top;
-            // console.log(delta);
-            this.$refs.SheetBody.$el.scrollTop -= delta + 12;
-          }
-          this.focusCell(geometryPreviousNode);
-        }
-        // console.log(cellNamePrevious);
-      }
-      return true;
-    },
-    moveCursorDown(target) {
-      if (!target.parentElement.parentElement.nextElementSibling) {
-        if (!target.closest('.sheet-body-fixed') || !target.closest('.sheet-body-fixed').nextElementSibling) return false;
-      }
-      const cellName = target.getAttribute('data-name');
-      const { cellColumn } = this.parseCellName(cellName);
-      let { cellRow } = this.parseCellName(cellName);
-      const rowspan = this.cells[cellName] ? this.cells[cellName].rowspan || 1 : 1;
-      let cellNameNext = `${cellColumn}${cellRow + rowspan}`;
-
-      const geometryVirtualScroll = target.closest('.spread-sheet-body').getBoundingClientRect();
-
-      let geometryNextNode = this.getCellNodeForName(cellNameNext);
-      if (geometryNextNode) {
-        if (geometryNextNode.getBoundingClientRect().bottom > geometryVirtualScroll.bottom) {
-          const delta = geometryNextNode.getBoundingClientRect().bottom - geometryVirtualScroll.bottom;
-          this.$refs.SheetBody.$el.scrollTop += delta + 8;
-        }
-        this.focusCell(geometryNextNode);
-      } else {
-        cellRow = this.rows[this.rows.findIndex((row) => row.value === cellRow) + rowspan].value;
-        cellNameNext = `${cellColumn}${cellRow}`;
-        geometryNextNode = this.getCellNodeForName(cellNameNext);
-        if (geometryNextNode) {
-          if (geometryNextNode.getBoundingClientRect().bottom > geometryVirtualScroll.bottom) {
-            const delta = geometryNextNode.getBoundingClientRect().bottom - geometryVirtualScroll.bottom;
-            this.$refs.SheetBody.$el.scrollTop += delta + 8;
-          }
-          this.focusCell(geometryNextNode);
-        } else {
-          const cellNameJoin = Object.entries(this.setExcludedCells)
-            .find((item) => item[1].includes(cellNameNext))[0];
-          geometryNextNode = this.getCellNodeForName(cellNameJoin);
-          if (geometryNextNode) {
-            if (geometryNextNode.getBoundingClientRect().bottom > geometryVirtualScroll.bottom) {
-              const delta = geometryNextNode.getBoundingClientRect().bottom - geometryVirtualScroll.bottom;
-              this.$refs.SheetBody.$el.scrollTop += delta + 8;
-            }
-          }
-          this.focusCell(this.getCellNodeForName(cellNameJoin));
-        }
-        // console.log(cellNameNext);
-      }
-      return true;
+      return false;
     },
 
-    toggleRowGroup(rowName) {
-      this.$emit('toggle-row-group', rowName);
-      // this.$emit('toggle-row-group', {
-      //   value: +target.getAttribute('data-row-parent'),
-      // index: +target.getAttribute('data-row-index'),
-      // count: +target.getAttribute('data-row-count'),
-      // status: !!target.getAttribute('data-row-status'),
-      // target,
-      // });
+    shiftBodyScrollDown(currentCell) {
+      const bodyBorders = this.$refs.TableBody.getBoundingClientRect();
+      const cellBorders = currentCell.getBoundingClientRect();
+      if (cellBorders.bottom > bodyBorders.bottom) {
+        const delta = cellBorders.bottom - bodyBorders.bottom;
+        this.$refs.SheetBody.$el.scrollTop += delta + 18;
+      }
     },
 
-    getCellNodeForName(cellName) {
-      return this.$refs.TableBody.querySelector(`[data-name="${cellName}"]`);
-    },
-    parseCellName(cellName) {
-      return {
-        cellColumn: cellName.replace(/[0-9]/g, ''),
-        cellRow: +cellName.replace(/[A-z]/g, ''),
-      };
+    shiftBodyScrollUp(currentCell) {
+      const bodyBorders = this.$refs.TableBody.getBoundingClientRect();
+      const cellBorders = currentCell.getBoundingClientRect();
+      if (cellBorders.top < bodyBorders.top + 10) {
+        const delta = (bodyBorders.top + 10) - cellBorders.top;
+        this.$refs.SheetBody.$el.scrollTop -= delta + 12;
+      }
     },
   },
 };
@@ -547,10 +556,6 @@ export default {
   position: absolute;
   left: -100px;
   top: -100px;
-  // width: 100px;
-  // height: 60px;
-  // right: 400px;
-  // bottom: 600px;
   border: 2px solid rgb(26, 115, 232);
   z-index: 99;
   background-color: rgba(26, 115, 232, .1);
@@ -568,7 +573,7 @@ export default {
     &_grid-off {
       border-bottom: 2px solid rgba(0, 0, 0, .3);
     }
-    &__item {
+    &__wrapper {
       display: flex;
       &_end {
         display:  block;
