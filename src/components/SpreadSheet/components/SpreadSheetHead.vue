@@ -1,28 +1,21 @@
 <template>
   <div class="sheet-head" @click="eventClickHead">
-    <template v-for="level in maxLevelGroupColumn">
-      <div :key="level"
+    <template v-if="isShowGroup">
+      <div v-for="level in maxColumnGroupingLevel"
            class="sheet-head__row"
+           :key="level"
            :style="templateColumnHeight">
-        <template v-for="(column, index) in columns">
-          <div :key="`head-group-${column.value}`"
-               class="column column-group"
-               :class="{
-                 'line-start': (setOpenGroupColumn.includes(column.name) && column.columnLevel === level - 1),
-                 'line': (column.parent && level <= column.columnLevel),
-                 'line-end': (getEndGroup(index, level) && level <= column.columnLevel),
-               }"
-               :style="getStyleCellFixed(column, index, level)">
-            <spread-sheet-btn-group v-if="isColumnGroup(column, level)"
-                             :data-column-index="index"
-                             :data-column-parent="column.value"
-                             :data-column-name="column.name"
-                             :data-column-count="column.columnGroup - 1"
-                             :data-column-status="column.openGroup">
-              {{ (setOpenGroupColumn.includes(column.name)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
-            </spread-sheet-btn-group>
-          </div>
-        </template>
+        <div v-for="(column, columnIndex) in columns"
+             class="column column-group"
+             :key="columnIndex"
+             :class="getGroupClass(level, column, columnIndex)">
+          <spread-sheet-btn-group v-if="isGroup(column, level)"
+                                  :data-column-name="column.name">
+            <v-icon small color="black">
+              {{ (setOpenGroupColumns.includes(column.name)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+            </v-icon>
+          </spread-sheet-btn-group>
+        </div>
         <div class="column column-group column-end"></div>
       </div>
     </template>
@@ -33,7 +26,7 @@
         <div :key="`head-title-${column.value}`"
              class="column column-title"
              :style="getStyleCellFixed(column, columnIndex)">
-          <div class="content">{{ column.display_name }}</div>
+          <div class="content">{{ column.name.toUpperCase() }}</div>
         </div>
       </template>
       <div class="column column-title column-end">
@@ -59,9 +52,10 @@ export default {
     columns: { type: Array },
     templateColumnWidth: { type: String, default: '' },
     templateTableWidth: { type: Number, default: 0 },
-    maxLevelGroupColumn: { type: Number, default: 0 },
-    setOpenGroupColumn: { type: Array, default() { return []; } },
+    maxColumnGroupingLevel: { type: Number, default: 0 },
+    setOpenGroupColumns: { type: Array, default() { return []; } },
     isGrid: { type: Boolean, default: true },
+    isShowGroup: { type: Boolean, default: true },
   },
   computed: {
     templateColumnHeight() {
@@ -73,21 +67,28 @@ export default {
     },
   },
   methods: {
-    getEndGroup(indexColumn, currentLevel) {
-      if (this.columns[indexColumn].parent
-        && !this.columns[indexColumn].columnLevel <= currentLevel
-        && (!this.columns[indexColumn + 1]?.parent
-          || this.columns[indexColumn + 1]?.parent !== this.columns[indexColumn].parent)
-        && this.columns[indexColumn + 1].columnLevel <= currentLevel - 1) return true;
+    isGroupEnd(level, columnIndex) {
+      if ((this.columns[columnIndex + 1]?.level !== level)
+        && this.columns[columnIndex + 1]?.level <= level - 1) return true;
       return false;
     },
+    getGroupClass(level, column, columnIndex) {
+      const { level: columnLevel } = column;
+      const groupClass = [];
+      if (this.setOpenGroupColumns.includes(column.name) && columnLevel === level - 1) {
+        groupClass.push('line-start');
+      }
+      if (level <= columnLevel) groupClass.push('line');
+      if (this.isGroupEnd(level, columnIndex) && level <= columnLevel) groupClass.push('line-end');
+      return groupClass;
+    },
+
     getStyleCellFixed(column, columnIndex, level = -1) {
       const fixed = {};
       if (column.fixed) {
         fixed.position = 'sticky';
         fixed['z-index'] = 100;
         fixed.left = 0; //  (20 * this.maxLevelGroupRow) + 60;
-        // const columnCurrentIndex = this.columns.findIndex((item) => item === column);
         for (let i = 0; i < columnIndex; i += 1) {
           fixed.left += this.columns[i].width;
         }
@@ -98,22 +99,17 @@ export default {
       return fixed;
     },
     eventClickHead(evt) {
-      if (evt.target.closest('button') && evt.target.closest('button').getAttribute('data-column-parent')) {
-        this.toggleColumnGroup(evt.target.closest('button'));
+      if (evt.target.closest('button')) {
+        const columnName = evt.target.closest('button').getAttribute('data-column-name');
+        this.toggleColumnGroup(columnName);
       }
     },
-    toggleColumnGroup(target) {
-      this.$emit('toggle-column-group', {
-        value: +target.getAttribute('data-column-parent'),
-        name: target.getAttribute('data-column-name'),
-        index: +target.getAttribute('data-column-index'),
-        count: +target.getAttribute('data-column-count'),
-        status: !!target.getAttribute('data-column-status'),
-        target,
-      });
+    toggleColumnGroup(columnName) {
+      this.$emit('toggle-group:column', columnName);
     },
-    isColumnGroup(column, level) {
-      return (Object.keys(column).includes('columnGroup') && level === column.columnLevel + 1);
+    isGroup(column, level) {
+      return (Object.keys(column).includes('isGroup')
+        && (column.level + 1) === level);
     },
   },
 };

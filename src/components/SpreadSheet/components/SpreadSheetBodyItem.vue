@@ -10,7 +10,9 @@
            :style="getGroupStyle(level)">
         <spread-sheet-btn-group v-if="isGroup(level)"
                                 :data-row-name="rowName">
-          {{ btnGroup }}
+          <v-icon small color="black">
+            {{ btnGroup }}
+          </v-icon>
         </spread-sheet-btn-group>
       </div>
     </template>
@@ -258,7 +260,7 @@ export default {
       justify-content: center;
       align-items: center;
       left: 0px;
-      width: 20px;
+      width: 22px;
       background-color: $backgroundColorTitle;
       z-index: 500;
       &:first-child {
@@ -387,7 +389,7 @@ export default {
     &::before {
       content: '';
       position: absolute;
-      left: 9.5px;
+      left: 10.5px;
       bottom: -1px;
       top: 0px;
       width: 8px;

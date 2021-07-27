@@ -7,9 +7,10 @@
          :class="{'sheet_noTitle': !isTitle}"
         :style="templateSheet">
       <div class="sheet__angle" v-show="isTitle">
-        <!-- <div class="sheet__angle" v-show="isTitle">
-          <spread-sheet-angle></spread-sheet-angle>
-        </div> -->
+        <spread-sheet-angle :max-column-grouping-level="maxColumnGroupingLevel"
+                            :max-row-grouping-level="maxRowGroupingLevel"
+                            @open-group:column="evtOpenGroupColumn"
+                            @open-group:row="evtOpenGroupRow"></spread-sheet-angle>
       </div>
       <div class="sheet__head">
         <spread-sheet-head ref="SheetHead"
@@ -18,10 +19,10 @@
                           :columns="tableColumns"
                           :template-column-width="templateColumnWidth"
                           :template-table-width="templateTableWidth"
-                          :max-level-group-column="maxLevelGroupColumn"
-                          :set-open-group-column="setOpenGroupColumns"
+                          :max-column-grouping-level="maxColumnGroupingLevel"
+                          :set-open-group-columns="setOpenGroupColumns"
                           :is-grid="isGrid"
-                          @toggle-column-group="toggleColumnGroup"></spread-sheet-head>
+                          @toggle-group:column="toggleColumnGroup"></spread-sheet-head>
       </div>
       <div class="sheet__body">
         <spread-sheet-body-print v-if="isPrintMode"
@@ -30,7 +31,7 @@
                                   :cells="tableCells"
                                   :templateTableWidth="templateTableWidth"
                                   :templateColumnWidth="templateColumnWidth"
-                                  :maxLevelGroupRow="maxLevelGroupRow"
+                                  :maxLevelGroupRow="maxRowGroupingLevel"
                                   :setExcludedCells="setExcludedCells"
                                   :print-mode="isPrintMode"></spread-sheet-body-print>
         <spread-sheet-body v-show="!isPrintMode"
@@ -42,8 +43,8 @@
                            :representations="representations"
                            :images="images"
                            :template-column-width="templateColumnWidth"
-                           :max-row-grouping-level="maxLevelGroupRow"
-                           :max-column-grouping-level="maxLevelGroupColumn"
+                           :max-row-grouping-level="maxRowGroupingLevel"
+                           :max-column-grouping-level="maxColumnGroupingLevel"
                            :set-excluded-cells="setExcludedCells"
                            :template-table-width="templateTableWidth"
                            :set-open-group-rows="setOpenGroupRows"
@@ -62,6 +63,7 @@
 </template>
 
 <script>
+import SpreadSheetAngle from './components/SpreadSheetAngle.vue';
 import SpreadSheetHead from './components/SpreadSheetHead.vue';
 import SpreadSheetBody from './components/SpreadSheetBody.vue';
 import SpreadSheetBodyPrint from './components/SpreadSheetBodyPrint.vue';
@@ -77,6 +79,7 @@ import {
 export default {
   name: 'SpreadSheet',
   components: {
+    SpreadSheetAngle,
     SpreadSheetHead,
     SpreadSheetBody,
     SpreadSheetBodyPrint,
@@ -105,129 +108,22 @@ export default {
     };
   },
   computed: {
-    // maxLevelGroupRow() {
-    //   const maxLevelGroup = [0];
-    //   this.prepareRows.filter((row) => Object.keys(row).includes('parent')).forEach((row) => {
-    //     maxLevelGroup.push(row.rowLevel);
-    //   });
-    //   return Math.max(...maxLevelGroup);
-    // },
-    maxLevelGroupRow() {
+    maxColumnGroupingLevel() {
+      const maxLevelGroup = [0];
+      this.prepareColumns.filter((column) => Object.keys(column).includes('level')).forEach((column) => {
+        maxLevelGroup.push(column.level);
+      });
+      return Math.max(...maxLevelGroup);
+    },
+
+    maxRowGroupingLevel() {
       const maxLevelGroup = [0];
       this.prepareRows.filter((row) => Object.keys(row).includes('level')).forEach((row) => {
         maxLevelGroup.push(row.level);
       });
       return Math.max(...maxLevelGroup);
     },
-    maxLevelGroupColumn() {
-      const maxLevelGroup = [0];
-      this.prepareColumns.filter((column) => Object.keys(column).includes('parent')).forEach((column) => {
-        maxLevelGroup.push(column.columnLevel);
-      });
-      return Math.max(...maxLevelGroup);
-    },
-    tableColumns() {
-      // console.log(this.setOpenGroupColumns);
-      return this.prepareColumns.filter((column) => this.setOpenGroupColumns.includes(column.parent) || !column.parent);
-    },
-    prepareColumns() {
-      // console.log('prepare columns');
-      const prepareColumns = [];
-      const columnsKeys = Object.keys(this.columns);
-      for (let i = 1; i < this.columnCount + 1; i += 1) {
-        const columnName = this.getColumnNameForNumber(i);
-        const columnItem = {
-          value: i,
-          name: columnName,
-          display_name: columnName.toUpperCase(),
-          width: this.cellWidth,
-          columnLevel: this.getColumnLevel(columnName),
-        };
-        if (columnsKeys.includes(columnName)) {
-          Object.assign(columnItem, { ...this.columns[columnName] });
-          if (Object.keys(this.columns[columnName]).includes('columnGroup')) {
-            columnItem.openGroup = false;
-          }
-          prepareColumns.push(columnItem);
-        } else {
-          prepareColumns.push(columnItem);
-        }
-      }
-      // console.log(prepareColumns);
-      return prepareColumns;
-    },
-    tableRows() {
-      const rows = [];
-      let showLevel = 0;
-      for (let i = 0; i < this.prepareRows.length; i += 1) {
-        const { level, fixed } = this.prepareRows[i];
-        if (level === showLevel && !fixed) {
-          rows.push(this.prepareRows[i]);
-        }
-        if (level < showLevel) {
-          showLevel = level;
-          rows.push(this.prepareRows[i]);
-        }
-        if (this.setOpenGroupRows.includes(this.prepareRows[i].value) && showLevel === level) {
-          showLevel = level + 1;
-        }
-      }
-      return rows;
-    },
-    // tableRows() {
-    //   // console.log('table rows');
-    //   return this.prepareRows.filter((row) => ((this.setOpenGroupRows.includes(+row.parent)
-    //     || !row.parent) && !row.fixed));
-    // },
-    // prepareRows() {
-    //   // console.log('prepare rows');
-    //   const prepareRows = [];
-    //   const rowsKeys = Object.keys(this.rows);
-    //   for (let i = 1; i < this.rowCount + 1; i += 1) {
-    //     const rowItem = {
-    //       value: i,
-    //       // name: i,
-    //       // display_name: i,
-    //       height: this.cellHeight,
-    //       rowLevel: this.getRowLevel(`${i}`),
-    //     };
-    //     if (rowsKeys.includes(`${i}`)) {
-    //       Object.assign(rowItem, { ...this.rows[i] });
-    //       if (Object.keys(this.rows[`${i}`]).includes('rowGroup')) {
-    //         rowItem.openGroup = false;
-    //       }
-    //       prepareRows.push(rowItem);
-    //     } else {
-    //       prepareRows.push(rowItem);
-    //     }
-    //   }
-    //   // console.log(prepareRows);
-    //   return prepareRows;
-    // },
-    prepareRows() {
-      console.log('prepare rows');
-      const prepareRows = [];
-      const rowsKeys = Object.keys(this.rows);
-      for (let i = 1; i < this.rowCount + 1; i += 1) {
-        const rowItem = {
-          value: i,
-          height: this.cellHeight,
-          level: 0,
-        };
-        if (rowsKeys.includes(`${i}`)) {
-          Object.assign(rowItem, { ...this.rows[i] });
-        }
-        prepareRows.push(rowItem);
-      }
-      return prepareRows;
-    },
-    tableRowsFixed() {
-      return this.prepareRows.filter((row) => row.fixed);
-    },
-    tableCells() {
-      // console.log('table cells');
-      return this.prepareCells;
-    },
+
     prepareCells() {
       // console.log('prepare cells');
       const prepareCells = {};
@@ -245,11 +141,11 @@ export default {
             const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + i);
             this.setExcludedCells[cellName].push(`${columnNameNext}${cellNameRow}`);
           }
-          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxLevelGroupRow + 2);
-          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (this.maxLevelGroupRow + 2)) + colspan;
+          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2);
+          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2)) + colspan;
         } else {
-          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxLevelGroupRow + 2);
-          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (this.maxLevelGroupRow + 2)) + 1;
+          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2);
+          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2)) + 1;
         }
 
         let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || this.cellHeight : this.cellHeight;
@@ -272,9 +168,111 @@ export default {
       // console.log(tableCells);
       return prepareCells;
     },
+
+    prepareColumns() {
+      // console.log('prepare columns');
+      const prepareColumns = [];
+      const columnsKeys = Object.keys(this.columns);
+      for (let i = 1; i < this.columnCount + 1; i += 1) {
+        const columnName = this.getColumnNameForNumber(i);
+        const columnItem = {
+          value: i,
+          name: columnName,
+          width: this.cellWidth,
+          level: 0,
+        };
+        if (columnsKeys.includes(columnName)) {
+          Object.assign(columnItem, { ...this.columns[columnName] });
+        }
+        prepareColumns.push(columnItem);
+      }
+      // console.log(prepareColumns);
+      return prepareColumns;
+    },
+
+    prepareRows() {
+      const prepareRows = [];
+      const rowsKeys = Object.keys(this.rows);
+      for (let i = 1; i < this.rowCount + 1; i += 1) {
+        const rowItem = {
+          value: i,
+          height: this.cellHeight,
+          level: 0,
+        };
+        if (rowsKeys.includes(`${i}`)) {
+          Object.assign(rowItem, { ...this.rows[i] });
+        }
+        prepareRows.push(rowItem);
+      }
+      return prepareRows;
+    },
+
+    tableCells() {
+      // console.log('table cells');
+      return this.prepareCells;
+    },
+
+    tableColumns() {
+      const columns = [];
+      let showLevel = 0;
+      for (let i = 0; i < this.prepareColumns.length; i += 1) {
+        const { level } = this.prepareColumns[i];
+        if (level === showLevel) {
+          columns.push(this.prepareColumns[i]);
+        }
+        if (level < showLevel) {
+          showLevel = level;
+          columns.push(this.prepareColumns[i]);
+        }
+        if (this.setOpenGroupColumns.includes(this.prepareColumns[i].name) && showLevel === level) {
+          showLevel = level + 1;
+        }
+      }
+      return columns;
+    },
+
+    tableRows() {
+      const rows = [];
+      let showLevel = 0;
+      for (let i = 0; i < this.prepareRows.length; i += 1) {
+        const { level, fixed } = this.prepareRows[i];
+        if (level === showLevel && !fixed) {
+          rows.push(this.prepareRows[i]);
+        }
+        if (level < showLevel) {
+          showLevel = level;
+          rows.push(this.prepareRows[i]);
+        }
+        if (this.setOpenGroupRows.includes(this.prepareRows[i].value) && showLevel === level) {
+          showLevel = level + 1;
+        }
+      }
+      return rows;
+    },
+
+    tableRowsFixed() {
+      return this.prepareRows.filter((row) => row.fixed);
+    },
+
+    templateColumnWidth() {
+      let templateColumnWidth = '';
+      for (let i = 0; i < this.tableColumns.length; i += 1) {
+        templateColumnWidth += `${this.tableColumns[i].width}px `;
+      }
+      return templateColumnWidth;
+    },
+
+    templateTableWidth() {
+      let templateTableWidth = 0;
+      this.tableColumns.forEach((item) => {
+        templateTableWidth += item.width;
+      });
+      return templateTableWidth;
+    },
+
     templateSheet() {
-      const shiftTop = (CELL_WIDTH_LEFT_GROUP * this.maxLevelGroupRow) + CELL_WIDTH_LEFT_TITLE;
-      const shiftLeft = (this.cellHeight * this.maxLevelGroupColumn) + this.cellHeight;
+      const shiftTop = (CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel) + CELL_WIDTH_LEFT_TITLE;
+      const shiftLeft = (this.cellHeight * this.maxColumnGroupingLevel) + this.cellHeight;
       const style = {
         'grid-template-columns': `${shiftTop}px 1fr`,
         'grid-template-rows': `${shiftLeft}px 1fr`,
@@ -286,20 +284,6 @@ export default {
       if (!this.isTitle) Object.assign(style, shift);
       return style;
     },
-    templateTableWidth() {
-      let templateTableWidth = 0;
-      this.tableColumns.forEach((item) => {
-        templateTableWidth += item.width;
-      });
-      return templateTableWidth;
-    },
-    templateColumnWidth() {
-      let templateColumnWidth = '';
-      for (let i = 0; i < this.tableColumns.length; i += 1) {
-        templateColumnWidth += `${this.tableColumns[i].width}px `;
-      }
-      return templateColumnWidth;
-    },
   },
   watch: {
     cells() {
@@ -310,12 +294,10 @@ export default {
         const [, rowValue] = row;
         return Object.keys(rowValue).includes('isOpen');
       });
-      // console.log(rowsOpen);
       rowsOpen.forEach((row) => {
         const [rowName] = row;
         this.setOpenGroupRows.push(+rowName);
       });
-      // console.log(Object.entries(this.rows).filter((row) => Object.keys(rowValue).includes('isOpen')));
     },
     styles() {
       this.updateDocumentStyles();
@@ -329,14 +311,12 @@ export default {
   },
   methods: {
     evtClickCell(options) {
-      // console.log(options);
       this.$emit('click:cell', options);
     },
     evtDblclickCell(options) {
       this.$emit('dblclick:cell', options);
     },
     evtKeydownCell(options) {
-      // console.log(options);
       this.$emit('keydown:cell', options);
     },
     evtBufferCopy(cellName) {
@@ -345,6 +325,14 @@ export default {
     evtBufferPaste(cellName) {
       this.$emit('buffer:paste', cellName);
     },
+    evtOpenGroupColumn(level) {
+      console.log('column', level);
+    },
+
+    evtOpenGroupRow(level) {
+      console.log('row', level);
+    },
+
     scrollBodyX(scrollLeft) {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
       this.$emit('scroll:body');
@@ -353,76 +341,39 @@ export default {
     toggleRowGroup(rowName) {
       if (this.setOpenGroupRows.includes(rowName)) {
         this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((item) => item === rowName), 1);
-        // for (let i = rowName + 1; i < this.prepareRows.length; i += 1) {
-        //   if (this.prepareRows[i].level > this.prepareRows[rowName].level) {
-        //     if (this.setOpenGroupRows.findIndex((element) => element === i) !== -1) {
-        //       this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
-        //     }
-        //   }
-        //   if (this.prepareRows[i].level < this.prepareRows[rowName].level) return;
-        // }
       } else {
         this.setOpenGroupRows.push(rowName);
       }
       console.log(this.setOpenGroupRows);
     },
 
-    // recursiveClosingRowGroup(rowParent) {
-    //   this.prepareRows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
-    //     if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
-    //       this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
-    //     }
-    //     this.recursiveClosingRowGroup(item.value);
-    //   });
-    // },
-    // recursiveClosingRowGroup(rowName) {
-    //   const currentLevel = this.prepareRows[rowName].level;
-    //   // console.log(rowParent);
-    //   // console.log(this.setOpenGroupRows.findIndex((element) => element === rowParent));
-    //   this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === rowName), 1);
-    //   for (let i = rowName + 1; i < this.prepareRows.length; i += 1) {
-    //     console.log(this.prepareRows[i].level, '>=', currentLevel);
-    //     if (this.prepareRows[i].level >= currentLevel) {
-    //       this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
-    //     }
-    //     if (this.prepareRows[i].level < currentLevel) return;
-    //   //   if (this.prepareRows[i].level > currentLevel) {
-    //   //     if (this.setOpenGroupRows.findIndex((element) => element === i) !== -1) {
-    //   //       this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
-    //   //     }
-    //   //   }
-    //   //   if (this.prepareRows[i].level < currentLevel) {
-    //   //     // this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === i), 1);
-    //   //     return;
-    //   //   }
-    //   }
-    //   // this.prepareRows.filter((row) => (+row.parent === rowParent && row.rowGroup)).forEach((item) => {
-    //   //   if (this.setOpenGroupRows.findIndex((element) => element === item.value) > -1) {
-    //   //     this.setOpenGroupRows.splice(this.setOpenGroupRows.findIndex((element) => element === item.value), 1);
-    //   //   }
-    //   //   this.recursiveClosingRowGroup(item.value);
-    //   // });
-    // },
-
-    toggleColumnGroup(columnGroup) {
-      console.log(columnGroup);
-      console.log(this.setOpenGroupColumns);
-      if (this.setOpenGroupColumns.includes(columnGroup.name)) {
-        this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnGroup.name), 1);
-        this.recursiveClosingColumnGroup(columnGroup.name);
+    toggleColumnGroup(columnName) {
+      if (this.setOpenGroupColumns.includes(columnName)) {
+        this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnName), 1);
       } else {
-        this.setOpenGroupColumns.push(columnGroup.name);
+        this.setOpenGroupColumns.push(columnName);
       }
     },
 
-    recursiveClosingColumnGroup(columnParent) {
-      this.prepareColumns.filter((column) => (column.parent === columnParent && column.columnGroup)).forEach((item) => {
-        if (this.setOpenGroupColumns.findIndex((element) => element === item.name) > -1) {
-          this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((element) => element === item.name), 1);
-        }
-        this.recursiveClosingColumnGroup(item.name);
-      });
-    },
+    // toggleColumnGroup(columnGroup) {
+    //   console.log(columnGroup);
+    //   console.log(this.setOpenGroupColumns);
+    //   if (this.setOpenGroupColumns.includes(columnGroup.name)) {
+    //     this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnGroup.name), 1);
+    //     this.recursiveClosingColumnGroup(columnGroup.name);
+    //   } else {
+    //     this.setOpenGroupColumns.push(columnGroup.name);
+    //   }
+    // },
+
+    // recursiveClosingColumnGroup(columnParent) {
+    //   this.prepareColumns.filter((column) => (column.parent === columnParent && column.columnGroup)).forEach((item) => {
+    //     if (this.setOpenGroupColumns.findIndex((element) => element === item.name) > -1) {
+    //       this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((element) => element === item.name), 1);
+    //     }
+    //     this.recursiveClosingColumnGroup(item.name);
+    //   });
+    // },
 
     getColumnNameForNumber(columnNumber) {
       if (columnNumber > 702) return 'Infinity';
@@ -449,34 +400,34 @@ export default {
       return (indexFirst * this.setColumnName.length) + indexSecond;
     },
 
-    getRowLevel(rowNumber) {
-      let level = 0;
-      let currentRow = rowNumber;
-      let condition = true;
-      while (condition) {
-        if (!this.rows[currentRow]?.parent) { condition = false; return level; }
-        level += 1;
-        currentRow = this.rows[currentRow].parent;
-      }
-      return level;
-    },
+    // getRowLevel(rowNumber) {
+    //   let level = 0;
+    //   let currentRow = rowNumber;
+    //   let condition = true;
+    //   while (condition) {
+    //     if (!this.rows[currentRow]?.parent) { condition = false; return level; }
+    //     level += 1;
+    //     currentRow = this.rows[currentRow].parent;
+    //   }
+    //   return level;
+    // },
 
-    getColumnLevel(columnName) {
-      let level = 0;
-      let currentColumn = columnName;
-      let condition = true;
-      while (condition) {
-        if (!this.columns[currentColumn]?.parent) { condition = false; return level; }
-        level += 1;
-        currentColumn = this.columns[currentColumn].parent;
-      }
-      return level;
-    },
+    // getColumnLevel(columnName) {
+    //   let level = 0;
+    //   let currentColumn = columnName;
+    //   let condition = true;
+    //   while (condition) {
+    //     if (!this.columns[currentColumn]?.parent) { condition = false; return level; }
+    //     level += 1;
+    //     currentColumn = this.columns[currentColumn].parent;
+    //   }
+    //   return level;
+    // },
 
-    prepareOpenGroup(rowName) {
-      if (this.setOpenGroupRows.includes(rowName)) return;
-      this.setOpenGroupRows.push(rowName);
-    },
+    // prepareOpenGroup(rowName) {
+    //   if (this.setOpenGroupRows.includes(rowName)) return;
+    //   this.setOpenGroupRows.push(rowName);
+    // },
     parseCellName(cellName) {
       return {
         cellNameColumn: cellName.replace(/[0-9]/g, ''),

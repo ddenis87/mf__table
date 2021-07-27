@@ -44,12 +44,12 @@
       "i":{"width":50},
       "j":{"width":50},
       "m":{"width":80},
-      "n":{"columnGroup":2},
-      "o":{"parent":"n","width":50},
-      "p":{"columnGroup":2,"parent":"n"},
-      "q":{"parent":"p","columnGroup":1},
-      "r":{"parent":"q"},
-      "s":{"parent":"p"},
+      "n":{"isGroup":true},
+      "o":{"level":1,"width":50},
+      "p":{"isGroup":true,"level":1},
+      "q":{"level":2,"isGroup":true},
+      "r":{"level":3},
+      "s":{"level":2},
       "t":{"width":20}
       },
       "cells":{
