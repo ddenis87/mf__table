@@ -124,7 +124,7 @@ export default {
     hasCell(columnName) {
       return (this.cells[this.getCellName(columnName)]) || false;
     },
-    
+
     hasImg(columnName) {
       return (this.hasCell(columnName)?.image) || false;
     },

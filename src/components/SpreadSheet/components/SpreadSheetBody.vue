@@ -9,8 +9,8 @@
        @mouseout="evtMouseout">
     <tooltip v-bind="propsTooltip"></tooltip>
 
-    <div class="select-area"
-         :style="rangeSelect"></div>
+    <!-- <div class="select-area"
+         :style="rangeSelect"></div> -->
 
     <div ref="SheetBodyFixed"
          class="sheet-body-fixed"
@@ -140,50 +140,50 @@ export default {
       };
     },
 
-    rangeSelect() {
-      if (!this.selectEnd) return {};
-      if (this.selectStart === this.selectEnd) return {};
-      if (!this.selectStart || !this.selectEnd) return {};
-      const startRange = {
-        left: -100, top: -100, width: 0, height: 0,
-      };
-      const endRange = {
-        left: -100, top: -100, width: 0, height: 0,
-      };
+    // rangeSelect() {
+    //   if (!this.selectEnd) return {};
+    //   if (this.selectStart === this.selectEnd) return {};
+    //   if (!this.selectStart || !this.selectEnd) return {};
+    //   const startRange = {
+    //     left: -100, top: -100, width: 0, height: 0,
+    //   };
+    //   const endRange = {
+    //     left: -100, top: -100, width: 0, height: 0,
+    //   };
 
-      ({
-        left: startRange.left, top: startRange.top, width: startRange.width, height: startRange.height,
-      } = this.selectStart.getBoundingClientRect());
-      ({
-        left: endRange.left, top: endRange.top, width: endRange.width, height: endRange.height,
-      } = this.selectEnd.getBoundingClientRect());
+    //   ({
+    //     left: startRange.left, top: startRange.top, width: startRange.width, height: startRange.height,
+    //   } = this.selectStart.getBoundingClientRect());
+    //   ({
+    //     left: endRange.left, top: endRange.top, width: endRange.width, height: endRange.height,
+    //   } = this.selectEnd.getBoundingClientRect());
 
-      if (endRange?.left < startRange?.left) {
-        const tLeft = startRange?.left;
-        startRange.left = endRange?.left;
-        endRange.left = tLeft;
-        const tWidth = startRange?.width;
-        startRange.width = endRange?.width;
-        endRange.width = tWidth;
-      }
+    //   if (endRange?.left < startRange?.left) {
+    //     const tLeft = startRange?.left;
+    //     startRange.left = endRange?.left;
+    //     endRange.left = tLeft;
+    //     const tWidth = startRange?.width;
+    //     startRange.width = endRange?.width;
+    //     endRange.width = tWidth;
+    //   }
 
-      if (endRange?.top < startRange?.top) {
-        const tTop = startRange?.top;
-        startRange.top = endRange?.top;
-        endRange.top = tTop;
-        const tHeight = startRange?.height;
-        startRange.height = endRange?.height;
-        endRange.height = tHeight;
-      }
+    //   if (endRange?.top < startRange?.top) {
+    //     const tTop = startRange?.top;
+    //     startRange.top = endRange?.top;
+    //     endRange.top = tTop;
+    //     const tHeight = startRange?.height;
+    //     startRange.height = endRange?.height;
+    //     endRange.height = tHeight;
+    //   }
 
-      const selectPosition = {
-        left: `${startRange?.left - 6 || -100}px`,
-        top: `${startRange?.top - 152.5 || -100}px`,
-        width: `${(endRange?.left - startRange?.left) + endRange?.width + 3 || 0}px`,
-        height: `${(endRange?.top - startRange?.top) + endRange?.height + 3 || 0 }px`,
-      };
-      return selectPosition;
-    },
+    //   const selectPosition = {
+    //     left: `${startRange?.left - 6 || -100}px`,
+    //     top: `${startRange?.top - 152.5 || -100}px`,
+    //     width: `${(endRange?.left - startRange?.left) + endRange?.width + 3 || 0}px`,
+    //     height: `${(endRange?.top - startRange?.top) + endRange?.height + 3 || 0 }px`,
+    //   };
+    //   return selectPosition;
+    // },
 
     heightVirtualList() {
       let heightBodyFixed = 156 + (this.maxColumnGroupingLevel * (22 + 1));
@@ -230,7 +230,7 @@ export default {
       const cellName = evt.target.getAttribute('data-name');
       this.$emit('dblclick:cell', { evt, cellName });
     },
-    
+
     evtKeydownBody(evt) {
       if (this.isNavigationKey(evt)) return;
       const setTemplateKey = ['Key', 'Numpad', 'Digit', 'Enter', 'Delete', 'Space'];
@@ -326,42 +326,6 @@ export default {
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
 
-    isCopyKey(evt) {
-      const cellName = evt.target.getAttribute('data-name');
-      if (!cellName) return false;
-      if (!(evt.ctrlKey && evt.code === 'KeyC')) return false;
-      this.$emit('buffer:copy', cellName);
-      return true;
-    },
-
-    isNavigationKey(evt) {
-      evt.preventDefault();
-      if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && !evt.shiftKey)) this.moveCursorNext(evt.target);
-      if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey)) this.moveCursorPrevious(evt.target);
-      if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
-      if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
-      return evt.code.includes('Arrow');
-    },
-
-    isPasteKey(evt) {
-      const cellName = evt.target.getAttribute('data-name');
-      if (!cellName) return false;
-      if (!(evt.ctrlKey && evt.code === 'KeyV')) return false;
-      this.$emit('buffer:paste', cellName);
-      return true;
-    },
-
-    // getSelectedRange() {
-    //   let range = null;
-    //   if (this.selectStart.hasAttribute('data-name')) {
-    //     range = this.selectStart.getAttribute('data-name');
-    //   }
-    //   if (this.selectEnd.hasAttribute('data-name')) {
-    //     range += `:${this.selectEnd.getAttribute('data-name')}`;
-    //   }
-    //   return range;
-    // },
-
     focusCell(target) {
       if (target.getBoundingClientRect().left < this.widthFixedArea) {
         this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 5;
@@ -377,59 +341,13 @@ export default {
       this.selectedCell(target.getAttribute('data-name'));
     },
 
-    selectedCell(cellName) {
-      const cellNode = this.getCellNodeForName(cellName);
-      if (cellName === this.currentSelectedCellName) {
-        cellNode.classList.add('selected');
-        return;
-      }
-      if (this.currentSelectedCellName && this.getCellNodeForName(this.currentSelectedCellName)) {
-        this.getCellNodeForName(this.currentSelectedCellName).classList.remove('selected');
-      }
-      if (!cellNode) return;
-      cellNode.classList.add('selected');
-      this.currentSelectedCellName = cellName;
-    },
-
-    toggleRowGroup(rowName) {
-      this.$emit('toggle-row-group', rowName);
-    },
-
-    parseCellName(cellName) {
-      return {
-        cellColumn: cellName.replace(/[0-9]/g, ''),
-        cellRow: +cellName.replace(/[A-z]/g, ''),
-      };
-    },
-    // -----------------------
-    hasElement(target, direction) {
-      if (direction === 'previous') {
-        if (!target.previousSibling) return false;
-        if (target.previousSibling.nodeName === 'DIV'
-          && target.previousSibling.closest('.column-title')) return false;
-      }
-      if (direction === 'next') {
-        if (!target.nextSibling) return false;
-        if (!target.nextElementSibling) return false;
-      }
-      if (direction === 'up') {
-        if (!target.parentElement.parentElement.previousSibling
-          && !target.closest('.sheet-body')?.previousSibling) return false;
-      }
-      if (direction === 'down') {
-        if (!target.parentElement.parentElement.nextSibling
-          && !target.closest('.sheet-body-fixed')?.nextSibling) return false;
-      }
-      return true;
-    },
-
     getCellNodeForName(cellName) {
       return this.$refs.TableBody.querySelector(`[data-name="${cellName}"]`);
     },
 
     getExpectedCellName(target, direction) {
       const currentCellName = target.getAttribute('data-name');
-      let { cellRow, cellColumn } = this.parseCellName(currentCellName);
+      let { cellRow, cellColumn } = this.getParseAtSymbolDigit(currentCellName);
       if (direction === 'next') {
         cellColumn = this.columns[this.columns.findIndex((item) => item.name === cellColumn) + 1].name;
       }
@@ -463,6 +381,59 @@ export default {
       const mergedCellName = Object.entries(this.setExcludedCells)
         .find((item) => item[1].includes(this.getExpectedCellName(target, direction)))[0];
       return mergedCellName;
+    },
+
+    getParseAtSymbolDigit(cellName) {
+      return {
+        cellColumn: cellName.replace(/[0-9]/g, ''),
+        cellRow: +cellName.replace(/[A-z]/g, ''),
+      };
+    },
+
+    hasElement(target, direction) {
+      if (direction === 'previous') {
+        if (!target.previousSibling) return false;
+        if (target.previousSibling.nodeName === 'DIV'
+          && target.previousSibling.closest('.column-title')) return false;
+      }
+      if (direction === 'next') {
+        if (!target.nextSibling) return false;
+        if (!target.nextElementSibling) return false;
+      }
+      if (direction === 'up') {
+        if (!target.parentElement.parentElement.previousSibling
+          && !target.closest('.sheet-body')?.previousSibling) return false;
+      }
+      if (direction === 'down') {
+        if (!target.parentElement.parentElement.nextSibling
+          && !target.closest('.sheet-body-fixed')?.nextSibling) return false;
+      }
+      return true;
+    },
+
+    isCopyKey(evt) {
+      const cellName = evt.target.getAttribute('data-name');
+      if (!cellName) return false;
+      if (!(evt.ctrlKey && evt.code === 'KeyC')) return false;
+      this.$emit('buffer:copy', cellName);
+      return true;
+    },
+
+    isNavigationKey(evt) {
+      evt.preventDefault();
+      if (evt.code === 'ArrowRight' || (evt.code === 'Tab' && !evt.shiftKey)) this.moveCursorNext(evt.target);
+      if (evt.code === 'ArrowLeft' || (evt.code === 'Tab' && evt.shiftKey)) this.moveCursorPrevious(evt.target);
+      if (evt.code === 'ArrowUp') this.moveCursorUp(evt.target);
+      if (evt.code === 'ArrowDown') this.moveCursorDown(evt.target);
+      return evt.code.includes('Arrow');
+    },
+
+    isPasteKey(evt) {
+      const cellName = evt.target.getAttribute('data-name');
+      if (!cellName) return false;
+      if (!(evt.ctrlKey && evt.code === 'KeyV')) return false;
+      this.$emit('buffer:paste', cellName);
+      return true;
     },
 
     moveCursorDown(target) {
@@ -528,6 +499,24 @@ export default {
       return false;
     },
 
+    selectedCell(cellName) {
+      const cellNode = this.getCellNodeForName(cellName);
+      if (cellName === this.currentSelectedCellName) {
+        cellNode.classList.add('selected');
+        return;
+      }
+      if (this.currentSelectedCellName && this.getCellNodeForName(this.currentSelectedCellName)) {
+        this.getCellNodeForName(this.currentSelectedCellName).classList.remove('selected');
+      }
+      if (!cellNode) return;
+      cellNode.classList.add('selected');
+      this.currentSelectedCellName = cellName;
+    },
+
+    toggleRowGroup(rowName) {
+      this.$emit('toggle-row-group', rowName);
+    },
+
     shiftBodyScrollDown(currentCell) {
       const bodyBorders = this.$refs.TableBody.getBoundingClientRect();
       const cellBorders = currentCell.getBoundingClientRect();
@@ -545,6 +534,17 @@ export default {
         this.$refs.SheetBody.$el.scrollTop -= delta + 12;
       }
     },
+
+    // getSelectedRange() {
+    //   let range = null;
+    //   if (this.selectStart.hasAttribute('data-name')) {
+    //     range = this.selectStart.getAttribute('data-name');
+    //   }
+    //   if (this.selectEnd.hasAttribute('data-name')) {
+    //     range += `:${this.selectEnd.getAttribute('data-name')}`;
+    //   }
+    //   return range;
+    // },
   },
 };
 </script>
@@ -585,5 +585,4 @@ export default {
     }
   }
 }
-
 </style>
