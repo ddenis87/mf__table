@@ -1,14 +1,17 @@
 <template>
   <div class="filter-extended">
     <div class="body">
-      <div v-for="item in listFields" :key="item.key">
+      <div v-for="item in listFields"
+           :key="item.key">
         <filter-extended-item :field-options="item"
+                              v-model="fieldsValue[item.key]"
+                              @input:field="evtInputField"
                               @keydown:control="evtKeydownControl"></filter-extended-item>
       </div>
     </div>
     <div class="control">
       <btn-form height="24">Сбросить все</btn-form>
-      <btn-form height="24">Применить</btn-form>
+      <btn-form height="24" @click="evtFilterAccept">Применить</btn-form>
     </div>
   </div>
 </template>
@@ -25,6 +28,11 @@ export default {
     guid: { type: String, default: null },
     excludedFields: { type: Array, default() { return ['id', 'is_deleted', 'is_group', 'parent', 'related']; } },
   },
+  data() {
+    return {
+      fieldsValue: {},
+    };
+  },
   computed: {
     listFields() {
       const listFields = [];
@@ -37,11 +45,19 @@ export default {
           value: fieldValue,
         });
       });
-      console.log(listFields);
+      // console.log(listFields);
       return listFields;
     },
   },
   methods: {
+    evtFilterAccept() {
+      console.log(this.fieldsValue);
+    },
+
+    evtInputField(value) {
+      console.log(value);
+    },
+
     evtKeydownControl(evt) {
       let nextItem = evt.target.closest('.filter-extended-item').parentElement.nextElementSibling;
       let nextField = nextItem.querySelector('.item__compare input');

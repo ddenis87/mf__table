@@ -63,7 +63,7 @@ export default {
   grid-template-rows: 1fr 22px;
   height: 100%;
   font-size: 0.7em;
-  
+
   &_hidden {
     display: none;
   }

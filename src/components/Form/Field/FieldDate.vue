@@ -7,6 +7,7 @@
                   v-model="fieldValue"
                   v-mask="fieldMask"
                   @input="evtInput"
+                  @click:clear="evtClickClear"
                   @keydown="evtKeydown"
                   @keydown.enter="evtKeydownControl"
                   @keydown.esc="evtKeydownControl"
@@ -89,6 +90,12 @@ export default {
     },
   },
   watch: {
+    fieldValue() {
+      // console.log('watch filedValue', this.fieldValue);
+      // this.fieldValue = null;
+      // this.fieldValueDate = null;
+    },
+
     fieldValueInput() {
       // this.fieldValue = formattedDataDisplay(this.fieldValueInput, { valueType: 'date' }) || null;
       this.fieldValue = display.formate(this.fieldValueInput, { type: 'date' }) || null;
@@ -104,6 +111,11 @@ export default {
     }, 50);
   },
   methods: {
+    evtClickClear() {
+      this.fieldValue = null;
+      this.fieldValueDate = null;
+      this.evtInput();
+    },
     evtClickOutside() {
       const evt = new KeyboardEvent('keydown', { code: 'Escape' });
       this.evtKeydownControl(evt);

@@ -307,6 +307,14 @@ export default {
     openJSONFileTemplate(file) {
       if (file === null || Object.keys(file).includes('length')) return;
       apiSpreadSheet.uploadJSONFile(file).then(async (JSONTemplate) => {
+        const { type } = JSON.parse(JSONTemplate);
+        if (type === 'document') {
+          const temp = await new TableDocumentApi({ JSONString: JSONTemplate });
+          this.tableDocument = temp;
+          this.isFileTemplateDisabled = true;
+          this.isGrid = false;
+          return;
+        }
         try {
           this.tableDocumentPrepare.setTableDocumentTemplate(JSONTemplate);
         } catch (err) {
@@ -314,14 +322,6 @@ export default {
           this.fileTemplate = null;
         }
         this.isFileSettingDisabled = false;
-
-        const { type } = JSON.parse(JSONTemplate);
-        if (type === 'document') {
-          const temp = await new TableDocumentApi({ JSONString: JSONTemplate });
-          this.tableDocument = temp;
-          this.isFileTemplateDisabled = true;
-          this.isGrid = false;
-        }
       });
     },
 
@@ -351,21 +351,6 @@ export default {
         this.tableDocument.recalculateFormulas();
         this.isGrid = false;
       }
-      // console.log('file upload');
-      // const tableDocument = new TableDocumentApi();
-      // try {
-      //   await tableDocument.deserialize(JSONFile, this.tableDocumentTemplate, this.documentSetting);
-      // } catch (err) {
-      //   if (err instanceof TableDocumentGroupsRowsError) {
-      //     this.showDialogMessage(err.getMessagesText());
-      //   }
-      //   console.log(err);
-      // } finally {
-      //   this.tableDocument = tableDocument;
-      //   this.tableDocument.recalculateFormulas();
-      //   // this.isFileDataDisabled = true;
-      //   this.isGrid = false;
-      // }
     },
     openPrintPage() {
       localStorage.setItem('SpreadSheetTableDocument', this.tableDocument.getDocument(true));

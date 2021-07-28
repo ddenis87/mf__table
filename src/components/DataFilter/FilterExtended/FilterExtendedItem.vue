@@ -30,6 +30,9 @@ export default {
   components: {
     FilterFieldWrapper,
   },
+  model: {
+    event: 'input:field',
+  },
   props: {
     fieldOptions: { type: Object, default() { return { type: 'string' }; } },
   },
@@ -56,11 +59,15 @@ export default {
   methods: {
     toggleFilter() {},
     evtInput() {
-      console.log(this.valueCompare);
+      // console.log(this.valueCompare);
       const compare = this.getCompareKey();
       if (this.valueCompare === 'between') this.fieldMode = FIELD_MODE.RANGE;
       else this.fieldMode = FIELD_MODE.SINGLE;
-      if (!this.valueField) { console.log('emit "clear:key"'); return; }
+      if (!this.valueField) {
+        this.$emit('input:field', null);
+        // console.log('emit "clear:key"');
+        return;
+      }
       this.valuesField = this.valueField;
       if (!Array.isArray(this.valuesField)) this.valuesField = [this.valuesField];
 
@@ -71,8 +78,8 @@ export default {
 
       // const value = this.getCompareValue();
       // const compareValue = compare.replace('{$value}', value);
-
-      console.log(compareValue);
+      this.$emit('input:field', compareValue);
+      // console.log(compareValue);
     },
     evtKeydownControl(evt) {
       if (evt.code === 'Escape') return;
