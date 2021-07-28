@@ -226,6 +226,8 @@ export default {
       const groupStyle = {
         left: `${CELL_WIDTH_LEFT_GROUP * (+level - 1)}px`,
       };
+      if (!this.isShowTitle
+        && this.maxRowGroupingLevel === level) groupStyle['border-right'] = 'thin solid grey';
       return groupStyle;
     },
 

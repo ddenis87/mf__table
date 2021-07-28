@@ -271,6 +271,7 @@ export default {
         shiftTop += CELL_WIDTH_LEFT_TITLE;
         shiftLeft += CELL_HEIGHT;
       }
+      if (!this.isTitle) shiftLeft += 1;
       const style = {
         'grid-template-columns': `${shiftTop}px 1fr`,
         'grid-template-rows': `${shiftLeft}px 1fr`,

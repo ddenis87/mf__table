@@ -1,5 +1,6 @@
 <template>
-  <div class="sheet-head" @click="eventClickHead">
+  <div class="sheet-head"
+       :class="{'sheet-head_no-title': !isShowTitle}" @click="eventClickHead">
     <template v-if="isShowGroup">
       <div v-for="level in maxColumnGroupingLevel"
            class="sheet-head__row"
@@ -60,11 +61,12 @@ export default {
   },
   computed: {
     templateColumnHeight() {
-      return {
+      const template = {
         'grid-template-columns': `${this.templateColumnWidth} 8px`,
         'grid-template-rows': `${CELL_HEIGHT}px`,
         width: `${this.templateTableWidth}px`,
       };
+      return template;
     },
   },
   methods: {
@@ -126,6 +128,9 @@ export default {
   font-size: $headFontSize;
   font-weight: $headFontWeight;
   color: $headFontColor;
+  &_no-title {
+    border-bottom: thin solid grey;
+  }
   &::-webkit-scrollbar {
     display: none;
   }
@@ -172,6 +177,7 @@ export default {
       }
       &-end {
         min-width: 18px;
+        border-left: $borderStyle;
         // border-right: $borderStyle;
         &::after {
           content: '';
@@ -180,7 +186,9 @@ export default {
           top: 0px;
           right: 0px;
           bottom: 0px;
-          border-right: $borderStyle;
+          background-color: white;
+          border: 0px;
+          // border-left: $borderStyle;
         }
       }
     }
