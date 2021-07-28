@@ -113,7 +113,7 @@ export default {
       this.prepareColumns.filter((column) => Object.keys(column).includes('level')).forEach((column) => {
         maxLevelGroup.push(column.level);
       });
-      return Math.max(...maxLevelGroup);
+      return Math.max(...maxLevelGroup) + 1;
     },
 
     maxRowGroupingLevel() {
@@ -121,7 +121,7 @@ export default {
       this.prepareRows.filter((row) => Object.keys(row).includes('level')).forEach((row) => {
         maxLevelGroup.push(row.level);
       });
-      return Math.max(...maxLevelGroup);
+      return Math.max(...maxLevelGroup) + 1;
     },
 
     prepareCells() {
@@ -231,22 +231,36 @@ export default {
       return columns;
     },
 
+    // tableRows() {
+    //   const rows = [];
+    //   let showLevel = 0;
+    //   for (let i = 0; i < this.prepareRows.length; i += 1) {
+    //     const { level, fixed } = this.prepareRows[i];
+    //     if (level === showLevel && !fixed) {
+    //       rows.push(this.prepareRows[i]);
+    //     }
+    //     if (level < showLevel) {
+    //       showLevel = level;
+    //       rows.push(this.prepareRows[i]);
+    //     }
+    //     if (this.setOpenGroupRows.includes(this.prepareRows[i].value) && showLevel === level) {
+    //       showLevel = level + 1;
+    //     }
+    //   }
+    //   return rows;
+    // },
     tableRows() {
       const rows = [];
       let showLevel = 0;
-      for (let i = 0; i < this.prepareRows.length; i += 1) {
-        const { level, fixed } = this.prepareRows[i];
-        if (level === showLevel && !fixed) {
-          rows.push(this.prepareRows[i]);
+      this.prepareRows.forEach((row) => {
+        const { level, fixed } = row;
+        if ((level === showLevel && !fixed)
+          || (level < showLevel)) {
+          rows.push(row);
         }
-        if (level < showLevel) {
-          showLevel = level;
-          rows.push(this.prepareRows[i]);
-        }
-        if (this.setOpenGroupRows.includes(this.prepareRows[i].value) && showLevel === level) {
-          showLevel = level + 1;
-        }
-      }
+        if (level < showLevel) showLevel = level;
+        if (this.setOpenGroupRows.includes(row.value) && showLevel === level) showLevel = level + 1;
+      });
       return rows;
     },
 
@@ -326,11 +340,36 @@ export default {
       this.$emit('buffer:paste', cellName);
     },
     evtOpenGroupColumn(level) {
-      console.log('column', level);
+      if (level === 1) {
+        this.setOpenGroupColumns = [];
+        return;
+      }
+      const openGroup = [];
+      this.prepareColumns.forEach((column, columnIndex) => {
+        if (column.level >= level) return;
+        if (!this.prepareColumns[columnIndex - 1]) return;
+        if (Object.keys(this.prepareColumns[columnIndex - 1]).includes('isGroup')) {
+          openGroup.push(this.prepareColumns[columnIndex - 1].name);
+        }
+      });
+      console.log(openGroup);
+      this.setOpenGroupColumns = [...openGroup];
     },
 
     evtOpenGroupRow(level) {
-      console.log('row', level);
+      if (level === 1) {
+        this.setOpenGroupRows = [];
+        return;
+      }
+      const openGroup = [];
+      this.prepareRows.forEach((row, rowIndex) => {
+        if (row.level >= level) return;
+        if (!this.prepareRows[rowIndex - 1]) return;
+        if (Object.keys(this.prepareRows[rowIndex - 1]).includes('isGroup')) {
+          openGroup.push(this.prepareRows[rowIndex - 1].value);
+        }
+      });
+      this.setOpenGroupRows = [...openGroup];
     },
 
     scrollBodyX(scrollLeft) {
