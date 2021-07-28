@@ -1,5 +1,6 @@
 <template>
-  <div class="angle">
+  <div class="angle"
+       :class="{'angle_hidden': !isShowTitle}">
     <div class="group group__columns">
       <div v-for="levelColumn in maxColumnGroupingLevel"
            class="group group__item"
@@ -34,7 +35,9 @@ export default {
   props: {
     maxColumnGroupingLevel: { type: Number, default: 0 },
     maxRowGroupingLevel: { type: Number, default: 0 },
-    isTitle: { type: Boolean, default: true },
+    isShowTitle: { type: Boolean, default: true },
+  },
+  computed: {
   },
   methods: {
     evtClickGroupColumn(evt) {
@@ -50,6 +53,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../SpreadSheet.scss';
+
 .angle {
   display: grid;
   grid-template-areas: "lt group-columns"
@@ -58,7 +63,10 @@ export default {
   grid-template-rows: 1fr 22px;
   height: 100%;
   font-size: 0.7em;
-
+  
+  &_hidden {
+    display: none;
+  }
   .group {
     display: flex;
     gap: 6px;
@@ -75,6 +83,7 @@ export default {
       grid-area: group-rows;
       flex-direction: row;
       padding-bottom: 2px;
+      align-items: center;
     }
 
     &__item {
@@ -85,7 +94,8 @@ export default {
     }
   }
   .btn_text {
-    color: black;
+    font-family: $fontFamily;
+    color: $headFontColor;
   }
 }
 </style>

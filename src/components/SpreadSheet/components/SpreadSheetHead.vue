@@ -20,7 +20,7 @@
       </div>
     </template>
 
-    <div class="sheet-head__row"
+    <div v-if="isShowTitle" class="sheet-head__row"
          :style="templateColumnHeight">
       <template v-for="(column, columnIndex) in columns">
         <div :key="`head-title-${column.value}`"
@@ -56,6 +56,7 @@ export default {
     setOpenGroupColumns: { type: Array, default() { return []; } },
     isGrid: { type: Boolean, default: true },
     isShowGroup: { type: Boolean, default: true },
+    isShowTitle: { type: Boolean, default: true },
   },
   computed: {
     templateColumnHeight() {

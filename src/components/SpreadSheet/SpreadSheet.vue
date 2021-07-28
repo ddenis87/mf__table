@@ -4,25 +4,24 @@
     'spread-sheet-print': isPrintMode,
   }">
     <div class="sheet"
-         :class="{'sheet_noTitle': !isTitle}"
-        :style="templateSheet">
-      <div class="sheet__angle" v-show="isTitle">
-        <spread-sheet-angle :max-column-grouping-level="maxColumnGroupingLevel"
+         :style="templateSheet">
+      <div class="sheet__angle">
+        <spread-sheet-angle v-show="isTitle"
+                            :max-column-grouping-level="maxColumnGroupingLevel"
                             :max-row-grouping-level="maxRowGroupingLevel"
                             @open-group:column="evtOpenGroupColumn"
                             @open-group:row="evtOpenGroupRow"></spread-sheet-angle>
       </div>
       <div class="sheet__head">
         <spread-sheet-head ref="SheetHead"
-                          v-if="!isPrintMode"
-                          v-show="isTitle"
-                          :columns="tableColumns"
-                          :template-column-width="templateColumnWidth"
-                          :template-table-width="templateTableWidth"
-                          :max-column-grouping-level="maxColumnGroupingLevel"
-                          :set-open-group-columns="setOpenGroupColumns"
-                          :is-grid="isGrid"
-                          @toggle-group:column="toggleColumnGroup"></spread-sheet-head>
+                           v-if="!isPrintMode"
+                           :columns="tableColumns"
+                           :template-column-width="templateColumnWidth"
+                           :template-table-width="templateTableWidth"
+                           :max-column-grouping-level="maxColumnGroupingLevel"
+                           :set-open-group-columns="setOpenGroupColumns"
+                           :is-show-title="isTitle"
+                           @toggle-group:column="toggleColumnGroup"></spread-sheet-head>
       </div>
       <div class="sheet__body">
         <spread-sheet-body-print v-if="isPrintMode"
@@ -113,7 +112,8 @@ export default {
       this.prepareColumns.filter((column) => Object.keys(column).includes('level')).forEach((column) => {
         maxLevelGroup.push(column.level);
       });
-      return Math.max(...maxLevelGroup) + 1;
+      const result = (Math.max(...maxLevelGroup) === 0) ? Math.max(...maxLevelGroup) : Math.max(...maxLevelGroup) + 1;
+      return result;
     },
 
     maxRowGroupingLevel() {
@@ -121,7 +121,8 @@ export default {
       this.prepareRows.filter((row) => Object.keys(row).includes('level')).forEach((row) => {
         maxLevelGroup.push(row.level);
       });
-      return Math.max(...maxLevelGroup) + 1;
+      const result = (Math.max(...maxLevelGroup) === 0) ? Math.max(...maxLevelGroup) : Math.max(...maxLevelGroup) + 1;
+      return result;
     },
 
     prepareCells() {
@@ -170,7 +171,7 @@ export default {
     },
 
     prepareColumns() {
-      // console.log('prepare columns');
+      console.log(this.maxRowGroupingLevel);
       const prepareColumns = [];
       const columnsKeys = Object.keys(this.columns);
       for (let i = 1; i < this.columnCount + 1; i += 1) {
@@ -215,40 +216,18 @@ export default {
     tableColumns() {
       const columns = [];
       let showLevel = 0;
-      for (let i = 0; i < this.prepareColumns.length; i += 1) {
-        const { level } = this.prepareColumns[i];
-        if (level === showLevel) {
-          columns.push(this.prepareColumns[i]);
+      this.prepareColumns.forEach((column) => {
+        const { level } = column;
+        if (level === showLevel || level < showLevel) {
+          columns.push(column);
         }
-        if (level < showLevel) {
-          showLevel = level;
-          columns.push(this.prepareColumns[i]);
-        }
-        if (this.setOpenGroupColumns.includes(this.prepareColumns[i].name) && showLevel === level) {
-          showLevel = level + 1;
-        }
-      }
+        if (level < showLevel) showLevel = level;
+        if (this.setOpenGroupColumns.includes(column.name)
+          && showLevel === level) showLevel = level + 1;
+      });
       return columns;
     },
 
-    // tableRows() {
-    //   const rows = [];
-    //   let showLevel = 0;
-    //   for (let i = 0; i < this.prepareRows.length; i += 1) {
-    //     const { level, fixed } = this.prepareRows[i];
-    //     if (level === showLevel && !fixed) {
-    //       rows.push(this.prepareRows[i]);
-    //     }
-    //     if (level < showLevel) {
-    //       showLevel = level;
-    //       rows.push(this.prepareRows[i]);
-    //     }
-    //     if (this.setOpenGroupRows.includes(this.prepareRows[i].value) && showLevel === level) {
-    //       showLevel = level + 1;
-    //     }
-    //   }
-    //   return rows;
-    // },
     tableRows() {
       const rows = [];
       let showLevel = 0;
@@ -259,7 +238,8 @@ export default {
           rows.push(row);
         }
         if (level < showLevel) showLevel = level;
-        if (this.setOpenGroupRows.includes(row.value) && showLevel === level) showLevel = level + 1;
+        if (this.setOpenGroupRows.includes(row.value)
+          && showLevel === level) showLevel = level + 1;
       });
       return rows;
     },
@@ -285,17 +265,21 @@ export default {
     },
 
     templateSheet() {
-      const shiftTop = (CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel) + CELL_WIDTH_LEFT_TITLE;
-      const shiftLeft = (this.cellHeight * this.maxColumnGroupingLevel) + this.cellHeight;
+      let shiftTop = (CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel); // + CELL_WIDTH_LEFT_TITLE;
+      let shiftLeft = CELL_HEIGHT * this.maxColumnGroupingLevel; // + (this.isTitle) ? CELL_HEIGHT : 0;
+      if (this.isTitle) {
+        shiftTop += CELL_WIDTH_LEFT_TITLE;
+        shiftLeft += CELL_HEIGHT;
+      }
       const style = {
         'grid-template-columns': `${shiftTop}px 1fr`,
         'grid-template-rows': `${shiftLeft}px 1fr`,
       };
-      const shift = {
-      //   'margin-top': `-${shiftLeft}px`,
-        'margin-left': `-${shiftTop}px`,
-      };
-      if (!this.isTitle) Object.assign(style, shift);
+      // const shift = {
+      //   // 'margin-top': `-${shiftLeft}px`,
+      //   // 'margin-left': `-${shiftTop}px`,
+      // };
+      // if (!this.isTitle) Object.assign(style, shift);
       return style;
     },
   },
@@ -311,6 +295,16 @@ export default {
       rowsOpen.forEach((row) => {
         const [rowName] = row;
         this.setOpenGroupRows.push(+rowName);
+      });
+    },
+    columns() {
+      const columnOpen = Object.entries(this.columns).filter((column) => {
+        const [, columnValue] = column;
+        return Object.keys(columnValue).includes('isOpen');
+      });
+      columnOpen.forEach((column) => {
+        const [columnName] = column;
+        this.setOpenGroupColumns.push(columnName);
       });
     },
     styles() {
@@ -394,26 +388,6 @@ export default {
       }
     },
 
-    // toggleColumnGroup(columnGroup) {
-    //   console.log(columnGroup);
-    //   console.log(this.setOpenGroupColumns);
-    //   if (this.setOpenGroupColumns.includes(columnGroup.name)) {
-    //     this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnGroup.name), 1);
-    //     this.recursiveClosingColumnGroup(columnGroup.name);
-    //   } else {
-    //     this.setOpenGroupColumns.push(columnGroup.name);
-    //   }
-    // },
-
-    // recursiveClosingColumnGroup(columnParent) {
-    //   this.prepareColumns.filter((column) => (column.parent === columnParent && column.columnGroup)).forEach((item) => {
-    //     if (this.setOpenGroupColumns.findIndex((element) => element === item.name) > -1) {
-    //       this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((element) => element === item.name), 1);
-    //     }
-    //     this.recursiveClosingColumnGroup(item.name);
-    //   });
-    // },
-
     getColumnNameForNumber(columnNumber) {
       if (columnNumber > 702) return 'Infinity';
       if (columnNumber <= this.setColumnName.length) {
@@ -439,34 +413,6 @@ export default {
       return (indexFirst * this.setColumnName.length) + indexSecond;
     },
 
-    // getRowLevel(rowNumber) {
-    //   let level = 0;
-    //   let currentRow = rowNumber;
-    //   let condition = true;
-    //   while (condition) {
-    //     if (!this.rows[currentRow]?.parent) { condition = false; return level; }
-    //     level += 1;
-    //     currentRow = this.rows[currentRow].parent;
-    //   }
-    //   return level;
-    // },
-
-    // getColumnLevel(columnName) {
-    //   let level = 0;
-    //   let currentColumn = columnName;
-    //   let condition = true;
-    //   while (condition) {
-    //     if (!this.columns[currentColumn]?.parent) { condition = false; return level; }
-    //     level += 1;
-    //     currentColumn = this.columns[currentColumn].parent;
-    //   }
-    //   return level;
-    // },
-
-    // prepareOpenGroup(rowName) {
-    //   if (this.setOpenGroupRows.includes(rowName)) return;
-    //   this.setOpenGroupRows.push(rowName);
-    // },
     parseCellName(cellName) {
       return {
         cellNameColumn: cellName.replace(/[0-9]/g, ''),
@@ -588,11 +534,11 @@ export default {
     grid-template-areas: "angle head" "body body";
     height: 100%;
     box-sizing: border-box;
-    &_noTitle {
-      grid-template-areas: "body";
-      .sheet__angle { display: none; }
-      .sheet__head { display: none; }
-    }
+    // &_noTitle {
+    //   grid-template-areas: "angle head" "body body";
+    //   // .sheet__angle { display: none; }
+    //   // .sheet__head { display: none; }
+    // }
     &__angle {
       grid-area: angle;
       border: thin solid grey;

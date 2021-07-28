@@ -99,13 +99,20 @@ export default {
     },
 
     templateColumnTitle() {
-      let tempalteColumnTitle = `${CELL_WIDTH_LEFT_TITLE}px ${this.templateColumnWidth}`;
+      let tempalteColumnTitle = `${this.templateColumnWidth}`;
+      if (this.isShowTitle) tempalteColumnTitle = `${CELL_WIDTH_LEFT_TITLE}px ${tempalteColumnTitle}`;
       if (this.maxRowGroupingLevel !== 0) {
         tempalteColumnTitle = `repeat(${this.maxRowGroupingLevel},
                                minmax(${CELL_WIDTH_LEFT_GROUP}px, ${CELL_WIDTH_LEFT_GROUP}px))
-                               ${CELL_WIDTH_LEFT_TITLE}px
-                               ${this.templateColumnWidth}`;
+                               ${tempalteColumnTitle}`;
       }
+      // let tempalteColumnTitle = `${CELL_WIDTH_LEFT_TITLE}px ${this.templateColumnWidth}`;
+      // if (this.maxRowGroupingLevel !== 0) {
+      //   tempalteColumnTitle = `repeat(${this.maxRowGroupingLevel},
+      //                          minmax(${CELL_WIDTH_LEFT_GROUP}px, ${CELL_WIDTH_LEFT_GROUP}px))
+      //                          ${CELL_WIDTH_LEFT_TITLE}px
+      //                          ${this.templateColumnWidth}`;
+      // }
       return tempalteColumnTitle;
     },
   },
@@ -159,8 +166,8 @@ export default {
       if (this.columns[columnIndex].fixed) {
         cellFixed.position = 'sticky';
         cellFixed['z-index'] = 100;
-        cellFixed.left = (CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel)
-          + CELL_WIDTH_LEFT_TITLE;
+        cellFixed.left = CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel;
+        if (this.isShowTitle) cellFixed.left += CELL_WIDTH_LEFT_TITLE;
         for (let i = 0; i < columnIndex; i += 1) {
           cellFixed.left += this.columns[i].width;
         }
@@ -185,6 +192,10 @@ export default {
       } else {
         cellGeometry['grid-column-start'] = columnIndex + (this.maxRowGroupingLevel + 2);
         cellGeometry['grid-column-end'] = (columnIndex + (this.maxRowGroupingLevel + 2)) + 1;
+      }
+      if (!this.isShowTitle) {
+        cellGeometry['grid-column-start'] -= 1;
+        cellGeometry['grid-column-end'] -= 1;
       }
       return cellGeometry;
     },

@@ -48,6 +48,7 @@ import SpreadSheetBodyItem from './SpreadSheetBodyItem.vue';
 import {
   CELL_WIDTH_LEFT_TITLE,
   CELL_WIDTH_LEFT_GROUP,
+  CELL_HEIGHT,
 } from '../SpreadSheetConst';
 
 export default {
@@ -107,6 +108,7 @@ export default {
         'max-row-grouping-level': this.maxRowGroupingLevel,
         'template-column-width': this.templateColumnWidth,
         'is-show-grid': this.isShowGrid,
+        'is-show-title': this.isShowTitle,
       };
     },
 
@@ -121,7 +123,6 @@ export default {
         ...this.propsItem,
         'set-open-group-rows': this.setOpenGroupRows,
         images: this.images,
-        'is-show-titile': this.isShowTitle,
       };
     },
 
@@ -186,11 +187,12 @@ export default {
     // },
 
     heightVirtualList() {
-      let heightBodyFixed = 156 + (this.maxColumnGroupingLevel * (22 + 1));
+      let heightBodyFixed = 158 + (this.maxColumnGroupingLevel * (CELL_HEIGHT));
+      if (this.maxColumnGroupingLevel !== 0) heightBodyFixed += 2;
       for (let i = 0; i < this.rowsFixed.length; i += 1) {
         heightBodyFixed += this.rowsFixed[i].height;
       }
-      if (!this.isShowTitle) heightBodyFixed -= (this.maxColumnGroupingLevel || 1 * (22));
+      if (!this.isShowTitle) heightBodyFixed -= CELL_HEIGHT;
       return {
         height: `calc(100vh - ${heightBodyFixed}px)`,
       };
@@ -205,7 +207,8 @@ export default {
     },
 
     widthVirtualList() {
-      const title = (this.isShowTitle) ? 0 : (this.maxLevelGroupRow || 1 * 22) + 38;
+      let title = 0;
+      if (!this.isShowTitle) title = this.maxLevelGroupRow * CELL_WIDTH_LEFT_GROUP;
       const width = {
         width: `calc(100vw - 10px + ${title}px)`,
       };
