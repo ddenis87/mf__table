@@ -14,7 +14,7 @@ import {
 
 import Formulas from './Formulas';
 import TableDocumentDeserializeError from './TableDocumentDeserializeError';
-import TableDocumentGroupsRowsError from './TableDocumentGroupsRowsError';
+import TableDocumentGeneralError from './TableDocumentGeneralError';
 import TableDocumentValidationCellError from './TableDocumentValidationCellError';
 
 const EDIT_ACCESS = {
@@ -71,7 +71,8 @@ function validateCellValueType(value = '', type = 'string') {
 
 class TableDocument {
   constructor({
-    template = false,
+    // template = false,
+    version = null,
     editAccess = undefined,
     methodName = null,
     rows = {},
@@ -90,7 +91,8 @@ class TableDocument {
     if (JSONString) {
       const JSONStringParse = JSON.parse(JSONString);
       ({
-        template: this.template = false,
+        version: this.version = null,
+        // template: this.template = false,
         editAccess: this.editAccess = undefined,
         methodName: this.methodName = null,
         rows: this.rows = {},
@@ -107,7 +109,8 @@ class TableDocument {
       } = JSONStringParse);
       return;
     }
-    this.template = template;
+    // this.template = template;
+    this.version = version;
     this.editAccess = editAccess;
     this.methodName = methodName;
     this.rows = rows;
@@ -124,6 +127,8 @@ class TableDocument {
   }
 
   BaseClass = this.constructor;
+
+  // version = null;
 
   editAccess = undefined;
 
@@ -224,10 +229,10 @@ class TableDocument {
     }
   }
 
-  deserialize(data, template, settings) {
+  deserialize(data) {
     const documentData = getObjectOfJSON(data);
     const deserializeError = [];
-    this.setDeserializeSettings(template, settings);
+    // this.setDeserializeSettings(template, settings);
     this.documentSettings.forEach((setting) => {
       const [sectionKey, sectionValue] = Object.entries(setting)[0];
       if (Object.keys(sectionValue).includes('nested')) return;
@@ -238,7 +243,7 @@ class TableDocument {
         try {
           this.deserializeArea(sectionKey, sectionDataItem);
         } catch (err) {
-          if (err instanceof TableDocumentGroupsRowsError) throw err;
+          if (err instanceof TableDocumentGeneralError) throw err;
           // console.log(err instanceof TableDocumentGroupsRowsError);
           deserializeError.push(...err);
         }
@@ -916,13 +921,13 @@ class TableDocument {
       const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(currentCellName);
       const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
 
-      this.writeColumn(shiftColumn, area.getColumn(currentColumn));
+      this.updateColumn(shiftColumn, area.getColumn(currentColumn));
       this.updateRow(shiftRow, area.getRow(currentRow));
       this.writeCell(shiftCellName, area.getCell(currentCellName));
     });
 
-    this.writeStyles(area.getStyles());
-    this.writeNamedArea(area.getNamedAreas());
+    this.updateStyles(area.getStyles());
+    this.updateNamedArea(area.getNamedAreas());
 
     this.scripts = { ...this.scripts, ...areaScripts };
     this.images = { ...this.images, ...areaImages };
@@ -947,13 +952,13 @@ class TableDocument {
     }
   }
 
-  writeColumn(columnName, columnValue) {
+  updateColumn(columnName, columnValue) {
     let columnNameText = columnName;
     if (+columnName) columnNameText = getColumnNameForNumber(columnName);
     this.columns = { ...this.columns, [columnNameText]: columnValue };
   }
 
-  writeNamedArea(namedAreasArea, numberRow, numberColumn) {
+  updateNamedArea(namedAreasArea, numberRow, numberColumn) {
     const moveRangeDirection = {
       [RANGE_TYPE.ROW]: (range) => moveRange(range, numberRow),
       [RANGE_TYPE.COLUMN]: (range) => moveRange(range, numberColumn),
@@ -969,9 +974,15 @@ class TableDocument {
   }
 
   updateRow(rowName, rowValue) {
-    // console.log(rowValue);
     this.setRowGroup(rowName, rowValue.level || 0);
     this.rows = { ...this.rows, [rowName]: rowValue };
+  }
+
+  updateStyles(stylesArea) {
+    stylesArea.forEach((styleItem) => {
+      const styles = this.styles.find((style) => style.name === styleItem.name);
+      if (!styles) this.styles.push(styleItem);
+    });
   }
 
   setRowGroup(rowName, level) {
@@ -980,19 +991,12 @@ class TableDocument {
     const levelGroupAddingRow = level;
     if (levelGroupAddingRow > levelGroupLastRow + 1) {
       console.log('error');
-      throw new TableDocumentGroupsRowsError(
+      throw new TableDocumentGeneralError(
         'setRowGroup',
         'Уровень строки превышает уровень активной группировки',
       );
     }
     if (levelGroupAddingRow === levelGroupLastRow + 1) lastRow.isGroup = true;
-  }
-
-  writeStyles(stylesArea) {
-    stylesArea.forEach((styleItem) => {
-      const styles = this.styles.find((style) => style.name === styleItem.name);
-      if (!styles) this.styles.push(styleItem);
-    });
   }
 
   joinArea(area) {
@@ -1068,10 +1072,57 @@ class TableDocument {
     return (keyValue.presentationType === 'unit') ? { ...areaValue } : [{ ...areaValue }];
   }
 
-  setDeserializeSettings(template, settings) {
-    this.documentTemplate = getObjectOfJSON(template);
-    this.documentSettings = getObjectOfJSON(settings);
-    this.editAccess = this.documentTemplate.editAccess || undefined;
+  // setDeserializeSettings(template, settings) {
+  //   this.documentTemplate = getObjectOfJSON(template);
+  //   this.documentSettings = getObjectOfJSON(settings);
+  //   this.editAccess = this.documentTemplate.editAccess || undefined;
+  // }
+
+  setTableDocumentTemplate(template) {
+    let templateParse = null;
+    try {
+      templateParse = getObjectOfJSON(template);
+    } catch (err) {
+      throw new TableDocumentGeneralError(
+        'setTableDocumentTemplate',
+        'Ошибка парсинга шаблона',
+      );
+    }
+    const { type, version } = templateParse;
+    if (!type || type !== 'template') {
+      throw new TableDocumentGeneralError(
+        'setTableDocumentTemplate',
+        'Не определен тип, или тип не "Шаблон"',
+      );
+    }
+    this.version = version;
+    this.documentTemplate = new this.BaseClass(templateParse);
+  }
+
+  setTableDocumentSettings(settings) {
+    let settingsParse = null;
+    try {
+      settingsParse = getObjectOfJSON(settings);
+    } catch (err) {
+      throw new TableDocumentGeneralError(
+        'setTableDocumentSettings',
+        'Ошибка парсинга опций документа',
+      );
+    }
+    const { type, version, data } = settingsParse;
+    if (!type || type !== 'settings') {
+      throw new TableDocumentGeneralError(
+        'setTableDocumentTemplate',
+        'Не определен тип, или тип не "Опции"',
+      );
+    }
+    if (this.version !== version) {
+      throw new TableDocumentGeneralError(
+        'setTableDocumentTemplate',
+        `Версия шаблона отлична от версии опций: \n Версия шаблона: ${this.version} \n Версия опций: ${version}`,
+      );
+    }
+    this.documentSettings = data;
   }
 
   updateCellValue(cellName, cellValue) {

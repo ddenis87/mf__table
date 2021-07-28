@@ -89,6 +89,7 @@ export default {
           top: -100,
         },
       },
+      isTooltipTimer: null,
     };
   },
   computed: {
@@ -277,6 +278,7 @@ export default {
     },
 
     evtMouseout() {
+      clearTimeout(this.isTooltipTimer);
       if (!this.propsTooltip.isShow) return;
       this.propsTooltip = {
         text: '',
@@ -289,7 +291,7 @@ export default {
     },
 
     evtMouseover(evt) {
-      setTimeout(() => {
+      this.isTooltipTimer = setTimeout(() => {
         const titleText = evt.target.closest('.column-body')?.getAttribute('data-tooltip');
         if (titleText) {
           const targetPosition = evt.target.closest('.column-body').getBoundingClientRect();

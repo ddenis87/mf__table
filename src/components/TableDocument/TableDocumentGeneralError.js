@@ -1,6 +1,6 @@
 import TableDocumentError from './TableDocumentError';
 
-export default class TableDocumentValidationCellError extends TableDocumentError {
+export default class TableDocumentGeneralError extends TableDocumentError {
   constructor(sourceName, messages) {
     super(sourceName);
     this.messages = messages;
