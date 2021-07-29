@@ -154,12 +154,10 @@ class TableDocument {
     const formula = new Formulas(cellFormula, cellName);
     if (formula.hasOperandsInclude(cellName)) {
       this.updateCellValue(cellName, NaN);
-      // this.writeCell(cellName, NaN);
       return NaN;
     }
     const result = eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
     this.updateCellValue(cellName, result);
-    // this.writeCell(cellName, result);
     return result;
   }
 
@@ -232,7 +230,6 @@ class TableDocument {
   deserialize(data) {
     const documentData = getObjectOfJSON(data);
     const deserializeError = [];
-    // this.setDeserializeSettings(template, settings);
     this.documentSettings.forEach((setting) => {
       const [sectionKey, sectionValue] = Object.entries(setting)[0];
       if (Object.keys(sectionValue).includes('nested')) return;
@@ -244,7 +241,6 @@ class TableDocument {
           this.deserializeArea(sectionKey, sectionDataItem);
         } catch (err) {
           if (err instanceof TableDocumentGeneralError) throw err;
-          // console.log(err instanceof TableDocumentGroupsRowsError);
           deserializeError.push(...err);
         }
       });
@@ -283,100 +279,10 @@ class TableDocument {
     });
   }
 
-  // deserialize(data, template, settings) {
-  //   const documentData = getObjectOfJSON(data);
-  //   const documentTemplate = getObjectOfJSON(template);
-  //   const documentSettings = getObjectOfJSON(settings);
-  //   if (!this.documentTemplate) this.documentTemplate = documentTemplate;
-  //   if (!this.documentSettings) this.documentSettings = documentSettings;
-  //   if (!this.editAccess) this.editAccess = this.documentTemplate.editAccess || undefined;
-  //   const deserializeError = [];
-  //   documentSettings.forEach((setting) => {
-  //     const [key, keyValue] = Object.entries(setting)[0];
-  //     if (Object.keys(keyValue).includes('nested')) return;
-  //     const dataSection = documentData.find((item) => Object.keys(item).includes(key));
-  //     const dataSectionItems = dataSection[key];
-  //     if (Array.isArray(dataSectionItems)) {
-  //       dataSectionItems.forEach((dataSectionItem) => {
-  //         try {
-  //           this.deserializeArea(key, dataSectionItem);
-  //         } catch (err) {
-  //           // console.log(err);
-  //           deserializeError.push(...err);
-  //           // deserializeError.push(err.getMessage());
-  //         }
-  //       });
-  //       return;
-  //     }
-  //     try {
-  //       this.deserializeArea(key, dataSectionItems);
-  //     } catch (err) {
-  //       deserializeError.push(...err);
-  //     }
-  //   });
-  //   // if (deserializeError.length) throw new TableDocumentValidationCellError('deserialize', deserializeError);
-  //   if (deserializeError.length) throw new TableDocumentDeserializeError('deserialize', deserializeError);
-  // }
-
-  // deserializeArea(key, dataItem) {
-  //   const insertMethods = {
-  //     put: (buildData, buildArea, buildParameter) => { this.putArea(buildData, buildArea, buildParameter); },
-  //     join: (buildData, buildArea, buildParameter) => { this.joinArea(buildData, buildArea, buildParameter); },
-  //   };
-
-  //   if (Array.isArray(dataItem)) {
-  //     dataItem.forEach((item) => {
-  //       this.deserializeArea(key, item);
-  //     });
-  //     return;
-  //   }
-
-  //   const [, keyValue] = Object.entries(this.documentSettings.find((setting) => Object.keys(setting).includes(key)))[0];
-  //   const {
-  //     templateSectionName, methodName: insertMethod, parameters, nestedData,
-  //   } = keyValue;
-  //   const area = this.documentTemplate.getNamedArea(templateSectionName);
-
-  //   // try {
-  //   //   insertMethods[insertMethod](dataItem, area, parameters);
-  //   // } finally {
-  //   //   if (nestedData) {
-  //   //     nestedData.forEach((nestedDataKey) => {
-  //   //       if (Object.keys(dataItem).includes(nestedDataKey)) {
-  //   //         this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
-  //   //       }
-  //   //     });
-  //   //   }
-  //   // }
-  //   if (nestedData) {
-  //     nestedData.forEach((nestedDataKey) => {
-  //       if (Object.keys(dataItem).includes(nestedDataKey)) {
-  //         this.deserializeArea(nestedDataKey, dataItem[nestedDataKey]);
-  //       }
-  //     });
-  //   }
-  //   insertMethods[insertMethod](dataItem, area, parameters);
-  // }
-
   editingCell(cellName, cellValue) {
-    this.writeCellValue(cellName, cellValue);
+    this.updateCellValue(cellName, cellValue);
     this.recalculateFormulas();
   }
-
-  // editingCell(cellName, cellValue) { // проверять существует строка/столбец
-  //   // получать максимальный из имеющихся, сравнивать
-  //   // если пусстое значение и больше ничего нет, то удалять ячейку из набора ???
-  //   // this.valueValidate(cellValue, cellName);
-
-  //   let cellValues = (Object.keys(this.cells).includes(cellName)) ? this.cells[cellName] : {};
-  //   cellValues = { ...cellValues, ...{ value: cellValue || '' } };
-  //   if (!cellValue && !Object.keys(this.cells).includes(cellName)) return;
-
-  //   this.writeCell(cellName, cellValues);
-  //   // this.cells = { ...this.cells, ...{ [cellName]: cellValues } };
-  //   this.recalculateFormulas();
-  //   // console.log(this.cells);
-  // }
 
   executeAction(cellName) {
     const scripts = this.getCellParameter(cellName, CELL_ATTRIBUTES.SCRIPTS);
@@ -399,32 +305,13 @@ class TableDocument {
       if (!Object.keys(parameters).includes(cellParameter)) return;
       const cellValue = data[parameters[cellParameter]];
       try {
-        this.writeCellValue(cellName, cellValue);
+        this.updateCellValue(cellName, cellValue);
       } catch (err) {
         errorValidation.push(err);
       }
     });
     if (errorValidation.length) throw errorValidation;
   }
-
-  // fillArea(dataArea, parameters) {
-  //   // const validationCellError = [];
-  //   Object.entries(this.cells).forEach((cell) => {
-  //     const [, cellValue] = cell;
-  //     const parameterName = cellValue?.parameter || null;
-  //     if (!parameterName) return;
-  //     const parameterNameData = parameters[parameterName] || parameterName;
-  //     if (!parameterName || !Object.keys(dataArea).includes(parameterNameData)) return;
-  //     cellValue.value = dataArea[parameterNameData];
-  //     // try {
-  //     //   this.writeCell(cellName, cellValue);
-  //     // } catch (err) {
-  //     //   validationCellError.push(err.getMessage());
-  //     // }
-  //     // cellValue.value = dataArea[parameterNameData];
-  //   });
-  //   // if (validationCellError.length) throw validationCellError;
-  // }
 
   getAreaCopy() {
     const {
@@ -484,13 +371,6 @@ class TableDocument {
           }
         }
       }
-      // if (Object.keys(cellValueCurrent).includes('action')) {
-      //   const actionName = cellValueCurrent.action;
-      //   const script = Object.entries(this.scripts).find((scriptItem) => scriptItem[0] === actionName);
-      //   if (script) {
-      //     scripts[actionName] = this.scripts[actionName];
-      //   }
-      // }
 
       if (Object.keys(cellValueCurrent).includes('image')) {
         // console.log(this.images);
@@ -580,10 +460,6 @@ class TableDocument {
       || this.getRowType(cellRow)
       || 'string';
   }
-
-  // getCellTypeClean(cellName) {
-  //   return this.getCellType(cellName).split('.')[0];
-  // }
 
   getCellValueForFormula(cellName) { // ??? use in Formula class
     if (this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA)) return this.calculateCellValue(cellName);
@@ -923,7 +799,7 @@ class TableDocument {
 
       this.updateColumn(shiftColumn, area.getColumn(currentColumn));
       this.updateRow(shiftRow, area.getRow(currentRow));
-      this.writeCell(shiftCellName, area.getCell(currentCellName));
+      this.updateCell(shiftCellName, area.getCell(currentCellName));
     });
 
     this.updateStyles(area.getStyles());
@@ -938,17 +814,17 @@ class TableDocument {
     shiftInsert[shiftType]();
   }
 
-  writeCell(cellName, cellValue) {
+  updateCell(cellName, cellValue) {
     this.cells = { ...this.cells, [cellName]: cellValue };
   }
 
-  writeCellValue(cellName, cellValue, isErrorStop = false) {
+  updateCellValue(cellName, cellValue, isErrorStop = false) {
     const cellAttribute = this.getCell(cellName);
     try {
       this.validateCellValue(cellName, { ...cellAttribute, value: cellValue });
       cellAttribute.value = cellValue;
     } finally {
-      if (!isErrorStop) this.writeCell(cellName, cellAttribute);
+      if (!isErrorStop) this.updateCell(cellName, cellAttribute);
     }
   }
 
@@ -1005,40 +881,15 @@ class TableDocument {
     this.insertArea(numberNewColumn, numberLastRow, area);
   }
 
-  // joinArea(dataArea, area, parameters) {
-  //   const areaCopy = area.getAreaCopy();
-  //   const numberLastRow = this.getLastRow();
-  //   const numberNewColumn = this.getLastColumnInRow(numberLastRow) + 1;
-  //   // try {
-  //   areaCopy.fillArea(dataArea, parameters);
-  //   // } finally {
-  //   this.insertArea(numberNewColumn, numberLastRow, areaCopy);
-  //   // }
-  // }
-
   putArea(area) {
     const numberNewRow = this.getLastRow() + 1;
     this.insertArea(1, numberNewRow, area);
   }
 
-  // putArea(dataArea, area, parameters) {
-  //   const areaCopy = area.getAreaCopy();
-  //   const numberNewRow = this.getLastRow() + 1;
-  //   // try {
-  //   areaCopy.fillArea(dataArea, parameters);
-  //   // } finally {
-  //   this.insertArea(1, numberNewRow, areaCopy);
-  //   // }
-  // }
-
   recalculateFormulas() {
     const formulasCellsSet = this.getFormularsCellsSet();
     formulasCellsSet.map((cellName) => this.calculateCellValue(cellName));
   }
-
-  // recalculateFormulas() {
-  //   this.getFormulars.map((formula) => this.updateCellValue())
-  // }
 
   serializationDataSection(nameDataSection, settings) {
     if (!nameDataSection) {
@@ -1071,12 +922,6 @@ class TableDocument {
     }
     return (keyValue.presentationType === 'unit') ? { ...areaValue } : [{ ...areaValue }];
   }
-
-  // setDeserializeSettings(template, settings) {
-  //   this.documentTemplate = getObjectOfJSON(template);
-  //   this.documentSettings = getObjectOfJSON(settings);
-  //   this.editAccess = this.documentTemplate.editAccess || undefined;
-  // }
 
   setTableDocumentTemplate(template) {
     let templateParse = null;
@@ -1123,11 +968,6 @@ class TableDocument {
       );
     }
     this.documentSettings = data;
-  }
-
-  updateCellValue(cellName, cellValue) {
-    this.cells[cellName].value = cellValue;
-    this.writeCell(cellName, this.cells[cellName]);
   }
 
   validateCellValue(cellName, cellValue) {

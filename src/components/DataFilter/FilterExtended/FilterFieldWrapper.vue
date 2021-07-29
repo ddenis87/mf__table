@@ -88,6 +88,7 @@ export default {
   },
   watch: {
     fieldValueInput() {
+      this.fieldValue = this.fieldValueInput;
       // console.log(this.fieldValueInput);
     },
   },

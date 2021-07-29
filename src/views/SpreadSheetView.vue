@@ -292,6 +292,7 @@ export default {
       this.$refs.SpreadSheet.newDocument();
       await this.$nextTick();
       this.tableDocument = new TableDocument();
+      this.tableDocumentPrepare = new TableDocument();
       this.isGrid = true;
 
       this.isFileTemplateDisabled = false;
@@ -346,6 +347,7 @@ export default {
         if (err instanceof TableDocumentGeneralError) {
           this.showDialogMessage(err.getMessagesText());
         }
+        console.log(err);
       } finally {
         this.tableDocument = this.tableDocumentPrepare;
         this.tableDocument.recalculateFormulas();
