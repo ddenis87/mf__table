@@ -16,7 +16,9 @@ import FieldNumber from '@/components/Form/Field/FieldNumber.vue';
 import FieldNumberRange from '@/components/Form/Field/FieldNumberRange.vue';
 import FieldChoice from '@/components/Form/Field/FieldChoice.vue';
 import FieldDate from '@/components/Form/Field/FieldDate.vue';
+import FieldDateRange from '@/components/Form/Field/FieldDateRange.vue';
 import FieldDateTime from '@/components/Form/Field/FieldDateTime.vue';
+import FieldDateTimeRange from '@/components/Form/Field/FieldDateTimeRange.vue';
 import FieldDialog from '@/components/Form/Field/FieldDialog.vue';
 import FieldCompare from '@/components/Form/Field/FieldCompare.vue';
 
@@ -30,7 +32,9 @@ export default {
     FieldNumberRange,
     FieldChoice,
     FieldDate,
+    FieldDateRange,
     FieldDateTime,
+    FieldDateTimeRange,
     FieldDialog,
     FieldCompare,
   },
@@ -58,7 +62,9 @@ export default {
         compare: FieldCompare,
         choice: FieldChoice,
         date: FieldDate,
+        dateRange: FieldDateRange,
         datetime: FieldDateTime,
+        datetimeRange: FieldDateTimeRange,
         field: FieldDialog,
       },
     };
@@ -89,7 +95,6 @@ export default {
   watch: {
     fieldValueInput() {
       this.fieldValue = this.fieldValueInput;
-      // console.log(this.fieldValueInput);
     },
   },
   mounted() {
@@ -104,7 +109,7 @@ export default {
       this.$emit('keydown:control', evt);
     },
     evtBlur() {
-      this.evtInput();
+      // this.evtInput();
     },
   },
 };

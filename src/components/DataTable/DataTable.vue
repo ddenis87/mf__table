@@ -79,7 +79,7 @@
       </slot>
     </div>
     <div class="data-table__dialog-modal">
-      <data-table-empty-data :is-show="isShowDialogEmpty" @close-dialog="closeEmptyDialog"></data-table-empty-data>
+      <!-- <data-table-empty-data :is-show="isShowDialogEmpty" @close-dialog="closeEmptyDialog"></data-table-empty-data> -->
     </div>
   </div>
 </template>

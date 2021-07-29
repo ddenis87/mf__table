@@ -13,6 +13,14 @@
       <btn-form height="24" @click="evtFilterReset">Сбросить все</btn-form>
       <btn-form height="24" @click="evtFilterAccept">Применить</btn-form>
     </div>
+    <dialog-modal :is-dialog-show="isDataTotalCountNull"
+                  :is-control="true"
+                  :is-accept="{ isShow: true, text: 'Отключить' }"
+                  :is-cancel="{ isShow: true, text: 'Отменить' }"
+                  @dialog:cancel="evtDialogCancel"
+                  @dialog:accept="evtDialogFilterOff">
+      По заданным условиям записи отсутствуют, отключить фильтры?
+    </dialog-modal>
   </div>
 </template>
 
@@ -20,11 +28,16 @@
 import api from '@/api/DataTable';
 
 import BtnForm from '@/components/Form/Btn/BtnForm.vue';
+import DialogModal from '@/components/Dialogs/DialogModal.vue';
 import FilterExtendedItem from './FilterExtendedItem.vue';
 
 export default {
   name: 'FilterExtended',
-  components: { FilterExtendedItem, BtnForm },
+  components: {
+    BtnForm,
+    DialogModal,
+    FilterExtendedItem,
+  },
   props: {
     excludedFields: { type: Array, default() { return ['id', 'is_deleted', 'is_group', 'parent', 'related']; } },
     guid: { type: String, default: null },
@@ -34,9 +47,17 @@ export default {
   data() {
     return {
       fieldsValue: {},
+      isShowDialog: false,
     };
   },
   computed: {
+    isDataTotalCountNull() {
+      const dataCount = api.getDataTotalCount(this.getSendOptions());
+      const filterExtend = api.getFilterExtend(this.getSendOptions());
+      if (!this.isShowDialog) return false;
+      return !!(dataCount === 0 && filterExtend);
+    },
+
     listFields() {
       const listFields = [];
       const listOptions = api.getListOptions(this.sourceName);
@@ -60,12 +81,27 @@ export default {
     },
   },
   methods: {
+    evtDialogCancel() {
+      console.log('close');
+      this.isShowDialog = false;
+    },
+
+    evtDialogFilterOff() {
+      api.resetFilterExtend(this.getSendOptions(true));
+      this.isShowDialog = false;
+      this.$emit('accept');
+      this.$refs.FilterField.map((field) => field.filterExtendedItemOff());
+    },
+
     evtFilterAccept() {
       api.setFilterExtend(this.getSendOptions());
+      this.isShowDialog = true;
       this.$emit('accept');
     },
+
     evtFilterReset() {
       api.resetFilterExtend(this.getSendOptions(true));
+      this.isShowDialog = false;
       this.$emit('accept');
       this.$refs.FilterField.map((field) => field.filterExtendedItemReset());
     },
@@ -82,11 +118,11 @@ export default {
     },
 
     getFilterString() {
-      let fieldsValue = '';
+      let fieldsValuesString = '';
       Object.values(this.fieldsValue).forEach((fieldValue) => {
-        if (fieldValue) fieldsValue += fieldValue;
+        if (fieldValue) fieldsValuesString += fieldValue;
       });
-      return fieldsValue;
+      return fieldsValuesString;
     },
 
     getSendOptions(reset = false) {

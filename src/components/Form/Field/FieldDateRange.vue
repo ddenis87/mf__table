@@ -1,28 +1,28 @@
 <template>
   <div class="field-range">
-    <field-number ref="fieldFrom"
-                  v-bind="fieldFrom"
-                  v-model="fieldValueFrom"
-                  @input="evtInput"
-                  @keydown:control="evtKeydownControl"></field-number>
-    <field-number ref="fieldTo"
-                  v-bind="fieldTo"
-                  v-model="fieldValueTo"
-                  @input="evtInput"
-                  @keydown:control="evtKeydownControl"></field-number>
+    <field-date ref="fieldFrom"
+                v-bind="fieldFrom"
+                v-model="fieldValueFrom"
+                @input="evtInput"
+                @keydown:control="evtKeydownControl"></field-date>
+    <field-date ref="fieldTo"
+                v-bind="fieldTo"
+                v-model="fieldValueTo"
+                @input="evtInput"
+                @keydown:control="evtKeydownControl"></field-date>
   </div>
 </template>
 
 <script>
-import FieldNumber from './FieldNumber.vue';
+import FieldDate from './FieldDate.vue';
 
 import fieldModel from './FieldModel';
 import fieldProps from './FieldProps';
 
 export default {
-  name: 'FieldNumberRange',
+  name: 'FieldDateRange',
   components: {
-    FieldNumber,
+    FieldDate,
   },
   model: {
     ...fieldModel,

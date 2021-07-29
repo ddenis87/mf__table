@@ -55,11 +55,6 @@ export default {
     },
   },
   methods: {
-    evtToggleFilter() {
-      if (this.isFilterOn) this.evtInput();
-      if (!this.isFilterOn) this.$emit('input:field', null);
-    },
-
     evtInput() {
       const compare = this.getCompareKey();
       if (this.valueCompare === 'between') this.fieldMode = FIELD_MODE.RANGE;
@@ -99,6 +94,23 @@ export default {
       }
     },
 
+    evtToggleFilter() {
+      if (this.isFilterOn) this.evtInput();
+      if (!this.isFilterOn) this.$emit('input:field', null);
+    },
+
+    filterExtendedItemOff() {
+      this.isFilterOn = false;
+      this.$emit('input:field', null);
+    },
+
+    filterExtendedItemReset() {
+      this.valueField = null;
+      this.isFilterOn = false;
+      this.fieldMode = FIELD_MODE.SINGLE;
+      this.$emit('input:field', null);
+    },
+
     getCompareKey() {
       const { key } = this.fieldOptions;
       const compareKey = {
@@ -123,13 +135,6 @@ export default {
         field: (v) => v.id,
       };
       return valueType[this.fieldOptions.value.type](value);
-    },
-
-    filterExtendedItemReset() {
-      this.valueField = null;
-      this.isFilterOn = false;
-      this.fieldMode = FIELD_MODE.SINGLE;
-      this.$emit('input:field', null);
     },
   },
 };

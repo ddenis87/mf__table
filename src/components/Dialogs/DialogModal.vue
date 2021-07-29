@@ -7,7 +7,6 @@
             :width="width"
             v-model="isDialogShow"
             max-width="800">
-
     <v-card calss="dialog-modal__body">
       <dialog-toolbar class="dm__header"
                       :is-dialog-name="isDialogName"
