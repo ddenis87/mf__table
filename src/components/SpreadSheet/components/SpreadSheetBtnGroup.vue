@@ -1,16 +1,14 @@
 <template>
-  <v-btn class="action-btn"
+  <div class="spread-sheet-btn-group">
+    <v-btn class="action-btn"
          icon
          width="16"
          height="16"
          :disabled="isDisabled"
          @click="(event) => $emit('click', event)">
-    <!-- <slot name="text"></slot> -->
     <slot></slot>
-    <!-- <v-icon small :color="iconColor">
-      <slot></slot>
-    </v-icon> -->
   </v-btn>
+  </div>
 </template>
 
 <script>
@@ -24,8 +22,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.action-btn {
-  font-size: 1em;
-  // color: red;
+.spread-sheet-btn-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 18px;
+  height: 18px;
+  border: thin solid black;
+  overflow: hidden;
+  .action-btn {
+    font-size: 1em;
+  }
 }
 </style>

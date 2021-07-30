@@ -54,7 +54,7 @@
                            @keydown:cell="evtKeydownCell"
                            @buffer:copy="evtBufferCopy"
                            @buffer:paste="evtBufferPaste"
-                           @toggle-row-group="toggleRowGroup"
+                           @open-group:row="toggleRowGroup"
                            @scroll-body-x="scrollBodyX"></spread-sheet-body>
       </div>
     </div>
@@ -351,20 +351,43 @@ export default {
       this.setOpenGroupColumns = [...openGroup];
     },
 
+    // evtOpenGroupRow(level) {
+    //   if (level === 1) {
+    //     this.setOpenGroupRows = [];
+    //     return;
+    //   }
+    //   const openGroup = [];
+    //   this.prepareRows.forEach((row, rowIndex) => {
+    //     if (row.level >= level) return;
+    //     if (!this.prepareRows[rowIndex - 1]) return;
+    //     if (Object.keys(this.prepareRows[rowIndex - 1]).includes('isGroup')) {
+    //       openGroup.push(this.prepareRows[rowIndex - 1].value);
+    //     }
+    //   });
+    //   this.setOpenGroupRows = [...openGroup];
+    // },
     evtOpenGroupRow(level) {
-      if (level === 1) {
-        this.setOpenGroupRows = [];
-        return;
-      }
-      const openGroup = [];
-      this.prepareRows.forEach((row, rowIndex) => {
-        if (row.level >= level) return;
-        if (!this.prepareRows[rowIndex - 1]) return;
-        if (Object.keys(this.prepareRows[rowIndex - 1]).includes('isGroup')) {
-          openGroup.push(this.prepareRows[rowIndex - 1].value);
+      // const openGroup = [];
+      this.prepareRows.forEach((row) => {
+        // if (!this.prepareRows[rowIndex - 1]) return;
+        if (Object.keys(row).includes('isGroup') && row.level >= level - 1) {
+          this.toggleRowGroup(row.value);
         }
       });
-      this.setOpenGroupRows = [...openGroup];
+      console.log(level);
+      // if (level === 1) {
+      //   this.setOpenGroupRows = [];
+      //   return;
+      // }
+      // const openGroup = [];
+      // this.prepareRows.forEach((row, rowIndex) => {
+      //   if (row.level >= level) return;
+      //   if (!this.prepareRows[rowIndex - 1]) return;
+      //   if (Object.keys(this.prepareRows[rowIndex - 1]).includes('isGroup')) {
+      //     openGroup.push(this.prepareRows[rowIndex - 1].value);
+      //   }
+      // });
+      // this.setOpenGroupRows = [...openGroup];
     },
 
     scrollBodyX(scrollLeft) {

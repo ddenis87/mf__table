@@ -1,7 +1,7 @@
 const CELL_HEIGHT = 22;
 const CELL_WIDTH = 94;
 const CELL_WIDTH_LEFT_TITLE = 60;
-const CELL_WIDTH_LEFT_GROUP = 22;
+const CELL_WIDTH_LEFT_GROUP = 20;
 const CELL_TYPE_DEFAULT = 'string';
 
 export {

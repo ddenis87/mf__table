@@ -4,10 +4,10 @@
        :style="gridRow">
     <template v-if="isShowGroup">
       <div v-for="(level, levelIndex) in maxRowGroupingLevel"
-           class="column column-group"
-           :key="levelIndex"
-           :class="getGroupClass(level)"
-           :style="getGroupStyle(level)">
+          class="column column-group"
+          :key="levelIndex"
+          :class="getGroupClass(level)"
+          :style="getGroupStyle(level)">
         <spread-sheet-btn-group v-if="isGroup(level)"
                                 :data-row-name="rowName">
           <v-icon small color="black">
@@ -83,7 +83,7 @@ export default {
   computed: {
     btnGroup() {
       return (this.setOpenGroupRows.includes(this.rowName))
-        ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline';
+        ? 'mdi-minus' : 'mdi-plus';
     },
 
     gridRow() {
@@ -95,7 +95,7 @@ export default {
     },
 
     shiftTitle() {
-      return { left: `${CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel}px` };
+      return { left: `${(CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel)}px` };
     },
 
     templateColumnTitle() {
@@ -224,7 +224,7 @@ export default {
 
     getGroupStyle(level) {
       const groupStyle = {
-        left: `${CELL_WIDTH_LEFT_GROUP * (+level - 1)}px`,
+        left: `${(CELL_WIDTH_LEFT_GROUP * (+level - 1))}px`,
       };
       if (!this.isShowTitle
         && this.maxRowGroupingLevel === level) groupStyle['border-right'] = 'thin solid grey';
@@ -268,16 +268,20 @@ export default {
     }
 
     &-group {
-      padding-top: 2px;
+      // padding-top: 2px;
+      // padding-left: 0px;
       display: flex;
-      justify-content: center;
+      justify-content: flex-end;
       align-items: center;
       left: 0px;
-      width: 22px;
+      width: 100%;
+      height: 100%;
       background-color: $backgroundColorTitle;
+      // border: thin solid black;
       z-index: 500;
       &:first-child {
-        box-shadow:  inset 1px 0px 0px grey;
+        // box-shadow: inset 1px 0px 0px grey;
+        border-left: thin solid  grey;
       }
       &::after {
         position: absolute;
@@ -383,8 +387,10 @@ export default {
     &::before {
       content: '';
       position: absolute;
-      top: calc(50% + 6px);
-      height: 50%;
+      // left: 10px;
+      width: 9.5px;
+      top: calc(50% + 9px);
+      height: 100%;
       border-left: 1px solid #3F3F3F;
     }
   }
@@ -392,8 +398,9 @@ export default {
     &::before {
       content: '';
       position: absolute;
-      top: 0px;
-      width: 1px;
+      // top: 0px;
+
+      width: 9.5px;
       height: 100%;
       border-left: 1px solid #3F3F3F;
     }
@@ -402,12 +409,12 @@ export default {
     &::before {
       content: '';
       position: absolute;
-      left: 10.5px;
+      // left: 10px;
       bottom: -1px;
       top: 0px;
-      width: 8px;
+      width: 9.5px;
       height: 100%;
-      border-left: 1px solid #3F3F3F;
+      // border-left: 1px solid #3F3F3F;
       border-bottom: 1px solid #3F3F3F;
       background-color: unset;
       z-index: 9999;

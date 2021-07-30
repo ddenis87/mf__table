@@ -224,7 +224,7 @@ export default {
   methods: {
     evtClickBody(evt) {
       if (evt.target.closest('button')) {
-        const rowName = evt.target.closest('button').getAttribute('data-row-name');
+        const rowName = evt.target.closest('button').parentElement.getAttribute('data-row-name');
         this.toggleRowGroup(+rowName);
       }
     },
@@ -519,7 +519,7 @@ export default {
     },
 
     toggleRowGroup(rowName) {
-      this.$emit('toggle-row-group', rowName);
+      this.$emit('open-group:row', rowName);
     },
 
     shiftBodyScrollDown(currentCell) {

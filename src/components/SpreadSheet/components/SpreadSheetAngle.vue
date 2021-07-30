@@ -25,6 +25,10 @@
 </template>
 
 <script>
+import {
+  CELL_WIDTH_LEFT_GROUP,
+  CELL_WIDTH_LEFT_TITLE,
+} from '../SpreadSheetConst';
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
 export default {
@@ -38,6 +42,14 @@ export default {
     isShowTitle: { type: Boolean, default: true },
   },
   computed: {
+    groupRowStyle() {
+      const rowStyle = {
+        'grid-template-columns': `repeat(${this.maxRowGroupingLevel}, minmax(${CELL_WIDTH_LEFT_GROUP}px,${CELL_WIDTH_LEFT_GROUP}px)`,
+      };
+      if (this.isShowTitle) rowStyle['grid-column'] += ` ${CELL_WIDTH_LEFT_TITLE}px`;
+      console.log(rowStyle);
+      return rowStyle;
+    },
   },
   methods: {
     evtClickGroupColumn(evt) {
@@ -58,7 +70,7 @@ export default {
 .angle {
   display: grid;
   grid-template-areas: "lt group-columns"
-                       "group-rows rb";
+                       "group-rows group-rows";
   grid-template-columns: 1fr 60px;
   grid-template-rows: 1fr 22px;
   height: 100%;
@@ -68,29 +80,32 @@ export default {
     display: none;
   }
   .group {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
+    gap: 0px;
     align-items: flex-end;
-
     &__columns {
+      display: flex;
       grid-area: group-columns;
       flex-direction: column;
       padding-right: 2px;
     }
 
     &__rows {
+      // padding-bottom: 1px;
+      // margin-left: -1px;
+      // gap: 1px;
       grid-area: group-rows;
-      flex-direction: row;
-      padding-bottom: 2px;
-      align-items: center;
+      display: grid;
+      grid-row: 22px;
+      grid-template-columns: repeat(4, 20px);
+      justify-items: center;
     }
 
     &__item {
+      display: flex;
+      justify-content: center;
       align-items: center;
-      width: 16px;
-      height: 16px;
-      border: thin solid grey;
+      width: 20px;
+      height: 20px;
     }
   }
   .btn_text {
