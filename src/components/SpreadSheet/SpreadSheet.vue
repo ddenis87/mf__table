@@ -564,6 +564,7 @@ export default {
     //   // .sheet__head { display: none; }
     // }
     &__angle {
+      padding-left: 1px;
       grid-area: angle;
       border: thin solid grey;
       background-color: $backgroundColorTitle;
@@ -575,7 +576,9 @@ export default {
       box-sizing: border-box;
     }
     &__body {
+      // padding-left: 1px;
       grid-area: body;
+      border-left: thin solid grey;
     }
   }
 }

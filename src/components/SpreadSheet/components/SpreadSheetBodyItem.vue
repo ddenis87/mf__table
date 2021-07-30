@@ -279,10 +279,10 @@ export default {
       background-color: $backgroundColorTitle;
       // border: thin solid black;
       z-index: 500;
-      &:first-child {
-        // box-shadow: inset 1px 0px 0px grey;
-        border-left: thin solid  grey;
-      }
+      // &:first-child {
+      //   // box-shadow: inset 1px 0px 0px grey;
+      //   // border-left: thin solid  grey;
+      // }
       &::after {
         position: absolute;
         content: '';
@@ -391,7 +391,7 @@ export default {
       width: 9.5px;
       top: calc(50% + 9px);
       height: 100%;
-      border-left: 1px solid #3F3F3F;
+      border-left: 1px solid grey;
     }
   }
   .line {
@@ -402,7 +402,7 @@ export default {
 
       width: 9.5px;
       height: 100%;
-      border-left: 1px solid #3F3F3F;
+      border-left: 1px solid grey;
     }
   }
   .line-end {
@@ -415,7 +415,7 @@ export default {
       width: 9.5px;
       height: 100%;
       // border-left: 1px solid #3F3F3F;
-      border-bottom: 1px solid #3F3F3F;
+      border-bottom: 1px solid grey;
       background-color: unset;
       z-index: 9999;
     }

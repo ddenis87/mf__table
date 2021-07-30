@@ -28,7 +28,7 @@ export default {
   align-items: center;
   width: 18px;
   height: 18px;
-  border: thin solid black;
+  border: thin solid grey;
   overflow: hidden;
   .action-btn {
     font-size: 1em;
