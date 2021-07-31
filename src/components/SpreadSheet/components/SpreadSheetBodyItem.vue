@@ -95,15 +95,16 @@ export default {
     },
 
     shiftTitle() {
-      return { left: `${(CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel)}px` };
+      return { left: `${(CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel) + 4}px` };
     },
 
     templateColumnTitle() {
       let tempalteColumnTitle = `${this.templateColumnWidth}`;
       if (this.isShowTitle) tempalteColumnTitle = `${CELL_WIDTH_LEFT_TITLE}px ${tempalteColumnTitle}`;
       if (this.maxRowGroupingLevel !== 0) {
-        tempalteColumnTitle = `repeat(${this.maxRowGroupingLevel},
+        tempalteColumnTitle = `repeat(${this.maxRowGroupingLevel - 1},
                                minmax(${CELL_WIDTH_LEFT_GROUP}px, ${CELL_WIDTH_LEFT_GROUP}px))
+                               ${CELL_WIDTH_LEFT_GROUP + 4}px
                                ${tempalteColumnTitle}`;
       }
       // let tempalteColumnTitle = `${CELL_WIDTH_LEFT_TITLE}px ${this.templateColumnWidth}`;
@@ -388,8 +389,8 @@ export default {
       content: '';
       position: absolute;
       // left: 10px;
-      width: 9.5px;
-      top: calc(50% + 9px);
+      width: 9px;
+      top: calc(50% + 8px);
       height: 100%;
       border-left: 1px solid grey;
     }
@@ -400,7 +401,7 @@ export default {
       position: absolute;
       // top: 0px;
 
-      width: 9.5px;
+      width: 9px;
       height: 100%;
       border-left: 1px solid grey;
     }
@@ -412,7 +413,7 @@ export default {
       // left: 10px;
       bottom: -1px;
       top: 0px;
-      width: 9.5px;
+      width: 9px;
       height: 100%;
       // border-left: 1px solid #3F3F3F;
       border-bottom: 1px solid grey;

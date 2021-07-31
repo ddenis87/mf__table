@@ -131,7 +131,13 @@ export default {
       return [
         this.heightVirtualList,
         this.widthVirtualList,
-        { 'overflow-y': 'auto', position: 'relative' },
+        {
+          'overflow-y': 'auto',
+          position: 'relative',
+          // 'padding-left': '2px',
+          // 'background-color': 'rgb(240, 240, 240)',
+          // left: '0px',
+        },
       ];
     },
 

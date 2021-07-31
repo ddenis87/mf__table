@@ -11,7 +11,8 @@
         </spread-sheet-btn-group>
       </div>
     </div>
-    <div class="group group__rows">
+    <div class="group group__rows"
+         :style="groupRowStyle">
       <div v-for="levelRow in maxRowGroupingLevel"
            class="group group__item"
            :key="levelRow"
@@ -20,6 +21,7 @@
           <span class="btn_text">{{ levelRow }}</span>
         </spread-sheet-btn-group>
       </div>
+      <div class="group group__angle"></div>
     </div>
   </div>
 </template>
@@ -44,9 +46,9 @@ export default {
   computed: {
     groupRowStyle() {
       const rowStyle = {
-        'grid-template-columns': `repeat(${this.maxRowGroupingLevel}, minmax(${CELL_WIDTH_LEFT_GROUP}px,${CELL_WIDTH_LEFT_GROUP}px)`,
+        'grid-template-columns': `repeat(${this.maxRowGroupingLevel}, minmax(${CELL_WIDTH_LEFT_GROUP}px,${CELL_WIDTH_LEFT_GROUP}px))`,
       };
-      if (this.isShowTitle) rowStyle['grid-column'] += ` ${CELL_WIDTH_LEFT_TITLE}px`;
+      if (this.isShowTitle) rowStyle['grid-template-columns'] += ` ${CELL_WIDTH_LEFT_TITLE}px`;
       console.log(rowStyle);
       return rowStyle;
     },
@@ -86,7 +88,7 @@ export default {
       display: flex;
       grid-area: group-columns;
       flex-direction: column;
-      padding-right: 2px;
+      // padding-right: 1px;
     }
 
     &__rows {
@@ -96,7 +98,7 @@ export default {
       grid-area: group-rows;
       display: grid;
       grid-row: 22px;
-      grid-template-columns: repeat(4, 20px);
+      // grid-template-columns: repeat(4, 20px);
       justify-items: center;
     }
 
@@ -106,6 +108,26 @@ export default {
       align-items: center;
       width: 20px;
       height: 20px;
+    }
+    &__angle {
+      position: relative;
+      padding-top: 1px;
+      padding-left: 1px;
+      width: 100%;
+      height: 100%;
+      // border-top: thin solid grey;
+      // border-left: thin solid grey;
+      // box-shadow: 1px 0px 0px grey;
+      &::after {
+        position: absolute;
+        content: '';
+        left: 2px;
+        top: 1px;
+        width: 100%;
+        height: 100%;
+        border-top: thin solid grey;
+        border-left: thin solid grey;
+      }
     }
   }
   .btn_text {

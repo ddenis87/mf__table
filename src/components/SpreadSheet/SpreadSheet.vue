@@ -265,7 +265,7 @@ export default {
     },
 
     templateSheet() {
-      let shiftTop = (CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel); // + CELL_WIDTH_LEFT_TITLE;
+      let shiftTop = (CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel) + 5; // + CELL_WIDTH_LEFT_TITLE;
       let shiftLeft = CELL_HEIGHT * this.maxColumnGroupingLevel; // + (this.isTitle) ? CELL_HEIGHT : 0;
       if (this.isTitle) {
         shiftTop += CELL_WIDTH_LEFT_TITLE;
@@ -367,27 +367,14 @@ export default {
     //   this.setOpenGroupRows = [...openGroup];
     // },
     evtOpenGroupRow(level) {
-      // const openGroup = [];
+      const openGroup = [];
       this.prepareRows.forEach((row) => {
-        // if (!this.prepareRows[rowIndex - 1]) return;
-        if (Object.keys(row).includes('isGroup') && row.level >= level - 1) {
-          this.toggleRowGroup(row.value);
+        if (Object.keys(row).includes('isGroup') && row.level === level - 1) {
+          openGroup.push(row.value);
+          // this.toggleRowGroup(row.value);
         }
       });
-      console.log(level);
-      // if (level === 1) {
-      //   this.setOpenGroupRows = [];
-      //   return;
-      // }
-      // const openGroup = [];
-      // this.prepareRows.forEach((row, rowIndex) => {
-      //   if (row.level >= level) return;
-      //   if (!this.prepareRows[rowIndex - 1]) return;
-      //   if (Object.keys(this.prepareRows[rowIndex - 1]).includes('isGroup')) {
-      //     openGroup.push(this.prepareRows[rowIndex - 1].value);
-      //   }
-      // });
-      // this.setOpenGroupRows = [...openGroup];
+      console.log(openGroup);
     },
 
     scrollBodyX(scrollLeft) {
@@ -564,7 +551,7 @@ export default {
     //   // .sheet__head { display: none; }
     // }
     &__angle {
-      padding-left: 1px;
+      padding-left: 2px;
       grid-area: angle;
       border: thin solid grey;
       background-color: $backgroundColorTitle;
