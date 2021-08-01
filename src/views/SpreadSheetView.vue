@@ -105,8 +105,8 @@
                             @editing:cancel="cancelEditingCell"></spread-sheet-editing>
       <spread-sheet ref="SpreadSheet"
                     v-bind="tableDocument"
-                    :is-grid="isGrid"
-                    :is-title="isTitle"
+                    :is-show-grid="isGrid"
+                    :is-show-title="isTitle"
                     @click:cell="evtClickCell"
                     @dblclick:cell="evtDblClickCell"
                     @keydown:cell="evtKeydownCell"

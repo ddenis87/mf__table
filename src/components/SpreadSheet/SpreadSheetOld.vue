@@ -1,91 +1,106 @@
 <template>
-  <table-layout padding="4px 4px 4px 4px">
-    <div class="spread-sheet"
-         :style="spreadSheetStyle">
-      <spread-sheet-angle :max-column-grouping-level="maxColumnGroupingLevel"
-                          :max-row-grouping-level="maxRowGroupingLevel"
-                          :is-show-title="isShowTitle"
-                          @open-group:column="evtOpenGroupColumn"
-                          @open-group:row="evtOpenGroupRow"></spread-sheet-angle>
-      <spread-sheet-head ref="SheetHead"
-                         :columns="tableColumns"
-                         :template-column-width="templateColumnWidth"
-                         :table-width="tableWidth"
-                         :max-column-grouping-level="maxColumnGroupingLevel"
-                         :set-open-group-columns="setOpenGroupColumns"
-                         :is-show-title="isShowTitle"
-                         @toggle-group:column="toggleColumnGroup"></spread-sheet-head>
-
-      <spread-sheet-body ref="SpreadSheetBody"
-                         :rows="tableRows"
-                         :columns="tableColumns"
-                         :cells="tableCells"
-                         :representations="representations"
-                         :images="images"
-                         :template-column-width="templateColumnWidth"
-                         :max-row-grouping-level="maxRowGroupingLevel"
-                         :max-column-grouping-level="maxColumnGroupingLevel"
-                         :set-excluded-cells="setExcludedCells"
-                         :table-width="tableWidth"
-                         :set-open-group-rows="setOpenGroupRows"
-                         :is-show-grid="isShowGrid"
-                         :is-show-title="isShowTitle"
-                         @click:cell="evtClickCell"
-                         @dblclick:cell="evtDblclickCell"
-                         @keydown:cell="evtKeydownCell"
-                         @buffer:copy="evtBufferCopy"
-                         @buffer:paste="evtBufferPaste"
-                         @open-group:row="toggleRowGroup"
-                         @scroll-body-x="scrollBodyX"></spread-sheet-body>
+  <div :class="{
+    'spread-sheet': !isPrintMode,
+    'spread-sheet-print': isPrintMode,
+  }">
+    <div class="sheet"
+         :style="templateSheet">
+      <div class="sheet__angle">
+        <spread-sheet-angle v-show="isTitle"
+                            :max-column-grouping-level="maxColumnGroupingLevel"
+                            :max-row-grouping-level="maxRowGroupingLevel"
+                            @open-group:column="evtOpenGroupColumn"
+                            @open-group:row="evtOpenGroupRow"></spread-sheet-angle>
+      </div>
+      <div class="sheet__head">
+        <spread-sheet-head ref="SheetHead"
+                           v-if="!isPrintMode"
+                           :columns="tableColumns"
+                           :template-column-width="templateColumnWidth"
+                           :template-table-width="templateTableWidth"
+                           :max-column-grouping-level="maxColumnGroupingLevel"
+                           :set-open-group-columns="setOpenGroupColumns"
+                           :is-show-title="isTitle"
+                           @toggle-group:column="toggleColumnGroup"></spread-sheet-head>
+      </div>
+      <div class="sheet__body">
+        <spread-sheet-body-print v-if="isPrintMode"
+                                  :rows="tableRows"
+                                  :columns="tableColumns"
+                                  :cells="tableCells"
+                                  :templateTableWidth="templateTableWidth"
+                                  :templateColumnWidth="templateColumnWidth"
+                                  :maxLevelGroupRow="maxRowGroupingLevel"
+                                  :setExcludedCells="setExcludedCells"
+                                  :print-mode="isPrintMode"></spread-sheet-body-print>
+        <spread-sheet-body v-show="!isPrintMode"
+                           ref="SpreadSheetBody"
+                           :rows="tableRows"
+                           :rows-fixed="tableRowsFixed"
+                           :columns="tableColumns"
+                           :cells="tableCells"
+                           :representations="representations"
+                           :images="images"
+                           :template-column-width="templateColumnWidth"
+                           :max-row-grouping-level="maxRowGroupingLevel"
+                           :max-column-grouping-level="maxColumnGroupingLevel"
+                           :set-excluded-cells="setExcludedCells"
+                           :template-table-width="templateTableWidth"
+                           :set-open-group-rows="setOpenGroupRows"
+                           :is-show-grid="isGrid"
+                           :is-show-title="isTitle"
+                           @click:cell="evtClickCell"
+                           @dblclick:cell="evtDblclickCell"
+                           @keydown:cell="evtKeydownCell"
+                           @buffer:copy="evtBufferCopy"
+                           @buffer:paste="evtBufferPaste"
+                           @open-group:row="toggleRowGroup"
+                           @scroll-body-x="scrollBodyX"></spread-sheet-body>
+      </div>
     </div>
-  </table-layout>
+  </div>
 </template>
 
 <script>
-import {
-  getColumnNameForNumber,
-  getColumnNumberForName,
-  getParseAtSymbolDigit,
-} from '@/helpers/spreadSheet';
-
-import TableLayout from '../TableLayout.vue';
-import SpreadSheetAngle from './component/SpreadSheetAngle.vue';
-import SpreadSheetHead from './component/SpreadSheetHead.vue';
-import SpreadSheetBody from './component/SpreadSheetBody.vue';
+import SpreadSheetAngle from './components/SpreadSheetAngle.vue';
+import SpreadSheetHead from './components/SpreadSheetHead.vue';
+import SpreadSheetBody from './components/SpreadSheetBody.vue';
+import SpreadSheetBodyPrint from './components/SpreadSheetBodyPrint.vue';
 
 import {
-  CELL_WIDTH_TITLE,
-  CELL_WIDTH_GROUP,
-  CELL_WIDTH_BODY,
-  CELL_HEIGHT_TITLE,
-  CELL_HEIGHT_GROUP,
-  CELL_HEIGHT_BODY,
+  CELL_HEIGHT,
+  CELL_WIDTH,
+  CELL_WIDTH_LEFT_TITLE,
+  CELL_WIDTH_LEFT_GROUP,
+  // CELL_TYPE_DEFAULT,
 } from './SpreadSheetConst';
 
 export default {
   name: 'SpreadSheet',
   components: {
-    TableLayout,
     SpreadSheetAngle,
     SpreadSheetHead,
     SpreadSheetBody,
+    SpreadSheetBodyPrint,
   },
   props: {
-    cells: { type: Object, default() { return {}; } },
-    cellHeight: { type: Number, default: CELL_HEIGHT_BODY },
-    cellWidth: { type: Number, default: CELL_WIDTH_BODY },
-    columnCount: { type: Number, default: 50 },
-    columns: { type: Object, default() { return {}; } },
-    rowCount: { type: Number, default: 1000 },
     rows: { type: Object, default() { return {}; } },
+    rowCount: { type: Number, default: 1000 },
+    columns: { type: Object, default() { return {}; } },
+    columnCount: { type: Number, default: 50 },
+    cells: { type: Object, default() { return {}; } },
     representations: { type: Map, default() { return new Map(); } },
     styles: { type: Array, default() { return []; } },
     images: { type: Object, default() { return {}; } },
-    isShowGrid: { type: Boolean, default: true },
-    isShowTitle: { type: Boolean, default: true },
+    cellWidth: { type: Number, default: CELL_WIDTH },
+    cellHeight: { type: Number, default: CELL_HEIGHT },
+    isPrintMode: { type: Boolean, default: false },
+    isGrid: { type: Boolean, default: true },
+    isTitle: { type: Boolean, default: true },
   },
   data() {
     return {
+      setColumnName: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       setOpenGroupColumns: [],
       setOpenGroupRows: [],
       setExcludedCells: {},
@@ -115,7 +130,7 @@ export default {
       const prepareCells = {};
       Object.entries(this.cells).forEach((item) => {
         const [cellName, cellValue] = item;
-        const { parthSymbol: cellNameColumn, parthDigit: cellNameRow } = getParseAtSymbolDigit(cellName);
+        const { cellNameColumn, cellNameRow } = this.parseCellName(cellName);
         const cellValueKeys = Object.keys(cellValue);
 
         prepareCells[cellName] = { ...cellValue };
@@ -124,7 +139,7 @@ export default {
           colspan = cellValue.colspan;
           this.setExcludedCells[cellName] = [];
           for (let i = 1; i < colspan; i += 1) {
-            const columnNameNext = getColumnNameForNumber(getColumnNumberForName(cellNameColumn) + i);
+            const columnNameNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + i);
             this.setExcludedCells[cellName].push(`${columnNameNext}${cellNameRow}`);
           }
           prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2);
@@ -142,7 +157,7 @@ export default {
             if (cellValueKeys.includes('colspan')) {
               colspan = cellValue.colspan;
               for (let j = 1; j < colspan; j += 1) {
-                const cellNameColumnNext = getColumnNameForNumber(getColumnNumberForName(cellNameColumn) + j);
+                const cellNameColumnNext = this.getColumnNameForNumber(this.getColumnNumberForName(cellNameColumn) + j);
                 this.setExcludedCells[cellName].push(`${cellNameColumnNext}${cellNameRow + i}`);
               }
             }
@@ -156,10 +171,11 @@ export default {
     },
 
     prepareColumns() {
+      console.log(this.maxRowGroupingLevel);
       const prepareColumns = [];
       const columnsKeys = Object.keys(this.columns);
       for (let i = 1; i < this.columnCount + 1; i += 1) {
-        const columnName = getColumnNameForNumber(i);
+        const columnName = this.getColumnNameForNumber(i);
         const columnItem = {
           value: i,
           name: columnName,
@@ -171,6 +187,7 @@ export default {
         }
         prepareColumns.push(columnItem);
       }
+      // console.log(prepareColumns);
       return prepareColumns;
     },
 
@@ -188,7 +205,6 @@ export default {
         }
         prepareRows.push(rowItem);
       }
-      console.log('prepare row');
       return prepareRows;
     },
 
@@ -225,9 +241,11 @@ export default {
         if (this.setOpenGroupRows.includes(row.value)
           && showLevel === level) showLevel = level + 1;
       });
-      console.log('table row');
-      // console.log(rows);
       return rows;
+    },
+
+    tableRowsFixed() {
+      return this.prepareRows.filter((row) => row.fixed);
     },
 
     templateColumnWidth() {
@@ -238,28 +256,31 @@ export default {
       return templateColumnWidth;
     },
 
-    tableWidth() {
-      let tableWidth = 0;
+    templateTableWidth() {
+      let templateTableWidth = 0;
       this.tableColumns.forEach((item) => {
-        tableWidth += item.width;
+        templateTableWidth += item.width;
       });
-      return tableWidth;
+      return templateTableWidth;
     },
 
-    spreadSheetStyle() {
-      let titleColumn = CELL_WIDTH_GROUP * this.maxRowGroupingLevel;
-      let titleRow = CELL_HEIGHT_GROUP * this.maxColumnGroupingLevel;
-      if (this.isShowTitle) {
-        titleColumn += CELL_WIDTH_TITLE;
-        titleRow += CELL_HEIGHT_TITLE;
+    templateSheet() {
+      let shiftTop = (CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel) + 5; // + CELL_WIDTH_LEFT_TITLE;
+      let shiftLeft = CELL_HEIGHT * this.maxColumnGroupingLevel + 2; // + (this.isTitle) ? CELL_HEIGHT : 0;
+      if (this.isTitle) {
+        shiftTop += CELL_WIDTH_LEFT_TITLE;
+        shiftLeft += CELL_HEIGHT;
       }
-      if (this.maxRowGroupingLevel !== 0) titleColumn += (this.isShowTitle) ? 4 : 5;
-      if (this.maxColumnGroupingLevel !== 0) titleRow += (this.isShowTitle) ? 4 : 4;
-
+      if (!this.isTitle) shiftLeft += 1;
       const style = {
-        'grid-template-rows': `${titleRow}px 1fr`,
-        'grid-template-columns': `${titleColumn}px 1fr`,
+        'grid-template-columns': `${shiftTop}px 1fr`,
+        'grid-template-rows': `${shiftLeft}px 1fr`,
       };
+      // const shift = {
+      //   // 'margin-top': `-${shiftLeft}px`,
+      //   // 'margin-left': `-${shiftTop}px`,
+      // };
+      // if (!this.isTitle) Object.assign(style, shift);
       return style;
     },
   },
@@ -301,11 +322,9 @@ export default {
     evtClickCell(options) {
       this.$emit('click:cell', options);
     },
-
     evtDblclickCell(options) {
       this.$emit('dblclick:cell', options);
     },
-
     evtKeydownCell(options) {
       this.$emit('keydown:cell', options);
     },
@@ -315,46 +334,52 @@ export default {
     evtBufferPaste(cellName) {
       this.$emit('buffer:paste', cellName);
     },
-
     evtOpenGroupColumn(level) {
+      if (level === 1) {
+        this.setOpenGroupColumns = [];
+        return;
+      }
       const openGroup = [];
-      this.prepareColumns.forEach((column) => {
-        if (Object.keys(column).includes('isGroup') && column.level === level - 1) {
-          openGroup.push(column.name);
+      this.prepareColumns.forEach((column, columnIndex) => {
+        if (column.level >= level) return;
+        if (!this.prepareColumns[columnIndex - 1]) return;
+        if (Object.keys(this.prepareColumns[columnIndex - 1]).includes('isGroup')) {
+          openGroup.push(this.prepareColumns[columnIndex - 1].name);
         }
       });
-      this.setOpenGroupColumns = this.setOpenGroupColumns.filter((x) => !openGroup.includes(x));
+      console.log(openGroup);
+      this.setOpenGroupColumns = [...openGroup];
     },
 
+    // evtOpenGroupRow(level) {
+    //   if (level === 1) {
+    //     this.setOpenGroupRows = [];
+    //     return;
+    //   }
+    //   const openGroup = [];
+    //   this.prepareRows.forEach((row, rowIndex) => {
+    //     if (row.level >= level) return;
+    //     if (!this.prepareRows[rowIndex - 1]) return;
+    //     if (Object.keys(this.prepareRows[rowIndex - 1]).includes('isGroup')) {
+    //       openGroup.push(this.prepareRows[rowIndex - 1].value);
+    //     }
+    //   });
+    //   this.setOpenGroupRows = [...openGroup];
+    // },
     evtOpenGroupRow(level) {
-      let flag = false;
-      let openGroup = [];
+      const openGroup = [];
       this.prepareRows.forEach((row) => {
         if (Object.keys(row).includes('isGroup') && row.level === level - 1) {
-          if (this.setOpenGroupRows.includes(row.value)) flag = true;
           openGroup.push(row.value);
+          // this.toggleRowGroup(row.value);
         }
       });
-      if (flag) {
-        console.log(openGroup);
-        this.setOpenGroupRows = this.setOpenGroupRows.filter((x) => !openGroup.includes(x));
-      } else {
-        openGroup = [];
-        this.prepareRows.forEach((row) => {
-          if (Object.keys(row).includes('isGroup') && row.level < level - 1) {
-            openGroup.push(row.value);
-          }
-        });
-        this.setOpenGroupRows = [...new Set([...this.setOpenGroupRows, ...openGroup])];
-      }
+      console.log(openGroup);
     },
 
-    toggleColumnGroup(columnName) {
-      if (this.setOpenGroupColumns.includes(columnName)) {
-        this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnName), 1);
-      } else {
-        this.setOpenGroupColumns.push(columnName);
-      }
+    scrollBodyX(scrollLeft) {
+      this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
+      this.$emit('scroll:body');
     },
 
     toggleRowGroup(rowName) {
@@ -366,9 +391,44 @@ export default {
       console.log(this.setOpenGroupRows);
     },
 
-    scrollBodyX(scrollLeft) {
-      this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
-      this.$emit('scroll:body');
+    toggleColumnGroup(columnName) {
+      if (this.setOpenGroupColumns.includes(columnName)) {
+        this.setOpenGroupColumns.splice(this.setOpenGroupColumns.findIndex((item) => item === columnName), 1);
+      } else {
+        this.setOpenGroupColumns.push(columnName);
+      }
+    },
+
+    getColumnNameForNumber(columnNumber) {
+      if (columnNumber > 702) return 'Infinity';
+      if (columnNumber <= this.setColumnName.length) {
+        const columnName = this.setColumnName[columnNumber - 1];
+        return columnName;
+      }
+      if ((columnNumber % this.setColumnName.length) === 0) {
+        const columnName = `${this.setColumnName[
+          ((columnNumber - this.setColumnName.length) / this.setColumnName.length) - 1
+        ]}${this.setColumnName[this.setColumnName.length - 1]}`;
+        return columnName;
+      }
+      const columnName = `${this.setColumnName[
+        (Math.floor(columnNumber / this.setColumnName.length)) - 1
+      ]}${this.setColumnName[(columnNumber % this.setColumnName.length) - 1]}`;
+      return columnName;
+    },
+
+    getColumnNumberForName(columnName) {
+      if (columnName.length === 1) return this.setColumnName.findIndex((item) => item === columnName) + 1;
+      const indexFirst = this.setColumnName.findIndex((item) => item === columnName[0]) + 1;
+      const indexSecond = this.setColumnName.findIndex((item) => item === columnName[1]) + 1;
+      return (indexFirst * this.setColumnName.length) + indexSecond;
+    },
+
+    parseCellName(cellName) {
+      return {
+        cellNameColumn: cellName.replace(/[0-9]/g, ''),
+        cellNameRow: +cellName.replace(/[a-z]/g, ''),
+      };
     },
 
     updateDocumentStyles(create = true) {
@@ -380,8 +440,7 @@ export default {
     addingDocumentStyles() {
       let stylesPath = '';
       const prepareStyles = [];
-      // stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
-      stylesPath = ' .spread-sheet .spread-sheet__body .body-virtual .sheet-body__row ';
+      stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
       if (this.isPrintMode) {
         stylesPath = '.spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
       }
@@ -466,37 +525,52 @@ export default {
       this.setOpenGroupRows = [];
       this.setExcludedCells = {};
     },
+    // ------ ------- ---------
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import './Spread.scss';
-
+@import './SpreadSheet.scss';
 .spread-sheet {
-  display: grid;
-  grid-template-areas: "angle head" "body body";
+  width: 100%;
   height: 100%;
-  border: $borderBase;
-  &__angle {
-    grid-area: angle;
-    border-right: thin solid grey;
-    border-bottom: thin solid grey;
-    background-color: $headBackgroundColor;
-    // background: blue;
-  }
-  &__head {
-    grid-area: head;
-    font-size: $headFontSize;
-    font-weight: $headFontWeight;
-    color: $headFontColor;
-    background-color: $headBackgroundColor;
-    overflow: hidden;
-    // border-bottom: thin solid grey;
-  }
-  &__body {
-    grid-area: body;
-    // background: cadetblue;
+  border-radius: $borderRadius;
+  box-shadow: $boxShadow;
+  overflow: hidden;
+  font-family: $fontFamily;
+  font-size: $fontSize;
+  .sheet {
+    display: grid;
+    grid-template-areas: "angle head" "body body";
+    height: 100%;
+    box-sizing: border-box;
+    // &_noTitle {
+    //   grid-template-areas: "angle head" "body body";
+    //   // .sheet__angle { display: none; }
+    //   // .sheet__head { display: none; }
+    // }
+    &__angle {
+      grid-area: angle;
+      padding-left: 2px;
+      padding-top: 2px;
+      border: thin solid grey;
+      background-color: $backgroundColorTitle;
+      box-sizing: border-box;
+    }
+    &__head {
+      grid-area: head;
+      padding-top: 2px;
+      border-top: thin solid grey;
+      background-color: $backgroundColorTitle;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    &__body {
+      // padding-left: 1px;
+      grid-area: body;
+      border-left: thin solid grey;
+    }
   }
 }
 </style>

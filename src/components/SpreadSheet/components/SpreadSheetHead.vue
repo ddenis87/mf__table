@@ -5,7 +5,7 @@
       <div v-for="level in maxColumnGroupingLevel"
            class="sheet-head__row"
            :key="level"
-           :style="templateColumnHeight">
+           :style="templateColumnGroupHeight">
         <div v-for="(column, columnIndex) in columns"
              class="column column-group"
              :key="columnIndex"
@@ -13,7 +13,7 @@
           <spread-sheet-btn-group v-if="isGroup(column, level)"
                                   :data-column-name="column.name">
             <v-icon small color="black">
-              {{ (setOpenGroupColumns.includes(column.name)) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+              {{ (setOpenGroupColumns.includes(column.name)) ? 'mdi-minus' : 'mdi-plus' }}
             </v-icon>
           </spread-sheet-btn-group>
         </div>
@@ -41,7 +41,7 @@
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
 import {
-  CELL_HEIGHT,
+  CELL_HEIGHT, CELL_HEIGHT_GROUP,
 } from '../SpreadSheetConst';
 
 export default {
@@ -60,12 +60,23 @@ export default {
     isShowTitle: { type: Boolean, default: true },
   },
   computed: {
+    templateColumnGroupHeight() {
+      const template = {
+        'grid-template-columns': `${this.templateColumnWidth} 8px`,
+        'grid-template-rows': `${CELL_HEIGHT_GROUP + 1}px`,
+        width: `${this.templateTableWidth}px`,
+      };
+      return template;
+    },
     templateColumnHeight() {
       const template = {
         'grid-template-columns': `${this.templateColumnWidth} 8px`,
         'grid-template-rows': `${CELL_HEIGHT}px`,
         width: `${this.templateTableWidth}px`,
       };
+      if (this.setOpenGroupColumns.length) {
+        template['padding-top'] = '0px';
+      }
       return template;
     },
   },
@@ -103,7 +114,7 @@ export default {
     },
     eventClickHead(evt) {
       if (evt.target.closest('button')) {
-        const columnName = evt.target.closest('button').getAttribute('data-column-name');
+        const columnName = evt.target.closest('button').parentElement.getAttribute('data-column-name');
         this.toggleColumnGroup(columnName);
       }
     },
@@ -198,10 +209,11 @@ export default {
         position: absolute;
         top: 10px;
         right: 0px;
-        width: calc(50% - 5px);
+        width: calc(50% - 7px);
         height: 0px;
-        border-bottom: thin solid #3F3F3F;
-        background-color: #3F3F3F;
+        // border-bottom: thin solid #3F3F3F;
+        border-bottom: thin solid grey;
+        // background-color: #3F3F3F;
       }
     }
     .line {
@@ -211,8 +223,9 @@ export default {
         top: 10px;
         width: 100%;
         height: 0px;
-        border-bottom: thin solid #3F3F3F;
-        background-color: #3F3F3F;
+        // border-bottom: thin solid #3F3F3F;
+        border-bottom: thin solid grey;
+        // background-color: #3F3F3F;
       }
     }
     .line-end {
@@ -223,18 +236,20 @@ export default {
         width: 100%;
         height: 10px;
         border: 0;
-        border-right: 1px solid #3F3F3F;
-        border-top: 1px solid #3F3F3F;
+        // border-right: 1px solid #3F3F3F;
+        border-right: thin solid grey;
+        // border-top: 1px solid #3F3F3F;
+        border-top: thin solid grey;
         background-color: unset;
       }
     }
-    &:first-child {
-      .column {
-        &-group {
-          box-shadow:  inset 0px 1px 0px grey;
-        }
-      }
-    }
+    // &:first-child {
+    //   .column {
+    //     &-group {
+    //       // box-shadow:  inset 0px 1px 0px grey;
+    //     }
+    //   }
+    // }
   }
 }
 </style>

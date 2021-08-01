@@ -1,7 +1,8 @@
 <template>
   <div class="angle"
        :class="{'angle_hidden': !isShowTitle}">
-    <div class="group group__columns">
+    <div class="group group__columns"
+         :style="groupColumnStyle">
       <div v-for="levelColumn in maxColumnGroupingLevel"
            class="group group__item"
            :key="levelColumn"
@@ -30,6 +31,8 @@
 import {
   CELL_WIDTH_LEFT_GROUP,
   CELL_WIDTH_LEFT_TITLE,
+  CELL_HEIGHT_GROUP,
+  // CELL_HEIGHT,
 } from '../SpreadSheetConst';
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
@@ -46,11 +49,17 @@ export default {
   computed: {
     groupRowStyle() {
       const rowStyle = {
-        'grid-template-columns': `repeat(${this.maxRowGroupingLevel}, minmax(${CELL_WIDTH_LEFT_GROUP}px,${CELL_WIDTH_LEFT_GROUP}px))`,
+        'grid-template-columns': `repeat(${this.maxRowGroupingLevel}, minmax(${CELL_WIDTH_LEFT_GROUP}px, ${CELL_WIDTH_LEFT_GROUP}px))`,
       };
       if (this.isShowTitle) rowStyle['grid-template-columns'] += ` ${CELL_WIDTH_LEFT_TITLE}px`;
-      console.log(rowStyle);
       return rowStyle;
+    },
+    groupColumnStyle() {
+      const columnStyle = {
+        'grid-template-rows': `repeat()${this.maxColumnGroupingLevel}, minmax(${CELL_HEIGHT_GROUP}, ${CELL_HEIGHT_GROUP})`,
+      };
+      // if (this.isShowTitle) columnStyle['grid-template-rows'] += ` ${CELL_HEIGHT}px`;
+      return columnStyle;
     },
   },
   methods: {
@@ -85,20 +94,18 @@ export default {
     gap: 0px;
     align-items: flex-end;
     &__columns {
-      display: flex;
       grid-area: group-columns;
-      flex-direction: column;
-      // padding-right: 1px;
+      display: grid;
+      grid-column: 22px;
+      justify-content: end;
+      // flex-direction: column;
+      padding-bottom: 2px;
     }
 
     &__rows {
-      // padding-bottom: 1px;
-      // margin-left: -1px;
-      // gap: 1px;
       grid-area: group-rows;
       display: grid;
       grid-row: 22px;
-      // grid-template-columns: repeat(4, 20px);
       justify-items: center;
     }
 

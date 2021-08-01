@@ -1,9 +1,6 @@
 import {
   RANGE_TYPE,
   SHIFT_TYPE,
-  getParseAtSymbolDigit,
-  getColumnNameForNumber,
-  getColumnNumberForName,
   getRangeType,
   getRangeSplit,
   getRangeLength,
@@ -11,6 +8,12 @@ import {
   moveCell,
   moveRange,
 } from './TableDocumentHelpers';
+
+import {
+  getColumnNameForNumber,
+  getColumnNumberForName,
+  getParseAtSymbolDigit,
+} from '../../helpers/spreadSheet';
 
 import Formulas from './Formulas';
 import TableDocumentDeserializeError from './TableDocumentDeserializeError';
@@ -937,7 +940,7 @@ class TableDocument {
     if (!type || type !== 'template') {
       throw new TableDocumentGeneralError(
         'setTableDocumentTemplate',
-        'Не определен тип, или тип не "Шаблон"',
+        'Неверный формат файла "Шаблон"',
       );
     }
     this.version = version;
@@ -958,13 +961,13 @@ class TableDocument {
     if (!type || type !== 'settings') {
       throw new TableDocumentGeneralError(
         'setTableDocumentTemplate',
-        'Не определен тип, или тип не "Опции"',
+        'Неверный формат файла "Опции"',
       );
     }
     if (this.version !== version) {
       throw new TableDocumentGeneralError(
         'setTableDocumentTemplate',
-        `Версия шаблона отлична от версии опций: \n Версия шаблона: ${this.version} \n Версия опций: ${version}`,
+        `Неподдерживаемая версия формата: \n Версия шаблона: ${this.version} \n Версия опций: ${version}`,
       );
     }
     this.documentSettings = data;
