@@ -292,7 +292,7 @@ export default {
       this.$refs.SpreadSheet.newDocument();
       await this.$nextTick();
       this.tableDocument = new TableDocument();
-      this.tableDocumentPrepare = new TableDocument();
+      this.tableDocumentPrepare = new TableDocumentApi();
       this.isGrid = true;
 
       this.isFileTemplateDisabled = false;
