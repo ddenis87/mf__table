@@ -1,5 +1,6 @@
 <template>
   <div class="spread-sheet__head"
+       :class="{'spread-sheet__head_bottom-line': isShowTitle}"
        @click="eventClickHead">
     <div v-for="level in maxColumnGroupingLevel"
          class="rows rows__group"
@@ -12,7 +13,7 @@
             :style="getGroupStyle(level)">
         <spread-sheet-btn-group v-if="isGroup(column, level)"
                                 :data-column-name="column.name">
-          <v-icon small color="black">
+          <v-icon x-small color="black">
             {{ (setOpenGroupColumns.includes(column.name)) ? 'mdi-minus' : 'mdi-plus' }}
           </v-icon>
         </spread-sheet-btn-group>
@@ -64,6 +65,7 @@ export default {
         'grid-template-rows': `${CELL_HEIGHT_TITLE}px`,
         width: `${this.tableWidth}px`,
       };
+      // if (this.isShowTitle) templateRow['border-bottom'] = 'thin solid grey';
       return templateRow;
     },
   },

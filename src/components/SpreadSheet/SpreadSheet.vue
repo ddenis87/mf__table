@@ -318,35 +318,33 @@ export default {
 
     evtOpenGroupColumn(level) {
       const openGroup = [];
+      const closeGroup = [];
       this.prepareColumns.forEach((column) => {
-        if (Object.keys(column).includes('isGroup') && column.level === level - 1) {
-          openGroup.push(column.name);
+        if (Object.keys(column).includes('isGroup')) {
+          if (column.level < level - 1) openGroup.push(column.name);
+          if (column.level === level - 1) closeGroup.push(column.name);
         }
       });
-      this.setOpenGroupColumns = this.setOpenGroupColumns.filter((x) => !openGroup.includes(x));
+      this.setOpenGroupColumns = this.setOpenGroupColumns.filter((x) => !closeGroup.includes(x));
+      this.setOpenGroupColumns = [...new Set([...this.setOpenGroupColumns, ...openGroup])];
     },
 
     evtOpenGroupRow(level) {
-      let flag = false;
-      let openGroup = [];
+      const openGroup = [];
+      const closeGroup = [];
       this.prepareRows.forEach((row) => {
-        if (Object.keys(row).includes('isGroup') && row.level === level - 1) {
-          if (this.setOpenGroupRows.includes(row.value)) flag = true;
-          openGroup.push(row.value);
+        if (Object.keys(row).includes('isGroup')) {
+          if (row.level < level - 1) openGroup.push(row.value);
+          if (row.level === level - 1) closeGroup.push(row.value);
         }
       });
-      if (flag) {
-        console.log(openGroup);
-        this.setOpenGroupRows = this.setOpenGroupRows.filter((x) => !openGroup.includes(x));
-      } else {
-        openGroup = [];
-        this.prepareRows.forEach((row) => {
-          if (Object.keys(row).includes('isGroup') && row.level < level - 1) {
-            openGroup.push(row.value);
-          }
-        });
-        this.setOpenGroupRows = [...new Set([...this.setOpenGroupRows, ...openGroup])];
-      }
+      // this.prepareRows.forEach((row) => {
+      //   if (Object.keys(row).includes('isGroup') && row.level === level - 1) {
+      //     closeGroup.push(row.value);
+      //   }
+      // });
+      this.setOpenGroupRows = this.setOpenGroupRows.filter((x) => !closeGroup.includes(x));
+      this.setOpenGroupRows = [...new Set([...this.setOpenGroupRows, ...openGroup])];
     },
 
     toggleColumnGroup(columnName) {
@@ -492,7 +490,9 @@ export default {
     color: $headFontColor;
     background-color: $headBackgroundColor;
     overflow: hidden;
-    // border-bottom: thin solid grey;
+    &_bottom-line {
+      border-bottom: thin solid grey;
+    }
   }
   &__body {
     grid-area: body;

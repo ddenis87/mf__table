@@ -309,7 +309,7 @@ class TableDocument {
       if (!Object.keys(parameters).includes(cellParameter)) return;
       const cellValue = data[parameters[cellParameter]];
       try {
-        this.updateCellValue(cellName, cellValue);
+        this.updateCellValue(cellName, cellValue, cellParameter);
       } catch (err) {
         errorValidation.push(err);
       }
@@ -822,10 +822,10 @@ class TableDocument {
     this.cells = { ...this.cells, [cellName]: cellValue };
   }
 
-  updateCellValue(cellName, cellValue, isErrorStop = false) {
+  updateCellValue(cellName, cellValue, cellParameter = '', isErrorStop = false) {
     const cellAttribute = this.getCell(cellName);
     try {
-      this.validateCellValue(cellName, { ...cellAttribute, value: cellValue });
+      this.validateCellValue(cellName, { ...cellAttribute, value: cellValue }, cellParameter);
       cellAttribute.value = cellValue;
     } finally {
       if (!isErrorStop) this.updateCell(cellName, cellAttribute);
@@ -974,7 +974,7 @@ class TableDocument {
     this.documentSettings = data;
   }
 
-  validateCellValue(cellName, cellValue) {
+  validateCellValue(cellName, cellValue, cellParameter) {
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
     const { type: cellType, value: checkValue } = cellValue;
     const checkType = cellType
@@ -989,7 +989,13 @@ class TableDocument {
       validateCustom = validateCellValueCustom(checkValue);
     }
     if (validateType !== true || validateCustom !== true) {
-      throw new TableDocumentValidationCellError(cellName, checkType, checkValue, [validateType, validateCustom]);
+      throw new TableDocumentValidationCellError(
+        cellName,
+        cellParameter,
+        checkType,
+        checkValue,
+        [validateType, validateCustom],
+      );
     }
   }
 }

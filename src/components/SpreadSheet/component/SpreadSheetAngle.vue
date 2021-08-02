@@ -119,7 +119,7 @@ export default {
   &__rowGroup {
     grid-area: rowGroup;
     display: grid;
-    padding-top: 2px;
+    padding-top: 3px;
   }
   &__rb {
     position: relative;

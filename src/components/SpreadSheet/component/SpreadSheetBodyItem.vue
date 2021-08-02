@@ -10,7 +10,7 @@
           :style="getGroupStyle(level)">
         <spread-sheet-btn-group v-if="isGroup(level)"
                                 :data-row-name="rowName">
-          <v-icon small color="black">
+          <v-icon x-small color="black">
             {{ btnGroup }}
           </v-icon>
         </spread-sheet-btn-group>

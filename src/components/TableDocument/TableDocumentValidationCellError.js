@@ -1,8 +1,9 @@
 import TableDocumentError from './TableDocumentError';
 
 export default class TableDocumentValidationCellError extends TableDocumentError {
-  constructor(sourceName, sourceType, value, messages) {
-    super(sourceName);
+  constructor(sourceName, sourceParameter, sourceType, value, messages) {
+    super((sourceParameter) ? '' : sourceName);
+    this.sourceParameter = sourceParameter;
     this.sourceType = sourceType;
     if (value) this.value = value;
     this.addingMessages(messages);
@@ -18,7 +19,9 @@ export default class TableDocumentValidationCellError extends TableDocumentError
 
   getMessages() {
     const BaseClass = this.constructor;
-    return new BaseClass(this.sourceName, this.sourceType, this.value, this.messages);
+    return new BaseClass(
+      this.sourceName, this.sourceParameter, this.sourceType, this.value, this.messages,
+    );
   }
 
   getMessagesText() {
