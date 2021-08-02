@@ -254,7 +254,7 @@ export default {
         titleRow += CELL_HEIGHT_TITLE;
       }
       if (this.maxRowGroupingLevel !== 0) titleColumn += (this.isShowTitle) ? 4 : 5;
-      if (this.maxColumnGroupingLevel !== 0) titleRow += (this.isShowTitle) ? 4 : 4;
+      if (this.maxColumnGroupingLevel !== 0) titleRow += (this.isShowTitle) ? 5 : 5;
 
       const style = {
         'grid-template-rows': `${titleRow}px 1fr`,

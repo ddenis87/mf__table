@@ -144,11 +144,12 @@ class TableDocument {
   }
 
   addArea(cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) {
+    const flagValid = false;
     const area = this.documentTemplate.getNamedArea(areaName);
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
     const cellColumnNumber = (shiftType === SHIFT_TYPE.VERTICAL) ? 1 : getColumnNumberForName(cellColumn);
     const cellRowNumber = (shiftType === SHIFT_TYPE.HORIZONTAL) ? 1 : cellRow;
-    this.insertArea(cellColumnNumber, cellRowNumber, area, shiftType);
+    this.insertArea(cellColumnNumber, cellRowNumber, area, shiftType, flagValid);
     this.recalculateFormulas();
   }
 
@@ -763,7 +764,7 @@ class TableDocument {
     return rezult;
   }
 
-  insertArea(numberColumn, numberRow, area, shiftType = null) {
+  insertArea(numberColumn, numberRow, area, shiftType = null, flagValid = true) {
     const namedAreas = [];
     const {
       cells: insertCells,
@@ -801,7 +802,7 @@ class TableDocument {
       const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
 
       this.updateColumn(shiftColumn, area.getColumn(currentColumn));
-      this.updateRow(shiftRow, area.getRow(currentRow));
+      this.updateRow(shiftRow, area.getRow(currentRow), flagValid);
       this.updateCell(shiftCellName, area.getCell(currentCellName));
     });
 
@@ -852,8 +853,8 @@ class TableDocument {
     });
   }
 
-  updateRow(rowName, rowValue) {
-    this.setRowGroup(rowName, rowValue.level || 0);
+  updateRow(rowName, rowValue, flagValid = true) {
+    if (flagValid) this.setRowGroup(rowValue.level || 0);
     this.rows = { ...this.rows, [rowName]: rowValue };
   }
 
@@ -864,7 +865,7 @@ class TableDocument {
     });
   }
 
-  setRowGroup(rowName, level) {
+  setRowGroup(level) {
     const lastRow = this.getRow(this.getLastRow());
     const levelGroupLastRow = lastRow.level || 0;
     const levelGroupAddingRow = level;

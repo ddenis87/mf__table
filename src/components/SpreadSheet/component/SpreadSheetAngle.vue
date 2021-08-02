@@ -54,7 +54,7 @@ export default {
   computed: {
     angleStyle() {
       let angleStyle = {
-        'grid-template-rows': `${this.maxColumnGroupingLevel * CELL_HEIGHT_GROUP + 3}px 1fr`,
+        'grid-template-rows': `${this.maxColumnGroupingLevel * CELL_HEIGHT_GROUP + 2.5}px 1fr`,
         'grid-template-columns': `${(this.maxRowGroupingLevel * CELL_WIDTH_GROUP + 4)}px 1fr`,
       };
       if (!this.isShowTitle) {
@@ -138,7 +138,7 @@ export default {
       content: '';
       position: absolute;
       left: 0px;
-      top: 0px;
+      top: 1px;
       right: 0px;
       bottom: 0px;
     }

@@ -70,7 +70,7 @@ export default {
   methods: {
     templateRowGroup(level) {
       let rowHeight = CELL_HEIGHT_GROUP;
-      if (level === this.maxColumnGroupingLevel) rowHeight += 4;
+      if (level === this.maxColumnGroupingLevel) rowHeight += 5;
       const templateRow = {
         'grid-template-columns': `${this.templateColumnWidth} 8px`,
         'grid-template-rows': `${rowHeight}px`,
