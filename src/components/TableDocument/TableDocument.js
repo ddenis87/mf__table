@@ -145,7 +145,7 @@ class TableDocument {
 
   addArea(cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) {
     const flagValid = false;
-    const area = this.documentTemplate.getNamedArea(areaName);
+    const area = this.documentTemplate.getNamedArea(areaName).getAreaCopy();
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
     const cellColumnNumber = (shiftType === SHIFT_TYPE.VERTICAL) ? 1 : getColumnNumberForName(cellColumn);
     const cellRowNumber = (shiftType === SHIFT_TYPE.HORIZONTAL) ? 1 : cellRow;
