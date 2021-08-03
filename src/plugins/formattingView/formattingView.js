@@ -18,15 +18,16 @@ export default {
     {
       type = 'string',
       formatString = null,
-      // prefix: null,
-      // suffix: null,
+      prefix = null,
+      suffix = null,
       representations = new Map(),
-    },
+    } = {},
   ) {
-    if ([null, undefined].includes(value)) return null;
+    // console.log(value);
+    if ([null, undefined, ''].includes(value)) return '';
     const FUNCTION_TYPE = {
       string: (v) => this.formatString(v),
-      number: (v, f) => this.formatNumber(v, f),
+      number: (v, f) => this.formatNumber(v, f).replace('.',','),
       date: (v, f) => this.formatDate(v, f),
       boolean: (v) => v,
       field: (v, f, r) => r.get(v) || '<#ССЫЛКА>',
@@ -35,7 +36,10 @@ export default {
     const typeClear = type.split('.')[0];
     const formatMap = (formatString) ? new Map(formatString.split('$').map((item) => item.split('='))) : new Map();
     // console.log(representation);
-    return FUNCTION_TYPE[typeClear](value, formatMap, representations);
+    let result = FUNCTION_TYPE[typeClear](value, formatMap, representations);
+    if (prefix) result = `${prefix}${result}`;
+    if (suffix) result = `${result}${suffix}`;
+    return result;
   },
 
   formatString(value) {
@@ -50,6 +54,7 @@ export default {
     formatMap.forEach((keyValue, key) => {
       if (FORMATE_NUMBER_KEY[key]) formatOptions[FORMATE_NUMBER_KEY[key]] = keyValue;
     });
+    console.log(formatOptions);
     const formatFunction = new Intl.NumberFormat('ru-RU', formatOptions);
     let formatValue = formatFunction.format(value);
     if (formatMap.has('positive') && value > 0) formatValue = `+${formatValue}`;
