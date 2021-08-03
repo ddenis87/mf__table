@@ -232,8 +232,10 @@ export default {
       //   && this.maxRowGroupingLevel === level) groupStyle['border-right'] = 'thin solid grey';
       if (this.index === this.rows.length - 1) groupStyle['border-bottom'] = 'thin solid grey';
       if (this.maxRowGroupingLevel === level) {
+        console.log('add width');
         groupStyle['border-right'] = 'thin solid grey';
-        groupStyle.width = '24.5px';
+        groupStyle['padding-right'] = '4px';
+        groupStyle.width = '25px';
       }
       return groupStyle;
     },
@@ -257,6 +259,7 @@ export default {
   display: grid;
   grid-row: $bodyGridAutoRow;
   // grid-auto-rows: $bodyGridAutoRow;
+  box-sizing: border-box;
   .column {
     position: relative;
     display: inline-flex;

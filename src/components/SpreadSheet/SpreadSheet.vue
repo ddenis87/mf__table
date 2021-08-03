@@ -415,7 +415,7 @@ export default {
           content: "''",
           position: 'absolute',
           left: '0px',
-          top: '0px',
+          top: '-1.4px',
           right: '-1px',
           bottom: '-0.6px',
           'z-index': '80',
@@ -424,7 +424,7 @@ export default {
       const listKeys = Object.keys(style.list);
       if (listKeys.includes('borderRight')) {
         pseudoBorder.list.borderRight = style.list.borderRight;
-        pseudoBorder.list.right = `-${(1 * +style.list.borderRight[0])}px`;
+        pseudoBorder.list.right = `-${(0.8 * +style.list.borderRight[0])}px`;
       }
       if (listKeys.includes('borderBottom')) {
         pseudoBorder.list.borderBottom = style.list.borderBottom;

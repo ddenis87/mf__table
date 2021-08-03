@@ -144,12 +144,16 @@ class TableDocument {
   }
 
   addArea(cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) {
-    const flagValid = false;
+    // const flagValid = false;
     const area = this.documentTemplate.getNamedArea(areaName).getAreaCopy();
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
     const cellColumnNumber = (shiftType === SHIFT_TYPE.VERTICAL) ? 1 : getColumnNumberForName(cellColumn);
     const cellRowNumber = (shiftType === SHIFT_TYPE.HORIZONTAL) ? 1 : cellRow;
-    this.insertArea(cellColumnNumber, cellRowNumber, area, shiftType, flagValid);
+    // try {
+    this.insertArea(cellColumnNumber, cellRowNumber, area, shiftType);
+    // } catch (err) {
+    //   console.log(err.getMessagesText());
+    // }
     this.recalculateFormulas();
   }
 
@@ -626,6 +630,11 @@ class TableDocument {
     return this.namedAreas;
   }
 
+  // getPreviousRow(rowName) {
+  //   const previousRow = +rowName - 1;
+  //   return this.rows[previousRow] || {};
+  // }
+
   getRangeByAreaName(areaName) {
     const range = [];
     if (!areaName) return null;
@@ -832,9 +841,15 @@ class TableDocument {
     }
   }
 
+  // updateColumn(columnName, columnValue) {
+  //   let columnNameText = columnName;
+  //   if (+columnName) columnNameText = getColumnNameForNumber(columnName);
+  //   this.columns = { ...this.columns, [columnNameText]: columnValue };
+  // }
   updateColumn(columnName, columnValue) {
     let columnNameText = columnName;
     if (+columnName) columnNameText = getColumnNameForNumber(columnName);
+    this.setColumnGroup(columnValue.level || 0, columnNameText);
     this.columns = { ...this.columns, [columnNameText]: columnValue };
   }
 
@@ -853,8 +868,9 @@ class TableDocument {
     });
   }
 
-  updateRow(rowName, rowValue, flagValid = true) {
-    if (flagValid) this.setRowGroup(rowValue.level || 0);
+  updateRow(rowName, rowValue) {
+    // if (flagValid)
+    this.setRowGroup(rowValue.level || 0, rowName);
     this.rows = { ...this.rows, [rowName]: rowValue };
   }
 
@@ -865,18 +881,32 @@ class TableDocument {
     });
   }
 
-  setRowGroup(level) {
-    const lastRow = this.getRow(this.getLastRow());
-    const levelGroupLastRow = lastRow.level || 0;
+  setRowGroup(level, rowName) {
+    const previousRow = this.getRow(+rowName - 1);
+    const levelGroupPreviousRow = previousRow.level || 0;
     const levelGroupAddingRow = level;
-    if (levelGroupAddingRow > levelGroupLastRow + 1) {
-      console.log('error');
+    if (levelGroupAddingRow > levelGroupPreviousRow + 1) {
+      // console.log('error');
       throw new TableDocumentGeneralError(
         'setRowGroup',
-        'Уровень строки превышает уровень активной группировки',
+        'Уровень добавляемой области превышает уровень активной группировки',
       );
     }
-    if (levelGroupAddingRow === levelGroupLastRow + 1) lastRow.isGroup = true;
+    if (levelGroupAddingRow === levelGroupPreviousRow + 1) previousRow.isGroup = true;
+  }
+
+  setColumnGroup(level, columnName) {
+    const columnNameNumber = getColumnNumberForName(columnName);
+    const previousColumn = this.getColumn(+columnNameNumber - 1);
+    const levelGroupPreviousColumn = previousColumn.level || 0;
+    const levelGroupAddingColumn = level;
+    if (levelGroupAddingColumn > levelGroupPreviousColumn + 1) {
+      throw new TableDocumentGeneralError(
+        'setRowGroup',
+        'Уровень добавляемой области превышает уровень активной группировки',
+      );
+    }
+    if (levelGroupAddingColumn === levelGroupPreviousColumn + 1) previousColumn.isGroup = true;
   }
 
   joinArea(area) {

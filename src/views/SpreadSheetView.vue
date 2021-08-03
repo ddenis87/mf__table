@@ -204,7 +204,13 @@ export default {
     },
     evtClickCell(options) {
       const { cellName } = options;
-      if (cellName) this.tableDocument.actionCell(cellName);
+      if (cellName) {
+        try {
+          this.tableDocument.actionCell(cellName);
+        } catch (err) {
+          this.showDialogMessage(err.getMessagesText());
+        }
+      }
       // const selectedCell = this.tableDocument.getCell(cellName);
       // if (Object.keys(selectedCell).includes('action')) this.tableDocument.executeAction(cellName);
       // if (Object.keys(selectedCell).includes('formula')) this.tableDocument.calculateCellValue(cellName);
