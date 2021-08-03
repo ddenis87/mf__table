@@ -27,7 +27,7 @@ export default {
     if ([null, undefined, ''].includes(value)) return '';
     const FUNCTION_TYPE = {
       string: (v) => this.formatString(v),
-      number: (v, f) => this.formatNumber(v, f).replace('.',','),
+      number: (v, f) => this.formatNumber(v, f).toString().replace('.', ','),
       date: (v, f) => this.formatDate(v, f),
       boolean: (v) => v,
       field: (v, f, r) => r.get(v) || '<#ССЫЛКА>',
@@ -55,7 +55,7 @@ export default {
       if (FORMATE_NUMBER_KEY[key]) formatOptions[FORMATE_NUMBER_KEY[key]] = keyValue;
     });
     console.log(formatOptions);
-    const formatFunction = new Intl.NumberFormat('ru-RU', formatOptions);
+    const formatFunction = new Intl.NumberFormat('ru', formatOptions);
     let formatValue = formatFunction.format(value);
     if (formatMap.has('positive') && value > 0) formatValue = `+${formatValue}`;
     if (formatMap.has('color')) {
@@ -70,7 +70,7 @@ export default {
     formatMap.forEach((keyValue, key) => {
       if (FORMATE_DATE_KEY[key]) formatOptions[FORMATE_DATE_KEY[key]] = keyValue;
     });
-    const formatFunction = new Intl.DateTimeFormat('ru-RU', formatOptions);
+    const formatFunction = new Intl.DateTimeFormat('ru', formatOptions);
     const formatValue = formatFunction.format(new Date(value));
     return formatValue;
   },

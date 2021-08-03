@@ -36,20 +36,20 @@ describe('formattingView', () => {
     });
   });
   
-  // describe('Type Date', () => {
-  //   const type = { valueType: 'date' };
-  //   it('Value 1   - 12.04.2021 -> 12.04.2021', () => expect(formattingView('12.04.2021', { ...type })).toBe('12.04.2021'));
-  //   it('Value 2   - 2021-04-12 -> 12.04.2021', () => expect(formattingView('2021-04-12', { ...type })).toBe('12.04.2021'));
-  //   it('Value 3   - hello      -> hello', () => expect(formattingView('hello', { ...type })).toBe('hello'));
-  //   describe('Format string:', () => {
-  //     const formatString_1 = { formatString: 'd=2-digit$m=short$y=numeric' };
-  //     const formatString_2 = { formatString: 'd=2-digit$m=long' };
-  //     const formatString_3 = { formatString: 'd=numeric$m=numeric$y=2-digit' };
-  //     it('"d=2-digit$m=short$y=numeric"                  - 12.04.2021 -> 12 апр. 2021 г.', () => expect(formattingView('2021-04-12', { ...type, ...formatString_1 })).toBe('12 апр. 2021 г.'));
-  //     it('"d=2-digit$m=long"                             - 12.04.2021 -> 12 апреля', () => expect(formattingView('2021-04-12', { ...type, ...formatString_2 })).toBe('12 апреля'));
-  //     it('"d=numeric$m=numeric$y=2-digit"                - 01.04.2021 -> 01.04.21', () => expect(formattingView('2021-04-01', { ...type, ...formatString_3 })).toBe('01.04.21'));
-  //   });
-  // });
+  describe('Type Date', () => {
+    const type = { type: 'date' };
+    it('Value 1   - 12.04.2021 -> 12.04.2021', () => expect(display.formate('12.04.2021', { ...type })).toBe('12.04.2021'));
+    it('Value 2   - 2021-04-12 -> 12.04.2021', () => expect(display.formate('2021-04-12', { ...type })).toBe('12.04.2021'));
+    it('Value 3   - hello      -> hello', () => expect(display.formate('hello', { ...type })).toBe('hello'));
+    describe('Format string:', () => {
+      const formatString_1 = { formatString: 'd=2-digit$m=short$y=numeric' };
+      const formatString_2 = { formatString: 'd=2-digit$m=long' };
+      const formatString_3 = { formatString: 'd=numeric$m=numeric$y=2-digit' };
+      it('"d=2-digit$m=short$y=numeric"                  - 12.04.2021 -> 12 апр. 2021 г.', () => expect(display.formate('2021-04-12', { ...type, ...formatString_1 })).toBe('12 апр. 2021 г.'));
+      it('"d=2-digit$m=long"                             - 12.04.2021 -> 12 апреля', () => expect(display.formate('2021-04-12', { ...type, ...formatString_2 })).toBe('12 апреля'));
+      it('"d=numeric$m=numeric$y=2-digit"                - 01.04.2021 -> 01.04.21', () => expect(display.formate('2021-04-01', { ...type, ...formatString_3 })).toBe('01.04.21'));
+    });
+  });
   // describe('Type Boolean', () => {
   //   const type = { valueType: 'boolean' };
   //   it('Value 1   - true  -> Да', () => expect(formattingView(true, { ...type })).toBe('Да'));
