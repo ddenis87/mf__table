@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import login from '@/logics/components/Login';
 
 export default {
   name: 'ProfileUser',
@@ -21,7 +22,8 @@ export default {
   },
   methods: {
     logout() {
-      this.$store.commit('Login/SET_LOGOUT');
+      // this.$store.commit('Login/logout');
+      login.logout();
       this.$router.push('/Logout');
     },
   },

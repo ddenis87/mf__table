@@ -1,20 +1,18 @@
 <template>
   <div class="test">
-    <div class="field">
-      <field-wrapper field-type="string"></field-wrapper>
-    </div>
   </div>
 </template>
 
 <script>
-import FieldWrapper from '../components/SpreadSheetEditing/FieldWrapper.vue';
+import Api from '@/logics/apiHTTP';
 
 export default {
   name: 'Test',
-  components: {
-    FieldWrapper,
-  },
-  methods: {
+  async mounted() {
+    const http = new Api('http://195.2.84.28/');
+    await http.authorization('frontender_1', 'fr01Nt3n63R');
+    console.log(http);
+    console.log(http.getOptions('organization/'));
   },
 };
 </script>

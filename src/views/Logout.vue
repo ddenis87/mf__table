@@ -25,9 +25,13 @@ export default {
   components: {
     DialogToolbar,
   },
+  mounted() {
+    console.log(this.$store.state);
+    console.log(localStorage.getItem('Token'));
+  },
   methods: {
     goLogin() {
-      this.$router.push('/');
+      this.$router.push('/Login');
     },
   },
 };

@@ -22,6 +22,9 @@ export default {
   computed: {
     layout() { return `Layout${this.$route.meta.layout || 'Main'}`; },
   },
+  mounted() {
+    console.log('mounted app');
+  },
 };
 </script>
 
