@@ -1,13 +1,16 @@
 <template>
-  <table-layout padding="4px 4px 4px 4px">
-    <div class="spread-sheet"
+  <table-layout padding="4px 4px 4px 4px" :border-off="isPrintMode">
+    <div :class="{
+            'spread-sheet': !isPrintMode,
+            'spread-sheet-print': isPrintMode,
+          }"
          :style="spreadSheetStyle">
-      <spread-sheet-angle :max-column-grouping-level="maxColumnGroupingLevel"
+      <spread-sheet-angle v-if="!isPrintMode" :max-column-grouping-level="maxColumnGroupingLevel"
                           :max-row-grouping-level="maxRowGroupingLevel"
                           :is-show-title="isShowTitle"
                           @open-group:column="evtOpenGroupColumn"
                           @open-group:row="evtOpenGroupRow"></spread-sheet-angle>
-      <spread-sheet-head ref="SheetHead"
+      <spread-sheet-head v-if="!isPrintMode" ref="SheetHead"
                          :columns="tableColumns"
                          :template-column-width="templateColumnWidth"
                          :table-width="tableWidth"
@@ -16,7 +19,17 @@
                          :is-show-title="isShowTitle"
                          @toggle-group:column="toggleColumnGroup"></spread-sheet-head>
 
-      <spread-sheet-body ref="SpreadSheetBody"
+      <spread-sheet-body-print v-if="isPrintMode"
+                              :rows="tableRows"
+                              :columns="tableColumns"
+                              :cells="tableCells"
+                              :templateTableWidth="templateTableWidth"
+                              :templateColumnWidth="templateColumnWidth"
+                              :maxLevelGroupRow="maxRowGroupingLevel"
+                              :setExcludedCells="setExcludedCells"
+                              :print-mode="isPrintMode"></spread-sheet-body-print>
+      <spread-sheet-body v-if="!isPrintMode"
+                         ref="SpreadSheetBody"
                          :rows="tableRows"
                          :columns="tableColumns"
                          :cells="tableCells"
@@ -52,6 +65,7 @@ import TableLayout from '../TableLayout.vue';
 import SpreadSheetAngle from './component/SpreadSheetAngle.vue';
 import SpreadSheetHead from './component/SpreadSheetHead.vue';
 import SpreadSheetBody from './component/SpreadSheetBody.vue';
+import SpreadSheetBodyPrint from './components/SpreadSheetBodyPrint.vue';
 
 import {
   CELL_WIDTH_TITLE,
@@ -69,6 +83,7 @@ export default {
     SpreadSheetAngle,
     SpreadSheetHead,
     SpreadSheetBody,
+    SpreadSheetBodyPrint,
   },
   props: {
     cells: { type: Object, default() { return {}; } },
@@ -83,6 +98,7 @@ export default {
     images: { type: Object, default() { return {}; } },
     isShowGrid: { type: Boolean, default: true },
     isShowTitle: { type: Boolean, default: true },
+    isPrintMode: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -381,7 +397,7 @@ export default {
       // stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
       stylesPath = ' .spread-sheet .spread-sheet__body .body-virtual .sheet-body__row ';
       if (this.isPrintMode) {
-        stylesPath = '.spread-sheet-print .sheet .sheet-body-print .sheet-body__row ';
+        stylesPath = '.spread-sheet-print .spread-sheet-body-print .sheet-body__row ';
       }
       const elementDOMStyle = document.createElement('style');
       let stylesString = '';

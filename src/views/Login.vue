@@ -71,10 +71,14 @@ export default {
   // },
   methods: {
     async sendLogin() {
+      const userData = {
+        userName: this.userName,
+        password: this.userPassword,
+      };
       if (!this.$refs.FormLogin.validate()) return;
       console.log('valid');
-      this.$store.commit('Login/SET_USER_NAME_PASSWORD', this.userData);
-      await this.$store.dispatch('Login/GET_USER_TOKEN_ACCESS', this.userData)
+      this.$store.commit('Login/SET_USER_NAME_PASSWORD', userData);
+      await this.$store.dispatch('Login/GET_USER_TOKEN_ACCESS', userData)
         .then(() => this.$router.push('/Home'))
         .catch(() => {
           this.isError = true;

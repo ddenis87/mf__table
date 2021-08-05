@@ -154,6 +154,7 @@ export default {
       bottom: -1px;
       // border-top: thin solid grey;
       border-right: thin solid grey;
+      pointer-events: none;
     }
   }
   &__rb {

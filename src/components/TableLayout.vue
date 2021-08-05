@@ -10,12 +10,17 @@ export default {
   name: 'TableLayout',
   props: {
     padding: { type: String, default: '0px 0px 0px 0px' },
+    borderOff: { type: Boolean, default: false },
   },
   computed: {
     tableLayoutStyle() {
-      return {
+      const layouteStyle = {
         padding: this.padding,
       };
+      if (this.borderOff) {
+        layouteStyle['box-shadow'] = 'unset';
+      }
+      return layouteStyle;
     },
   },
 };

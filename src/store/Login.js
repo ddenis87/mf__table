@@ -39,6 +39,7 @@ export default {
   actions: {
     GET_USER_TOKEN_ACCESS(state, option, rootState) {
       state.commit('SET_PROCCESS_REQUEST', true);
+      console.log(option);
       return new Promise((resolve, reject) => {
         axios
           .post(state.rootState.addressApi + 'api-token-auth/', {

@@ -3,6 +3,8 @@
                 :rows="rows"
                 :cells="cells"
                 :styles="styles"
+                :is-show-grid="false"
+                :is-show-title="false"
                 :is-print-mode="true"></spread-sheet>
 </template>
 
