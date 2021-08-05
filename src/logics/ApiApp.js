@@ -1,21 +1,29 @@
-import ApiHttp from './ApiHttp';
-import apiLocalStorages from './ApiLocalStorages';
+import ApiHttp from './apiHttp';
+// import apiLocalStorages from './ApiLocalStorages';
 
 export default class ApiApp extends ApiHttp {
   // constructor(baseURL) {
   //   super(baseURL);
   // }
 
-  async authorization(userName, userPassword) {
-    if (userName === undefined && userPassword === undefined) {
-      const userToken = apiLocalStorages.getValue('Token');
-      if (userToken) {
-        this.setHeaderToken(userToken);
-        return;
-      }
-    }
-    super.authorization(userName, userPassword);
-  }
+  // async authorization(userName, userPassword) {
+  //   if (userName === undefined && userPassword === undefined) {
+  //     const userToken = apiLocalStorages.getValue('Token');
+  //     if (userToken) {
+  //       this.setHeaderToken(userToken);
+  //       return true;
+  //     }
+  //     return false;
+  //   }
+  //   await super.authorization(userName, userPassword);
+  //   return true;
+  // }
+
+  // authorizationLS() {
+  //   const userToken = apiLocalStorages.getValue('Token');
+  //   if (userToken) this.setHeaderToken(userToken);
+  //   return userToken;
+  // }
 
   async deleteElement(sourceName, elementId) {
     let response = null;

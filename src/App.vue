@@ -7,7 +7,6 @@
 </template>
 
 <script>
-
 import LayoutEmpty from '@/layout/LayoutEmpty.vue';
 import LayoutMain from '@/layout/LayoutMain.vue';
 import LayoutPrint from '@/layout/LayoutPrint.vue';
@@ -20,7 +19,7 @@ export default {
     LayoutPrint,
   },
   computed: {
-    layout() { return `Layout${this.$route.meta.layout || 'Main'}`; },
+    layout() { return `Layout${this.$route.meta.layout || 'Empty'}`; },
   },
   mounted() {
     console.log('mounted app');

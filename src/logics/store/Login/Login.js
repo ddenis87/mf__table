@@ -1,3 +1,5 @@
+import apiLocalStorages from '@/logics/ApiLocalStorages';
+
 export default {
   state: {
     userName: null,
@@ -11,7 +13,7 @@ export default {
     deleteUserName(state) {
       state.userName = null;
     },
-  
+
     setUserName(state, options) {
       state.userName = options.userName;
     },
@@ -22,9 +24,17 @@ export default {
       const { userName, userPassword } = options;
       // const userName = await apiApp.authorization(userName, userPassword);
       // console.log(state);
-      await apiApp.authorization(userName, userPassword);
+      console.log('store logic login');
+      const userToken = await apiApp.authorization(userName, userPassword);
       state.commit('setUserName', { userName });
-      return true;
+      return userToken;
+    },
+
+    logout(state) {
+      apiLocalStorages.deleteValue('userToken');
+      apiLocalStorages.deleteValue('userName');
+      apiLocalStorages.deleteValue('userPassword');
+      state.commit('deleteUserName');
     },
   },
 };

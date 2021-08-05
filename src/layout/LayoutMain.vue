@@ -25,9 +25,7 @@ export default {
     AppBarNav,
   },
   created() {
-    // console.log(login.hasAuthorization());
-    // if (!login.hasAuthorization()) this.$router.push('/Login');
-    if (localStorage.getItem('Token') == null) this.$router.push('/Login');
+    if (!login.hasAuthorization()) this.$router.push('/Login');
   },
 };
 </script>

@@ -20,7 +20,7 @@ export default class ApiHttp {
     } catch (err) {
       console.log(err);
     }
-    return userName;
+    return userToken;
   }
 
   setHeaderToken(token) {
