@@ -1,35 +1,33 @@
 import axios from 'axios';
 
-export default class {
-  constructor(baseUrl) {
+export default class ApiHTTP {
+  constructor(baseURL) {
     this.require = axios.create({
-      baseURL: baseUrl,
+      baseURL,
       headers: {},
     });
+  }
+
+  async authorization(userName, userPassword) {
+    let userToken = null;
+    try {
+      const response = await this.require.post('api-token-auth/', {
+        username: userName,
+        password: userPassword,
+      });
+      userToken = response.data.token;
+      this.setHeaderToken(userToken);
+    } catch (err) {
+      console.log(err);
+    }
+    return userName;
   }
 
   setHeaderToken(token) {
     this.require.defaults.headers.common = { Authorization: `Token ${token}` };
   }
 
-  // async authorization(userName, userPassword) {
-  //   try {
-  //     const response = await this.ax.post('api-token-auth/', {
-  //       username: userName,
-  //       password: userPassword,
-  //     });
-  //     this.ax.defaults.headers.common = { Authorization: `Token ${response.data.token}` };
-  //   } catch (err) {
-  //     console.log(err.response.data);
-  //   }
-  // }
-
-  // async getOptions(sourceName) {
-  //   try {
-  //     const response = await this.ax.options(`api/v1/${sourceName}`);
-  //     console.log(response);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
+  setHeaderURL(url) {
+    this.require.defaults.headers.common = { baseURL: url };
+  }
 }

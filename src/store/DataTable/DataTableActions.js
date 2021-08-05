@@ -1,20 +1,36 @@
 import axios from 'axios';
 
 export default {
-  CREATE_TABLE_DATA_SPACE(state, option) {
-    return new Promise((resolve, reject) => {
-      state.commit('CREATE_TABLE_DATA_SPACE', option);
-      if (option.defaultFilters)
-        state.commit('SET_FILTER_DEFAULT', option);
-      state.dispatch('REQUEST_OPTIONS', option) // Не запрашивать когда повторное открытие?
-        .then(() => {
-          state.dispatch('REQUEST_DATA', option)
-            .then(() => {
+  // CREATE_TABLE_DATA_SPACE(state, option) {
+  //   return new Promise(async (resolve, reject) => {
+  //     state.commit('CREATE_TABLE_DATA_SPACE', option);
+  //     if (option.defaultFilters)
+  //       state.commit('SET_FILTER_DEFAULT', option);
+  //     await state.dispatch('REQUEST_OPTIONS', option) // Не запрашивать когда повторное открытие?
+  //       // .then(() => {
+  //     await state.dispatch('REQUEST_DATA', option)
+  //           // .then(() => {
+  //             // console.log(state);
+  //     resolve();
+  //           // })
+  //       // })
+  //   });
+  // },
+  async CREATE_TABLE_DATA_SPACE(state, option) {
+    
+    state.commit('CREATE_TABLE_DATA_SPACE', option);
+    if (option.defaultFilters) state.commit('SET_FILTER_DEFAULT', option);
+    console.log('before option', new Date());
+    await state.dispatch('REQUEST_OPTIONS', option) // Не запрашивать когда повторное открытие?
+    console.log('after option', new Date());
+    console.log('before data', new Date());
+    await state.dispatch('REQUEST_DATA', option)
+            // .then(() => {
               // console.log(state);
-              resolve();
-            })
-        })
-    });
+      // resolve();
+            // })
+        // })
+    // });
   },
   DELETE_TABLE_DATA_SPACE(state, option) {
     state.commit('DELETE_TABLE_DATA_SPACE', option);
@@ -97,6 +113,26 @@ export default {
       resolve();
     });
   },
+  // ADDING_NEW_ELEMENT(state, option) {
+  //   // state.commit('SET_FILTER_DEFAULT', Object.assign(option, {})); ????
+  //   // state.commit('CLEAR_DATA', option);
+    
+  //   return new Promise((resolve, reject) => {
+  //     state.dispatch('REQUEST_ADDING', option)
+  //       .then((response) => {
+  //         console.log(response);
+  //         state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+  //         // Отчистить Data запросить данные если добавляем не в строке
+  //         // response должен содержать id созданного элемента
+  //         state.commit('CLEAR_DATA', option); // перенесено в REQUEST_DATA ???
+  //         state.dispatch('REQUEST_DATA', Object.assign(option, {id: response.data.id, previous: true}))
+  //           .then(() => {
+  //             console.log('request data iz adding element')
+  //             resolve(response.data.id);
+  //           })
+  //       })
+  //   });
+  // },
   ADDING_NEW_ELEMENT(state, option) {
     // state.commit('SET_FILTER_DEFAULT', Object.assign(option, {})); ????
     // state.commit('CLEAR_DATA', option);
@@ -180,36 +216,51 @@ export default {
 
   // REQUEST API
   // ПОЛУЧЕНИЕ OPTIONS
-  REQUEST_OPTIONS(state, option) {
-    let addressApi = state.getters.GET_ADDRESS_API('options', option.tableName);
-    let tokenAccess = state.rootGetters['Login/GET_USER_TOKEN_ACCESS'];
-    axios.defaults.headers.common = {'Authorization': tokenAccess};
-    return new Promise((resolve, reject) => {
-      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-      axios
-        .options(addressApi)
-        .then(response => {
-          // console.log(response);
-          let sendOption = {
-            tableName: option.tableName,
-            guid: option.guid,
-            description: response.data.description,
-            data: JSON.parse(response.request.response).actions.POST
-          };
-          state.commit('SET_OPTIONS', sendOption);
-          sendOption.data = response.data.extra_actions;
-          state.commit('SET_EXTRA_ACTIONS', sendOption);
-          resolve();
-        })
-        .catch(error => {
-          console.log(error);
-          reject();
-        })
-        .finally(() => {
-          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-        });
-      });
+  async REQUEST_OPTIONS(state, options) {
+    const { apiApp } = state.rootState;
+    state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
+    const response = await apiApp.getOptions(options.tableName);
+    const sendOptions = {
+      ...options,
+      description: response.data.description,
+      data: JSON.parse(response.request.response).actions.POST
+    };
+    state.commit('SET_OPTIONS', sendOptions);
+    sendOptions.data = response.data.extra_actions;
+    state.commit('SET_EXTRA_ACTIONS', sendOptions);
+    state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
   },
+  // // const {  } = state.rootState;
+  // REQUEST_OPTIONS(state, option) {
+  //   let addressApi = state.getters.GET_ADDRESS_API('options', option.tableName);
+  //   let tokenAccess = state.rootGetters['Login/GET_USER_TOKEN_ACCESS'];
+  //   axios.defaults.headers.common = {'Authorization': tokenAccess};
+  //   return new Promise((resolve, reject) => {
+  //     state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+  //     axios
+  //       .options(addressApi)
+  //       .then(response => {
+  //         // console.log(response);
+  //         let sendOption = {
+  //           tableName: option.tableName,
+  //           guid: option.guid,
+  //           description: response.data.description,
+  //           data: JSON.parse(response.request.response).actions.POST
+  //         };
+  //         state.commit('SET_OPTIONS', sendOption);
+  //         sendOption.data = response.data.extra_actions;
+  //         state.commit('SET_EXTRA_ACTIONS', sendOption);
+  //         resolve();
+  //       })
+  //       .catch(error => {
+  //         console.log(error);
+  //         reject();
+  //       })
+  //       .finally(() => {
+  //         state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+  //       });
+  //     });
+  // },
 
   REQUEST_DATA_PREVIOUS(state, option) {
     let addressApi = state.getters.GET_LINK_PAGE_PREVIOUS(option);
@@ -420,23 +471,25 @@ export default {
     });
   },
 
-  REQUEST_ADDING(state, option) {
-    let addressApi = state.getters.GET_ADDRESS_API('post', option.tableName);
+  REQUEST_ADDING(state, options) {
+    let addressApi = state.getters.GET_ADDRESS_API('post', options.tableName);
     return new Promise((resolve, reject) => {
-      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-      axios
-        .post(addressApi, option.formData)
-        .then(response => {
-          console.log(response);
-          resolve(response);
-        })
-        .catch(err => {
-          console.log(err);
-          reject(err);
-        })
-        .finally(() => {
-          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-        });
+      console.log(addressApi);
+      console.log(options);
+      // state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+      // axios
+      //   .post(addressApi, option.formData)
+      //   .then(response => {
+      //     console.log(response);
+      //     resolve(response);
+      //   })
+      //   .catch(err => {
+      //     console.log(err);
+      //     reject(err);
+      //   })
+      //   .finally(() => {
+      //     state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+      //   });
     });
   },
 

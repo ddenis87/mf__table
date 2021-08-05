@@ -80,10 +80,10 @@ export const DataTable = {
         
       },
       defaultFilters: this.defaultFilters
-    })
-      .then(() => {
-        // properties in stor
-      });
+    });
+      // .then(() => {
+      //   // properties in stor
+      // });
   },
   mounted() { // Сообщаем в родителя что компонент смонтирован
     this.mountedComponent({

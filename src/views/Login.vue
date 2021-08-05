@@ -20,7 +20,7 @@
                   color="blue darken-3"
                   height="30"
                   :disabled="isProccessRequest"
-                  @click="sendLogin">Войти
+                  @click="authorization">Войти
           </v-btn>
         </v-card-actions>
       </v-form>
@@ -56,18 +56,20 @@ export default {
     };
   },
   computed: {
-    isProccessRequest() { return this.$store.getters['Login/GET_PROCCESS_REQUEST']; },
+    isProccessRequest() {
+      return false;
+      // this.$store.getters.GET_PROCCESS_REQUEST;
+    },
   },
   // mounted() {
   //   if (localStorage.getItem('Token') != null) this.$router.push('/Home');
   // },
   async mounted() {
-    const userToken = await login.authorizationLocalStorages();
-    console.log(userToken);
-    console.log(login.hasAuthorization());
-    if (login.hasAuthorization() || userToken) {
-      this.$router.push('/Home');
-    }
+    // const userToken = await login.authorizationLocalStorages();
+    // console.log(userToken);
+    // console.log(login.hasAuthorization());
+    if (login.hasAuthorization()) this.$router.push('/Home');
+    // console.log(this.$store);
   },
   methods: {
     // async sendLogin() {
@@ -83,7 +85,7 @@ export default {
     //       return false;
     //     });
     // },
-    async sendLogin() {
+    async authorization() {
       if (!this.$refs.FormLogin.validate()) return;
       try {
         await login.authorization(this.userName, this.userPassword);

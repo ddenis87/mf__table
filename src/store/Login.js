@@ -1,26 +1,27 @@
-import loginState from '@/logics/store/Login/state';
-import loginGetters from '@/logics/store/Login/getters';
-import loginMutations from '@/logics/store/Login/mutations';
-import loginActions from '@/logics/store/Login/actions';
+// import loginState from '@/logics/store/Login/state';
+// import loginGetters from '@/logics/store/Login/getters';
+// import loginMutations from '@/logics/store/Login/mutations';
+// import loginActions from '@/logics/store/Login/actions';
 
-import axios from 'axios';
+// import axios from 'axios';
+import logicLogin from '@/logics/store/Login/Login';
 export default {
   namespaced: true,
   state: {
-    ...loginState,
+    ...logicLogin.state,
     isProccessRequest: false,
     userTokenAccess: (localStorage.getItem('Token')) ? localStorage.getItem('Token') : '',
-    userName: (localStorage.getItem('userName')) ? localStorage.getItem('userName') : '',
+    // userName: (localStorage.getItem('userName')) ? localStorage.getItem('userName') : '',
     password: '',
   },
   getters: {
-    ...loginGetters,
+    ...logicLogin.getters,
     GET_PROCCESS_REQUEST(state) { return state.isProccessRequest; },
     GET_USER_TOKEN_ACCESS(state) { return `Token ${state.userTokenAccess}`; },
     GET_USER_NAME_PASSWORD(state) { return { userName: state.userName, password: state.password }; }
   },
   mutations: {
-    ...loginMutations,
+    ...logicLogin.mutations,
     SET_PROCCESS_REQUEST(state, status = false) { state.isProccessRequest = status },
     SET_USER_TOKEN_ACCESS(state, option) {
       state.userTokenAccess = option;
@@ -37,26 +38,27 @@ export default {
     },
   },
   actions: {
-    GET_USER_TOKEN_ACCESS(state, option, rootState) {
-      state.commit('SET_PROCCESS_REQUEST', true);
-      return new Promise((resolve, reject) => {
-        axios
-          .post(state.rootState.addressApi + 'api-token-auth/', {
-            username: option.userName,
-            password: option.password
-          })
-          .then(response => {
-            console.log(response);
-            state.commit('SET_USER_TOKEN_ACCESS', response.data.token);
-            resolve(response);
-          })
-          .catch(error => {
-            console.log(error);
-            reject(error);
-          })
-          .finally(() => state.commit('SET_PROCCESS_REQUEST'));
-      })
-    },
-    ...loginActions,
+    ...logicLogin.actions,
+    // GET_USER_TOKEN_ACCESS(state, option, rootState) {
+    //   state.commit('SET_PROCCESS_REQUEST', true);
+    //   return new Promise((resolve, reject) => {
+    //     axios
+    //       .post(state.rootState.addressApi + 'api-token-auth/', {
+    //         username: option.userName,
+    //         password: option.password
+    //       })
+    //       .then(response => {
+    //         console.log(response);
+    //         state.commit('SET_USER_TOKEN_ACCESS', response.data.token);
+    //         resolve(response);
+    //       })
+    //       .catch(error => {
+    //         console.log(error);
+    //         reject(error);
+    //       })
+    //       .finally(() => state.commit('SET_PROCCESS_REQUEST'));
+    //   })
+    // },
+    // ...loginActions,
   },
 }
