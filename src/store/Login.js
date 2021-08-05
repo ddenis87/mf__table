@@ -1,26 +1,26 @@
-import loginState from '@/logics/store/Login/state';
-import loginGetters from '@/logics/store/Login/getters';
-import loginMutations from '@/logics/store/Login/mutations';
-import loginActions from '@/logics/store/Login/actions';
+// import loginState from '@/logics/store/Login/state';
+// import loginGetters from '@/logics/store/Login/getters';
+// import loginMutations from '@/logics/store/Login/mutations';
+// import loginActions from '@/logics/store/Login/actions';
 
 import axios from 'axios';
 export default {
   namespaced: true,
   state: {
-    ...loginState,
+    // ...loginState,
     isProccessRequest: false,
     userTokenAccess: (localStorage.getItem('Token')) ? localStorage.getItem('Token') : '',
     userName: (localStorage.getItem('userName')) ? localStorage.getItem('userName') : '',
     password: '',
   },
   getters: {
-    ...loginGetters,
+    // ...loginGetters,
     GET_PROCCESS_REQUEST(state) { return state.isProccessRequest; },
     GET_USER_TOKEN_ACCESS(state) { return `Token ${state.userTokenAccess}`; },
     GET_USER_NAME_PASSWORD(state) { return { userName: state.userName, password: state.password }; }
   },
   mutations: {
-    ...loginMutations,
+    // ...loginMutations,
     SET_PROCCESS_REQUEST(state, status = false) { state.isProccessRequest = status },
     SET_USER_TOKEN_ACCESS(state, option) {
       state.userTokenAccess = option;
@@ -57,6 +57,6 @@ export default {
           .finally(() => state.commit('SET_PROCCESS_REQUEST'));
       })
     },
-    ...loginActions,
+    // ...loginActions,
   },
 }

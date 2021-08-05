@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import login from '@/logics/components/Login';
+// import login from '@/logics/components/Login';
 
 import AppBar from '@/components/App/AppBar.vue';
 import AppBarNav from '@/components/App/AppBarNav.vue';
@@ -25,9 +25,9 @@ export default {
     AppBarNav,
   },
   created() {
-    console.log(login.hasAuthorization());
-    if (!login.hasAuthorization()) this.$router.push('/Login');
-    // if (localStorage.getItem('Token') == null) this.$router.push('/Login');
+    // console.log(login.hasAuthorization());
+    // if (!login.hasAuthorization()) this.$router.push('/Login');
+    if (localStorage.getItem('Token') == null) this.$router.push('/Login');
   },
 };
 </script>
