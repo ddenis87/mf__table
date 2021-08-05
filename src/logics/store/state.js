@@ -1,5 +1,5 @@
-import Api from '@/logics/api.ts';
+import ApiApp from '@/logics/ApiApp.js';
 
 export default {
-  api: new Api('http://195.2.84.28/'),
+  api: new ApiApp('http://195.2.84.28/'),
 };

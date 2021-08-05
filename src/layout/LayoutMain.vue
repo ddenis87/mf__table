@@ -13,7 +13,7 @@
 </template>
 
 <script>
-// import login from '@/logics/components/Login';
+import login from '@/logics/views/Login';
 
 import AppBar from '@/components/App/AppBar.vue';
 import AppBarNav from '@/components/App/AppBarNav.vue';

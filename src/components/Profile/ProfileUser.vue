@@ -11,19 +11,23 @@
 </template>
 
 <script>
-import login from '@/logics/components/Login';
+import apiLocalStorages from '@/logics/ApiLocalStorages';
 
 export default {
   name: 'ProfileUser',
-  computed: {
-    userName() {
-      return this.$store.getters['Login/GET_USER_NAME_PASSWORD'].userName;
-    },
+  props: {
+    userName: { type: String, default: '' },
   },
+  // computed: {
+  //   userName() {
+  //     return this.$store.getters['Login/hasAuthorization'] || '';
+  //   },
+  // },
   methods: {
     logout() {
+      apiLocalStorages.deleteValue('Token');
       // this.$store.commit('Login/logout');
-      login.logout();
+      // login.logout();
       this.$router.push('/Logout');
     },
   },
