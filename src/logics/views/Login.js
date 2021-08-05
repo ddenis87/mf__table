@@ -9,6 +9,7 @@ export default {
   hasAuthorizationLS() {
     const userToken = apiLocalStorages.getValue('userToken');
     if (userToken) store.state.apiApp.setHeaderToken(userToken);
+    return userToken;
   },
 
   async authorization(userName, userPassword) {

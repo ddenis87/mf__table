@@ -2,30 +2,7 @@ import ApiHttp from './apiHttp';
 // import apiLocalStorages from './ApiLocalStorages';
 
 export default class ApiApp extends ApiHttp {
-  // constructor(baseURL) {
-  //   super(baseURL);
-  // }
-
-  // async authorization(userName, userPassword) {
-  //   if (userName === undefined && userPassword === undefined) {
-  //     const userToken = apiLocalStorages.getValue('Token');
-  //     if (userToken) {
-  //       this.setHeaderToken(userToken);
-  //       return true;
-  //     }
-  //     return false;
-  //   }
-  //   await super.authorization(userName, userPassword);
-  //   return true;
-  // }
-
-  // authorizationLS() {
-  //   const userToken = apiLocalStorages.getValue('Token');
-  //   if (userToken) this.setHeaderToken(userToken);
-  //   return userToken;
-  // }
-
-  async deleteElement(sourceName, elementId) {
+  async deleteListItem(sourceName, elementId) {
     let response = null;
     try {
       response = await this.require.get(`api/v1/${sourceName}/${elementId}`);
@@ -35,7 +12,7 @@ export default class ApiApp extends ApiHttp {
     return response;
   }
 
-  async getElements(sourceName, parametersURL) {
+  async getList(sourceName, parametersURL) {
     let response = null;
     try {
       response = await this.require.get(`api/v1/${sourceName}/?${parametersURL}`);
@@ -55,17 +32,17 @@ export default class ApiApp extends ApiHttp {
     return response;
   }
 
-  async postElement(sourceName, formData) {
+  async addListItem(sourceName, formData) {
     let response = null;
     try {
-      response = await this.require.post(`api/v1/${sourceName}`, formData);
+      response = await this.require.post(`api/v1/${sourceName}/`, formData);
     } catch (err) {
       console.log(err);
     }
     return response;
   }
 
-  async updateElement(sourceName, formData, elementId) {
+  async updateListItem(sourceName, formData, elementId) {
     let response = null;
     try {
       response = await this.require.put(`api/v1/${sourceName}/${elementId}`, formData);

@@ -68,7 +68,7 @@ export default {
     // const isAuthorizationLS = login.authorization(undefined, undefined);
     // console.log(userToken);
     // console.log(isAuthorizationLS);
-    // console.log(login.authorizationLS(undefined, undefined));
+    console.log(login.hasAuthorizationLS());
     // if (login.hasAuthorization() || isAuthorizationLS) this.$router.push('/Home');
     if (login.hasAuthorization() || login.hasAuthorizationLS()) this.$router.push('/Home');
     // if (login.hasAuthorization()) this.$router.push('/Home');
