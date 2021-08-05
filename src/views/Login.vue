@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import login from '@/logics/components/Login';
+import login from '@/logics/views/Login';
 import DialogToolbar from '@/components/Dialogs/DialogToolbar.vue';
 import ElProgressBar from '@/components/Elements/ElProgressBar/ElProgressBar.vue';
 
@@ -67,9 +67,9 @@ export default {
   async mounted() {
     // const userToken = await login.authorizationLocalStorages();
     // console.log(userToken);
-    // console.log(login.hasAuthorization());
-    if (login.hasAuthorization()) this.$router.push('/Home');
-    // console.log(this.$store);
+    console.log(login.hasAuthorization());
+    if (login.hasAuthorization() || login.authorization(undefined, undefined)) this.$router.push('/Home');
+    console.log(this.$store);
   },
   methods: {
     // async sendLogin() {

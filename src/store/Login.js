@@ -9,33 +9,33 @@ export default {
   namespaced: true,
   state: {
     ...logicLogin.state,
-    isProccessRequest: false,
-    userTokenAccess: (localStorage.getItem('Token')) ? localStorage.getItem('Token') : '',
+    // isProccessRequest: false,
+    // userTokenAccess: (localStorage.getItem('Token')) ? localStorage.getItem('Token') : '',
     // userName: (localStorage.getItem('userName')) ? localStorage.getItem('userName') : '',
-    password: '',
+    // password: '',
   },
   getters: {
     ...logicLogin.getters,
-    GET_PROCCESS_REQUEST(state) { return state.isProccessRequest; },
-    GET_USER_TOKEN_ACCESS(state) { return `Token ${state.userTokenAccess}`; },
-    GET_USER_NAME_PASSWORD(state) { return { userName: state.userName, password: state.password }; }
+    // GET_PROCCESS_REQUEST(state) { return state.isProccessRequest; },
+    // GET_USER_TOKEN_ACCESS(state) { return `Token ${state.userTokenAccess}`; },
+    // GET_USER_NAME_PASSWORD(state) { return { userName: state.userName, password: state.password }; }
   },
   mutations: {
     ...logicLogin.mutations,
-    SET_PROCCESS_REQUEST(state, status = false) { state.isProccessRequest = status },
-    SET_USER_TOKEN_ACCESS(state, option) {
-      state.userTokenAccess = option;
-      localStorage.setItem('Token', option);
-      localStorage.setItem('userName', state.userName);
-    },
-    SET_USER_NAME_PASSWORD(state, option) { state.userName = option.userName; state.password = option.password;  },
-    SET_LOGOUT(state) {
-      delete localStorage.Token;
-      delete localStorage.userName;
-      state.userTokenAccess = '';
-      state.userName = '';
-      state.password = '';
-    },
+    // SET_PROCCESS_REQUEST(state, status = false) { state.isProccessRequest = status },
+    // SET_USER_TOKEN_ACCESS(state, option) {
+    //   state.userTokenAccess = option;
+    //   localStorage.setItem('Token', option);
+    //   localStorage.setItem('userName', state.userName);
+    // },
+    // SET_USER_NAME_PASSWORD(state, option) { state.userName = option.userName; state.password = option.password;  },
+    // SET_LOGOUT(state) {
+    //   delete localStorage.Token;
+    //   delete localStorage.userName;
+    //   state.userTokenAccess = '';
+    //   state.userName = '';
+    //   state.password = '';
+    // },
   },
   actions: {
     ...logicLogin.actions,
