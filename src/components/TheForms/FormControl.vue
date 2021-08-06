@@ -36,9 +36,9 @@ export default {
       if (evt.code === 'Tab') {
         evt.preventDefault();
         this.$emit('control:tab');
-        return;
+        // return;
       }
-      this.$emit('control:accept');
+      if (evt.code.includes('Enter')) this.$emit('control:accept');
     },
   },
 };

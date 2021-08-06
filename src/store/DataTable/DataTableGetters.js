@@ -98,7 +98,12 @@ export default {
     // return state[option.tableName][option.guid].linkPageNext;
     return parametersURL;
   },
-  GET_LINK_PAGE_PREVIOUS:(state) => (option) => { return state[option.tableName][option.guid].linkPagePrevious; },
+  GET_LINK_PAGE_PREVIOUS:(state) => (option) => {
+    if (!state[option.tableName][option.guid].linkPagePrevious) return null;
+    const [, parametersURL] = state[option.tableName][option.guid].linkPagePrevious.split('?');
+    // return state[option.tableName][option.guid].linkPagePrevious;
+    return parametersURL;
+  },
 
   GET_FILTER_API:(state) => (option) => {
     let filters = state[option.tableName][option.guid].filters;

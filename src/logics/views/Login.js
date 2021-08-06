@@ -8,7 +8,7 @@ export default {
 
   hasAuthorizationLS() {
     const userToken = apiLocalStorages.getValue('userToken');
-    if (userToken) store.state.apiApp.setHeaderToken(userToken);
+    if (userToken) store.state.apiRest.setHeaderToken(userToken);
     return userToken;
   },
 

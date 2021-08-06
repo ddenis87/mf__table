@@ -134,10 +134,10 @@ export default {
   // },
 
   async ADDING_NEW_ELEMENT(state, options) {
-    const { apiApp } = state.rootState;
+    const { apiRest } = state.rootState;
     state.commit('SET_LOADING_API', { ... options, status: true });
 
-    const response = await apiApp.addListItem(options.tableName, options.formData);
+    const response = await apiRest.create(options.tableName, options.formData);
     state.commit('CLEAR_DATA', options); // перенесено в REQUEST_DATA ???
 
     await state.dispatch('REQUEST_DATA', { ...options, id: response.data.id, previous: true });
@@ -164,10 +164,10 @@ export default {
   //   });
   // },
   async UPDATE_ELEMENT_FIELD(state, options) {
-    const { apiApp } = state.rootState;
+    const { apiRest } = state.rootState;
     const { tableName: sourceName, formData, id: elementId } = options;
     state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
-    await apiApp.updateListItem(sourceName, formData, elementId);
+    await apiRest.update(sourceName, formData, elementId);
     state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
   },
   // ---------------------------------------------------------------------------
@@ -207,11 +207,11 @@ export default {
   //   });
   // },
   async DELETED_ELEMENT(state, options) {
-    const { apiApp } = state.rootState;
+    const { apiRest } = state.rootState;
     const { tableName: sourceName, id: elementId } = options;
     state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
     // console.log(sourceName, elementId);
-    const response = await apiApp.deleteListItem(sourceName, elementId);
+    const response = await apiRest.delete(sourceName, elementId);
     // console.log(response);
     state.commit('MARK_DELETED_ELEMENT', options);
     state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
@@ -235,9 +235,9 @@ export default {
   // REQUEST API
   // ПОЛУЧЕНИЕ OPTIONS
   async REQUEST_OPTIONS(state, options) {
-    const { apiApp } = state.rootState;
+    const { apiRest } = state.rootState;
     state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
-    const response = await apiApp.getOptions(options.tableName);
+    const response = await apiRest.options(options.tableName);
     const sendOptions = {
       ...options,
       description: response.data.description,
@@ -280,131 +280,217 @@ export default {
   //     });
   // },
 
-  REQUEST_DATA_PREVIOUS(state, option) {
-    let addressApi = state.getters.GET_LINK_PAGE_PREVIOUS(option);
-    let sendOption = { // Заменить на option
-      tableName: option.tableName,
-      guid: option.guid,
-    };
-    return new Promise((resolve, reject) => {
-      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-      axios
-          .get(addressApi)
-          .then(response => {
-            let buferData = [];
-            state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
-            response.data.results.forEach(element => {
-              for (let key of Object.keys(element)) {
-                let options = state.state[option.tableName].listOptions[key];
-                switch(options.type) {
-                  case 'choice': {
-                    element[key] = options.choices.find(item => item.value == element[key]);
-                    break;
-                  }
-                  case 'field': {
-                    if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
-                    let relatedModelName = options['related_model_name']
-                    if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
-                      state.commit('SET_DATA', {
-                        tableName: relatedModelName,
-                        value: element[key],
-                      });
-                    } // else Если есть, то возможно обновляем
-                    element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
-                  }
-                }
-              }
+  // REQUEST_DATA_PREVIOUS(state, option) {
+  //   let addressApi = state.getters.GET_LINK_PAGE_PREVIOUS(option);
+  //   let sendOption = { // Заменить на option
+  //     tableName: option.tableName,
+  //     guid: option.guid,
+  //   };
+  //   return new Promise((resolve, reject) => {
+  //     state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+  //     axios
+  //         .get(addressApi)
+  //         .then(response => {
+  //           let buferData = [];
+  //           state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
+  //           response.data.results.forEach(element => {
+  //             for (let key of Object.keys(element)) {
+  //               let options = state.state[option.tableName].listOptions[key];
+  //               switch(options.type) {
+  //                 case 'choice': {
+  //                   element[key] = options.choices.find(item => item.value == element[key]);
+  //                   break;
+  //                 }
+  //                 case 'field': {
+  //                   if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
+  //                   let relatedModelName = options['related_model_name']
+  //                   if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
+  //                     state.commit('SET_DATA', {
+  //                       tableName: relatedModelName,
+  //                       value: element[key],
+  //                     });
+  //                   } // else Если есть, то возможно обновляем
+  //                   element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
+  //                 }
+  //               }
+  //             }
 
-              if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
-                state.commit('SET_DATA', {
-                  tableName: option.tableName,
-                  value: element,
-                });
-              }
-              buferData.push(state.state[option.tableName].listData.find(item => item.id == element.id));
-              // sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
-              // state.commit('SET_DATA', sendOption);
-            });
-            sendOption.buferData = buferData;
-            state.commit('SET_DATA_PREVIOUS', sendOption);
-            resolve();
-          })
-          .catch(error => {
-            console.log(error);
-            reject();
-          })
-          .finally(() => {
-            setTimeout(() => {
-              state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-            }, 800);
-          });
+  //             if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
+  //               state.commit('SET_DATA', {
+  //                 tableName: option.tableName,
+  //                 value: element,
+  //               });
+  //             }
+  //             buferData.push(state.state[option.tableName].listData.find(item => item.id == element.id));
+  //             // sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
+  //             // state.commit('SET_DATA', sendOption);
+  //           });
+  //           sendOption.buferData = buferData;
+  //           state.commit('SET_DATA_PREVIOUS', sendOption);
+  //           resolve();
+  //         })
+  //         .catch(error => {
+  //           console.log(error);
+  //           reject();
+  //         })
+  //         .finally(() => {
+  //           setTimeout(() => {
+  //             state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+  //           }, 800);
+  //         });
+  //   });
+  // },
+  async REQUEST_DATA_PREVIOUS(state, options) {
+    const { apiRest } = state.rootState;
+    const parametersURL = state.getters.GET_LINK_PAGE_PREVIOUS(options);
+    const sendOption = { // Заменить на option
+      tableName: options.tableName,
+      guid: options.guid,
+    };
+
+    const response = await apiRest.getAll(options.tableName, parametersURL);
+    state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
+    response.data.results.forEach((element) => {
+      for (let key of Object.keys(element)) {
+        let optionsKey = state.state[option.tableName].listOptions[key];
+        switch(optionsKey.type) {
+          case 'choice': {
+            element[key] = optionsKey.choices.find(item => item.value == element[key]);
+            break;
+          }
+          case 'field': {
+            if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
+            let relatedModelName = optionsKey['related_model_name']
+            if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
+              state.commit('SET_DATA', {
+                tableName: relatedModelName,
+                value: element[key],
+              });
+            } // else Если есть, то возможно обновляем
+            element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
+          }
+        }
+      }
+
+      if (!state.state[options.tableName].listData.find(item => item.id == element.id)) {
+        state.commit('SET_DATA', {
+          tableName: options.tableName,
+          value: element,
+        });
+      }
+      buferData.push(state.state[options.tableName].listData.find(item => item.id == element.id));
     });
+    sendOption.buferData = buferData;
+    state.commit('SET_DATA_PREVIOUS', sendOption);
+    state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
   },
 
-  REQUEST_DATA_PRELOAD(state, option) {
-      console.log('preload data');
-      let addressApi = option.data.previous;
-      let sendOption = { // Заменить на option
-        tableName: option.tableName,
-        guid: option.guid,
-      };
-      console.log(addressApi);
-      return new Promise((resolve, reject) => {
-        state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-        axios
-          .get(addressApi)
-          .then(response => {
-            state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
-            let joinResponse = response.data.results.concat(option.data.results);
-            // console.log(joinResponse);
-            joinResponse.forEach(element => {
-              for (let key of Object.keys(element)) {
-                let options = state.state[option.tableName].listOptions[key];
-                switch(options.type) {
-                  case 'choice': {
-                    element[key] = options.choices.find(item => item.value == element[key]);
-                    break;
-                  }
-                  case 'field': {
-                    if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
-                    let relatedModelName = options['related_model_name']
-                    if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
-                      state.commit('SET_DATA', {
-                        tableName: relatedModelName,
-                        value: element[key],
-                      });
-                    } // else Если есть, то возможно обновляем
-                    element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
-                  }
-                }
-              }
 
-              if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
-                state.commit('SET_DATA', {
-                  tableName: option.tableName,
-                  value: element,
-                });
-              }
-              sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
-              state.commit('SET_DATA', sendOption);
-            });
-            // console.log('resolve preload');
-            resolve();
-          })
-          .catch(error => {
-            console.log(error);
-            reject();
-          })
-          .finally(() => {
-            setTimeout(() => {
-              state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-            }, 800);
-          });
-      });
+  // REQUEST_DATA_PRELOAD(state, option) {
+  //     console.log('preload data');
+  //     let addressApi = option.data.previous;
+  //     let sendOption = { // Заменить на option
+  //       tableName: option.tableName,
+  //       guid: option.guid,
+  //     };
+  //     console.log(addressApi);
+  //     return new Promise((resolve, reject) => {
+  //       state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+  //       axios
+  //         .get(addressApi)
+  //         .then(response => {
+  //           state.commit('SET_DATA_OPTIONS_PRELOAD', Object.assign(sendOption, {data: response.data}));
+  //           let joinResponse = response.data.results.concat(option.data.results);
+  //           // console.log(joinResponse);
+  //           joinResponse.forEach(element => {
+  //             for (let key of Object.keys(element)) {
+  //               let options = state.state[option.tableName].listOptions[key];
+  //               switch(options.type) {
+  //                 case 'choice': {
+  //                   element[key] = options.choices.find(item => item.value == element[key]);
+  //                   break;
+  //                 }
+  //                 case 'field': {
+  //                   if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
+  //                   let relatedModelName = options['related_model_name']
+  //                   if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
+  //                     state.commit('SET_DATA', {
+  //                       tableName: relatedModelName,
+  //                       value: element[key],
+  //                     });
+  //                   } // else Если есть, то возможно обновляем
+  //                   element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
+  //                 }
+  //               }
+  //             }
+
+  //             if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
+  //               state.commit('SET_DATA', {
+  //                 tableName: option.tableName,
+  //                 value: element,
+  //               });
+  //             }
+  //             sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
+  //             state.commit('SET_DATA', sendOption);
+  //           });
+  //           // console.log('resolve preload');
+  //           resolve();
+  //         })
+  //         .catch(error => {
+  //           console.log(error);
+  //           reject();
+  //         })
+  //         .finally(() => {
+  //           setTimeout(() => {
+  //             state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+  //           }, 800);
+  //         });
+  //     });
+  // },
+  async REQUEST_DATA_PRELOAD(state, options) {
+    const { apiRest } = state.rootState;
+    console.log(options.data.previous);
+    const [, parametersURL] = options.data.previous.split('?');
+    state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
+
+    const response = await apiRest.getListAll(options.tableName, parametersURL);
+    let joinResponse = response.data.results.concat(option.data.results);
+    joinResponse.forEach((element) => {
+      for (let key of Object.keys(element)) {
+        let options = state.state[option.tableName].listOptions[key];
+        switch(options.type) {
+          case 'choice': {
+            element[key] = options.choices.find(item => item.value == element[key]);
+            break;
+          }
+          case 'field': {
+            if (!element[key]) break; // ЕСЛИ ЗНАЧЕНИЕ NULL
+            let relatedModelName = options['related_model_name']
+            if (!state.state[relatedModelName].listData.find(item => item.id == element[key].id)) { // Если значение не найдено
+              state.commit('SET_DATA', {
+                tableName: relatedModelName,
+                value: element[key],
+              });
+            } // else Если есть, то возможно обновляем
+            element[key] = state.state[relatedModelName].listData.find(item => item.id == element[key].id)
+          }
+        }
+      }
+
+      if (!state.state[option.tableName].listData.find(item => item.id == element.id)) {
+        state.commit('SET_DATA', {
+          tableName: option.tableName,
+          value: element,
+        });
+      }
+      sendOption.value = state.state[option.tableName].listData.find(item => item.id == element.id);
+      state.commit('SET_DATA', sendOption);
+    });
+    state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
   },
 
   async REQUEST_DATA(state, options) {
-    const { apiApp } = state.rootState;
+    const { apiRest } = state.rootState;
     const filterApi = state.getters.GET_FILTER_API(options);
     const filterExtended = state.getters.GET_FILTER_EXTENDED(options);
     let parametersURL = filterApi + filterExtended;
@@ -415,7 +501,7 @@ export default {
     if (Object.keys(options).includes('next')) parametersURL = state.getters.GET_LINK_PAGE_NEXT(options);
     state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
 
-    const response = await apiApp.getList(options.tableName, parametersURL);
+    const response = await apiRest.getAll(options.tableName, parametersURL);
     state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: response.data}));
     if ((response.data.results.length < state.state[options.tableName][options.guid].filters['page_size'])
       && ('previous' in options)
@@ -557,9 +643,9 @@ export default {
 
   // async REQUEST_ADDING(state, options) {
   //   // options - formData
-  //   const { apiApp } = state.rootState;
+  //   const { apiRest } = state.rootState;
   //   state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
-  //   const response = await apiApp.addListItem(options.tableName, options.formData);
+  //   const response = await apiRest.addListItem(options.tableName, options.formData);
   //   state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
   //   return response;
   //   // let addressApi = state.getters.GET_ADDRESS_API('post', options.tableName);
@@ -655,11 +741,11 @@ export default {
   //   });
   // },
   async REQUEST_DATA_ITEM(state, options) {
-    const { apiApp } = state.rootState;
+    const { apiRest } = state.rootState;
     const { tableName: sourceName, id: elementId } = options;
     state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
 
-    const response = await apiApp.getListItem(sourceName, elementId);
+    const response = await apiRest.get(sourceName, elementId);
     console.log(response);
     response.data.results.forEach((element) => {
       state.commit('SET_DATA', {
@@ -694,7 +780,7 @@ export default {
   //   })
   // },
   async HISTORY_REQUEST_DATA(state, options) {
-    const { apiApp } = state.rootState;
+    const { apiRest } = state.rootState;
     const { tableName, mode, id: elementId } = options;
     let sourceName = tableName;
     let parametersURL = `related=${elementId}`;
@@ -702,7 +788,7 @@ export default {
       sourceName += '/retrieve_actual';
       parametersURL = `id=${elementId}`;
     }
-    const response = await apiApp.getList(sourceName, parametersURL);
+    const response = await apiRest.getAll(sourceName, parametersURL);
     return response.data;
   },
 }

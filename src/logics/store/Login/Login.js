@@ -20,12 +20,12 @@ export default {
   },
   actions: {
     async authorization(state, options) {
-      const { apiApp } = state.rootState;
+      const { apiRest } = state.rootState;
       const { userName, userPassword } = options;
       // const userName = await apiApp.authorization(userName, userPassword);
       // console.log(state);
       console.log('store logic login');
-      const userToken = await apiApp.authorization(userName, userPassword);
+      const userToken = await apiRest.authorization(userName, userPassword);
       state.commit('setUserName', { userName });
       return userToken;
     },
