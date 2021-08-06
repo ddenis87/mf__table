@@ -1,6 +1,6 @@
-import ApiHttp from './ApiHTTP';
+import ApiAxios from './ApiAxios';
 
-export default class ApiRest extends ApiHttp {
+export default class ApiRest extends ApiAxios {
   async create(sourceName, formData) {
     let response = null;
     try {

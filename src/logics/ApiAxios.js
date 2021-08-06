@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export default class ApiHttp {
+export default class ApiAxios {
   constructor(baseURL) {
     this.require = axios.create({
       baseURL,

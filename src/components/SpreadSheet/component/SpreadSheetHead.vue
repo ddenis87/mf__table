@@ -134,7 +134,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../Spread.scss';
+@import '../SpreadSheet.scss';
 .rows {
   position: relative;
   display: grid;

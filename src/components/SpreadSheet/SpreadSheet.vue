@@ -65,7 +65,7 @@ import TableLayout from '../TableLayout.vue';
 import SpreadSheetAngle from './component/SpreadSheetAngle.vue';
 import SpreadSheetHead from './component/SpreadSheetHead.vue';
 import SpreadSheetBody from './component/SpreadSheetBody.vue';
-import SpreadSheetBodyPrint from './components/SpreadSheetBodyPrint.vue';
+import SpreadSheetBodyPrint from './component/SpreadSheetBodyPrint.vue';
 
 import {
   CELL_WIDTH_TITLE,
@@ -485,7 +485,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import './Spread.scss';
+@import './SpreadSheet.scss';
 
 .spread-sheet {
   display: grid;

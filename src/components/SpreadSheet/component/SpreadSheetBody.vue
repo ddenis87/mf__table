@@ -34,6 +34,7 @@ import {
   CELL_WIDTH_GROUP,
   CELL_HEIGHT_BODY,
   CELL_HEIGHT_GROUP,
+  CELL_WIDTH_TITLE,
 } from '../SpreadSheetConst';
 
 export default {
@@ -69,6 +70,7 @@ export default {
         },
       },
       isTooltipTimer: null,
+      sheetBodyGeometry: null,
     };
   },
   computed: {
@@ -124,9 +126,18 @@ export default {
       };
     },
 
+    widthFixedArea() {
+      let width = (CELL_WIDTH_GROUP * this.maxRowGroupingLevel) + CELL_WIDTH_TITLE + 6;
+      this.columns.forEach((column) => {
+        if (column.fixed) width += column.width;
+      });
+      console.log(width);
+      return width;
+    },
+
     widthVirtualList() {
       let title = 0;
-      if (!this.isShowTitle) title = this.maxLevelGroupRow * CELL_WIDTH_GROUP;
+      if (!this.isShowTitle) title = this.maxRowGroupingLevel * CELL_WIDTH_GROUP;
       const width = {
         width: `calc(100vw - 20px + ${title}px)`,
       };
@@ -235,14 +246,14 @@ export default {
 
     focusCell(target) {
       if (target.getBoundingClientRect().left < this.widthFixedArea) {
-        this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 5;
-        this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 5;
+        this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 8;
+        this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 8;
       }
       const geometryVirtualScroll = target.closest('.spread-sheet__body').getBoundingClientRect();
       if (target.getBoundingClientRect().right > geometryVirtualScroll.right) {
         const delta = target.getBoundingClientRect().right - geometryVirtualScroll.right;
-        this.$refs.SheetBody.$el.scrollLeft += delta + 17;
-        this.$refs.SheetBodyFixed.scrollLeft += delta + 17;
+        this.$refs.SheetBody.$el.scrollLeft += delta + 18;
+        this.$refs.SheetBodyFixed.scrollLeft += delta + 18;
       }
       target.focus();
       this.selectedCell(target.getAttribute('data-name'));

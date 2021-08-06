@@ -48,10 +48,11 @@
 import display from '@/plugins/formattingView/formattingView';
 
 import {
-  CELL_HEIGHT,
+  CELL_HEIGHT_BODY,
   CELL_WIDTH_GROUP,
-  CELL_WIDTH_LEFT_GROUP,
-  CELL_WIDTH_LEFT_TITLE,
+  CELL_WIDTH_TITLE,
+  // CELL_WIDTH_GROUP,
+  // CELL_WIDTH_TITLE,
 } from '../SpreadSheetConst';
 import SpreadSheetBtnGroup from './SpreadSheetBtnGroup.vue';
 
@@ -89,14 +90,14 @@ export default {
 
     gridRow() {
       const gridRow = {
-        'grid-template-rows': `${this.source.height || CELL_HEIGHT}px`,
+        'grid-template-rows': `${this.source.height || CELL_HEIGHT_BODY}px`,
         'grid-template-columns': this.templateColumnTitle,
       };
       return gridRow;
     },
 
     shiftTitle() {
-      let shiftLeft = CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel;
+      let shiftLeft = CELL_WIDTH_GROUP * this.maxRowGroupingLevel;
       if (this.maxRowGroupingLevel !== 0) shiftLeft += 4;
       const shiftTitle = {
         left: `${shiftLeft}px`,
@@ -108,7 +109,7 @@ export default {
 
     templateColumnTitle() {
       let tempalteColumnTitle = `${this.templateColumnWidth}`;
-      if (this.isShowTitle) tempalteColumnTitle = `${CELL_WIDTH_LEFT_TITLE}px ${tempalteColumnTitle}`;
+      if (this.isShowTitle) tempalteColumnTitle = `${CELL_WIDTH_TITLE}px ${tempalteColumnTitle}`;
       if (this.maxRowGroupingLevel !== 0) {
         tempalteColumnTitle = `repeat(${this.maxRowGroupingLevel - 1},
                                minmax(${CELL_WIDTH_GROUP}px, ${CELL_WIDTH_GROUP}px))
@@ -168,8 +169,8 @@ export default {
       if (this.columns[columnIndex].fixed) {
         cellFixed.position = 'sticky';
         cellFixed['z-index'] = 100;
-        cellFixed.left = CELL_WIDTH_LEFT_GROUP * this.maxRowGroupingLevel;
-        if (this.isShowTitle) cellFixed.left += CELL_WIDTH_LEFT_TITLE;
+        cellFixed.left = CELL_WIDTH_GROUP * this.maxRowGroupingLevel;
+        if (this.isShowTitle) cellFixed.left += CELL_WIDTH_TITLE;
         for (let i = 0; i < columnIndex; i += 1) {
           cellFixed.left += this.columns[i].width;
         }
@@ -226,13 +227,10 @@ export default {
 
     getGroupStyle(level) {
       const groupStyle = {
-        left: `${(CELL_WIDTH_LEFT_GROUP * (+level - 1))}px`,
+        left: `${(CELL_WIDTH_GROUP * (+level - 1))}px`,
       };
-      // if (!this.isShowTitle
-      //   && this.maxRowGroupingLevel === level) groupStyle['border-right'] = 'thin solid grey';
       if (this.index === this.rows.length - 1) groupStyle['border-bottom'] = 'thin solid grey';
       if (this.maxRowGroupingLevel === level) {
-        console.log('add width');
         groupStyle['border-right'] = 'thin solid grey';
         groupStyle['padding-right'] = '4px';
         groupStyle.width = '25px';
