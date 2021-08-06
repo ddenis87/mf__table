@@ -41,16 +41,11 @@ export default {
   },
   data() {
     return {
-      // isDialog: true,
       isPasswordShow: false,
       isError: false,
       rules: {
         required: (value) => !!value || 'Обязательное поле',
       },
-      // userData: {
-      //   userName: '',
-      //   password: '',
-      // },
       userName: '',
       userPassword: '',
     };
@@ -61,41 +56,10 @@ export default {
       // this.$store.getters.GET_PROCCESS_REQUEST;
     },
   },
-  // mounted() {
-  //   if (localStorage.getItem('Token') != null) this.$router.push('/Home');
-  // },
-  async mounted() {
-    // const isAuthorizationLS = login.authorization(undefined, undefined);
-    // console.log(userToken);
-    // console.log(isAuthorizationLS);
-    console.log(login.hasAuthorizationLS());
-    // if (login.hasAuthorization() || isAuthorizationLS) this.$router.push('/Home');
+  created() {
     if (login.hasAuthorization() || login.hasAuthorizationLS()) this.$router.push('/Home');
-    // if (login.hasAuthorization()) this.$router.push('/Home');
-    // console.log(this.$store);
   },
-  // async mounted() {
-  //   const userToken = await login.authorizationLocalStorages();
-  //   console.log(userToken);
-  //   console.log(login.hasAuthorization());
-  //   if (login.hasAuthorization() || userToken) {
-  //     this.$router.push('/Home');
-  //   }
-  // },
   methods: {
-    // async sendLogin() {
-    //   if (!this.$refs.FormLogin.validate()) return;
-    //   console.log('valid');
-    //   this.$store.commit('Login/SET_USER_NAME_PASSWORD', this.userData);
-    //   await this.$store.dispatch('Login/GET_USER_TOKEN_ACCESS', this.userData)
-    //     .then(() => this.$router.push('/Home'))
-    //     .catch(() => {
-    //       this.isError = true;
-    //       this.$refs.FormLogin.reset();
-    //       setTimeout(() => { this.isError = false; }, 3000);
-    //       return false;
-    //     });
-    // },
     async authorization() {
       if (!this.$refs.FormLogin.validate()) return;
       try {
@@ -106,18 +70,7 @@ export default {
         this.$refs.FormLogin.reset();
         setTimeout(() => { this.isError = false; }, 3000);
       }
-      // console.log(this.$store);
     },
-    // async sendLogin() {
-    //   if (!this.$refs.FormLogin.validate()) return;
-    //   try {
-    //     await login.authorization(this.userName, this.userPassword);
-    //     this.$router.push('/Home');
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    //   console.log(this.$store);
-    // },
   },
 };
 </script>

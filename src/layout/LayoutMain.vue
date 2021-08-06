@@ -24,8 +24,8 @@ export default {
     AppBar,
     AppBarNav,
   },
-  created() {
-    if (!login.hasAuthorization()) this.$router.push('/Login');
+  mounted() {
+    if (!login.hasAuthorizationLS()) this.$router.push('/Login');
   },
 };
 </script>

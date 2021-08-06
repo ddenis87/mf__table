@@ -1,11 +1,11 @@
-import ApiHttp from './apiHttp';
+import ApiHttp from './ApiHTTP';
 // import apiLocalStorages from './ApiLocalStorages';
 
 export default class ApiApp extends ApiHttp {
   async deleteListItem(sourceName, elementId) {
     let response = null;
     try {
-      response = await this.require.get(`api/v1/${sourceName}/${elementId}`);
+      response = await this.require.delete(`api/v1/${sourceName}/${elementId}`);
     } catch (err) {
       console.log(err);
     }
@@ -16,6 +16,16 @@ export default class ApiApp extends ApiHttp {
     let response = null;
     try {
       response = await this.require.get(`api/v1/${sourceName}/?${parametersURL}`);
+    } catch (err) {
+      console.log(err);
+    }
+    return response;
+  }
+
+  async getListItem(sourceName, elementId) {
+    let response = null;
+    try {
+      response = await this.require.get(`api/v1/${sourceName}/?id=${elementId}`);
     } catch (err) {
       console.log(err);
     }
@@ -45,7 +55,7 @@ export default class ApiApp extends ApiHttp {
   async updateListItem(sourceName, formData, elementId) {
     let response = null;
     try {
-      response = await this.require.put(`api/v1/${sourceName}/${elementId}`, formData);
+      response = await this.require.put(`api/v1/${sourceName}/${elementId}/`, formData);
     } catch (err) {
       console.log(err);
     }

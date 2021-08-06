@@ -92,7 +92,12 @@ export default {
       default: return addressApi;
     }
   },
-  GET_LINK_PAGE_NEXT:(state) => (option) => { return state[option.tableName][option.guid].linkPageNext; },
+  GET_LINK_PAGE_NEXT:(state) => (option) => {
+    if (!state[option.tableName][option.guid].linkPageNext) return null;
+    const [, parametersURL] = state[option.tableName][option.guid].linkPageNext.split('?');
+    // return state[option.tableName][option.guid].linkPageNext;
+    return parametersURL;
+  },
   GET_LINK_PAGE_PREVIOUS:(state) => (option) => { return state[option.tableName][option.guid].linkPagePrevious; },
 
   GET_FILTER_API:(state) => (option) => {

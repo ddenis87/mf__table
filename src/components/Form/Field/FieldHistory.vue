@@ -55,6 +55,7 @@ export default {
     filters: null,
     dimension: { type: String, default: '' },
     dimensionValue: { type: [String, Number, Object], default: null },
+    idElement: { type: Number, default: null },
   },
   data() {
     return {
@@ -83,6 +84,32 @@ export default {
     filterTable() {
       return { [this.dimension]: this.dimensionValue || '' };
     },
+  },
+  async created() {
+    if (!this.idElement) return;
+    this.isLoadingData = true;
+    const relatedModelView = this.$store.getters['DataTable/GET_RELATED_MODEL_VIEW']({ tableName: this.relatedModelName });
+    const templateValue = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1)
+      .split('}{');
+    await this.$store.dispatch('DataTable/HISTORY_REQUEST_DATA', {
+      tableName: this.relatedModelName,
+      mode: 'element',
+      id: this.idElement,
+    })
+      .then((element) => {
+        let newValue = relatedModelView;
+        // console.log(element);
+        templateValue.forEach((item) => {
+          newValue = newValue.replace(`{${item}}`, element[item]);
+        });
+        // console.log(newValue);
+        if (newValue !== 'undefined') {
+          this.fieldValue = newValue;
+        } else {
+          this.fieldValue = '';
+        }
+        this.isLoadingData = false;
+      });
   },
   methods: {
     evtMountTable(option) {

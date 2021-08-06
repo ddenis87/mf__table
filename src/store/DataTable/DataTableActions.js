@@ -105,10 +105,10 @@ export default {
       resolve();
     });
   },
+
   // ADDING_NEW_ELEMENT(state, option) {
   //   // state.commit('SET_FILTER_DEFAULT', Object.assign(option, {})); ????
   //   // state.commit('CLEAR_DATA', option);
-    
   //   return new Promise((resolve, reject) => {
   //     state.dispatch('REQUEST_ADDING', option)
   //       .then((response) => {
@@ -125,40 +125,24 @@ export default {
   //       })
   //   });
   // },
-  // ADDING_NEW_ELEMENT(state, option) {
-  //   // state.commit('SET_FILTER_DEFAULT', Object.assign(option, {})); ????
-  //   // state.commit('CLEAR_DATA', option);
-    
-  //   return new Promise((resolve, reject) => {
-  //     state.dispatch('REQUEST_ADDING', option)
-  //       .then((response) => {
-  //         console.log(response);
-  //         state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-  //         // Отчистить Data запросить данные если добавляем не в строке
-  //         // response должен содержать id созданного элемента
-  //         state.commit('CLEAR_DATA', option); // перенесено в REQUEST_DATA ???
-  //         state.dispatch('REQUEST_DATA', Object.assign(option, {id: response.data.id, previous: true}))
-  //           .then(() => {
-  //             console.log('request data iz adding element')
-  //             resolve(response.data.id);
-  //           })
-  //       })
-  //   });
+  // async ADDING_NEW_ELEMENT(state, options) {
+  //   const response = await state.dispatch('REQUEST_ADDING', options)
+  //   state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
+  //   state.commit('CLEAR_DATA', options); // перенесено в REQUEST_DATA ???
+  //   await state.dispatch('REQUEST_DATA', Object.assign(options, {id: response.data.id, previous: true}))
+  //   return response.data.id;
   // },
+
   async ADDING_NEW_ELEMENT(state, options) {
-    const response = await state.dispatch('REQUEST_ADDING', options)
-    state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
-        // Отчистить Data запросить данные если добавляем не в строке
-        // response должен содержать id созданного элемента
+    const { apiApp } = state.rootState;
+    state.commit('SET_LOADING_API', { ... options, status: true });
+
+    const response = await apiApp.addListItem(options.tableName, options.formData);
     state.commit('CLEAR_DATA', options); // перенесено в REQUEST_DATA ???
-    await state.dispatch('REQUEST_DATA', Object.assign(options, {id: response.data.id, previous: true}))
+
+    await state.dispatch('REQUEST_DATA', { ...options, id: response.data.id, previous: true });
+    state.commit('SET_LOADING_API', { ... options, status: true });
     return response.data.id;
-            // .then(() => {
-            //   console.log('request data iz adding element')
-            //   resolve(response.data.id);
-            // })
-        // })
-    // });
   },
 
   DELETING_NEW_ELEMENT_INLINE(state, option) {
@@ -170,40 +154,67 @@ export default {
   // ---------------------------------------------------------------------------
 
   // ----ОБНОВЛЕНИЕ ПОЛЕЙ ЭЛЕМЕНТА----------------------------------------------
-  UPDATE_ELEMENT_FIELD(state, option) {
-    return new Promise((resolve, reject) => {
+  // UPDATE_ELEMENT_FIELD(state, option) {
+  //   return new Promise((resolve, reject) => {
 
-      state.dispatch('REQUEST_UPDATE', option)
-        .then((response) => {
+  //     state.dispatch('REQUEST_UPDATE', option)
+  //       .then((response) => {
           
-        })
-    });
+  //       })
+  //   });
+  // },
+  async UPDATE_ELEMENT_FIELD(state, options) {
+    const { apiApp } = state.rootState;
+    const { tableName: sourceName, formData, id: elementId } = options;
+    state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
+    await apiApp.updateListItem(sourceName, formData, elementId);
+    state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
   },
   // ---------------------------------------------------------------------------
 
   // ----ОБНОВЛЕНИЕ ЭЛЕМЕНТА----------------------------------------------------
-  UPDATE_ELEMENT(state, option) {
-    return new Promise((resolve, reject) => {
-      state.dispatch('REQUEST_UPDATE', option)
-        .then((response) => {
-          // Перезапрос данные
-          let newOption = Object.assign({}, option);
-          delete newOption.id;
-          state.commit('CLEAR_DATA', newOption);
-          state.dispatch('REQUEST_DATA', newOption);
-        })
-    });
+  // UPDATE_ELEMENT(state, option) {
+  //   return new Promise((resolve, reject) => {
+  //     state.dispatch('REQUEST_UPDATE', option)
+  //       .then((response) => {
+  //         // Перезапрос данные
+  //         let newOption = Object.assign({}, option);
+  //         delete newOption.id;
+  //         state.commit('CLEAR_DATA', newOption);
+  //         state.dispatch('REQUEST_DATA', newOption);
+  //       })
+  //   });
+  // },
+  async UPDATE_ELEMENT(state, options) {
+    await state.dispatch('UPDATE_ELEMENT_FIELD', options);
+    const { tableName, guid } = options;
+    const sendOptions = {
+      tableName,
+      guid,
+    };
+    state.commit('CLEAR_DATA', sendOptions);
+    state.dispatch('REQUEST_DATA', sendOptions);
   },
   // ---------------------------------------------------------------------------
 
   // ----ПОМЕТКА НА УДАЛЕНИЕ ЭЛЕМЕНТА-------------------------------------------
-  DELETED_ELEMENT(state, option) {
-    return new Promise((resolve, reject) => {
-      state.dispatch('REQUEST_MARK_DELETED', option)
-        .then(() => {
-          resolve();
-        })
-    });
+  // DELETED_ELEMENT(state, option) {
+  //   return new Promise((resolve, reject) => {
+  //     state.dispatch('REQUEST_MARK_DELETED', option)
+  //       .then(() => {
+  //         resolve();
+  //       })
+  //   });
+  // },
+  async DELETED_ELEMENT(state, options) {
+    const { apiApp } = state.rootState;
+    const { tableName: sourceName, id: elementId } = options;
+    state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
+    // console.log(sourceName, elementId);
+    const response = await apiApp.deleteListItem(sourceName, elementId);
+    // console.log(response);
+    state.commit('MARK_DELETED_ELEMENT', options);
+    state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
   },
   // ---------------------------------------------------------------------------
 
@@ -396,13 +407,15 @@ export default {
     const { apiApp } = state.rootState;
     const filterApi = state.getters.GET_FILTER_API(options);
     const filterExtended = state.getters.GET_FILTER_EXTENDED(options);
-    const filterAll = filterApi + filterExtended;
+    let parametersURL = filterApi + filterExtended;
     const sendOption = { // Заменить на option
       tableName: options.tableName,
       guid: options.guid,
     };
+    if (Object.keys(options).includes('next')) parametersURL = state.getters.GET_LINK_PAGE_NEXT(options);
     state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
-    const response = await apiApp.getList(options.tableName, filterAll);
+
+    const response = await apiApp.getList(options.tableName, parametersURL);
     state.commit('SET_DATA_OPTIONS', Object.assign(sendOption, {data: response.data}));
     if ((response.data.results.length < state.state[options.tableName][options.guid].filters['page_size'])
       && ('previous' in options)
@@ -542,104 +555,119 @@ export default {
   //   });
   // },
 
-  async REQUEST_ADDING(state, options) {
-    // options - formData
-    const { apiApp } = state.rootState;
-    state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
-    const response = await apiApp.addListItem(options.tableName, options.formData);
-    state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
-    return response;
-    // let addressApi = state.getters.GET_ADDRESS_API('post', options.tableName);
-    // return new Promise((resolve, reject) => {
-    //   console.log(addressApi);
-    //   console.log(options);
-    // state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-    // axios
-    //   .post(addressApi, option.formData)
-    //   .then(response => {
-    //     console.log(response);
-    //     resolve(response);
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //     reject(err);
-    //   })
-    //   .finally(() => {
-    //     state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-    //   });
-    // });
-  },
+  // async REQUEST_ADDING(state, options) {
+  //   // options - formData
+  //   const { apiApp } = state.rootState;
+  //   state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
+  //   const response = await apiApp.addListItem(options.tableName, options.formData);
+  //   state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
+  //   return response;
+  //   // let addressApi = state.getters.GET_ADDRESS_API('post', options.tableName);
+  //   // return new Promise((resolve, reject) => {
+  //   //   console.log(addressApi);
+  //   //   console.log(options);
+  //   // state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+  //   // axios
+  //   //   .post(addressApi, option.formData)
+  //   //   .then(response => {
+  //   //     console.log(response);
+  //   //     resolve(response);
+  //   //   })
+  //   //   .catch(err => {
+  //   //     console.log(err);
+  //   //     reject(err);
+  //   //   })
+  //   //   .finally(() => {
+  //   //     state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+  //   //   });
+  //   // });
+  // },
 
-  REQUEST_UPDATE(state, option) {
-    let addressApi = state.getters.GET_ADDRESS_API('update', option.tableName);
-    addressApi += `${option.id}/`;
-    return new Promise((resolve, reject) => {
-      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-      axios
-        .put(addressApi, option.formData)
-        .then(response => {
-          console.log(response);
+  // REQUEST_UPDATE(state, option) {
+  //   let addressApi = state.getters.GET_ADDRESS_API('update', option.tableName);
+  //   addressApi += `${option.id}/`;
+  //   return new Promise((resolve, reject) => {
+  //     state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+  //     axios
+  //       .put(addressApi, option.formData)
+  //       .then(response => {
+  //         console.log(response);
 
-          resolve();
-        })
-        .catch(err => {
-          console.log(err);
-          reject(err);
-        })
-        .finally(() => {
-          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-        });
-    });
-  },
+  //         resolve();
+  //       })
+  //       .catch(err => {
+  //         console.log(err);
+  //         reject(err);
+  //       })
+  //       .finally(() => {
+  //         state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+  //       });
+  //   });
+  // },
 
-  REQUEST_MARK_DELETED(state, option) {
-    let addressApi = state.getters.GET_ADDRESS_API('delete', option.tableName);
-    addressApi += `${option.id}`;
-    return new Promise((resolve, reject) => {
-      state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-      axios
-        .delete(addressApi)
-        .then(response => {
-          console.log(response);
-          state.commit('MARK_DELETED_ELEMENT', option);
-          resolve();
-        })
-        .catch(err => {
-          console.log(err);
-          reject(err);
-         })
-        .finally(() => {
-          state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-        });
-    });
-  },
+  // REQUEST_MARK_DELETED(state, option) {
+  //   let addressApi = state.getters.GET_ADDRESS_API('delete', option.tableName);
+  //   addressApi += `${option.id}`;
+  //   return new Promise((resolve, reject) => {
+  //     state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+  //     axios
+  //       .delete(addressApi)
+  //       .then(response => {
+  //         console.log(response);
+  //         state.commit('MARK_DELETED_ELEMENT', option);
+  //         resolve();
+  //       })
+  //       .catch(err => {
+  //         console.log(err);
+  //         reject(err);
+  //        })
+  //       .finally(() => {
+  //         state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+  //       });
+  //   });
+  // },
 
   // ЗАПРОС ЭЛЕМЕНТА ДАННЫХ ----------------------------------------------
-  REQUEST_DATA_ITEM(state, option) {
-    let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName);
-    let tokenAccess = state.rootGetters['Login/GET_USER_TOKEN_ACCESS'];
-    axios.defaults.headers.common = {'Authorization': tokenAccess};
-    addressApi += `id=${option.id}`;
-    return new Promise((resolve, reject) => {
-      // state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
-      axios
-        .get(addressApi)
-        .then(response => {
-          response.data.results.forEach(element => {
-            state.commit('SET_DATA', {
-              tableName: option.tableName,
-              value: element,
-            });
-          });
-          resolve();
-        })
-        .catch(err => {
-          reject(err);
-        })
-        .finally(() => {
-          // state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
-        });
+  // REQUEST_DATA_ITEM(state, option) {
+  //   let addressApi = state.getters.GET_ADDRESS_API('get', option.tableName);
+  //   let tokenAccess = state.rootGetters['Login/GET_USER_TOKEN_ACCESS'];
+  //   axios.defaults.headers.common = {'Authorization': tokenAccess};
+  //   addressApi += `id=${option.id}`;
+  //   return new Promise((resolve, reject) => {
+  //     // state.commit('SET_LOADING_API', Object.assign(option, { status: true }));
+  //     axios
+  //       .get(addressApi)
+  //       .then(response => {
+  //         response.data.results.forEach(element => {
+  //           state.commit('SET_DATA', {
+  //             tableName: option.tableName,
+  //             value: element,
+  //           });
+  //         });
+  //         resolve();
+  //       })
+  //       .catch(err => {
+  //         reject(err);
+  //       })
+  //       .finally(() => {
+  //         // state.commit('SET_LOADING_API', Object.assign(option, { status: false }));
+  //       });
+  //   });
+  // },
+  async REQUEST_DATA_ITEM(state, options) {
+    const { apiApp } = state.rootState;
+    const { tableName: sourceName, id: elementId } = options;
+    state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
+
+    const response = await apiApp.getListItem(sourceName, elementId);
+    console.log(response);
+    response.data.results.forEach((element) => {
+      state.commit('SET_DATA', {
+        tableName: sourceName,
+        value: element,
+      });
     });
+    state.commit('SET_LOADING_API', Object.assign(options, { status: false }));
   },
   // --------------------------------------------------------------------
 
@@ -647,22 +675,34 @@ export default {
   // ------------ -------------------------------------------------------
   // ------------ -------------------------------------------------------
 
-  HISTORY_REQUEST_DATA(state, option) {
-    let addressApi = state.getters.GET_HISTORY_ADDRESS_API(option);
-    if (option.mode == 'element') addressApi += `id=${option.id}`;
-    if (option.mode == 'element_list') addressApi += `related=${option.id}`;
-    console.log(addressApi);
-    return new Promise((resolve, reject) => {
-      axios
-        .get(addressApi)
-        .then(response => {
-          // console.log(response);
-          resolve(response.data);
-        })
-        .catch((err) => {
-          console.log(err);
-          reject();
-        })
-    })
+  // HISTORY_REQUEST_DATA(state, option) {
+  //   let addressApi = state.getters.GET_HISTORY_ADDRESS_API(option);
+  //   if (option.mode == 'element') addressApi += `id=${option.id}`;
+  //   if (option.mode == 'element_list') addressApi += `related=${option.id}`;
+  //   console.log(addressApi);
+  //   return new Promise((resolve, reject) => {
+  //     axios
+  //       .get(addressApi)
+  //       .then(response => {
+  //         // console.log(response);
+  //         resolve(response.data);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //         reject();
+  //       })
+  //   })
+  // },
+  async HISTORY_REQUEST_DATA(state, options) {
+    const { apiApp } = state.rootState;
+    const { tableName, mode, id: elementId } = options;
+    let sourceName = tableName;
+    let parametersURL = `related=${elementId}`;
+    if (mode === 'element') {
+      sourceName += '/retrieve_actual';
+      parametersURL = `id=${elementId}`;
+    }
+    const response = await apiApp.getList(sourceName, parametersURL);
+    return response.data;
   },
 }
