@@ -31,6 +31,7 @@
       <spread-sheet-body v-if="!isPrintMode"
                          ref="SpreadSheetBody"
                          :rows="tableRows"
+                         :rows-fixed="tableRowsFixed"
                          :columns="tableColumns"
                          :cells="tableCells"
                          :representations="representations"
@@ -244,6 +245,10 @@ export default {
       console.log('table row');
       // console.log(rows);
       return rows;
+    },
+
+    tableRowsFixed() {
+      return this.prepareRows.filter((row) => row.fixed);
     },
 
     templateColumnWidth() {

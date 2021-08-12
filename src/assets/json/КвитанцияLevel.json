@@ -1,8 +1,8 @@
 { "type":"document",
   "version":"1.0",
   "rows":{
-    "1":{},
-    "2":{"height":40},
+    "1":{"fixed":true},
+    "2":{"fixed":true, "height":40},
     "5":{"height":30},
     "6":{"height":30},
     "7":{"height":30,"type":"number"},
@@ -34,8 +34,8 @@
   },
 
     "columns":{
-      "a":{"width":10},
-      "b":{"width":10},
+      "a":{"fixed":true,"width":10},
+      "b":{"fixed":true,"width":10},
       "c":{"width":10},
       "d":{"width":120},
       "e":{"width":80,"formatString":"positive=true$minFD=2$color=true"},
@@ -112,7 +112,7 @@
         "g10":{"style":"br2 fn1 fn4","value":"Текущие показания прибора учета:","colspan":3},
         "j10":{"style":"br0 fn4","value":"37"},
         "k10":{"style":"br0 fn0 fn4","value":"Всего к оплате:"},
-        "l10":{"style":"br0 fn2 fn4","value":"143.06","type":"number"},
+        "l10":{"style":"br0 fn2 fn4","value":"14346.06","type":"number","formatString":"minFD=2$group=true"},
         "m10":{"style":"br0 fn0 fn4","value":""},
         "d11":{"style":"br0 br3 fn1 fn4","value":"Пеня","type":"string"},
         "e11":{"style":"br0 fn1 fn2","value":"0.00"},

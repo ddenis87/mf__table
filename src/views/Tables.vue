@@ -36,7 +36,13 @@ export default {
   },
   watch: {
     selectedTable() {
-      if (this.selectedTable) { this.$router.push({ path: '/TablesPage', query: { tableName: this.selectedTable.tableName } }); }
+      // if (this.selectedTable) { this.$router.push({ path: '/TablesPage', query: { tableName: this.selectedTable.tableName } }); }
+      if (this.selectedTable) {
+        this.$router.push({
+          path: '/Catalog',
+          query: { sourceName: this.selectedTable.tableName },
+        });
+      }
     },
   },
 };

@@ -1,0 +1,13 @@
+@import '../../DataTable.scss';
+
+$fontSize: .875rem;
+$fontWeight: bold;
+$fontLineHeight: $dtFontLineHeight;
+$fontColor: rgba(0, 0, 0, .6);
+
+$border: thin solid rgba(0,0,0,.12);
+$background: white;
+
+$columnPaddingLRFixed: 10px;
+$columnPaddingLRDense: 6px;
+$columnPaddingLRAuto: 10px;

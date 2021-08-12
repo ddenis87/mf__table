@@ -36,6 +36,12 @@ const routes = [
     component: () => import('@/views/Tables.vue'),
   },
   {
+    path: '/Catalogs/Organization',
+    name: 'Organization',
+    meta: { layout: 'Main' },
+    component: () => import('@/views/Catalogs/Organization.vue'),
+  },
+  {
     path: '/TablesPage',
     name: 'TablesPage',
     meta: { layout: 'Main' },
@@ -56,10 +62,10 @@ const routes = [
     props: true,
   },
   {
-    path: '/Test',
-    name: 'Test',
+    path: '/Catalog',
+    name: 'Catalog',
     meta: { layout: 'Main' },
-    component: () => import('@/views/Test.vue'),
+    component: () => import('@/views/Catalog.vue'),
   },
 ];
 

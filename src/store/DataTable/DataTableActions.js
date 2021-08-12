@@ -79,11 +79,11 @@ export default {
   // ---------------------------------------------------------------------------
 
   // ----УСТАНОВКА РАСШИРЕННОГО ФИЛЬТА------------------------------------------
-  SET_FILTER_EXTENDED(state, option) {
+  async SET_FILTER_EXTENDED(state, option) {
     state.commit('SET_FILTER_EXTENDED', option);
     if ('requestFalse' in option) return;
     state.commit('CLEAR_DATA', option);
-    state.dispatch('REQUEST_DATA', option);
+    await state.dispatch('REQUEST_DATA', option);
   },
 
   // ---------------------------------------------------------------------------
@@ -163,7 +163,7 @@ export default {
   //       })
   //   });
   // },
-  async UPDATE_ELEMENT_FIELD(state, options) {
+  async UPDATE_ELEMENT_FIELD(state, options) { // обновляет запись
     const { apiRest } = state.rootState;
     const { tableName: sourceName, formData, id: elementId } = options;
     state.commit('SET_LOADING_API', Object.assign(options, { status: true }));
@@ -185,7 +185,7 @@ export default {
   //       })
   //   });
   // },
-  async UPDATE_ELEMENT(state, options) {
+  async UPDATE_ELEMENT(state, options) { // обновляет запись и перезапрашивает данные
     await state.dispatch('UPDATE_ELEMENT_FIELD', options);
     const { tableName, guid } = options;
     const sendOptions = {
@@ -228,8 +228,8 @@ export default {
   // ---------------------------------------------------------------------------
 
   // ----МАРКЕРЫ СОБЫТИЙ--------------------------------------------------------
-  MARK_EVENT_FILTER_EXTENDED_RESET(state, option) { state.commit('MARK_EVENT_FILTER_EXTENDED_RESET', option); },
-  MARK_EVENT_FILTER_EXTENDED_OFF(state, option) { state.commit('MARK_EVENT_FILTER_EXTENDED_OFF', option); },
+  // MARK_EVENT_FILTER_EXTENDED_RESET(state, option) { state.commit('MARK_EVENT_FILTER_EXTENDED_RESET', option); },
+  // MARK_EVENT_FILTER_EXTENDED_OFF(state, option) { state.commit('MARK_EVENT_FILTER_EXTENDED_OFF', option); },
 
 
   // REQUEST API

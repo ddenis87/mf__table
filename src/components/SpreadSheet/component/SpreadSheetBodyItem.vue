@@ -171,6 +171,7 @@ export default {
         cellFixed['z-index'] = 100;
         cellFixed.left = CELL_WIDTH_GROUP * this.maxRowGroupingLevel;
         if (this.isShowTitle) cellFixed.left += CELL_WIDTH_TITLE;
+        if (this.maxRowGroupingLevel) cellFixed.left += 4;
         for (let i = 0; i < columnIndex; i += 1) {
           cellFixed.left += this.columns[i].width;
         }

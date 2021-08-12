@@ -6,7 +6,19 @@
        @keydown="evtKeydownBody"
        @mousedown="evtMousedown">
     <tooltip v-bind="propsTooltip"></tooltip>
-    <div ref="SheetBodyFixed"></div>
+    <div ref="SheetBodyFixed"
+         class="body-fixed"
+         :class="classBodyFixed">
+      <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
+           class="sheet-body-fixed__wrapper"
+           :key="rowFixedIndex"
+           :style="styleWrapRow">
+        <spread-sheet-body-item :index="rowFixedIndex"
+                                :source="rowFixed"
+                                v-bind="propsItemBodyFixed"></spread-sheet-body-item>
+        <div class="sheet-body-fixed__wrapper_end"></div>
+      </div>
+    </div>
     <virtual-list ref="SheetBody"
                   class="body-virtual"
                   :style="styleBody"
@@ -40,7 +52,7 @@ import {
 export default {
   name: 'SpreadSheetBody',
   components: {
-    // SpreadSheetBodyItem,
+    SpreadSheetBodyItem,
     Tooltip,
   },
   props: {
@@ -74,6 +86,12 @@ export default {
     };
   },
   computed: {
+    classBodyFixed() {
+      const classNamed = [];
+      if (!this.isShowGrid) classNamed.push('sheet-body-fixed_grid-off');
+      if (this.rowsFixed.length) classNamed.push('sheet-body-fixed_separator');
+      return classNamed;
+    },
     propsItem() {
       return {
         columns: this.columns,
@@ -93,6 +111,12 @@ export default {
         ...this.propsItem,
         'set-open-group-rows': this.setOpenGroupRows,
         images: this.images,
+      };
+    },
+
+    propsItemBodyFixed() {
+      return {
+        ...this.propsItem,
       };
     },
 
@@ -117,9 +141,9 @@ export default {
     heightVirtualList() {
       let heightBodyFixed = 168 + (this.maxColumnGroupingLevel * (CELL_HEIGHT_GROUP));
       if (this.maxColumnGroupingLevel !== 0) heightBodyFixed += 4;
-      // for (let i = 0; i < this.rowsFixed.length; i += 1) {
-      //   heightBodyFixed += this.rowsFixed[i].height;
-      // }
+      for (let i = 0; i < this.rowsFixed.length; i += 1) {
+        heightBodyFixed += this.rowsFixed[i].height;
+      }
       if (!this.isShowTitle) heightBodyFixed -= CELL_HEIGHT_BODY;
       return {
         height: `calc(100vh - ${heightBodyFixed}px)`,
@@ -445,3 +469,27 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.sheet-body-fixed {
+    position: relative;
+    width: calc(100vw - 10px);
+    overflow: hidden;
+    &_separator {
+      border-bottom: 2px solid rgba(0, 0, 0, .3);
+    }
+    // &_grid-off {
+    //   border-bottom: 2px solid rgba(0, 0, 0, .3);
+    // }
+    &__wrapper {
+      display: flex;
+      &_end {
+        display:  block;
+        min-width: 20px;
+      }
+    }
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+</style>

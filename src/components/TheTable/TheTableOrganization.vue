@@ -1,6 +1,7 @@
 <template>
   <data-table v-bind="propertiesTable"
-              @event-component="eventComponent"></data-table>
+              @event-component="eventComponent"
+              @form-mount="mountForm"></data-table>
 </template>
 
 <script>
@@ -51,6 +52,11 @@ export default {
         ],
       },
     };
+  },
+  methods: {
+    mountForm() {
+      console.log('mount-form');
+    },
   },
 };
 </script>

@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap');
+
+// fonts component
+$dtFontFamily: Roboto, sans-serif;
+$dtFontSize: 16px;
+$dtFontColor: rgba(0, 0, 0, .87);
+$dtFontLineHeight: 1.5;
+
+// border component
+$borderRadius: 4px;
+$boxShadow: 0 -1px 1px -1px rgba(0,0,0,.2), 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+
+// scroll view component
+$scrollWidth: 8px;
+$scrollHeight: 8px;
+$scrollBorderRadius: 4px;
+$scrollThumbBorderRadius: 3px;
+$scrollThumbBackgroundColor: rgba(0,0,0,0.2);
+

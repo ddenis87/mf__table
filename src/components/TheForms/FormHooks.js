@@ -5,7 +5,7 @@ export default {
       return;
     }
     Object.keys(this.fieldForm).forEach((itemKey) => {
-      this.fieldFormValue[itemKey] = null;
+      this.fieldFormValue[itemKey] = this.fieldFormValue[itemKey] || null;
     });
     this.selectStartForm();
   },

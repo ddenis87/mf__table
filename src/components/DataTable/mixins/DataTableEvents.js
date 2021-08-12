@@ -11,7 +11,7 @@ export const DataTableEvents = {
     focusedElement(event, value) {
       this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', Object.assign({ value: value }, this.optionGetter));
       // console.log(option);
-      // this.eventComponent('focused-element', option)
+      this.eventComponent('focused-element', value)
       // this.$emit('event-row-focused', option);
     },
     selectedElement(event, value) {
@@ -27,7 +27,7 @@ export const DataTableEvents = {
     blurComponent() {
       // console.log(this.optionGetter);
       this.$store.commit('DataTable/SET_ACTIVE_ELEMENT', this.optionGetter);
-      // this.eventComponent('blur-component');
+      this.eventComponent('blur-component');
       // this.$emit('event-component-blur');
     },
 

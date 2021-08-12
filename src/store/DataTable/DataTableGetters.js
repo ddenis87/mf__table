@@ -21,6 +21,7 @@ export default {
 
   // ---- dataTableSpace ------------------------------------------------------
   GET_PROPS_TABLE:(state) => (option) => {
+    if (!option.tableName) return {};
     if (state[option.tableName][option.guid])
       return state[option.tableName][option.guid].propsTable;
     return {};
@@ -31,6 +32,7 @@ export default {
   },
 
   GET_COUNT_DATA_TOTAL:(state) => (option) => {
+    if (!option.tableName) return {};
     if (state[option.tableName][option.guid])
       return state[option.tableName][option.guid].countDataTotal;
     return -1;
@@ -77,6 +79,7 @@ export default {
   // --------------------------------------------------------------------------
 
   GET_LOADING_API:(state) => (option) => {
+    if (!option.tableName) return {};
     return state[option.tableName][option.guid].apiLoading;
   },
   GET_ADDRESS_API:(state, getters, rootState, rootGetters) => (option, tableName) => {
@@ -117,8 +120,14 @@ export default {
     return filtersApi;
   },
 
-  GET_DATA_GROUP:(state) => (option) => { return state[option.tableName][option.guid].listDataGroup; },
-  GET_DATA_GROUP_LEVEL:(state) => (option) => { return state[option.tableName][option.guid].listDataGroup.length; },
+  GET_DATA_GROUP:(state) => (option) => {
+    console.log(state[option.tableName][option.guid].listDataGroup);
+    return state[option.tableName][option.guid].listDataGroup;
+  },
+  GET_DATA_GROUP_LEVEL:(state) => (option) => {
+    if (!option.tableName) return 0;
+    return state[option.tableName][option.guid].listDataGroup.length;
+  },
   GET_ADDING_MODE:(state) => (option) => {
     if (option.guid)
       return state[option.tableName][option.guid].addingMode;
