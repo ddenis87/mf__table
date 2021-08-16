@@ -62,7 +62,12 @@ export default {
         isSingleLine: true,
       };
       if (this.sourceName) props.relatedModelName = this.sourceName;
-      // console.log(props);
+
+      if (this.fieldType.includes('choice')) {
+        const [, sourceName] = this.fieldType.split('.');
+        props.items = this.$store.getters['Lists/getList'](sourceName);
+      }
+      // console.log(this.fieldType);
       return props;
     },
   },

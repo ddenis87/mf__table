@@ -27,6 +27,8 @@ export default {
     cellElement: { type: HTMLDivElement, default: null },
     editEvent: { type: Event, default: null },
     isLabel: { type: Boolean, default: false },
+    shiftTop: { type: Number, default: 0 },
+    shiftLeft: { type: Number, default: 0 },
   },
   data() {
     return {
@@ -40,8 +42,8 @@ export default {
       return {
         width: `${geometry.width + 1}px`,
         height: `${geometry.height + 1}px`,
-        left: `${geometry.left}px`,
-        top: `${geometry.top - 124}px`,
+        left: `${geometry.left + this.shiftLeft}px`,
+        top: `${geometry.top + this.shiftTop}px`,
       };
     },
     isShow() {
