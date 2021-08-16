@@ -74,6 +74,7 @@ export default {
   },
 
   SET_LOADING_API(state, option) {
+    if (!option.guid) return;
     state[option.tableName][option.guid].apiLoading = option.status;
   },
 

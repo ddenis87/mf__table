@@ -3,9 +3,10 @@ import Vuex from 'vuex'
 
 // import gState from '@/logics/store/state';
 import ApiRest from '../logics/ApiRest';
-import Login from './Login.js';
-import DataTable from './DataTable/DataTable.js';
-import AccessControl from './AccessControl.js';
+import Lists from './Lists/Lists';
+import Login from './Login';
+import DataTable from './DataTable/DataTable';
+import AccessControl from './AccessControl';
 
 Vue.use(Vuex)
 
@@ -25,8 +26,9 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
+    Lists,
     Login,
     DataTable,
     AccessControl,
   }
-})
+});
