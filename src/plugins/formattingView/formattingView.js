@@ -1,3 +1,5 @@
+import store from '@/store';
+
 const FORMATE_NUMBER_KEY = {
   type: 'style',
   minFD: 'minimumFractionDigits',
@@ -24,19 +26,19 @@ export default {
     } = {},
   ) {
     // console.log(value);
-    if ([null, undefined, ''].includes(value)) return '';
+    // if ([null, undefined, ''].includes(value)) return '';
     const FUNCTION_TYPE = {
-      string: (v) => this.formatString(v),
-      number: (v, f) => this.formatNumber(v, f).toString().replace('.', ','),
+      string: (v) => this.formatString(v || ''),
+      number: (v, f) => this.formatNumber(v || 0, f), // .toString().replace('.', ','),
       date: (v, f) => this.formatDate(v, f),
       boolean: (v) => v,
       field: (v, f, r) => r.get(v) || '<#ССЫЛКА>',
-      choice: (v) => v,
+      choice: (v, f, r, t) => this.formatChoice(v, t),
     };
     const typeClear = type.split('.')[0];
     const formatMap = (formatString) ? new Map(formatString.split('$').map((item) => item.split('='))) : new Map();
-    // console.log(representation);
-    let result = FUNCTION_TYPE[typeClear](value, formatMap, representations);
+    // if (typeClear === 'choice') console.log(value);
+    let result = FUNCTION_TYPE[typeClear](value, formatMap, representations, type);
     if (prefix) result = `${prefix}${result}`;
     if (suffix) result = `${result}${suffix}`;
     return result;
@@ -47,21 +49,22 @@ export default {
   },
 
   formatNumber(value, formatMap) {
-    if (value === 0) return value;
-    if (!+value) return NaN;
+    // if (value === 0) return value;
+    // console.log(value);
+    if (!+value && value !== 0) return NaN;
     if (!formatMap.size) return value;
     const formatOptions = {};
     formatMap.forEach((keyValue, key) => {
       if (FORMATE_NUMBER_KEY[key]) formatOptions[FORMATE_NUMBER_KEY[key]] = keyValue;
     });
-    console.log(formatOptions);
+    // console.log(formatOptions);
     const formatFunction = new Intl.NumberFormat('ru', formatOptions);
     let formatValue = formatFunction.format(value);
     if (formatMap.has('positive') && value > 0) formatValue = `+${formatValue}`;
     if (formatMap.has('color')) {
       formatValue = `<span style="color: ${(value < 0) ? 'red' : 'green'}">${formatValue}</span>`;
     }
-    return formatValue;
+    return formatValue.toString().replace('.', ',');
   },
 
   formatDate(value, formatMap) {
@@ -79,5 +82,13 @@ export default {
     let formatValue = value;
     if (formatMap.has(value)) formatValue = formatMap.get(value);
     return formatValue;
+  },
+
+  formatChoice(value, type) {
+    // console.log(value);
+    if (!value) return '';
+    const [, listName] = type.split('.');
+    // const [, listName, id] = value.slice(1).split('|');
+    return store.getters['Lists/getListItem']({ listName, value })?.display_name || '';
   },
 };
