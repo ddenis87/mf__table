@@ -2,9 +2,10 @@
   <div class="spread-sheet__angle"
        :class="(isShowTitle) ? 'angle' : 'angle_no-group'"
        :style="angleStyle">
-    <div v-if="isShowTitle && maxColumnGroupingLevel" class="angle__columnGroup"
+    <div v-if="isShowTitle && maxColumnGrouping"
+         class="angle__columnGroup"
          :style="columnGroupStyle">
-      <div v-for="levelColumn in maxColumnGroupingLevel"
+      <div v-for="levelColumn in maxColumnGrouping"
            class="item item_column"
            :key="levelColumn"
            :data-level="levelColumn">
@@ -13,9 +14,10 @@
         </spread-sheet-btn-group>
       </div>
     </div>
-    <div v-if="isShowTitle && maxRowGroupingLevel" class="angle__rowGroup"
+    <div v-if="isShowTitle && maxRowGrouping"
+         class="angle__rowGroup"
          :style="rowGroupStyle">
-      <div v-for="levelRow in maxRowGroupingLevel"
+      <div v-for="levelRow in maxRowGrouping"
            class="item"
            :key="levelRow"
            :data-level="levelRow">
@@ -49,9 +51,16 @@ export default {
   props: {
     maxRowGroupingLevel: { type: Number, default: 0 },
     maxColumnGroupingLevel: { type: Number, default: 0 },
+    isShowGroup: { type: Boolean, default: true },
     isShowTitle: { type: Boolean, default: true },
   },
   computed: {
+    maxRowGrouping() {
+      return (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
+    },
+    maxColumnGrouping() {
+      return (this.isShowGroup) ? this.maxColumnGroupingLevel : 0;
+    },
     angleStyle() {
       // let angleStyle = {
       //   'grid-template-rows': `${(this.maxColumnGroupingLevel * CELL_HEIGHT_GROUP) + 4}px 1fr`,

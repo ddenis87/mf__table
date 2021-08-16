@@ -66,8 +66,8 @@ export default {
     columns: Array,
     images: { type: Object, default() { return {}; } },
     index: { type: Number }, // ????
-    isShowGroup: { type: Boolean, default: true },
     isShowGrid: { type: Boolean, default: true },
+    isShowGroup: { type: Boolean, default: true },
     isShowTitle: { type: Boolean, default: true },
     maxRowGroupingLevel: { type: Number, default: 0 },
     rows: Array, // ????
@@ -97,8 +97,9 @@ export default {
     },
 
     shiftTitle() {
-      let shiftLeft = CELL_WIDTH_GROUP * this.maxRowGroupingLevel;
-      if (this.maxRowGroupingLevel !== 0) shiftLeft += 4;
+      const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
+      let shiftLeft = CELL_WIDTH_GROUP * maxRowGroupingLevel;
+      if (maxRowGroupingLevel !== 0) shiftLeft += 4;
       const shiftTitle = {
         left: `${shiftLeft}px`,
       };
@@ -108,15 +109,16 @@ export default {
     },
 
     templateColumnTitle() {
-      let tempalteColumnTitle = `${this.templateColumnWidth}`;
-      if (this.isShowTitle) tempalteColumnTitle = `${CELL_WIDTH_TITLE}px ${tempalteColumnTitle}`;
-      if (this.maxRowGroupingLevel !== 0) {
-        tempalteColumnTitle = `repeat(${this.maxRowGroupingLevel - 1},
+      const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
+      let templateColumnTitle = `${this.templateColumnWidth}`;
+      if (this.isShowTitle) templateColumnTitle = `${CELL_WIDTH_TITLE}px ${templateColumnTitle}`;
+      if (maxRowGroupingLevel !== 0) {
+        templateColumnTitle = `repeat(${maxRowGroupingLevel - 1},
                                minmax(${CELL_WIDTH_GROUP}px, ${CELL_WIDTH_GROUP}px))
                                ${CELL_WIDTH_GROUP + 4}px
-                               ${tempalteColumnTitle}`;
+                               ${templateColumnTitle}`;
       }
-      return tempalteColumnTitle;
+      return templateColumnTitle;
     },
   },
   methods: {
@@ -128,9 +130,14 @@ export default {
 
     formattedData(columnName) {
       const cell = this.hasCell(columnName);
+      // console.log(cell);
       if (!cell) return '';
-      if (!Object.keys(cell).includes('value')) return '';
-      return display.formate(cell.value, { ...cell, representations: this.setRepresentations });
+      // if (!Object.keys(cell).includes('value')) return '';
+      const formattingParameters = {
+        ...cell,
+        representations: this.setRepresentations,
+      };
+      return display.formate(cell.value || null, formattingParameters);
     },
 
     hasCell(columnName) {
@@ -165,13 +172,14 @@ export default {
     },
 
     getCellFixed(columnIndex) {
+      const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
       const cellFixed = {};
       if (this.columns[columnIndex].fixed) {
         cellFixed.position = 'sticky';
         cellFixed['z-index'] = 100;
-        cellFixed.left = CELL_WIDTH_GROUP * this.maxRowGroupingLevel;
+        cellFixed.left = CELL_WIDTH_GROUP * maxRowGroupingLevel;
         if (this.isShowTitle) cellFixed.left += CELL_WIDTH_TITLE;
-        if (this.maxRowGroupingLevel) cellFixed.left += 4;
+        if (maxRowGroupingLevel) cellFixed.left += 4;
         for (let i = 0; i < columnIndex; i += 1) {
           cellFixed.left += this.columns[i].width;
         }
@@ -183,6 +191,7 @@ export default {
     },
 
     getCellGeometry(columnName, columnIndex) {
+      const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
       const cellGeometry = {};
       if (this.hasCell(columnName)) {
         const {
@@ -194,8 +203,8 @@ export default {
         cellGeometry['grid-column-end'] = +columnEnd + columnIndex;
         cellGeometry.height = `${height}px`;
       } else {
-        cellGeometry['grid-column-start'] = columnIndex + (this.maxRowGroupingLevel + 2);
-        cellGeometry['grid-column-end'] = (columnIndex + (this.maxRowGroupingLevel + 2)) + 1;
+        cellGeometry['grid-column-start'] = columnIndex + (maxRowGroupingLevel + 2);
+        cellGeometry['grid-column-end'] = (columnIndex + (maxRowGroupingLevel + 2)) + 1;
       }
       if (!this.isShowTitle) {
         cellGeometry['grid-column-start'] -= 1;
@@ -227,11 +236,12 @@ export default {
     },
 
     getGroupStyle(level) {
+      const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
       const groupStyle = {
         left: `${(CELL_WIDTH_GROUP * (+level - 1))}px`,
       };
       if (this.index === this.rows.length - 1) groupStyle['border-bottom'] = 'thin solid grey';
-      if (this.maxRowGroupingLevel === level) {
+      if (maxRowGroupingLevel === level) {
         groupStyle['border-right'] = 'thin solid grey';
         groupStyle['padding-right'] = '4px';
         groupStyle.width = '25px';

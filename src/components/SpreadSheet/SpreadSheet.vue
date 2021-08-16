@@ -1,5 +1,5 @@
 <template>
-  <table-layout padding="4px 4px 4px 4px" :border-off="isPrintMode">
+  <table-layout padding="4px 4px 4px 4px" :border-off="isPrintMode || isOuterBorderOff">
     <div :class="{
             'spread-sheet': !isPrintMode,
             'spread-sheet-print': isPrintMode,
@@ -7,6 +7,7 @@
          :style="spreadSheetStyle">
       <spread-sheet-angle v-if="!isPrintMode" :max-column-grouping-level="maxColumnGroupingLevel"
                           :max-row-grouping-level="maxRowGroupingLevel"
+                          :is-show-group="isShowGroup"
                           :is-show-title="isShowTitle"
                           @open-group:column="evtOpenGroupColumn"
                           @open-group:row="evtOpenGroupRow"></spread-sheet-angle>
@@ -27,6 +28,7 @@
                               :templateColumnWidth="templateColumnWidth"
                               :maxLevelGroupRow="maxRowGroupingLevel"
                               :setExcludedCells="setExcludedCells"
+                              :representations="representations"
                               :print-mode="isPrintMode"></spread-sheet-body-print>
       <spread-sheet-body v-if="!isPrintMode"
                          ref="SpreadSheetBody"
@@ -34,6 +36,7 @@
                          :rows-fixed="tableRowsFixed"
                          :columns="tableColumns"
                          :cells="tableCells"
+                         :delta-height-virtual-list="deltaHeightVirtualList"
                          :representations="representations"
                          :images="images"
                          :template-column-width="templateColumnWidth"
@@ -43,6 +46,7 @@
                          :table-width="tableWidth"
                          :set-open-group-rows="setOpenGroupRows"
                          :is-show-grid="isShowGrid"
+                         :is-show-group="isShowGroup"
                          :is-show-title="isShowTitle"
                          @click:cell="evtClickCell"
                          @dblclick:cell="evtDblclickCell"
@@ -92,14 +96,17 @@ export default {
     cellWidth: { type: Number, default: CELL_WIDTH_BODY },
     columnCount: { type: Number, default: 50 },
     columns: { type: Object, default() { return {}; } },
+    deltaHeightVirtualList: { type: Number, default: 168 },
     rowCount: { type: Number, default: 1000 },
     rows: { type: Object, default() { return {}; } },
     representations: { type: Map, default() { return new Map(); } },
     styles: { type: Array, default() { return []; } },
     images: { type: Object, default() { return {}; } },
     isShowGrid: { type: Boolean, default: true },
+    isShowGroup: { type: Boolean, default: true },
     isShowTitle: { type: Boolean, default: true },
     isPrintMode: { type: Boolean, default: false },
+    isOuterBorderOff: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -129,6 +136,7 @@ export default {
 
     prepareCells() {
       // console.log('prepare cells');
+      const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
       const prepareCells = {};
       Object.entries(this.cells).forEach((item) => {
         const [cellName, cellValue] = item;
@@ -144,11 +152,11 @@ export default {
             const columnNameNext = getColumnNameForNumber(getColumnNumberForName(cellNameColumn) + i);
             this.setExcludedCells[cellName].push(`${columnNameNext}${cellNameRow}`);
           }
-          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2);
-          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2)) + colspan;
+          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (maxRowGroupingLevel + 2);
+          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (maxRowGroupingLevel + 2)) + colspan;
         } else {
-          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2);
-          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (this.maxRowGroupingLevel + 2)) + 1;
+          prepareCells[cellName]['grid-column-start'] = (this.isPrintMode) ? 1 : (maxRowGroupingLevel + 2);
+          prepareCells[cellName]['grid-column-end'] = ((this.isPrintMode) ? 1 : (maxRowGroupingLevel + 2)) + 1;
         }
 
         let cellHeight = (this.rows[`${cellNameRow}`]) ? this.rows[`${cellNameRow}`].height || this.cellHeight : this.cellHeight;
@@ -230,6 +238,7 @@ export default {
     },
 
     tableRows() {
+      if (this.isPrintMode) return this.prepareRows;
       const rows = [];
       let showLevel = 0;
       this.prepareRows.forEach((row) => {
@@ -268,14 +277,16 @@ export default {
     },
 
     spreadSheetStyle() {
-      let titleColumn = CELL_WIDTH_GROUP * this.maxRowGroupingLevel;
-      let titleRow = CELL_HEIGHT_GROUP * this.maxColumnGroupingLevel;
+      const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
+      const maxColumnGroupingLevel = (this.isShowGroup) ? this.maxColumnGroupingLevel : 0;
+      let titleColumn = CELL_WIDTH_GROUP * maxRowGroupingLevel;
+      let titleRow = CELL_HEIGHT_GROUP * maxColumnGroupingLevel;
       if (this.isShowTitle) {
         titleColumn += CELL_WIDTH_TITLE;
         titleRow += CELL_HEIGHT_TITLE;
       }
-      if (this.maxRowGroupingLevel !== 0) titleColumn += (this.isShowTitle) ? 4 : 5;
-      if (this.maxColumnGroupingLevel !== 0) titleRow += (this.isShowTitle) ? 5 : 5;
+      if (maxRowGroupingLevel !== 0) titleColumn += (this.isShowTitle) ? 4 : 5;
+      if (maxColumnGroupingLevel !== 0) titleRow += (this.isShowTitle) ? 5 : 5;
 
       const style = {
         'grid-template-rows': `${titleRow}px 1fr`,
@@ -495,6 +506,7 @@ export default {
 .spread-sheet {
   display: grid;
   grid-template-areas: "angle head" "body body";
+  width: 100%;
   height: 100%;
   border: $borderBase;
   &__angle {

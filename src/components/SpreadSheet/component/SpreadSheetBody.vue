@@ -58,6 +58,7 @@ export default {
   props: {
     cells: { type: Object },
     columns: { type: Array },
+    deltaHeightVirtualList: { type: Number, default: 168 },
     rows: { type: Array },
     rowsFixed: { type: Array, default() { return []; } },
     tableWidth: { type: Number, default: 0 },
@@ -69,6 +70,7 @@ export default {
     setExcludedCells: { type: Object, default() { return {}; } },
     setOpenGroupRows: { type: Array, default() { return []; } },
     isShowGrid: { type: Boolean, default: true },
+    isShowGroup: { type: Boolean, default: true },
     isShowTitle: { type: Boolean, default: true },
   },
   data() {
@@ -102,6 +104,7 @@ export default {
         'max-row-grouping-level': this.maxRowGroupingLevel,
         'template-column-width': this.templateColumnWidth,
         'is-show-grid': this.isShowGrid,
+        'is-show-group': this.isShowGroup,
         'is-show-title': this.isShowTitle,
       };
     },
@@ -139,7 +142,7 @@ export default {
     },
 
     heightVirtualList() {
-      let heightBodyFixed = 168 + (this.maxColumnGroupingLevel * (CELL_HEIGHT_GROUP));
+      let heightBodyFixed = this.deltaHeightVirtualList + (this.maxColumnGroupingLevel * CELL_HEIGHT_GROUP);
       if (this.maxColumnGroupingLevel !== 0) heightBodyFixed += 4;
       for (let i = 0; i < this.rowsFixed.length; i += 1) {
         heightBodyFixed += this.rowsFixed[i].height;
@@ -151,7 +154,8 @@ export default {
     },
 
     widthFixedArea() {
-      let width = (CELL_WIDTH_GROUP * this.maxRowGroupingLevel) + CELL_WIDTH_TITLE + 6;
+      const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
+      let width = (maxRowGroupingLevel * CELL_WIDTH_GROUP) + CELL_WIDTH_TITLE + 6;
       this.columns.forEach((column) => {
         if (column.fixed) width += column.width;
       });
@@ -160,10 +164,11 @@ export default {
     },
 
     widthVirtualList() {
-      let title = 0;
-      if (!this.isShowTitle) title = this.maxRowGroupingLevel * CELL_WIDTH_GROUP;
+      // let title = 0;
+      // if (!this.isShowTitle) title = this.maxRowGroupingLevel * CELL_WIDTH_GROUP;
       const width = {
-        width: `calc(100vw - 20px + ${title}px)`,
+        // width: `calc(100vw - 20px + ${title}px)`,
+        width: '100%',
       };
       return width;
     },
