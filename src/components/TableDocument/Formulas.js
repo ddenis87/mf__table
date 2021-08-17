@@ -33,8 +33,9 @@ class Formulas {
   }
 
   highlightOperands() {
-    this.operands = this.formula.replace(REG_OPERATORS, '').split('$').splice(1);
-    // console.log(this.operands);
+    console.log(this.formula.replace(REG_OPERATORS, ''));
+    this.operands = this.formula.replace(REG_OPERATORS, '').split('$'); // .splice(1);
+    console.log(...this.operands);
   }
 
   matchOperands(functionName = 'this.getCellValueForFormula') {
@@ -85,8 +86,6 @@ class Formulas {
   }
 
   getFormulaForCalculation() {
-    // console.log(this.cellName);
-    // console.log(this.formula);
     if (this.formula.includes('SUM')) {
       let [functionName, functionParameters] = this.formula.slice(1, -1).split('(');
       functionName = (functionParameters.split(':').length === 1) ? `${functionName}_GROUP` : functionName;

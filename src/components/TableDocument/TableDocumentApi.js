@@ -81,7 +81,7 @@ class TableDocumentApi extends TableDocument {
         }),
       };
     });
-    console.log(cells);
+    // console.log(cells);
     // const cells = Object.entries(this.cells).filter((cell) => {
     //   const [, cellValue] = cell;
     //   // console.log(cellValue);
