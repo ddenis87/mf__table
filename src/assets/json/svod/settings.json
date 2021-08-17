@@ -15,7 +15,10 @@
         "templateSectionName":"header",
         "baseSection":"header",
         "methodName":"put",
-        "presentationType":"multiple"
+        "presentationType":"multiple",
+        "parameters": {
+          "organization":"organization"
+        }
       }
     },
     {

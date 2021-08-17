@@ -11,11 +11,13 @@ export default {
   props: {
     padding: { type: String, default: '0px 0px 0px 0px' },
     borderOff: { type: Boolean, default: false },
+    display: { type: String, default: 'block' },
   },
   computed: {
     tableLayoutStyle() {
       const layouteStyle = {
         padding: this.padding,
+        display: this.display,
       };
       if (this.borderOff) {
         layouteStyle['box-shadow'] = 'unset';

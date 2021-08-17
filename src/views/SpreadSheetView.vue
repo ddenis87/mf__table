@@ -101,6 +101,7 @@
                             :cell-element="editableCellElement"
                             :edit-event="editableCellEvent"
                             :is-label="isShowEditableLabel"
+                            :shift-top="-124"
                             @editing:accept="acceptEditingCell"
                             @editing:cancel="cancelEditingCell"></spread-sheet-editing>
       <spread-sheet ref="SpreadSheet"
@@ -149,7 +150,7 @@ export default {
       fileData: [],
 
       editableCell: null,
-      editableCellType: null,
+      editableCellType: 'string',
       editableCellEvent: null,
       editableCellElement: null,
       editableCellGeometry: null,
@@ -172,6 +173,9 @@ export default {
       rangeCopy: null,
     };
   },
+  async created() {
+    await this.$store.dispatch('Lists/readList', 'region');
+  },
   mounted() {
     // console.log(this.tableDocument);
   },
@@ -187,7 +191,7 @@ export default {
       const pasteValue = await Buffer.paste();
       // console.log(pasteValue);
       try {
-        this.tableDocument.editingCell(cellName, pasteValue);
+        this.tableDocument.editingCell(cellName, pasteValue); // setCell
       } catch (err) {
         // console.log(err);
         this.showDialogMessage(err.getMessagesText());
@@ -258,7 +262,7 @@ export default {
       // console.log(this.editableCellElement);
       if (this.editableCellElement) this.editableCellElement.focus();
       this.editableCell = null;
-      this.editableCellType = null;
+      this.editableCellType = 'string';
       this.editableCellEvent = null;
       this.editableCellElement = null;
       this.isShowEditableLabel = false;
@@ -320,6 +324,7 @@ export default {
           this.tableDocument = temp;
           this.isFileTemplateDisabled = true;
           this.isGrid = false;
+          console.log(this.tableDocument);
           return;
         }
         try {
@@ -359,6 +364,7 @@ export default {
         this.tableDocument.recalculateFormulas();
         this.isGrid = false;
       }
+      console.log(this.tableDocument);
     },
     openPrintPage() {
       localStorage.setItem('SpreadSheetTableDocument', this.tableDocument.getDocument(true));

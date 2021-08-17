@@ -13,7 +13,7 @@
             (cells[`${column.name}${source.value}`]) ? cells[`${column.name}${source.value}`].style : '',
           ]"
           :style="[getCellGeometry(source, column, columnIndex)]"
-          :data-name="`${column.name}${source.name}`"
+          :data-name="`${column.name}${source.value}`"
           :tabindex="columnIndex">
         <div class="content" v-html="formattedData(column.name, source)"></div>
       </div>
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import display from '@/plugins/formattingView/formattingView';
+// import display from '@/plugins/formattingView/formattingView';
 import {
   CELL_TYPE_DEFAULT,
 } from '../SpreadSheetConst';
@@ -40,8 +40,8 @@ export default {
     setExcludedCell: { type: Array },
     maxLevelGroupRow: { type: Number, default: 0 },
     templateColumnWidth: { type: String, default: '' },
-
-    printMode: { type: Boolean, default: false },
+    setRepresentations: { type: Map, default() { return new Map(); } },
+    printMode: { type: Boolean, default: true },
   },
   // data() {
   //   return {
@@ -54,11 +54,18 @@ export default {
     formattedData(columnName) {
       const cell = this.hasCell(columnName);
       if (!cell) return '';
-      if (!Object.keys(cell).includes('value')) return '';
-      return display.formate(cell.value, { ...cell, representations: this.representations });
+      // if (!Object.keys(cell).includes('value')) return '';
+      console.log(this.setRepresentations);
+      // const formattingParameters = {
+      //   ...cell,
+      //   representations: this.setRepresentations,
+      // };
+      return cell.value;
+      // return display.formate(cell.value || null, formattingParameters);
     },
     hasCell(column) {
       const cellName = `${column}${this.source.value}`;
+      // console.log(column, this.source.value);
       return (this.cells[cellName]) || false;
     },
     getCellType(cell, columnName) {
@@ -79,13 +86,18 @@ export default {
       const cellGeometry = {};
       const cellName = `${column.name}${row.value}`;
       if (this.cells[cellName]) {
-        cellGeometry['grid-column-start'] = this.cells[cellName]['grid-column-start'] + columnIndex;
-        cellGeometry['grid-column-end'] = this.cells[cellName]['grid-column-end'] + columnIndex;
-        cellGeometry.height = `${this.cells[cellName].height}px`;
+        const {
+          'grid-column-start': columnStart,
+          'grid-column-end': columnEnd,
+          height,
+        } = this.hasCell(column.name);
+        cellGeometry['grid-column-start'] = +columnStart + columnIndex;
+        cellGeometry['grid-column-end'] = +columnEnd + columnIndex;
+        cellGeometry.height = `${height}px`;
         // cellGeometry['z-index'] = 1;
       } else {
-        cellGeometry['grid-column-start'] = columnIndex + (this.printMode) ? 0 : (this.maxLevelGroupRow + 2);
-        cellGeometry['grid-column-end'] = (columnIndex + ((this.printMode) ? 1 : (this.maxLevelGroupRow + 2))) + 1;
+        cellGeometry['grid-column-start'] = columnIndex + 1;
+        cellGeometry['grid-column-end'] = (columnIndex + 1) + 1;
       }
       return cellGeometry;
     },
@@ -99,7 +111,9 @@ export default {
 .sheet-body__row {
   position: relative;
   display: grid;
-  grid-auto-rows: $bodyGridAutoRow;
+  // grid-auto-rows: $bodyGridAutoRow;
+  grid-row: $bodyGridAutoRow;
+  box-sizing: border-box;
   .column {
     position: relative;
     display: inline-flex;
@@ -111,15 +125,16 @@ export default {
       white-space: nowrap;
       outline: none;
       cursor: cell;
-
+      background-color: $backgroundColorBody;
       .content {
         display: flex;
         justify-content: inherit;
         align-items: inherit;
         height: 100%;
         width: 100%;
-        padding: 0px 2px;
+        padding: 0px 3px;
         overflow: hidden;
+        user-select: none;
         background-color: $backgroundColorBody;
         .active-element {
           display: none;
@@ -138,6 +153,15 @@ export default {
         // border-right: $bodyGridColor;
         // border-bottom: $bodyGridColor;
         z-index: 80;
+        // content: '';
+        // position: absolute;
+        // left: 0px;
+        // top: 0px;
+        // right: -1px;
+        // bottom: -1px;
+        // // border-right: $bodyGridColor;
+        // // border-bottom: $bodyGridColor;
+        // z-index: 80;
       }
     }
   }

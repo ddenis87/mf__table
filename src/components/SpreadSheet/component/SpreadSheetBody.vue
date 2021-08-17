@@ -6,18 +6,20 @@
        @keydown="evtKeydownBody"
        @mousedown="evtMousedown">
     <tooltip v-bind="propsTooltip"></tooltip>
-    <div ref="SheetBodyFixed"
+    <div ref="SheetBodyFixed" v-if="rowsFixed.length"
          class="body-fixed"
          :class="classBodyFixed">
       <div v-for="(rowFixed, rowFixedIndex) in rowsFixed"
-           class="sheet-body-fixed__wrapper"
+           class="body-fixed__wrapper"
            :key="rowFixedIndex"
-           :style="styleWrapRow">
+           :style="styleFixedWrapRow">
         <spread-sheet-body-item :index="rowFixedIndex"
                                 :source="rowFixed"
                                 v-bind="propsItemBodyFixed"></spread-sheet-body-item>
-        <div class="sheet-body-fixed__wrapper_end"></div>
+        <div class="body-fixed__wrapper_end"
+             :style="styleFixedEnd"></div>
       </div>
+      <div class="separator"></div>
     </div>
     <virtual-list ref="SheetBody"
                   class="body-virtual"
@@ -90,8 +92,8 @@ export default {
   computed: {
     classBodyFixed() {
       const classNamed = [];
-      if (!this.isShowGrid) classNamed.push('sheet-body-fixed_grid-off');
-      if (this.rowsFixed.length) classNamed.push('sheet-body-fixed_separator');
+      if (!this.isShowGrid) classNamed.push('body-fixed_grid-off');
+      if (this.rowsFixed.length) classNamed.push('body-fixed_separator');
       return classNamed;
     },
     propsItem() {
@@ -118,8 +120,11 @@ export default {
     },
 
     propsItemBodyFixed() {
+      console.log(this.templateColumnWidth);
       return {
         ...this.propsItem,
+        'template-column-width': `${this.templateColumnWidth} 25px`,
+        images: this.images,
       };
     },
 
@@ -134,13 +139,25 @@ export default {
       ];
     },
 
+    styleFixedEnd() {
+      return {
+        'grid-column-start': this.columns.length + 2 - 1,
+        'grid-column-end': this.columns.length + 2,
+      };
+    },
+
     styleWrapRow() {
       return {
         position: 'relative',
         width: `${this.tableWidth}px`,
       };
     },
-
+    styleFixedWrapRow() {
+      return {
+        position: 'relative',
+        width: `${this.tableWidth + 25}px`,
+      };
+    },
     heightVirtualList() {
       let heightBodyFixed = this.deltaHeightVirtualList + (this.maxColumnGroupingLevel * CELL_HEIGHT_GROUP);
       if (this.maxColumnGroupingLevel !== 0) heightBodyFixed += 4;
@@ -269,7 +286,7 @@ export default {
     evtScrollList(evt) {
       this.selectStart = null;
       this.selectEnd = null;
-      // this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
+      this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
 
@@ -476,21 +493,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.sheet-body-fixed {
-    position: relative;
-    width: calc(100vw - 10px);
-    overflow: hidden;
-    &_separator {
-      border-bottom: 2px solid rgba(0, 0, 0, .3);
-    }
-    // &_grid-off {
-    //   border-bottom: 2px solid rgba(0, 0, 0, .3);
-    // }
+.body-fixed {
+  overflow-x: hidden;
+  overflow-y: 'auto';
+  overflow: hidden;
+  position: relative;
+  margin-bottom: -1px;
+  .separator {
+    border-bottom: thin solid rgba(0, 0, 0, .3);
+  }
     &__wrapper {
-      display: flex;
       &_end {
         display:  block;
-        min-width: 20px;
+        min-width: 25px;
       }
     }
     &::-webkit-scrollbar {

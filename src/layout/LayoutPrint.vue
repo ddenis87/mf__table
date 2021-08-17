@@ -12,6 +12,9 @@ export default {
 
 <style lang="scss" scoped>
 .layout-print {
+  display: contents;
+  width: auto;
+  border: thin solid red;
   padding: 10px;
 }
 </style>

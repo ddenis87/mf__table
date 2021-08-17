@@ -58,6 +58,14 @@ export const SHIFT_TYPE = {
 //     parthDigit: +str.replace(REG_SYMBOLS, ''),
 //   };
 // }
+// export function deltaCell(currentCell, shiftCell) {
+//   const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(currentCell);
+//   const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCell);
+//   return {
+//     deltaRow: shiftRow - currentRow,
+//     deltaColumn: getColumnNumberForName(shiftColumn) - getColumnNumberForName(currentColumn),
+//   };
+// }
 
 export function getRangeSplit(range) {
   // console.log(range);
@@ -181,3 +189,14 @@ export function moveRange(range, from, rangeLimit = 'a1:a1') {
   };
   return rangeTypes[rangeType]();
 }
+
+// export function moveFormula(formula) {
+//   let [func, value] = formula.split('(');
+//   func = func.slice(1);
+//   console.log(func);
+//   value = value.slice(0, -1).toLowerCase().split(';');
+//   console.log(...value);
+//   value.map((item) => moveCell(item, 'a1', 'a1:a2'));
+//   console.log(...value);
+//   return value;
+// }

@@ -104,6 +104,7 @@ export default {
   align-items: center;
   padding: 0 3px;
   width: 100%;
+  max-width: 800px;
   min-width: 80px;
   height: 100%;
   min-height: 22px;

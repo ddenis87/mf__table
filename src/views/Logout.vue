@@ -26,8 +26,8 @@ export default {
     DialogToolbar,
   },
   mounted() {
-    console.log(this.$store.state);
-    console.log(localStorage.getItem('Token'));
+    // console.log(this.$store.state);
+    // console.log(localStorage.getItem('Token'));
   },
   methods: {
     goLogin() {

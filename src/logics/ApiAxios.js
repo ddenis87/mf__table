@@ -24,6 +24,7 @@ export default class ApiAxios {
   }
 
   setHeaderToken(token) {
+    console.log(token);
     this.require.defaults.headers.common = { Authorization: `Token ${token}` };
   }
 

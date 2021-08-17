@@ -1,5 +1,7 @@
 <template>
-  <table-layout padding="4px 4px 4px 4px" :border-off="isPrintMode || isOuterBorderOff">
+  <table-layout :padding="tableLayoutPadding"
+                :display="tableLayoutDisplay"
+                :border-off="isPrintMode || isOuterBorderOff">
     <div :class="{
             'spread-sheet': !isPrintMode,
             'spread-sheet-print': isPrintMode,
@@ -101,6 +103,8 @@ export default {
     rows: { type: Object, default() { return {}; } },
     representations: { type: Map, default() { return new Map(); } },
     styles: { type: Array, default() { return []; } },
+    tableLayoutDisplay: { type: String, default: 'block' },
+    tableLayoutPadding: { type: String, default: '4px 4px 4px 4px' },
     images: { type: Object, default() { return {}; } },
     isShowGrid: { type: Boolean, default: true },
     isShowGroup: { type: Boolean, default: true },
@@ -411,7 +415,7 @@ export default {
       let stylesPath = '';
       const prepareStyles = [];
       // stylesPath = ' .spread-sheet .sheet .sheet-body .sheet-body__row ';
-      stylesPath = ' .spread-sheet .spread-sheet__body .body-virtual .sheet-body__row ';
+      stylesPath = ' .spread-sheet .spread-sheet__body .sheet-body__row ';
       if (this.isPrintMode) {
         stylesPath = '.spread-sheet-print .spread-sheet-body-print .sheet-body__row ';
       }

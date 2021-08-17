@@ -9,6 +9,7 @@ import VueMask from './plugins/vmask';
 Vue.component('virtual-list', VirtualList);
 
 Vue.config.productionTip = false;
+Vue.config.performance = true;
 
 new Vue({
   router,

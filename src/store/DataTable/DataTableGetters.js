@@ -56,7 +56,7 @@ export default {
   
   GET_LIST_DATA_ITEM_REPRESENTATION:(state) => (options) => {
     // console.log(options);
-    const relatedModelView = state[options.tableName].relatedModelView;
+    const relatedModelView = options.relatedModelView || state[options.tableName].relatedModelView;
     const template = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1).split('}{');
     const dataItem = state[options.tableName].listData.find((item) => item.id === options.id);
     // console.log(dataItem);

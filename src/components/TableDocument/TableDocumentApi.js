@@ -1,4 +1,5 @@
 import store from '@/store/index';
+import display from '@/plugins/formattingView/formattingView';
 import TableDocument from './TableDocument';
 // import ValueValidate from './Errors';
 
@@ -24,7 +25,8 @@ function requestRepresentation(sourceName, value) {
 class TableDocumentApi extends TableDocument {
   constructor(params) {
     super(params);
-    this.prepareRepresentation();
+    console.log(params);
+    // this.prepareRepresentation();
   }
 
   // BASE_CLASS = TableDocumentApi; // заменить на this.constructor
@@ -41,11 +43,11 @@ class TableDocumentApi extends TableDocument {
 
   editingCell(cellName, cellValue) {
     if (this.cells[cellName] && cellValue) {
-      const { type } = this.cells[cellName];
+      const { type, relatedModelView } = this.cells[cellName];
       if (type?.includes('field')) {
         const { parthSource: sourceName } = parseType(type);
         const representation = store
-          .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: cellValue });
+          .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: cellValue, relatedModelView });
         this.setRepresentation(cellValue, representation);
       }
     }
@@ -54,16 +56,50 @@ class TableDocumentApi extends TableDocument {
 
   async getRepresentationStore() {
     const promises = Object.values(this.cells).map(async (cellValue) => {
-      const { type, value } = cellValue;
-      if (type?.includes('.') && value) {
+      const { type, value, relatedModelView } = cellValue;
+      if (type?.includes('field') && value) {
         const { parthSource: sourceName } = parseType(type);
         await requestRepresentation(sourceName, value);
         const representation = store
-          .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value });
+          .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value, relatedModelView });
         this.setRepresentation(value, representation);
       }
     });
     await Promise.all(promises);
+  }
+
+  getDocument(JSONFormat = false) {
+    const cells = {};
+    Object.entries(this.cells).forEach((cell) => {
+      const [cellName, cellValue] = cell;
+      if (Object.keys(cellValue).includes('scripts')) return;
+      cells[cellName] = {
+        ...cellValue,
+        value: display.formate(cellValue.value, {
+          ...cellValue,
+          representations: this.representations,
+        }),
+      };
+    });
+    console.log(cells);
+    // const cells = Object.entries(this.cells).filter((cell) => {
+    //   const [, cellValue] = cell;
+    //   // console.log(cellValue);
+    //   return (!Object.keys(cellValue).includes('action'));
+
+    // });
+    // console.log(Object.fromEntries(cells));
+    const document = {
+      editAccess: this.editAccess,
+      rows: this.rows,
+      rowCount: this.rowCount,
+      columns: this.columns,
+      columnCount: this.columnCount,
+      cells,
+      styles: this.styles,
+      representations: Object.fromEntries(this.representations),
+    };
+    return (JSONFormat) ? JSON.stringify(document) : document;
   }
 
   getRepresentation(key) {
