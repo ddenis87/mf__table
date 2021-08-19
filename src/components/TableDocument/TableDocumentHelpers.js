@@ -10,6 +10,7 @@ import {
 
 const REG_SYMBOLS = /[A-Z]/gi;
 const REG_DIGITS = /[0-9]/g;
+const REG_OPERATORS = /[+-/*)(%: ]/g;
 
 export const RANGE_TYPE = {
   CELL: 'cell',
@@ -166,6 +167,42 @@ export function moveCell(cellName, from = 'a1', rangeLimit = 'a1:a1') {
   const moveColumn = cellColumnNumber - rangeLimitFromColumnNumber + fromColumnNumber;
   const moveRow = cellRow - rangeLimitFromRow + fromRow;
   return `${getColumnNameForNumber(moveColumn)}${moveRow}`;
+}
+
+export function moveFormula(cellFormula, cellNameCurrent, cellNameTemplate) {
+  if (cellNameCurrent === cellNameTemplate) return cellFormula;
+  // console.log(cellNameCurrent, cellNameTemplate);
+  // console.log(cellFormula.slice(1));
+  // console.log(cellFormula.slice(1).replace(REG_OPERATORS, '$'));
+  const operands = cellFormula.slice(1).replace(REG_OPERATORS, '$').split('$');
+  // this.highlightOperands();
+  const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(cellNameCurrent);
+  const { parthSymbol: templateColumn, parthDigit: templateRow } = getParseAtSymbolDigit(cellNameTemplate);
+  const deltaColumn = getColumnNumberForName(currentColumn) - getColumnNumberForName(templateColumn);
+  const deltaRow = currentRow - templateRow;
+  const operandsShift = new Map();
+  // console.log(cellNameCurrent, cellNameTemplate);
+  // console.log(this.operands);
+  operands.forEach((operand) => {
+    if (+operand) {
+      operandsShift.set(operand, operand);
+      return;
+    }
+    const { parthSymbol: operandColumn, parthDigit: operandRow } = getParseAtSymbolDigit(operand);
+    const shiftColumn = getColumnNumberForName(operandColumn) + deltaColumn;
+    const shiftRow = operandRow + deltaRow;
+    operandsShift.set(operand, `${getColumnNameForNumber(shiftColumn)}${shiftRow}`);
+  });
+  // console.log(operandsShift);
+  let formula = cellFormula;
+  operandsShift.forEach((value, key) => {
+    // const [key, value] = shiftOperand;
+    // console.log(key, value);
+    formula = formula.replace(key, value);
+  });
+  // this.operands = operandsShift;
+  // console.log(this.formula);
+  return formula;
 }
 
 export function moveRange(range, from, rangeLimit = 'a1:a1') {

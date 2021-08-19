@@ -23,11 +23,11 @@ function requestRepresentation(sourceName, value) {
 }
 
 class TableDocumentApi extends TableDocument {
-  constructor(params) {
-    super(params);
-    console.log(params);
-    // this.prepareRepresentation();
-  }
+  // constructor(params) {
+  //   super(params);
+  //   // console.log(this.columnCount);
+  //   // this.prepareRepresentation();
+  // }
 
   // BASE_CLASS = TableDocumentApi; // заменить на this.constructor
 
@@ -81,14 +81,7 @@ class TableDocumentApi extends TableDocument {
         }),
       };
     });
-    // console.log(cells);
-    // const cells = Object.entries(this.cells).filter((cell) => {
-    //   const [, cellValue] = cell;
-    //   // console.log(cellValue);
-    //   return (!Object.keys(cellValue).includes('action'));
 
-    // });
-    // console.log(Object.fromEntries(cells));
     const document = {
       editAccess: this.editAccess,
       rows: this.rows,

@@ -120,7 +120,7 @@ export default {
     },
 
     propsItemBodyFixed() {
-      console.log(this.templateColumnWidth);
+      // console.log(this.templateColumnWidth);
       return {
         ...this.propsItem,
         'template-column-width': `${this.templateColumnWidth} 25px`,

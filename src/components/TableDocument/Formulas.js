@@ -5,10 +5,10 @@ import {
 } from '../../helpers/spreadSheet';
 
 const REG_OPERATORS = /[+-/*)(%: ]/g;
-
+// const REG_OPERANDS = /\w+\d+/g;
 const FUNCTION_FORMULA = {
   SUM: 'calculateSum', // sum
-  SUM_GROUP: 'calculateSumGroup', // sum
+  SUMGROUP: 'calculateSumGroup', // sum
 };
 
 class Formulas {
@@ -33,9 +33,11 @@ class Formulas {
   }
 
   highlightOperands() {
-    console.log(this.formula.replace(REG_OPERATORS, ''));
-    this.operands = this.formula.replace(REG_OPERATORS, '').split('$'); // .splice(1);
-    console.log(...this.operands);
+    console.log(this.formula.slice(1).replace(REG_OPERATORS, '$').split('$'));
+
+    // this.operands = this.formula.replace(REG_OPERATORS, '').split('$').splice(1);
+    this.operands = this.formula.slice(1).replace(REG_OPERATORS, '$').split('$');
+    // console.log(...this.operands);
   }
 
   matchOperands(functionName = 'this.getCellValueForFormula') {
@@ -88,9 +90,9 @@ class Formulas {
   getFormulaForCalculation() {
     if (this.formula.includes('SUM')) {
       let [functionName, functionParameters] = this.formula.slice(1, -1).split('(');
-      functionName = (functionParameters.split(':').length === 1) ? `${functionName}_GROUP` : functionName;
+      functionName = (functionParameters.split(':').length === 1) ? `${functionName}` : functionName;
       functionParameters = functionParameters.toLowerCase();
-      // console.log(functionParameters);
+      console.log(functionName);
       return `this.${FUNCTION_FORMULA[functionName]}('${functionParameters}','${this.cellName}')`;
     }
     // if (this.formula.includes('=')) {

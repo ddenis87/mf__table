@@ -1,3 +1,10 @@
+import FormulaParser, { Address } from 'fast-formula-parser';
+// import {
+//   FormulaHelpers,
+// } from 'fast-formula-parser';
+// import {
+//   FormulaHelpers, Types, FormulaError, MAX_ROW, MAX_COLUMN,
+// } from 'fast-formula-parser';
 import {
   RANGE_TYPE,
   SHIFT_TYPE,
@@ -6,6 +13,7 @@ import {
   getRangeLength,
   getRangeShift,
   moveCell,
+  moveFormula,
   moveRange,
 } from './TableDocumentHelpers';
 
@@ -15,7 +23,7 @@ import {
   getParseAtSymbolDigit,
 } from '../../helpers/spreadSheet';
 
-import Formulas from './Formulas';
+// import Formulas from './Formulas';
 import TableDocumentDeserializeError from './TableDocumentDeserializeError';
 import TableDocumentGeneralError from './TableDocumentGeneralError';
 import TableDocumentValidationCellError from './TableDocumentValidationCellError';
@@ -131,15 +139,34 @@ class TableDocument {
 
   BaseClass = this.constructor;
 
-  // version = null;
+  parseFormula = new FormulaParser({
+    functions: {
+      SUMGROUP: (column, row) => {
+        const cellNameRange = `${Address.columnNumberToName(column.value)}${row.value}`;
+        const cellKeys = this.getCellKeysInLevel(cellNameRange, this.getCell(cellNameRange).level || 1);
+        let result = 0;
+        cellKeys.forEach((cellKey) => {
+          result += this.getCellValue(cellKey.toLowerCase());
+        });
+        return result;
+      },
+      OBJECTPROPERTY(cellName, propertyName) {
+        // const cellNameSource = `${Address.columnNumberToName(column.value)}${row.value}`;
+        console.log(cellName);
+        console.log(propertyName);
+        return propertyName.value.toString();
+      },
+    },
+    onCell: ({ row, col }) => this.getCellValue(`${getColumnNameForNumber(col)}${row}`),
+  });
 
-  editAccess = undefined;
+  // editAccess = undefined;
 
   actionCell(cellName) {
-    const scripts = this.getCellParameter(cellName, CELL_ATTRIBUTES.SCRIPTS);
+    const scripts = this.getCellScripts(cellName);
     if (!scripts) return;
     if (Object.keys(scripts).includes(CELL_ATTRIBUTES.ACTION)) this.executeAction(cellName);
-    const formula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
+    const formula = this.getCellParameter(cellName, 'formula');
     if (formula) this.calculateCellValue(cellName);
   }
 
@@ -158,35 +185,39 @@ class TableDocument {
   }
 
   calculateCellValue(cellName) {
-    const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA);
-    const formula = new Formulas(cellFormula, cellName);
-    // if (formula.hasOperandsInclude(cellName)) {
-    //   this.setCellValue(cellName, NaN);
-    //   return NaN;
-    // }
-    // console.log(cellName, cellFormula, formula.getFormulaForCalculation());
-    const result = eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
+    const cellFormula = this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA).slice(1);
+    let result = null;
+    console.log(cellFormula);
+    result = this.parseFormula.parse(cellFormula, { sheet: 'List1' });
     this.setCellValue(cellName, result);
     return result;
   }
 
-  calculateSum(range, currentCellName) {
-    // console.log('calculate function ', currentCellName);
-    const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
-    const formula = new Formulas(cellKeys.map((cellKey) => `$${cellKey}`).join(' + '), currentCellName);
-    if (formula.hasOperandsInclude(currentCellName)) return NaN;
-    return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
-  }
+  // getFormula(cellFormula, cellName) {
+  //   const cellNameRange = cellFormula.split('(')[1].slice(0, -1);
+  //   const cellKeys = this.getCellKeysInLevel(cellNameRange, this.getCell(cellName).level || 1);
+  //   if (cellKeys.includes(cellName)) return NaN;
+  //   const formula = cellKeys.join('+').toLowerCase();
+  //   return formula;
+  // }
 
-  calculateSumGroup(range, currentCellName) {
-    const cellKeys = this.getCellsInLevel(range, this.getCell(currentCellName).level || 1);
-    const formula = new Formulas(cellKeys.map((cellKey) => `$${cellKey}`).join(' + '), currentCellName);
-    if (formula.hasOperandsInclude(currentCellName)) return NaN;
-    return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
-    // console.log(cells);
-    // console.log(range);
-    // console.log(currentCellName);
-  }
+  // calculateSum(range, currentCellName) {
+  //   // console.log('calculate function ', currentCellName);
+  //   const cellKeys = this.getCellsInRange(range, RETURN_FORMAT.KEYS);
+  //   const formula = new Formulas(cellKeys.map((cellKey) => `$${cellKey}`).join(' + '), currentCellName);
+  //   if (formula.hasOperandsInclude(currentCellName)) return NaN;
+  //   return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
+  // }
+
+  // calculateSumGroup(range, currentCellName) {
+  //   const cellKeys = this.getCellKeysInLevel(range, this.getCell(currentCellName).level || 1);
+  //   const formula = new Formulas(cellKeys.map((cellKey) => `$${cellKey}`).join(' + '), currentCellName);
+  //   if (formula.hasOperandsInclude(currentCellName)) return NaN;
+  //   return eval(formula.getFormulaForCalculation()); // eslint-disable-line no-eval
+  //   // console.log(cells);
+  //   // console.log(range);
+  //   // console.log(currentCellName);
+  // }
 
   deleteArea(range, shiftType = null) {
     const rangeType = getRangeType(range);
@@ -432,9 +463,9 @@ class TableDocument {
     return Math.max(...rows);
   }
 
-  getAreaRange() {
-    return `a1:${getColumnNameForNumber(this.getAreaWidth())}${this.getAreaHeight()}`;
-  }
+  // getAreaRange() {
+  //   return `a1:${getColumnNameForNumber(this.getAreaWidth())}${this.getAreaHeight()}`;
+  // }
 
   getAreaValue(parameters) {
     const parametersSet = new Map(Object.entries(parameters));
@@ -465,7 +496,19 @@ class TableDocument {
     return this.cells[cellName] || {};
   }
 
-  getCellParameter(cellName, cellParameter) {
+  getCellFormula(cellName) {
+    return this.cells[cellName]?.formula.slice(0) || null;
+  }
+
+  getCellScripts(cellName) {
+    return this.cells[cellName]?.scripts || null;
+  }
+
+  getCellValue(cellName) {
+    return this.cells[cellName]?.value || null;
+  }
+
+  getCellParameter(cellName, cellParameter) { // разбить на получение каждого атрибута
     if (!this.cells[cellName]) return null;
     return this.cells[cellName][cellParameter] || null;
   }
@@ -484,20 +527,28 @@ class TableDocument {
       || 'string';
   }
 
-  getCellValueForFormula(cellName) { // ??? use in Formula class
-    if (this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA)) return this.calculateCellValue(cellName);
-    const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
-    return +cellValue || 0;
-  }
+  // getCellValueForFormula(cellName) { // ??? use in Formula class
+  //   if (this.getCellParameter(cellName, CELL_ATTRIBUTES.FORMULA)) return this.calculateCellValue(cellName);
+  //   const cellValue = this.getCellParameter(cellName, CELL_ATTRIBUTES.VALUE);
+  //   return +cellValue || 0;
+  // }
 
-  getCellsInLevel(range, level) {
+  getCellKeysInLevel(range, level, rangeType = RANGE_TYPE.ROW) {
     const cells = [];
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(range);
-    // console.log(cellRow, this.rows.length);
-    for (let row = cellRow - 1; row < Object.keys(this.rows).length; row += 1) {
-      // console.log(this.rows[row].level, level);
-      if (this.rows[row].level === level) cells.push(`${cellColumn}${row}`);
-      if (this.rows[row].level < level) break;
+    if (rangeType === RANGE_TYPE.ROW) {
+      for (let row = cellRow - 1; row < Object.keys(this.rows).length; row += 1) {
+        if (this.rows[row].level === level) cells.push(`${cellColumn}${row}`);
+        if (this.rows[row].level < level) break;
+      }
+    }
+    if (rangeType === RANGE_TYPE.COLUMN) {
+      const columnNumber = getColumnNumberForName(cellColumn);
+      for (let column = columnNumber - 1; column < Object.keys(this.columns).length; column += 1) {
+        const columnName = getColumnNameForNumber(column);
+        if (this.columns[columnName].level === level) cells.push(`${columnName}${cellRow}`);
+        if (this.columns[columnName].level < level) break;
+      }
     }
     return cells;
   }
@@ -802,7 +853,7 @@ class TableDocument {
     return rezult;
   }
 
-  insertArea(numberColumn, numberRow, area, shiftType = null, isValidation = true) {
+  insertArea(numberColumn, numberRow, area, shiftType = null) {
     const namedAreas = [];
     const {
       cells: insertCells,
@@ -840,18 +891,13 @@ class TableDocument {
       const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
 
       this.setColumn(shiftColumn, area.getColumn(currentColumn));
-      this.setRow(shiftRow, area.getRow(currentRow), isValidation);
-      // add
-      // const deltaCellAndShiftCell = deltaCell(currentCellName, shiftCellName);
-      // console.log(area.getCell(currentCellName).cellNameTemplate, '=>', shiftCellName);
-      //
+      this.setRow(shiftRow, area.getRow(currentRow));
+
       const cellValue = area.getCell(currentCellName);
-      if (Object.keys(cellValue).includes('formula')
-        && !cellValue.formula.includes('SUM')) {
-        const formula = new Formulas(cellValue.formula, shiftCellName);
-        cellValue.formula = formula.moveFormula(shiftCellName, cellValue.cellNameTemplate);
-        // console.log(formula);
+      if (Object.keys(cellValue).includes('formula')) {
+        cellValue.formula = moveFormula(cellValue.formula, shiftCellName, cellValue.cellNameTemplate);
       }
+
       this.setCell(
         shiftCellName,
         {
@@ -859,7 +905,6 @@ class TableDocument {
           columnName: shiftColumn,
           rowName: shiftRow,
         },
-        // deltaCellAndShiftCell,
       );
     });
 
