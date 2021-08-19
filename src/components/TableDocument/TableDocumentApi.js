@@ -22,6 +22,16 @@ function requestRepresentation(sourceName, value) {
   });
 }
 
+// function getRepresentationAtStore(sourceName, value, relatedModelView) {
+//   const representation = store
+//     .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({
+//       tableName: sourceName,
+//       id: value,
+//       relatedModelView,
+//     });
+//   return representation;
+// }
+
 class TableDocumentApi extends TableDocument {
   // constructor(params) {
   //   super(params);
@@ -37,7 +47,8 @@ class TableDocumentApi extends TableDocument {
     try {
       super.deserialize(data, template, settings);
     } finally {
-      this.prepareRepresentation();
+      await this.prepareRepresentation();
+      super.recalculateFormulas();
     }
   }
 
@@ -54,7 +65,7 @@ class TableDocumentApi extends TableDocument {
     super.editingCell(cellName, cellValue);
   }
 
-  async getRepresentationStore() {
+  async getRepresentationStore() { // getRepresentationAtApi
     const promises = Object.values(this.cells).map(async (cellValue) => {
       const { type, value, relatedModelView } = cellValue;
       if (type?.includes('field') && value) {

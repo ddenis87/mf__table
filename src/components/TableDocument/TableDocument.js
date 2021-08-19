@@ -1,3 +1,4 @@
+import store from '@/store/index';
 import FormulaParser, { Address } from 'fast-formula-parser';
 // import {
 //   FormulaHelpers,
@@ -80,6 +81,16 @@ function validateCellValueType(value = '', type = 'string') {
   return validate[type.split('.')[0]](value) || 'Значение не соответствует типу ячейки';
 }
 
+function getRepresentationAtStore(sourceName, value, relatedModelView) {
+  const representation = store
+    .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({
+      tableName: sourceName,
+      id: value,
+      relatedModelView,
+    });
+  return representation;
+}
+
 class TableDocument {
   constructor({
     // template = false,
@@ -150,11 +161,12 @@ class TableDocument {
         });
         return result;
       },
-      OBJECTPROPERTY(cellName, propertyName) {
-        // const cellNameSource = `${Address.columnNumberToName(column.value)}${row.value}`;
-        console.log(cellName);
-        console.log(propertyName);
-        return propertyName.value.toString();
+      OBJECTPROPERTY: (cellName, propertyName) => { // переделать в ближайшем будущем
+        const cellNameSource = cellName.value.toLowerCase();
+        const { type, value } = this.cells[cellNameSource];
+        const property = `{${propertyName.value.toLowerCase()}}`;
+        const result = getRepresentationAtStore(type.split('.')[1], value, property);
+        return result;
       },
     },
     onCell: ({ row, col }) => this.getCellValue(`${getColumnNameForNumber(col)}${row}`),
@@ -972,17 +984,10 @@ class TableDocument {
     });
   }
 
-  setRow(rowName, rowValue) {
+  setRow(rowName, rowValue, sheet) {
     // if (flagValid)
-    this.setRowGroup(rowValue.level || 0, rowName);
+    this.setRowGroup(rowValue.level || 0, rowName, sheet);
     this.rows = { ...this.rows, [rowName]: rowValue };
-  }
-
-  updateStyles(stylesArea) {
-    stylesArea.forEach((styleItem) => {
-      const styles = this.styles.find((style) => style.name === styleItem.name);
-      if (!styles) this.styles.push(styleItem);
-    });
   }
 
   setRowGroup(level, rowName) {
@@ -997,6 +1002,13 @@ class TableDocument {
       );
     }
     if (levelGroupAddingRow === levelGroupPreviousRow + 1) previousRow.isGroup = true;
+  }
+
+  updateStyles(stylesArea) {
+    stylesArea.forEach((styleItem) => {
+      const styles = this.styles.find((style) => style.name === styleItem.name);
+      if (!styles) this.styles.push(styleItem);
+    });
   }
 
   setColumnGroup(level, columnName) {

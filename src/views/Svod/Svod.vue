@@ -9,6 +9,19 @@
                             @editing:accept="acceptEditingCell"
                             @editing:cancel="cancelEditingCell"></spread-sheet-editing>
     <div class="svod__body">
+      <!-- <div class="body-table">
+        <spread-sheet ref="SpreadSheet"
+                      v-bind="spreadSheetProps"
+                      :isOuterBorderOff="true"
+                      :delta-height-virtual-list="136"
+                      :is-show-title="false"
+                      :is-show-group="false"
+                      table-layout-padding="0px 4px 4px 4px"
+                      @click:cell="evtClickCell"
+                      @dblclick:cell="evtDblClickCell"
+                      @keydown:cell="evtKeydownCell"
+                      @scroll:body="scrollBody"></spread-sheet>
+      </div> -->
       <v-tabs-items v-model="currentList">
         <v-tab-item :transition="false"
                     v-for="list in lists"
@@ -82,6 +95,14 @@ export default {
         'is-show-grid': !(this[`tableDocument_list${this.currentList + 1}`].documentTemplate),
       };
     },
+    // spreadSheetProps() {
+    //   console.log(this.tableDocument_list1.rows[`list${this.currentList + 1}`]);
+    //   return {
+    //     ...this.tableDocument_list1,
+    //     rows: this.tableDocument_list1.rows[`list${this.currentList + 1}`],
+    //     'is-show-grid': !(this[`tableDocument_list${this.currentList + 1}`].documentTemplate),
+    //   };
+    // },
   },
   async created() {
     await this.$store.dispatch('Lists/readList', 'region');
