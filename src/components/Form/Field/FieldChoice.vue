@@ -8,6 +8,7 @@
                     :items="fieldItems"
                     :item-text="itemText"
                     :item-value="itemValue"
+                    :menu-props="{ minWidth: 120, }"
                     v-bind="fieldPropsNested"
                     v-model="fieldValue"
                     @click.stop="evtClick"
@@ -17,7 +18,9 @@
                     @keydown.esc="evtKeydownControl"
                     @keydown.tab="evtKeydownControl"
                     @blur="evtBlur"
-                    @focus="evtFocus"></v-autocomplete>
+                    @focus="evtFocus">
+      <template v-slot:append><v-icon class="action">mdi-menu-down</v-icon></template>
+    </v-autocomplete>
     <div v-if="isRequired" class="required"></div>
   </div>
 </template>

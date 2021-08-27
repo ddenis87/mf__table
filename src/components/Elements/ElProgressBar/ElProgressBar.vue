@@ -2,7 +2,7 @@
   <v-progress-linear class="data-progress-line"
                      color="blue" 
                      indeterminate 
-                     absolute 
+                     :absolute="absolute"
                      bottom
                      v-show="isShow"></v-progress-linear>
 </template>
@@ -14,7 +14,8 @@ export default {
     isShow: {
       type: Boolean,
       default: false,
-    }
+    },
+    absolute: { type: Boolean, default: true }
   }
 }
 </script>

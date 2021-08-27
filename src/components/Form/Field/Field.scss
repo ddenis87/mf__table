@@ -4,7 +4,9 @@
   &-item {
     font-size: inherit;
   }
-
+  .action {
+    cursor: pointer;
+  }
   .required {
     position: relative;
     bottom: 1px;

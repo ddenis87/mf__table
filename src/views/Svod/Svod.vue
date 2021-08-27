@@ -1,19 +1,31 @@
 <template>
   <div class="svod">
     <spread-sheet-editing ref="SpreadSheetEditDOM"
-                            :cell="editableCell"
-                            :cell-type="editableCellType"
-                            :cell-element="editableCellElement"
-                            :edit-event="editableCellEvent"
-                            :is-label="isShowEditableLabel"
-                            @editing:accept="acceptEditingCell"
-                            @editing:cancel="cancelEditingCell"></spread-sheet-editing>
+                          :cell="editableCell"
+                          :cell-type="editableCellType"
+                          :cell-element="editableCellElement"
+                          :edit-event="editableCellEvent"
+                          :is-label="isShowEditableLabel"
+                          @editing:accept="acceptEditingCell"
+                          @editing:cancel="cancelEditingCell"></spread-sheet-editing>
+    <div class="svod__progresss">
+      <el-progress-bar :is-show="isLoading" :absolute="false"></el-progress-bar>
+    </div>
+    <div class="svod__nav">
+      <v-tabs v-model="currentList"
+              align-with-title>
+        <v-tab v-for="list in lists"
+              :key="list.name"
+              class="nav-list"
+              active-class="nav-list_active">{{ list.nameView }}</v-tab>
+      </v-tabs>
+    </div>
     <div class="svod__body">
-      <!-- <div class="body-table">
+      <div class="body-table">
         <spread-sheet ref="SpreadSheet"
                       v-bind="spreadSheetProps"
                       :isOuterBorderOff="true"
-                      :delta-height-virtual-list="136"
+                      :delta-height-virtual-list="140"
                       :is-show-title="false"
                       :is-show-group="false"
                       table-layout-padding="0px 4px 4px 4px"
@@ -21,8 +33,8 @@
                       @dblclick:cell="evtDblClickCell"
                       @keydown:cell="evtKeydownCell"
                       @scroll:body="scrollBody"></spread-sheet>
-      </div> -->
-      <v-tabs-items v-model="currentList">
+      </div>
+      <!-- <v-tabs-items v-model="currentList">
         <v-tab-item :transition="false"
                     v-for="list in lists"
                     :key="list.name">
@@ -40,45 +52,39 @@
                           @scroll:body="scrollBody"></spread-sheet>
           </div>
         </v-tab-item>
-      </v-tabs-items>
-    </div>
-    <div class="svod__nav">
-      <v-tabs v-model="currentList"
-              align-with-title>
-        <v-tab v-for="list in lists"
-              :key="list.name"
-              class="nav-list"
-              active-class="nav-list_active">{{ list.value }}</v-tab>
-      </v-tabs>
+      </v-tabs-items> -->
     </div>
   </div>
 </template>
 
 <script>
+import ElProgressBar from '@/components/Elements/ElProgressBar/ElProgressBar.vue';
 import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 import SpreadSheetEditing from '@/components/SpreadSheetEditing/SpreadSheetEditing.vue';
 
 // import api from '@/logics/ApiRest';
+import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocumentApi from '@/components/TableDocument/TableDocumentApi';
-import TableDocumentGeneralError from '@/components/TableDocument/TableDocumentGeneralError';
+// import TableDocumentGeneralError from '@/components/TableDocument/TableDocumentGeneralError';
 
 export default {
   name: 'Svod',
   components: {
+    ElProgressBar,
     SpreadSheet,
     SpreadSheetEditing,
   },
   data() {
     return {
-      lists: [
-        { name: 'list1', value: 'Нежилые помещения' },
-        { name: 'list2', value: 'Лист 2' },
-        { name: 'list3', value: 'Лист 3' },
-      ],
+      // lists: [
+      //   { name: 'list1', value: 'Нежилые помещения' },
+      //   { name: 'list2', value: 'Лист 2' },
+      //   { name: 'list3', value: 'Лист 3' },
+      // ],
       currentList: 0,
-      tableDocument_list1: new TableDocumentApi(),
-      tableDocument_list2: new TableDocumentApi({ rowCount: 100, columnCount: 30 }),
-      tableDocument_list3: new TableDocumentApi({ rowCount: 100, columnCount: 30 }),
+      tableDocument: new TableDocumentApi(),
+      // tableDocument_list2: new TableDocumentApi({ rowCount: 100, columnCount: 30 }),
+      // tableDocument_list3: new TableDocumentApi({ rowCount: 100, columnCount: 30 }),
 
       editableCell: null,
       editableCellType: 'string',
@@ -86,79 +92,124 @@ export default {
       editableCellElement: null,
       editableCellGeometry: null,
       isShowEditableLabel: false,
+
+      isLoading: false,
     };
   },
   computed: {
-    spreadSheetProps() {
-      return {
-        ...this[`tableDocument_list${this.currentList + 1}`],
-        'is-show-grid': !(this[`tableDocument_list${this.currentList + 1}`].documentTemplate),
-      };
+    sheetName() {
+      return this.lists[this.currentList].name;
+    },
+    lists() {
+      const lists = [];
+      this.tableDocument.sheetsList.forEach((sheet) => {
+        lists.push({
+          name: sheet.name,
+          nameView: sheet.nameView,
+        });
+      });
+      return lists;
     },
     // spreadSheetProps() {
-    //   console.log(this.tableDocument_list1.rows[`list${this.currentList + 1}`]);
     //   return {
-    //     ...this.tableDocument_list1,
-    //     rows: this.tableDocument_list1.rows[`list${this.currentList + 1}`],
+    //     ...this[`tableDocument_list${this.currentList + 1}`],
     //     'is-show-grid': !(this[`tableDocument_list${this.currentList + 1}`].documentTemplate),
     //   };
     // },
+    spreadSheetProps() {
+      return {
+        ...this.tableDocument,
+        ...this.tableDocument.getPropsForView(this.sheetName),
+        'is-show-grid': false,
+      };
+    },
+  },
+  watch: {
+    currentList() {
+      this.tableDocument.recalculateFormulas();
+      this.tableDocument.recalculateFormulas(); // косяк в получении формул
+    },
   },
   async created() {
     await this.$store.dispatch('Lists/readList', 'region');
+    await this.$store.dispatch('Lists/readList', 'kodLgot');
     // await this.$store.dispatch('DataTable/REQUEST_OPTIONS', { tableName: 'organization' });
   },
   async mounted() {
+    this.isLoading = true;
     const tableDocumentPrepare = new TableDocumentApi();
-    let template = await import('@/assets/json/svod/template.json');
+    let template = await import('@/assets/json/svod/templateMultiGood.json');
     template = template.default;
+    // console.log(template);
+    if (template.type === 'document') {
+      this.tableDocument = new TableDocumentApi(template);
+      await this.tableDocument.prepareRepresentation();
+      this.tableDocument.recalculateFormulas();
+      this.currentList = '0';
+      console.log(this.tableDocument);
+      this.isLoading = false;
+      return;
+    }
     tableDocumentPrepare.setTableDocumentTemplate(template);
-    let settings = await import('@/assets/json/svod/settings.json');
+    let settings = await import('@/assets/json/svod/settingsMulti.json');
     settings = settings.default;
     tableDocumentPrepare.setTableDocumentSettings(settings);
-    let data = await import('@/assets/json/svod/data.json');
+    let data = await import('@/assets/json/svod/dataMulti.json');
     data = data.default;
-    try {
-      await tableDocumentPrepare.deserialize(data);
-    } catch (err) {
-      if (err instanceof TableDocumentGeneralError) {
-        this.showDialogMessage(err.getMessagesText());
-      }
-      console.log(err);
-    } finally {
-      this.tableDocument_list1 = tableDocumentPrepare;
-      this.tableDocument_list1.recalculateFormulas();
-    }
+    // try {
+    await tableDocumentPrepare.deserialize(data);
+    // } catch (err) {
+    //   if (err instanceof TableDocumentGeneralError) {
+    //     this.showDialogMessage(err.getMessagesText());
+    //   }
+    // // console.log(err);
+    // } finally {
+    this.tableDocument = tableDocumentPrepare;
+    this.tableDocument.recalculateFormulas();
+    this.currentList = '0';
+    this.isLoading = false;
+    // }
+    console.log(this.tableDocument);
   },
   methods: {
     evtClickCell(options) {
       const { cellName } = options;
-      const { scripts } = this.tableDocument_list1.getCell(cellName);
-      if (scripts) {
-        // console.log(scripts);
-        const { action } = scripts;
-        // console.log(action);
-        // console.log(Object.keys(this));
-        if (Object.keys(this).includes(action)) {
-          this[action]();
-          return;
-        }
+      const action = this.tableDocument.getCellAction(this.sheetName, cellName);
+      if (!action) return;
+      if (Object.keys(this).includes(action)) {
+        this[action]();
+        return;
       }
-      if (cellName) {
-        try {
-          this.tableDocument_list1.actionCell(cellName);
-        } catch (err) {
-          this.showDialogMessage(err.getMessagesText());
-        }
-      }
+      // try {
+      this.tableDocument.executeCellAction(this.sheetName, cellName);
+      // } catch (err) {
+      // this.showDialogMessage(err.getMessagesText());
+      // }
+      // if (scripts) {
+      //   // console.log(scripts);
+      //   const { action } = scripts;
+      //   // console.log(action);
+      //   // console.log(Object.keys(this));
+      //   if (Object.keys(this).includes(action)) {
+      //     this[action]();
+      //     return;
+      //   }
+      // }
+      // if (cellName) {
+      //   try {
+      //     // this.tableDocument.actionCell(cellName, this.sheetName);
+      //   } catch (err) {
+      //     this.showDialogMessage(err.getMessagesText());
+      //   }
+      // }
     },
     evtDblClickCell(options) {
       const { cellName } = options;
-      if (!this.tableDocument_list1.hasEditing(cellName)) {
+      if (!this.tableDocument.hasEditing(this.sheetName, cellName)) {
         return;
       }
-      this.editableCell = this.tableDocument_list1.getCell(cellName);
-      this.editableCellType = this.tableDocument_list1.getCellType(cellName);
+      this.editableCell = this.tableDocument.getCell(this.sheetName, cellName);
+      this.editableCellType = this.tableDocument.getCellType(this.sheetName, cellName);
       this.editableCellEvent = options.evt;
       this.editableCellElement = options.evt.target;
       this.editableCellGeometry = options.evt.target.getBoundingClientRect();
@@ -180,7 +231,7 @@ export default {
 
     clearEditCell() {
       if (this.editableCellElement) this.editableCellElement.focus();
-      this.editableCell = null;
+      this.editableCell = { value: null };
       this.editableCellType = 'string';
       this.editableCellEvent = null;
       this.editableCellElement = null;
@@ -189,7 +240,7 @@ export default {
     scrollBody() { // убрать в компонент ???
       if (this.editableCellElement) {
         const cellName = this.editableCellElement.getAttribute('data-name');
-        const cellEdit = this.$refs.SpreadSheet[this.currentList].$el.querySelector(`[data-name="${cellName}"]`).getBoundingClientRect();
+        const cellEdit = this.$refs.SpreadSheet.$el.querySelector(`[data-name="${cellName}"]`).getBoundingClientRect();
         if ((this.editableCellGeometry.left > cellEdit.left + 10
           || this.editableCellGeometry.left < cellEdit.left - 10)
           || (this.editableCellGeometry.top > cellEdit.top
@@ -203,21 +254,30 @@ export default {
       }
     },
     acceptEditingCell(option) {
+      // console.log(option);
       try {
-        this.tableDocument_list1.editingCell(option.cellName, option.value);
+        this.tableDocument.editingCell(this.sheetName, option.cellName, option.value);
       } catch (err) {
         console.log(err);
         this.showDialogMessage(err.getMessagesText());
       } finally {
+        console.log('acsept and clear');
         this.clearEditCell();
       }
+      this.tableDocument.recalculateFormulas();
+      console.log(this.tableDocument);
     },
     cancelEditingCell() {
+      console.log('cancel edit');
       this.clearEditCell();
     },
 
+    save() {
+      const JSONFormat = true;
+      apiSpreadSheet.dowloadJSONFile(JSON.stringify(this.tableDocument.serializationDataSection()), JSONFormat);
+    },
     print() {
-      localStorage.setItem('SpreadSheetTableDocument', this.tableDocument_list1.getDocument(true));
+      localStorage.setItem('SpreadSheetTableDocument', this.tableDocument.getDocument(this.sheetName, true));
       const pagePrint = this.$router.resolve({
         name: 'SpreadSheetPrint',
       });
@@ -230,16 +290,20 @@ export default {
 <style lang="scss" scoped>
 .svod {
   display: grid;
-  grid-template-areas: "nav" "body";
-  grid-template-rows: 44px 1fr;
+  grid-template-areas: "progresss" "nav" "body";
+  grid-template-rows: 4px 44px 1fr;
   grid-template-columns: 1fr;
   width: 100%;
   height: 100%;
 
+  .svod__progresss {
+    grid-area: progresss;
+    overflow: hidden;
+  }
   .svod__body {
     grid-area: body;
     // padding: 5px;
-    background-color: wheat;
+    // background-color: wheat;
     overflow: hidden;
   }
 
@@ -254,7 +318,7 @@ export default {
   .body-table {
     display: flex;
     // height: 100%;
-    height: calc(100vh - 108px);
+    height: calc(100vh - 112px);
   }
 
   // .nav-list {

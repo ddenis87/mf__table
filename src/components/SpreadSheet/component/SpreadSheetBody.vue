@@ -239,7 +239,7 @@ export default {
         const isTrySelected = cellValue.noSelect || false;
         if (isTrySelected) return;
       }
-      this.focusCell(this.getCellNodeForName(cellName));
+      this.focusCell(this.getCellNodeForName(cellName), evt);
     },
 
     evtMouseout() {
@@ -279,18 +279,28 @@ export default {
       const cellSelectedGeometry = cellSelectedNode.getBoundingClientRect();
       if (cellSelectedGeometry.top > this.sheetBodyGeometry.top - 10
         && cellSelectedGeometry.bottom < this.sheetBodyGeometry.bottom) {
-        this.focusCell(cellSelectedNode);
+        this.focusCell(cellSelectedNode, { type: 'mousedown' });
       }
     },
 
     evtScrollList(evt) {
       this.selectStart = null;
       this.selectEnd = null;
-      this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
+      if (this.$refs.SheetBodyFixed) this.$refs.SheetBodyFixed.scrollLeft = evt.target.scrollLeft;
       this.$emit('scroll-body-x', evt.target.scrollLeft);
     },
 
-    focusCell(target) {
+    resetScroll() {
+      if (this.$refs.SheetBodyFixed) this.$refs.SheetBodyFixed.scrollLeft = 0;
+      this.$refs.SheetBody.$el.scrollLeft = 0;
+    },
+
+    focusCell(target, evt) {
+      if (evt.type === 'mousedown') {
+        target.focus();
+        this.selectedCell(target.getAttribute('data-name'));
+        return;
+      }
       if (target.getBoundingClientRect().left < this.widthFixedArea) {
         this.$refs.SheetBody.$el.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 8;
         this.$refs.SheetBodyFixed.scrollLeft -= (this.widthFixedArea - target.getBoundingClientRect().left) + 8;

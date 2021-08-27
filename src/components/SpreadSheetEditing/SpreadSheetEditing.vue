@@ -22,7 +22,7 @@ export default {
   name: 'SpreadSheetEditing',
   components: { FieldWrapper },
   props: {
-    cell: { type: Object, default() {} },
+    cell: { type: Object, default() { return { value: '' }; } },
     cellType: { type: String, default: 'string' },
     cellElement: { type: HTMLDivElement, default: null },
     editEvent: { type: Event, default: null },
@@ -58,9 +58,11 @@ export default {
   },
   watch: {
     cell() {
+      console.log(this.cell);
+      this.fieldValue = null;
       if (this.editEvent && this.editEvent.type === 'keydown') {
-        console.log(this.editEvent.code);
-        if (this.editEvent.code === 'Delete') this.value = '';
+        console.log(this.cell);
+        if (this.editEvent.code === 'Delete') this.fieldValue = '';
         if (this.editEvent.code.includes('Key')
           || (this.editEvent.code.includes('Numpad') && !this.editEvent.code.includes('NumpadEnter'))
           || this.editEvent.code.includes('Digit')) {
@@ -79,10 +81,14 @@ export default {
         value: cellValue,
         cellName: this.cellName.toLowerCase(),
       };
+      this.fieldValue = null;
       this.$emit('editing:accept', option);
+      this.$refs.wrapper.clearComponent();
     },
     editCancel() {
+      this.fieldValue = null;
       this.$emit('editing:cancel');
+      this.$refs.wrapper.clearComponent();
     },
     evtKeydownControl(evt) {
       if (evt.code === 'Escape') {
@@ -104,7 +110,7 @@ export default {
         string: () => this.fieldValue,
         number: () => +this.fieldValue,
         date: () => this.fieldValue,
-        choice: () => this.fieldValue.value,
+        choice: () => this.fieldValue?.value,
         field: () => {
           let result = this.fieldValue;
           if (typeof this.fieldValue === 'object') result = this.fieldValue.id;

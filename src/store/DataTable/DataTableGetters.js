@@ -58,7 +58,10 @@ export default {
     // console.log(options);
     const relatedModelView = options.relatedModelView || state[options.tableName].relatedModelView;
     const template = relatedModelView.match(/[{\w}]/gi).join(',').replace(/,/g, '').slice(1, -1).split('}{');
-    const dataItem = state[options.tableName].listData.find((item) => item.id === options.id);
+    const dataItem = state[options.tableName].listData.find((item) => {
+      // console.log(item.id, '=', options.id);
+      return (item.id === options.id);
+    });
     // console.log(dataItem);
     if (!dataItem) return undefined;
     let value = relatedModelView;

@@ -28,7 +28,7 @@ export default {
     // console.log(value);
     // if ([null, undefined, ''].includes(value)) return '';
     const FUNCTION_TYPE = {
-      string: (v) => this.formatString(v || ''),
+      string: (v) => this.formatString(v),
       number: (v, f) => this.formatNumber(v || 0, f), // .toString().replace('.', ','),
       date: (v, f) => this.formatDate(v, f),
       boolean: (v) => v,
@@ -37,7 +37,7 @@ export default {
     };
     const typeClear = type.split('.')[0];
     const formatMap = (formatString) ? new Map(formatString.split('$').map((item) => item.split('='))) : new Map();
-    // if (typeClear === 'choice') console.log(value);
+    // if (typeClear === 'field') console.log(representations);
     let result = FUNCTION_TYPE[typeClear](value, formatMap, representations, type);
     if (prefix) result = `${prefix}${result}`;
     if (suffix) result = `${result}${suffix}`;
@@ -45,6 +45,7 @@ export default {
   },
 
   formatString(value) {
+    if ([null, undefined].includes(value)) return '';
     return value.toString().replace(/\n/g, '<br/>');
   },
 

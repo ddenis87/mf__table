@@ -73,7 +73,7 @@ export default {
   },
   watch: {
     fieldValueInput() {
-      // console.log(this.fieldValueInput);
+      console.log(this.fieldValueInput);
       this.$nextTick().then(() => {
         this.fieldValue = this.fieldValueInput;
       });
@@ -87,12 +87,12 @@ export default {
     evtKeydownControl(evt) {
       this.evtInput();
       this.$emit('keydown:control', evt);
-      // this.clearComponent();
+      this.clearComponent();
     },
     evtBlur() {
       this.evtInput();
       this.$emit('blur:wrapper');
-      // this.clearComponent();
+      this.clearComponent();
     },
   },
 };

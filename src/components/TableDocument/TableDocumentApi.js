@@ -35,7 +35,7 @@ function requestRepresentation(sourceName, value) {
 class TableDocumentApi extends TableDocument {
   // constructor(params) {
   //   super(params);
-  //   // console.log(this.columnCount);
+  //   console.log(this.columnCount);
   //   // this.prepareRepresentation();
   // }
 
@@ -48,13 +48,13 @@ class TableDocumentApi extends TableDocument {
       super.deserialize(data, template, settings);
     } finally {
       await this.prepareRepresentation();
-      super.recalculateFormulas();
+      // super.recalculateFormulas();
     }
   }
 
-  editingCell(cellName, cellValue) {
-    if (this.cells[cellName] && cellValue) {
-      const { type, relatedModelView } = this.cells[cellName];
+  editingCell(sheet, cellName, cellValue) {
+    if (this.getCell(sheet, cellName) && cellValue) {
+      const { type, relatedModelView } = this.getCell(sheet, cellName);
       if (type?.includes('field')) {
         const { parthSource: sourceName } = parseType(type);
         const representation = store
@@ -62,26 +62,55 @@ class TableDocumentApi extends TableDocument {
         this.setRepresentation(cellValue, representation);
       }
     }
-    super.editingCell(cellName, cellValue);
+    super.editingCell(sheet, cellName, cellValue);
   }
 
+  // async getRepresentationStore() { // getRepresentationAtApi
+  //   const promises = Object.values(this.cells).map(async (cellValue) => {
+  //     const { type, value, relatedModelView } = cellValue;
+  //     if (type?.includes('field') && value) {
+  //       const { parthSource: sourceName } = parseType(type);
+  //       await requestRepresentation(sourceName, value);
+  //       const representation = store
+  //         .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value, relatedModelView });
+  //       this.setRepresentation(value, representation);
+  //     }
+  //   });
+  //   await Promise.all(promises);
+  // }
   async getRepresentationStore() { // getRepresentationAtApi
-    const promises = Object.values(this.cells).map(async (cellValue) => {
-      const { type, value, relatedModelView } = cellValue;
-      if (type?.includes('field') && value) {
-        const { parthSource: sourceName } = parseType(type);
-        await requestRepresentation(sourceName, value);
-        const representation = store
-          .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value, relatedModelView });
-        this.setRepresentation(value, representation);
-      }
+    const promises = this.sheetsList.map(async (sheet) => {
+      const prom = Object.values(this.sheets[sheet.name].cells).map(async (cellValue) => {
+        const { type, value, relatedModelView } = cellValue;
+        if (type?.includes('field') && value) {
+          // console.log(type, value, relatedModelView);
+          const { parthSource: sourceName } = parseType(type);
+          await requestRepresentation(sourceName, value);
+          const representation = store
+            .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: +value, relatedModelView });
+          // console.log(representation);
+          this.setRepresentation(value, representation);
+        }
+      });
+      await Promise.all(prom);
     });
     await Promise.all(promises);
+    // const promises = Object.values(this.cells).map(async (cellValue) => {
+    //   const { type, value, relatedModelView } = cellValue;
+    //   if (type?.includes('field') && value) {
+    //     const { parthSource: sourceName } = parseType(type);
+    //     await requestRepresentation(sourceName, value);
+    //     const representation = store
+    //       .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value, relatedModelView });
+    //     this.setRepresentation(value, representation);
+    //   }
+    // });
+    // await Promise.all(promises);
   }
 
-  getDocument(JSONFormat = false) {
+  getDocument(sheet, JSONFormat = false) {
     const cells = {};
-    Object.entries(this.cells).forEach((cell) => {
+    Object.entries(this.sheets[sheet].cells).forEach((cell) => {
       const [cellName, cellValue] = cell;
       if (Object.keys(cellValue).includes('scripts')) return;
       cells[cellName] = {
@@ -95,12 +124,20 @@ class TableDocumentApi extends TableDocument {
 
     const document = {
       editAccess: this.editAccess,
-      rows: this.rows,
-      rowCount: this.rowCount,
-      columns: this.columns,
-      columnCount: this.columnCount,
+      rows: this.sheets[sheet].rows,
+      rowCount: this.sheets[sheet].rowCount,
+      columns: this.sheets[sheet].columns,
+      columnCount: this.sheets[sheet].columnCount,
       cells,
-      styles: this.styles,
+      styles: this.styles
+        .filter((style) => style.name.split('|')[0] === sheet)
+        .map((st) => {
+          const item = {
+            name: st.name.split('|')[1],
+            list: st.list,
+          };
+          return item;
+        }),
       representations: Object.fromEntries(this.representations),
     };
     return (JSONFormat) ? JSON.stringify(document) : document;
@@ -113,8 +150,13 @@ class TableDocumentApi extends TableDocument {
   }
 
   async prepareRepresentation() {
+    // console.log('before await');
     await this.getRepresentationStore(); // .then(() => {
-    this.cells = { ...this.cells };
+    // console.log('after await');
+    this.sheetsList.forEach((sheet) => {
+      this.sheets[sheet.name].cells = { ...this.sheets[sheet.name].cells };
+    });
+    // this.sheets = { ...this.sheets };
     // });
   }
 

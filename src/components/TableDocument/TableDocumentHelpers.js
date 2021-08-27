@@ -205,23 +205,30 @@ export function moveFormula(cellFormula, cellNameCurrent, cellNameTemplate) {
   return formula;
 }
 
-export function moveRange(range, from, rangeLimit = 'a1:a1') {
+export function moveRange(areaRange, from, rangeLimit = 'a1:a1') {
+  // console.log(areaRange, from, rangeLimit);
+  const [sheet, upperRange] = areaRange.split('!');
+  const range = upperRange.toLowerCase();
+  // console.log(range);
   const [rangeLimitFrom] = getRangeSplit(rangeLimit);
   let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
   if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
   if (rangeLimitFromRow === '') rangeLimitFromRow = 1;
   const rangeType = getRangeType(range);
+  // console.log(rangeType);
   let [rangeFrom, rangeTo] = getRangeSplit(range);
   if (rangeType === RANGE_TYPE.COLUMN) {
     rangeFrom = getColumnNumberForName(rangeFrom);
     rangeTo = getColumnNumberForName(rangeTo);
   }
+  // console.log(rangeFrom, '-', rangeLimitFromRow, '+', from);
+  // console.log(`${rangeFrom - rangeLimitFromRow + from}:${rangeTo - rangeLimitFromRow + from}`);
   const rangeTypes = {
-    [RANGE_TYPE.ROW]: () => `${rangeFrom - rangeLimitFromRow + from}:${rangeTo - rangeLimitFromRow + from}`,
+    [RANGE_TYPE.ROW]: () => `${sheet}!${rangeFrom - rangeLimitFromRow + from}:${rangeTo - rangeLimitFromRow + from}`,
     [RANGE_TYPE.COLUMN]: () => {
       const rangeMoveFromColumn = rangeFrom - getColumnNumberForName(rangeLimitFromColumn) + from;
       const rangeMoveToColumn = rangeTo - getColumnNumberForName(rangeLimitFromColumn) + from;
-      return `${getColumnNameForNumber(rangeMoveFromColumn)}:${getColumnNameForNumber(rangeMoveToColumn)}`;
+      return `${sheet}!${getColumnNameForNumber(rangeMoveFromColumn)}:${getColumnNameForNumber(rangeMoveToColumn)}`;
     },
   };
   return rangeTypes[rangeType]();

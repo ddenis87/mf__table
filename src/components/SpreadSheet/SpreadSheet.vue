@@ -302,6 +302,7 @@ export default {
   watch: {
     cells() {
       this.setExcludedCells = {};
+      this.$refs.SpreadSheetBody.resetScroll();
     },
     rows() {
       const rowsOpen = Object.entries(this.rows).filter((row) => {
@@ -457,7 +458,7 @@ export default {
           'z-index': '80',
         },
       };
-      console.log(this.rows[this.cells[style.name].rowName].fixed);
+      // console.log(this.rows[this.cells[style.name].rowName].fixed);
       const listKeys = Object.keys(style.list);
       if (listKeys.includes('borderRight')) {
         pseudoBorder.list.borderRight = style.list.borderRight;
@@ -470,7 +471,8 @@ export default {
       if (listKeys.includes('borderLeft')) {
         pseudoBorder.list.left = `-${(1 * +style.list.borderLeft[0])}px`;
       }
-      if (this.rows[this.cells[style.name].rowName].fixed) {
+      const { parthDigit: cellRow } = getParseAtSymbolDigit(style.name);
+      if (this.rows[cellRow].fixed) {
         pseudoBorder.list.borderBottom = 'thin solid black';
       }
       return pseudoBorder;

@@ -133,6 +133,7 @@ export default {
       // console.log(cell);
       if (!cell) return '';
       // if (!Object.keys(cell).includes('value')) return '';
+      // if (`${columnName}${this.source.value}` === 'h10') console.log(cell);
       const formattingParameters = {
         ...cell,
         representations: this.setRepresentations,

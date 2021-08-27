@@ -35,7 +35,7 @@ export default {
       navigations: [
         { value: 'Таблицы', icon: 'mdi-table', route: '/Tables' },
         { value: 'Домашняя страница', icon: 'mdi-home', route: '/' },
-        { value: 'SpreadSheet', icon: 'mdi-file-table-box-outline', route: '/SpreadSheetView' },
+        // { value: 'SpreadSheet', icon: 'mdi-file-table-box-outline', route: '/SpreadSheetView' },
         { value: 'Svod', icon: 'mdi-table-large-plus', route: '/Svod' },
       ],
     };
