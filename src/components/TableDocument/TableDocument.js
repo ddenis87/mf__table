@@ -182,6 +182,13 @@ class TableDocument {
     },
   });
 
+  /**
+   * Добавление области в документ
+   * @param {String} sheet - имя листа
+   * @param {String} cellName - имя ячейки
+   * @param {String} areaName - имя области
+   * @param {Enum} shiftType - тип сдвига докумета при вставки
+   */
   addArea(sheet, cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) { // надо удалить используется только в скрипте для добавления строки
     // const flagValid = false;
     const area = this.documentTemplate.getNamedArea(areaName).getAreaCopy(); // getAreaCopy() убрать
@@ -372,6 +379,12 @@ class TableDocument {
     this.setCellValue(sheet, cellName, cellValue);
   }
 
+  /**
+   * Выполнение скрипта ячейки
+   * @param {String} sheet - лист
+   * @param {String} cellName - имя ячейки
+   * @returns
+   */
   executeCellAction(sheet = 'sheet1', cellName) {
     const action = this.getCellAction(sheet, cellName);
     console.log(sheet);
@@ -383,7 +396,7 @@ class TableDocument {
   }
 
   /**
-   * Заполнить область данными по параметрам
+   * Заполнение области данными по параметрам
    * @param {Object} data - данные
    * @param {Object} parameters - параметры
    * @param {String} sheet - имя листа
@@ -613,8 +626,13 @@ class TableDocument {
     return this.sheets[sheet].cells[cellName][cellParameter] || null;
   }
 
-  getCellStyles(cellName) {
-    const cellStyle = this.styles.find((item) => item.name === cellName);
+  /**
+   * Возвращает стиль по имени
+   * @param {*} styleName - имя стиля
+   * @returns {Object}
+   */
+  getCellStyles(styleName) {
+    const cellStyle = this.styles.find((item) => item.name === styleName);
     if (!cellStyle) return null;
     return cellStyle;
   }
@@ -750,6 +768,11 @@ class TableDocument {
     return this.getColumn(sheet, columnName).type || undefined;
   }
 
+  /**
+   * Возвращает объект или строку JSON документа
+   * @param {Boolean} JSONFormat - тип возвращаемого значения
+   * @returns {Object|String}
+   */
   getDocument(JSONFormat = false) {
     const cells = Object.entries(this.cells).filter((cell) => {
       const [, cellValue] = cell;
@@ -793,18 +816,23 @@ class TableDocument {
     };
   }
 
-  getCellFormulas(sheetCurrent = null) { // переделать фильтры
+  /**
+   * Возвращает объект содержащий ячейки с формулами разложенные по листам или по конкретному листу
+   * @param {String} sheet - имя листа
+   * @returns {Object}
+   */
+  getCellFormulas(sheet = null) { // переделать фильтры
     console.time('GetFormulars');
     const cellFormulas = {};
-    if (sheetCurrent) {
+    if (sheet) {
       // cellFormulas[sheet] = [];
-      cellFormulas[sheetCurrent] = Object.keys(this.sheets[sheetCurrent].cells)
-        .filter((cellName) => Object.keys(this.sheets[sheetCurrent].cells[cellName])
+      cellFormulas[sheet] = Object.keys(this.sheets[sheet].cells)
+        .filter((cellName) => Object.keys(this.sheets[sheet].cells[cellName])
           .includes(CELL_ATTRIBUTES.FORMULA));
       return cellFormulas;
     }
-    this.sheetsList.forEach((sheet) => {
-      const { name: sheetName } = sheet;
+    this.sheetsList.forEach((sheetItem) => {
+      const { name: sheetName } = sheetItem;
       cellFormulas[sheetName] = [];
       const cellFormulasSheet = Object.keys(this.sheets[sheetName].cells)
         .filter((cellName) => Object.keys(this.sheets[sheetName].cells[cellName])
@@ -817,6 +845,10 @@ class TableDocument {
     return cellFormulas;
   }
 
+  /**
+   * Возвращает массив объектов ячеек содержащие формулы во всей книге
+   * @returns {Array}
+   */
   getFormularsCellsSet() {
     let formulasCellsSet = [];
     this.sheetsList.forEach((sheet) => {
@@ -873,6 +905,11 @@ class TableDocument {
     return Math.max(...rows);
   }
 
+  /**
+   * Возвращает список именованных диапазонов в диапазоне
+   * @param {String} areaRange - диапазон
+   * @returns {Array}
+   */
   getListNamedAreasForRange(areaRange) {
     const [sheet, upperRange] = areaRange.split('!');
     const range = upperRange.toLowerCase();
@@ -924,6 +961,11 @@ class TableDocument {
     return namedAreas;
   }
 
+  /**
+   * Возвращает массив табличных документов по имени области
+   * @param {String} areaName - имя именованной области
+   * @returns {TableDocument}
+   */
   getNamedArea(areaName) {
     const namedAreas = [];
     const range = this.getRangeByAreaName(areaName);
@@ -937,6 +979,10 @@ class TableDocument {
     return namedAreas;
   }
 
+  /**
+   * Возвращает массив именованных областей документа
+   * @returns {Array}
+   */
   getNamedAreas() {
     return this.namedAreas;
   }
@@ -990,6 +1036,13 @@ class TableDocument {
   //   return result;
   // }
 
+  /**
+   * Возвращает диапазон именованной области по имени ячейке
+   * @param {String} cellName - имя ячейки
+   * @param {String} areaName - имя области
+   * @param {Enum} rangeType - тип диапазона (направление)
+   * @returns {String}
+   */
   getRangeByCellName(cellName, areaName = null, rangeType = RANGE_TYPE.ROW) { // ??????
     if (rangeType === RANGE_TYPE.CELL) return cellName;
     let range = '';
@@ -1007,13 +1060,18 @@ class TableDocument {
     return range;
   }
 
-  getRangeToEdge(range) {
-    const [sheet, rangeFrom] = range.split('!');
-    const rangeType = getRangeType(rangeFrom);
+  /**
+   * Возвращает диапазон от начала диапазона до конца листа
+   * @param {String} rangeFrom - начало диапазона
+   * @returns {String}
+   */
+  getRangeToEdge(rangeFrom) {
+    const [sheet, range] = rangeFrom.split('!');
+    const rangeType = getRangeType(range);
     const rangeEdge = {
-      [RANGE_TYPE.CELL]: () => `${rangeFrom}:${getColumnNameForNumber(this.getLastColumn(sheet))}${this.getLastRow(sheet)}`,
-      [RANGE_TYPE.ROW]: () => `${rangeFrom}:${this.getLastRow(sheet)}`,
-      [RANGE_TYPE.COLUMN]: () => `${rangeFrom}:${getColumnNameForNumber(this.getLastColumn(sheet))}`,
+      [RANGE_TYPE.CELL]: () => `${range}:${getColumnNameForNumber(this.getLastColumn(sheet))}${this.getLastRow(sheet)}`,
+      [RANGE_TYPE.ROW]: () => `${range}:${this.getLastRow(sheet)}`,
+      [RANGE_TYPE.COLUMN]: () => `${range}:${getColumnNameForNumber(this.getLastColumn(sheet))}`,
     };
     return rangeEdge[rangeType]();
   }
@@ -1074,12 +1132,23 @@ class TableDocument {
     return rowSet[type]();
   }
 
+  /**
+   * Возвращает поля секции
+   * @param {String} sectionName - имя секции
+   * @returns {Object}
+   */
   getSectionSettings(sectionName) {
     const sectionSettings = this.documentSettings
       .find((setting) => Object.keys(setting).includes(sectionName));
+    console.log(Object.values(sectionSettings)[0]);
     return Object.values(sectionSettings)[0];
   }
 
+  /**
+   * Возвращает тело скрипта по имени
+   * @param {String} scriptName - имя скрипта
+   * @returns {String}
+   */
   getScriptBody(scriptName) {
     return this.scripts[scriptName]?.script || null;
   }
@@ -1089,14 +1158,30 @@ class TableDocument {
   //   return null;
   // }
 
+  /**
+   * Возвращает стили документа
+   * @returns {Array}
+   */
   getStyles() {
     return this.styles;
   }
 
+  /**
+   * Проверка редактирования
+   * @param {*} sheet - имя листа
+   * @param {*} cellName - имя ячейки
+   * @returns {Boolean}
+   */
   hasEditing(sheet, cellName) {
     return this.hasEditingSheet(sheet, cellName);
   }
 
+  /**
+   * Проверка редактирования ячейки
+   * @param {*} sheet - имя листа
+   * @param {*} cellName - имя ячейки
+   * @returns {Boolean}
+   */
   hasEditingCell(sheet, cellName) {
     const isEditAccessSheet = this.sheets[sheet].editAccess || EDIT_ACCESS.OPEN;
     let isEditAccessCell;
@@ -1111,12 +1196,23 @@ class TableDocument {
     return false;
   }
 
+  /**
+   * Проверка редактирования листа
+   * @param {*} sheet - имя листа
+   * @param {*} cellName - имя ячейки
+   * @returns {Boolean}
+   */
   hasEditingSheet(sheet, cellName) {
     console.log(this.sheets[sheet].editAccess, sheet);
     if (this.sheets[sheet].editAccess === EDIT_ACCESS.CLOSED) return false;
     return this.hasEditingCell(sheet, cellName);
   }
 
+  /**
+   * Проверяет наличие именованной секции в документе
+   * @param {String} namedArea - имя именованной секции
+   * @returns {Boolean}
+   */
   hasNamedArea(namedArea) {
     let rezult = false;
     const foundNamedArea = this.namedAreas
@@ -1125,6 +1221,14 @@ class TableDocument {
     return rezult;
   }
 
+  /**
+   * Вставка области в документ
+   * @param {String} sheet - имя листа
+   * @param {Number} numberColumn - начало колонки вставки
+   * @param {Number} numberRow - начало строки вставки
+   * @param {TableDocument} area - добавляемая область
+   * @param {Enum} shiftType - тип сдвига
+   */
   insertArea(sheet = 'sheet1', numberColumn, numberRow, area, shiftType = null) {
     console.time('insertArea');
     const namedAreas = [];
@@ -1187,9 +1291,9 @@ class TableDocument {
         },
       );
     });
-    this.updateStyles(area.getStyles());
+    this.setStyles(area.getStyles());
     // console.log(area.getNamedAreas());
-    this.updateNamedArea(area.getNamedAreas(), numberRow, numberColumn);
+    this.setNamedArea(area.getNamedAreas(), numberRow, numberColumn);
 
     // this.scripts = { ...this.scripts, ...areaScripts };
     this.images = { ...this.images, ...areaImages };
@@ -1245,6 +1349,12 @@ class TableDocument {
     }
   }
 
+  /**
+   * Устанавливает поля колонки
+   * @param {String} sheet - имя листа
+   * @param {String} columnName - имя колонки
+   * @param {Object} columnValue - объект содержащий поля колонки
+   */
   setColumn(sheet = 'sheet1', columnName, columnValue) {
     let columnNameText = columnName;
     if (+columnName) columnNameText = getColumnNameForNumber(columnName);
@@ -1253,6 +1363,12 @@ class TableDocument {
     this.setColumnGroup(sheet, columnValue.level || 0, columnNameText);
   }
 
+  /**
+   * Установка группировок колонок
+   * @param {String} sheet - имя листа
+   * @param {Number} level - уровень группировки
+   * @param {String} columnName - имя колонки
+   */
   setColumnGroup(sheet, level, columnName) {
     const columnNameNumber = getColumnNumberForName(columnName);
     const previousColumn = this.getColumn(sheet, +columnNameNumber - 1);
@@ -1267,38 +1383,49 @@ class TableDocument {
     if (levelGroupAddingColumn === levelGroupPreviousColumn + 1) previousColumn.isGroup = true;
   }
 
-  updateNamedArea(namedAreasArea, numberRow, numberColumn) {
-    // console.log(numberRow, numberColumn);
+  /**
+   * Устанавливает именованные секции со сдвигом в документ
+   * @param {Array} areas - именованные секции
+   * @param {Number} numberRow - номер строки области
+   * @param {Number} numberColumn - номер столбца области
+   */
+  setNamedArea(areas, numberRow, numberColumn) {
     const moveRangeDirection = {
       [RANGE_TYPE.ROW]: (range, numRow) => moveRange(range, numRow),
       [RANGE_TYPE.COLUMN]: (range, numCol) => moveRange(range, numCol),
     };
-    // console.log(namedAreasArea);
-    namedAreasArea.forEach((namedAreaItem) => {
-      // console.log(namedAreaItem);
-      const [, range] = namedAreaItem.range.split('!');
+    areas.forEach((area) => {
+      const [, range] = area.range.split('!');
       const rangeType = getRangeType(range);
       const namedArea = {
-        name: namedAreaItem.name,
+        name: area.name,
         range: `${moveRangeDirection[rangeType](
-          namedAreaItem.range,
+          area.range,
           (rangeType === RANGE_TYPE.ROW) ? numberRow : numberColumn,
         )}`,
       };
-      // console.log(moveRangeDirection[rangeType](
-      //   namedAreaItem.range,
-      //   (rangeType === RANGE_TYPE.ROW) ? numberRow : numberColumn,
-      // ));
       if (!this.hasNamedArea(namedArea)) this.namedAreas.push(namedArea);
     });
   }
 
+  /**
+   * Устанавливает поля строки
+   * @param {String} sheet - имя листа
+   * @param {String} rowName - имя строки
+   * @param {Object} rowValue - объект содержащий поля строки
+   */
   setRow(sheet = 'sheet1', rowName, rowValue) {
     // this.sheets[sheet].rows = { ...this.sheets[sheet].rows, [rowName]: rowValue };
     this.sheets[sheet].rows[rowName] = rowValue;
     this.setRowGroup(sheet, rowValue.level || 0, rowName);
   }
 
+  /**
+   * Установка группировок строк
+   * @param {String} sheet - имя листа
+   * @param {Number} level - уровень группировки
+   * @param {String} rowName - имя строки
+   */
   setRowGroup(sheet, level, rowName) {
     const previousRow = this.getRow(sheet, +rowName - 1);
     const levelGroupPreviousRow = previousRow.level || 0;
@@ -1313,9 +1440,23 @@ class TableDocument {
     if (levelGroupAddingRow === levelGroupPreviousRow + 1) previousRow.isGroup = true;
   }
 
-  toggleStateFormulas(state = false, sheet = null, cellName = null) {
+  /**
+   * Устанавливает поле ячейки calculated, если ячейка не задана то
+   * на всем листе, если лист не задан то на всей книге
+   * @param {Boolean} state - состояние
+   * @param {String} sheet - имя листа
+   * @param {String} cellName - имя ячейки
+   * @returns
+   */
+  setCalculated(state = false, sheet = null, cellName = null) {
     if (sheet && cellName) {
       this.sheets[sheet].cells[cellName].calculated = state;
+      return;
+    }
+    if (sheet) {
+      Object.values(this.sheets[sheet].cells).forEach((cellValue) => {
+        if (cellValue.includes('formula')) cellValue.calculated = state;
+      });
       return;
     }
     this.sheetsList.forEach((sheetItem) => {
@@ -1325,7 +1466,11 @@ class TableDocument {
     });
   }
 
-  updateStyles(stylesArea) {
+  /**
+   * Устанавливает стили области в документ
+   * @param {Array} stylesArea - массив стилей
+   */
+  setStyles(stylesArea) {
     stylesArea.forEach((styleItem) => {
       const styles = this.styles.find((style) => style.name === styleItem.name);
       if (!styles) this.styles.push(styleItem);
@@ -1368,6 +1513,12 @@ class TableDocument {
     console.timeEnd('recalculateFormulas');
   }
 
+  /**
+   * Сериализация, возвращает объект с данными документа
+   * @param {String} nameDataSection - имя секции данных
+   * @param {Array} settings - настройки
+   * @returns {Object}
+   */
   serializationDataSection(nameDataSection, settings) {
     if (!nameDataSection) {
       const result = [];
@@ -1399,6 +1550,10 @@ class TableDocument {
     return (keyValue.presentationType === 'unit') ? { ...areaValue } : [{ ...areaValue }];
   }
 
+  /**
+   * Устанавливает шаблон в документ
+   * @param {String|Object} template - объект или JSON строка 
+   */
   setTableDocumentTemplate(template) {
     let templateParse = null;
     try {
@@ -1420,6 +1575,10 @@ class TableDocument {
     this.documentTemplate = new this.BaseClass(templateParse);
   }
 
+  /**
+   * Устанавливает настройки в документ
+   * @param {String|Object} settings - объект или JSON строка настроек
+   */
   setTableDocumentSettings(settings) {
     let settingsParse = null;
     try {
