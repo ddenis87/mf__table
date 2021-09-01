@@ -75,11 +75,16 @@ export default {
     },
   },
   methods: {
-    editAccept() {
+    editAccept(evt) {
+      // console.log(evt);
       const cellValue = this.getCellValue();
       const option = {
         value: cellValue,
         cellName: this.cellName.toLowerCase(),
+        evt: {
+          code: evt?.code || '',
+          target: this.cellElement,
+        },
       };
       this.fieldValue = null;
       this.$emit('editing:accept', option);
@@ -95,7 +100,11 @@ export default {
         this.editCancel();
         return;
       }
-      this.editAccept();
+      if (evt.code.includes('Enter')) {
+        this.editAccept({ code: 'Enter' });
+        return;
+      }
+      this.editAccept({});
     },
     async evtFocusInput() {
       await this.$nextTick().then(() => {

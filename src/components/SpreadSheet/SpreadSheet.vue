@@ -139,7 +139,7 @@ export default {
     },
 
     prepareCells() {
-      // console.log('prepare cells');
+      console.time('prepareCells');
       const maxRowGroupingLevel = (this.isShowGroup) ? this.maxRowGroupingLevel : 0;
       const prepareCells = {};
       Object.entries(this.cells).forEach((item) => {
@@ -180,11 +180,12 @@ export default {
         }
         prepareCells[cellName].height = cellHeight;
       });
-      // console.log(tableCells);
+      console.timeEnd('prepareCells');
       return prepareCells;
     },
 
     prepareColumns() {
+      console.time('prepareColumns');
       const prepareColumns = [];
       const columnsKeys = Object.keys(this.columns);
       for (let i = 1; i < this.columnCount + 1; i += 1) {
@@ -200,10 +201,12 @@ export default {
         }
         prepareColumns.push(columnItem);
       }
+      console.timeEnd('prepareColumns');
       return prepareColumns;
     },
 
     prepareRows() {
+      console.time('prepareRow');
       const prepareRows = [];
       const rowsKeys = Object.keys(this.rows);
       for (let i = 1; i < this.rowCount + 1; i += 1) {
@@ -217,7 +220,7 @@ export default {
         }
         prepareRows.push(rowItem);
       }
-      console.log('prepare row');
+      console.timeEnd('prepareRow');
       return prepareRows;
     },
 
@@ -505,6 +508,9 @@ export default {
       this.setOpenGroupColumns = [];
       this.setOpenGroupRows = [];
       this.setExcludedCells = {};
+    },
+    editingComplete(evt) {
+      this.$refs.SpreadSheetBody.nextElement(evt);
     },
   },
 };

@@ -15,6 +15,7 @@
            :style="styleFixedWrapRow">
         <spread-sheet-body-item :index="rowFixedIndex"
                                 :source="rowFixed"
+                                :is-fixed="(rowFixedIndex === rowsFixed.length - 1) ? true : false"
                                 v-bind="propsItemBodyFixed"></spread-sheet-body-item>
         <div class="body-fixed__wrapper_end"
              :style="styleFixedEnd"></div>
@@ -296,7 +297,7 @@ export default {
     },
 
     focusCell(target, evt) {
-      if (evt.type === 'mousedown') {
+      if (evt?.type === 'mousedown') {
         target.focus();
         this.selectedCell(target.getAttribute('data-name'));
         return;
@@ -498,6 +499,13 @@ export default {
         this.$refs.SheetBody.$el.scrollTop -= delta + 12;
       }
     },
+
+    nextElement(evt) {
+      if (evt?.code.includes('Enter')) {
+        this.moveCursorDown(evt.target);
+      }
+      console.log(evt);
+    },
   },
 };
 </script>
@@ -509,8 +517,11 @@ export default {
   overflow: hidden;
   position: relative;
   margin-bottom: -1px;
+  z-index: 3;
   .separator {
     border-bottom: thin solid rgba(0, 0, 0, .3);
+    display: none;
+    // z-index: 4;
   }
     &__wrapper {
       &_end {

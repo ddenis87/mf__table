@@ -65,7 +65,7 @@ import SpreadSheetEditing from '@/components/SpreadSheetEditing/SpreadSheetEditi
 // import api from '@/logics/ApiRest';
 import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocumentApi from '@/components/TableDocument/TableDocumentApi';
-// import TableDocumentGeneralError from '@/components/TableDocument/TableDocumentGeneralError';
+import TableDocumentGeneralError from '@/components/TableDocument/TableDocumentGeneralError';
 
 export default {
   name: 'Svod',
@@ -126,8 +126,13 @@ export default {
   },
   watch: {
     currentList() {
-      this.tableDocument.recalculateFormulas();
-      this.tableDocument.recalculateFormulas(); // косяк в получении формул
+      console.time('watchRecalc');
+      setTimeout(() => {
+        this.tableDocument.recalculateFormulas();
+        this.tableDocument.recalculateFormulas();
+      }, 10);
+      // this.tableDocument.recalculateFormulas(); // косяк в получении формул
+      console.timeEnd('watchRecalc');
     },
   },
   async created() {
@@ -154,21 +159,21 @@ export default {
     let settings = await import('@/assets/json/svod/settingsMulti.json');
     settings = settings.default;
     tableDocumentPrepare.setTableDocumentSettings(settings);
-    let data = await import('@/assets/json/svod/dataMulti.json');
+    let data = await import('@/assets/json/svod/dataMulti10.json');
     data = data.default;
-    // try {
-    await tableDocumentPrepare.deserialize(data);
-    // } catch (err) {
-    //   if (err instanceof TableDocumentGeneralError) {
-    //     this.showDialogMessage(err.getMessagesText());
-    //   }
-    // // console.log(err);
-    // } finally {
-    this.tableDocument = tableDocumentPrepare;
-    this.tableDocument.recalculateFormulas();
-    this.currentList = '0';
-    this.isLoading = false;
-    // }
+    try {
+      await tableDocumentPrepare.deserialize(data);
+    } catch (err) {
+      if (err instanceof TableDocumentGeneralError) {
+        this.showDialogMessage(err.getMessagesText());
+      }
+    // console.log(err);
+    } finally {
+      this.tableDocument = tableDocumentPrepare;
+      // {this.tableDocument.recalculateFormulas();}
+      this.currentList = '0';
+      this.isLoading = false;
+    }
     console.log(this.tableDocument);
   },
   methods: {
@@ -204,6 +209,7 @@ export default {
       // }
     },
     evtDblClickCell(options) {
+      console.log(options);
       const { cellName } = options;
       if (!this.tableDocument.hasEditing(this.sheetName, cellName)) {
         return;
@@ -254,27 +260,31 @@ export default {
       }
     },
     acceptEditingCell(option) {
-      // console.log(option);
-      try {
-        this.tableDocument.editingCell(this.sheetName, option.cellName, option.value);
-      } catch (err) {
-        console.log(err);
-        this.showDialogMessage(err.getMessagesText());
-      } finally {
-        console.log('acsept and clear');
-        this.clearEditCell();
-      }
-      this.tableDocument.recalculateFormulas();
-      console.log(this.tableDocument);
+      // try {
+      this.tableDocument.editingCell(this.sheetName, option.cellName, option.value);
+      this.$refs.SpreadSheet.editingComplete(option.evt);
+      // } catch (err) {
+      //   console.log(err);
+      //   this.showDialogMessage(err.getMessagesText());
+      // } finally {
+      this.clearEditCell();
+      // }
+      this.recalculateFormulas();
     },
     cancelEditingCell() {
       console.log('cancel edit');
       this.clearEditCell();
     },
-
+    recalculateFormulas() {
+      setTimeout(() => {
+        this.tableDocument.recalculateFormulas();
+      }, 100);
+    },
     save() {
+      console.time('Save');
       const JSONFormat = true;
       apiSpreadSheet.dowloadJSONFile(JSON.stringify(this.tableDocument.serializationDataSection()), JSONFormat);
+      console.timeEnd('Save');
     },
     print() {
       localStorage.setItem('SpreadSheetTableDocument', this.tableDocument.getDocument(this.sheetName, true));

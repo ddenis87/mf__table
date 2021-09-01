@@ -69,6 +69,7 @@ export default {
     isShowGrid: { type: Boolean, default: true },
     isShowGroup: { type: Boolean, default: true },
     isShowTitle: { type: Boolean, default: true },
+    isFixed: { type: Boolean, default: false },
     maxRowGroupingLevel: { type: Number, default: 0 },
     rows: Array, // ????
     setExcludedCells: { type: Array },
@@ -187,6 +188,10 @@ export default {
         cellFixed.left += 'px';
         if (!this.columns[columnIndex + 1].fixed
           && !this.isShowGrid) cellFixed['box-shadow'] = '2px 0px 0px rgba(0, 0, 0, .2)';
+      }
+      if (this.isFixed && columnIndex !== 0) {
+        console.log(this.isFixed);
+        cellFixed['border-bottom'] = 'thin solid grey';
       }
       return cellFixed;
     },

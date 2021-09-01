@@ -73,6 +73,12 @@ const routes = [
     meta: { layout: 'Main' },
     component: () => import('@/views/Svod/Svod.vue'),
   },
+  {
+    path: '/Test',
+    name: 'Test',
+    meta: { layout: 'Main' },
+    component: () => import('@/views/Test.vue'),
+  },
 ];
 
 const router = new VueRouter({
