@@ -1,81 +1,46 @@
+import store from '@/store/index';
+
 import {
-  // REG_SYMBOLS,
-  // REG_DIGITS,
   getColumnNameForNumber,
   getColumnNumberForName,
   getParseAtSymbolDigit,
 } from '../../helpers/spreadSheet';
 
-// const SET_COLUMN_NAME = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+import {
+  REG_SYMBOLS,
+  REG_DIGITS,
+  REG_OPERATORS,
+  RANGE_TYPE,
+  SHIFT_TYPE,
+} from './TableDocumentConst';
 
-const REG_SYMBOLS = /[A-Z]/gi;
-const REG_DIGITS = /[0-9]/g;
-const REG_OPERATORS = /[+-/*)(%: ]/g;
+/**
+ * Возвращает объект полученный путем парсинга JSON строки
+ * @param {String|Object} data - строка JSON или объект
+ * @returns {Object}
+ */
+export function getObjectOfJSON(data) {
+  return (typeof data === 'string') ? JSON.parse(data) : data;
+}
 
-export const RANGE_TYPE = {
-  CELL: 'cell',
-  RANGE: 'range',
-  COLUMN: 'column',
-  ROW: 'row',
-};
-
-export const SHIFT_TYPE = {
-  VERTICAL: 'vertical',
-  HORIZONTAL: 'horizontal',
-};
-
-// export function getColumnNameForNumber(number) {
-
-// }
-//   if (number > 702) return 'Infinity';
-//   const settLength = SET_COLUMN_NAME.length;
-//   if (number <= settLength) {
-//     const columnName = SET_COLUMN_NAME[number - 1];
-//     return columnName;
-//   }
-//   if ((number % settLength) === 0) {
-//     const columnName = `${SET_COLUMN_NAME[
-//       ((number - settLength) / settLength) - 1
-//     ]}${SET_COLUMN_NAME[settLength - 1]}`;
-//     return columnName;
-//   }
-//   const columnName = `${SET_COLUMN_NAME[
-//     (Math.floor(number / settLength)) - 1
-//   ]}${SET_COLUMN_NAME[(number % settLength) - 1]}`;
-//   return columnName;
-// }
-
-// export function getColumnNumberForName(name) {
-//   const nameLowerCase = name.toLowerCase();
-//   if (nameLowerCase.length === 1) return SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase) + 1;
-//   const indexFirst = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[0]) + 1;
-//   const indexSecond = SET_COLUMN_NAME.findIndex((item) => item === nameLowerCase[1]) + 1;
-//   return (indexFirst * SET_COLUMN_NAME.length) + indexSecond;
-// }
-
-// export function getParseAtSymbolDigit(str) {
-//   return {
-//     parthSymbol: str.replace(REG_DIGITS, ''),
-//     parthDigit: +str.replace(REG_SYMBOLS, ''),
-//   };
-// }
-// export function deltaCell(currentCell, shiftCell) {
-//   const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(currentCell);
-//   const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCell);
-//   return {
-//     deltaRow: shiftRow - currentRow,
-//     deltaColumn: getColumnNumberForName(shiftColumn) - getColumnNumberForName(currentColumn),
-//   };
-// }
-
+/**
+ * Возвращает массив с началом и окончанием диапазона, полученный из строки
+ * @param {String} range - диапазон
+ * @returns {Array}
+ * @example getRangeSplit('a1:b5') // return [a1, b5]
+ */
 export function getRangeSplit(range) {
-  // console.log(range);
   let splitRange = range.toString();
   if (splitRange.includes(':')) splitRange = splitRange.split(':');
   else splitRange = [splitRange, splitRange];
   return splitRange;
 }
 
+/**
+ * Возвращает тип диапазона или undefined
+ * @param {String} range - диапазон
+ * @returns {RANGE_TYPE}
+ */
 export function getRangeType(range) {
   const [v1, v2] = `${range}`.toLowerCase().split(':');
   if (!v2) {
@@ -90,6 +55,12 @@ export function getRangeType(range) {
   return undefined;
 }
 
+/**
+ * Возвращает длину диапазона
+ * @param {*} range - диапазон
+ * @param {*} isCompute - ффлаг вычисления
+ * @returns {Number|Array}
+ */
 export function getRangeLength(range, isCompute = false) {
   const rangeType = getRangeType(range);
   let [r1, r2] = getRangeSplit(range);
@@ -120,6 +91,13 @@ export function getRangeLength(range, isCompute = false) {
   return rezult;
 }
 
+/**
+ * Возвращает диапазон сдвинутый на заданный шаг
+ * @param {String} range - диапазон
+ * @param {SHIFT_TYPE} shiftType - тип сдвига
+ * @param {Number} step - шаг сдвига
+ * @returns {String}
+ */
 export function getRangeShift(range, shiftType = SHIFT_TYPE.VERTICAL, step = 1) {
   const rangeString = range.toString();
   const rangeType = getRangeType(rangeString);
@@ -154,9 +132,33 @@ export function getRangeShift(range, shiftType = SHIFT_TYPE.VERTICAL, step = 1) 
   return rangeTypes[rangeType]().toString();
 }
 
-export function moveCell(cellName, from = 'a1', rangeLimit = 'a1:a1') {
+/**
+ * Возвращает представление значения из других источников
+ * @param {String} sourceName - имя источника
+ * @param {String|Number} value - значение
+ * @param {String} relatedModelView - представление источника
+ * @returns {String}
+ */
+export function getRepresentationAtStore(sourceName, value, relatedModelView) {
+  const representation = store
+    .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({
+      tableName: sourceName,
+      id: value,
+      relatedModelView,
+    });
+  return representation;
+}
+
+/**
+ * Возвращает имя ячейки со сдвигом по местоположению
+ * @param {String} cellName - имя ячейки
+ * @param {String} rangeFrom - начало сдвига
+ * @param {String} rangeLimit - диапазон сдвига
+ * @returns {String}
+ */
+export function moveCell(cellName, rangeFrom = 'a1', rangeLimit = 'a1:a1') {
   const [rangeLimitFrom] = getRangeSplit(rangeLimit);
-  const { parthSymbol: fromColumn, parthDigit: fromRow } = getParseAtSymbolDigit(from);
+  const { parthSymbol: fromColumn, parthDigit: fromRow } = getParseAtSymbolDigit(rangeFrom);
   const fromColumnNumber = getColumnNumberForName(fromColumn);
   let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
   if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
@@ -169,20 +171,21 @@ export function moveCell(cellName, from = 'a1', rangeLimit = 'a1:a1') {
   return `${getColumnNameForNumber(moveColumn)}${moveRow}`;
 }
 
+/**
+ * Возвращает формулу со сдвигом по местоположению
+ * @param {String} cellFormula - формула ячейки
+ * @param {String} cellNameCurrent - имя текущей ячейки
+ * @param {String} cellNameTemplate - имя ячейки в шаблоне
+ * @returns {String}
+ */
 export function moveFormula(cellFormula, cellNameCurrent, cellNameTemplate) {
   if (cellNameCurrent === cellNameTemplate) return cellFormula;
-  // console.log(cellNameCurrent, cellNameTemplate);
-  // console.log(cellFormula.slice(1));
-  // console.log(cellFormula.slice(1).replace(REG_OPERATORS, '$'));
   const operands = cellFormula.slice(1).replace(REG_OPERATORS, '$').split('$');
-  // this.highlightOperands();
   const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(cellNameCurrent);
   const { parthSymbol: templateColumn, parthDigit: templateRow } = getParseAtSymbolDigit(cellNameTemplate);
   const deltaColumn = getColumnNumberForName(currentColumn) - getColumnNumberForName(templateColumn);
   const deltaRow = currentRow - templateRow;
   const operandsShift = new Map();
-  // console.log(cellNameCurrent, cellNameTemplate);
-  // console.log(this.operands);
   operands.forEach((operand) => {
     if (+operand) {
       operandsShift.set(operand, operand);
@@ -193,36 +196,33 @@ export function moveFormula(cellFormula, cellNameCurrent, cellNameTemplate) {
     const shiftRow = operandRow + deltaRow;
     operandsShift.set(operand, `${getColumnNameForNumber(shiftColumn)}${shiftRow}`);
   });
-  // console.log(operandsShift);
   let formula = cellFormula;
   operandsShift.forEach((value, key) => {
-    // const [key, value] = shiftOperand;
-    // console.log(key, value);
     formula = formula.replace(key, value);
   });
-  // this.operands = operandsShift;
-  // console.log(this.formula);
   return formula;
 }
 
+/**
+ * Возвращает диапазон со сдвигом по местоположению
+ * @param {*} areaRange - диапазон
+ * @param {*} from - начало сдвига
+ * @param {*} rangeLimit - диапазон сдвига
+ * @returns {String}
+ */
 export function moveRange(areaRange, from, rangeLimit = 'a1:a1') {
-  // console.log(areaRange, from, rangeLimit);
   const [sheet, upperRange] = areaRange.split('!');
   const range = upperRange.toLowerCase();
-  // console.log(range);
   const [rangeLimitFrom] = getRangeSplit(rangeLimit);
   let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
   if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
   if (rangeLimitFromRow === '') rangeLimitFromRow = 1;
   const rangeType = getRangeType(range);
-  // console.log(rangeType);
   let [rangeFrom, rangeTo] = getRangeSplit(range);
   if (rangeType === RANGE_TYPE.COLUMN) {
     rangeFrom = getColumnNumberForName(rangeFrom);
     rangeTo = getColumnNumberForName(rangeTo);
   }
-  // console.log(rangeFrom, '-', rangeLimitFromRow, '+', from);
-  // console.log(`${rangeFrom - rangeLimitFromRow + from}:${rangeTo - rangeLimitFromRow + from}`);
   const rangeTypes = {
     [RANGE_TYPE.ROW]: () => `${sheet}!${rangeFrom - rangeLimitFromRow + from}:${rangeTo - rangeLimitFromRow + from}`,
     [RANGE_TYPE.COLUMN]: () => {
@@ -234,13 +234,24 @@ export function moveRange(areaRange, from, rangeLimit = 'a1:a1') {
   return rangeTypes[rangeType]();
 }
 
-// export function moveFormula(formula) {
-//   let [func, value] = formula.split('(');
-//   func = func.slice(1);
-//   console.log(func);
-//   value = value.slice(0, -1).toLowerCase().split(';');
-//   console.log(...value);
-//   value.map((item) => moveCell(item, 'a1', 'a1:a2'));
-//   console.log(...value);
-//   return value;
-// }
+/**
+ * Валидация значения ячейки по типу
+ * @param {String|Nuber|Date} value - значение ячейки
+ * @param {*} type - тип ячейки
+ * @returns {Boolean}
+ */
+export function validateCellValueType(value = '', type = 'string') {
+  if (!value && typeof type !== 'boolean') return true;
+  const validate = {
+    string: () => true, // (typeof v === 'string'),
+    number: (v) => (typeof v === 'number'),
+    integer: (v) => (typeof v === 'number'),
+    float: (v) => (typeof v === 'number'),
+    boolean: (v) => (typeof v === 'boolean'),
+    date: (v) => (new Date(v).toDateString() !== 'Invalid Date'),
+    datetime: (v) => (new Date(v).toDateString() !== 'Invalid Date'),
+    field: () => true,
+    choice: () => true,
+  };
+  return validate[type.split('.')[0]](value) || 'Значение не соответствует типу ячейки';
+}

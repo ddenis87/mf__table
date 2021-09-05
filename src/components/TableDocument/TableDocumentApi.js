@@ -1,7 +1,6 @@
 import store from '@/store/index';
 import display from '@/plugins/formattingView/formattingView';
 import TableDocument from './TableDocument';
-// import ValueValidate from './Errors';
 
 function parseType(type) {
   const [parthType, parthSource] = type.split('.');
@@ -32,6 +31,9 @@ function requestRepresentation(sourceName, value) {
 //   return representation;
 // }
 
+/**
+ * @constructor
+ */
 class TableDocumentApi extends TableDocument {
   // constructor(params) {
   //   super(params);

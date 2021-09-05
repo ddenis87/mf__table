@@ -159,7 +159,7 @@ export default {
     let settings = await import('@/assets/json/svod/settingsMulti.json');
     settings = settings.default;
     tableDocumentPrepare.setTableDocumentSettings(settings);
-    let data = await import('@/assets/json/svod/dataMulti10.json');
+    let data = await import('@/assets/json/svod/dataMulti5.json');
     data = data.default;
     try {
       await tableDocumentPrepare.deserialize(data);

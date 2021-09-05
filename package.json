@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build-lib": "cross-env NODE_ENV=production webpack --mode production --progress --hide-modules",
+    "lib": "vue-cli-service build --target lib --name vue_da_spreadsheet",
     "lint": "vue-cli-service lint",
     "test": "vue-cli-service test:unit"
   },

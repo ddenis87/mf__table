@@ -1,16 +1,19 @@
-import store from '@/store/index';
 import FormulaParser, { Address } from 'fast-formula-parser';
+import TableDocumentDeserializeError from './TableDocumentDeserializeError';
+import TableDocumentGeneralError from './TableDocumentGeneralError';
+import TableDocumentValidationCellError from './TableDocumentValidationCellError';
 
 import {
-  RANGE_TYPE,
-  SHIFT_TYPE,
+  getObjectOfJSON,
   getRangeType,
   getRangeSplit,
   getRangeLength,
   getRangeShift,
+  getRepresentationAtStore,
   moveCell,
   moveFormula,
   moveRange,
+  validateCellValueType,
 } from './TableDocumentHelpers';
 
 import {
@@ -19,73 +22,20 @@ import {
   getParseAtSymbolDigit,
 } from '../../helpers/spreadSheet';
 
-// import Formulas from './Formulas';
-import TableDocumentDeserializeError from './TableDocumentDeserializeError';
-import TableDocumentGeneralError from './TableDocumentGeneralError';
-import TableDocumentValidationCellError from './TableDocumentValidationCellError';
+import {
+  EDIT_ACCESS,
+  CELL_ATTRIBUTES,
+  CELL_HEIGHT,
+  CELL_WIDTH,
+  DELETE_MODE,
+  RANGE_TYPE,
+  RETURN_FORMAT,
+  SHIFT_TYPE,
+} from './TableDocumentConst';
 
-const EDIT_ACCESS = {
-  CLOSED: 'closed',
-  CLOSED_EXCEPT_OPEN: 'closedExceptOpen',
-  OPEN: 'open',
-};
-
-const CELL_WIDTH = 94;
-const CELL_HEIGHT = 22;
-// const ROW_COUNT = 100; // { sheet1: 1000, sheet3: 1000, sheet2: 1000 };
-// const COLUMNS_COUNT = 26; // { sheet1: 26, sheet3: 26, sheet2: 26 };
-
-const CELL_ATTRIBUTES = {
-  VALUE: 'value',
-  FORMULA: 'formula',
-  SCRIPTS: 'scripts',
-  PARAMETER: 'parameter',
-  ACTION: 'action',
-  VALIDATE: 'validate',
-};
-
-const DELETE_MODE = {
-  DATA: 'data',
-  COLUMN: 'column',
-  ROW: 'row',
-};
-
-const RETURN_FORMAT = {
-  OBJECT: 'object',
-  ENTRIES: 'entries',
-  KEYS: 'keys',
-};
-
-function getObjectOfJSON(data) {
-  return (typeof data === 'string') ? JSON.parse(data) : data;
-}
-
-function validateCellValueType(value = '', type = 'string') {
-  if (!value && typeof type !== 'boolean') return true;
-  const validate = {
-    string: () => true, // (typeof v === 'string'),
-    number: (v) => (typeof v === 'number'),
-    integer: (v) => (typeof v === 'number'),
-    float: (v) => (typeof v === 'number'),
-    boolean: (v) => (typeof v === 'boolean'),
-    date: (v) => (new Date(v).toDateString() !== 'Invalid Date'),
-    datetime: (v) => (new Date(v).toDateString() !== 'Invalid Date'),
-    field: () => true,
-    choice: () => true,
-  };
-  return validate[type.split('.')[0]](value) || 'Значение не соответствует типу ячейки';
-}
-
-function getRepresentationAtStore(sourceName, value, relatedModelView) {
-  const representation = store
-    .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({
-      tableName: sourceName,
-      id: value,
-      relatedModelView,
-    });
-  return representation;
-}
-
+/**
+ * @constructor
+ */
 class TableDocument {
   constructor({
     version = null,
@@ -190,16 +140,11 @@ class TableDocument {
    * @param {Enum} shiftType - тип сдвига докумета при вставки
    */
   addArea(sheet, cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) { // надо удалить используется только в скрипте для добавления строки
-    // const flagValid = false;
     const area = this.documentTemplate.getNamedArea(areaName).getAreaCopy(); // getAreaCopy() убрать
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
     const cellColumnNumber = (shiftType === SHIFT_TYPE.VERTICAL) ? 1 : getColumnNumberForName(cellColumn);
     const cellRowNumber = (shiftType === SHIFT_TYPE.HORIZONTAL) ? 1 : cellRow;
-    // try {
     this.insertArea(sheet, cellColumnNumber, cellRowNumber, area, shiftType);
-    // } catch (err) {
-    //   console.log(err.getMessagesText());
-    // }
     this.recalculateFormulas();
   }
 
@@ -222,7 +167,7 @@ class TableDocument {
   }
 
   /**
-   * Удаление диапазона в документе
+   * Удаление области в документе
    * @param {String} sheet - лист
    * @param {String} range - диапазон
    * @param {Enum} shiftType - направление сдвига документа
@@ -253,7 +198,7 @@ class TableDocument {
   }
 
   /**
-   * Тоже удалить диапазон // переименовать...
+   * Удалить диапазона в документе
    * @param {String} range - диапазон "'Sheet1'!A1:A5"
    * @param {Enum} deleteMode - режим удаления
    */
@@ -373,7 +318,7 @@ class TableDocument {
    * Редактирование ячейки
    * @param {String} sheet - лист
    * @param {String} cellName - имя ячейки
-   * @param {String|Number|Data} cellValue - значение ячейки
+   * @param {String|Number|Date} cellValue - значение ячейки
    */
   editingCell(sheet, cellName, cellValue) {
     this.setCellValue(sheet, cellName, cellValue);
@@ -607,7 +552,7 @@ class TableDocument {
    * Возвращает значение ячейки или null
    * @param {String} sheet - имя листа
    * @param {String} cellName - имя ячейки
-   * @returns {String|Number|Data}
+   * @returns {String|Number|Date}
    */
   getCellValue(sheet = 'sheet1', cellName) {
     return this.getCell(sheet, cellName).value || null;
@@ -1330,7 +1275,7 @@ class TableDocument {
    * Устанавливает значение ячейки
    * @param {String} sheet - имя листа
    * @param {String} cellName - имя ячейки
-   * @param {String|Number|Data|Boolean} cellValue - значение ячейки
+   * @param {String|Number|Date|Boolean} cellValue - значение ячейки
    * @param {String} cellParameter - имя параметра ячейки
    * @param {Boolean} isErrorStop - флаг остановки в случае ошибки
    */

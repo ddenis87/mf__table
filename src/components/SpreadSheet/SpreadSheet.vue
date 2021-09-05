@@ -62,6 +62,7 @@
 </template>
 
 <script>
+/** @module SpreadSheet */
 import {
   getColumnNameForNumber,
   getColumnNumberForName,
@@ -92,6 +93,26 @@ export default {
     SpreadSheetBody,
     SpreadSheetBodyPrint,
   },
+  /**
+   * @param {Object} cells - ячейки
+   * @param {Number} cellHeight - высота ячеек
+   * @param {Number} cellWidth - ширина ячеек
+   * @param {Number} columnCount - количество столбцов
+   * @param {Object} columns - колонки
+   * @param {Number} deltaHeightVirtualList - разница высоты виртуального скролла
+   * @param {Number} rowCount - количество строк
+   * @param {Object} rows - строки
+   * @param {Map} representations - представление значений ячеек (ссылки на внешнии источники)
+   * @param {Array} styles - стили
+   * @param {String} tableLayoutDisplay - стиль отображения
+   * @param {String} tableLayoutPadding - внутренний отступ таблицы
+   * @param {Object} images - изображения
+   * @param {Boolean} isShowGrid - отображать сетку
+   * @param {Boolean} isShowGroup - отображать группировки
+   * @param {Boolean} isShowTitle - отображать заголовки
+   * @param {Boolean} isPrintMode - режим печати
+   * @param {Boolean} isOuterBorderOff - отображать внешнюю границу
+   */
   props: {
     cells: { type: Object, default() { return {}; } },
     cellHeight: { type: Number, default: CELL_HEIGHT_BODY },
@@ -337,6 +358,9 @@ export default {
   beforeDestroy() {
     this.updateDocumentStyles(false);
   },
+  /**
+   * Methods
+   */
   methods: {
     evtClickCell(options) {
       this.$emit('click:cell', options);
@@ -503,12 +527,20 @@ export default {
       return JSON.stringify(object).replace(/","/g, ';').replace(/"/g, '').replace(/}/g, ';}');
     },
 
-    // public methods ---------
+    /**
+     * Сброс компонента
+     * @public Это публичный метод
+     */
     newDocument() {
       this.setOpenGroupColumns = [];
       this.setOpenGroupRows = [];
       this.setExcludedCells = {};
     },
+    /**
+     * Вызывается после завершения редактирования ячейки
+     * @param {Event} evt - событие
+     * @public Это публичный метод
+     */
     editingComplete(evt) {
       this.$refs.SpreadSheetBody.nextElement(evt);
     },
