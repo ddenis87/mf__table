@@ -367,6 +367,7 @@ export default {
     },
 
     evtDblclickCell(options) {
+      console.log(options);
       this.$emit('dblclick:cell', options);
     },
 

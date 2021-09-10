@@ -206,7 +206,15 @@ export default {
     evtDblClickBody(evt) {
       if (!evt.target.hasAttribute('data-name')) return;
       const cellName = evt.target.getAttribute('data-name');
-      this.$emit('dblclick:cell', { evt, cellName });
+      // console.log(evt.target.getBoundingClientRect());
+      const cellGeometry = {};
+      ({
+        top: cellGeometry.top,
+        left: cellGeometry.left,
+        width: cellGeometry.width,
+        height: cellGeometry.height,
+      } = evt.target.getBoundingClientRect());
+      this.$emit('dblclick:cell', { evt, cellName, cellGeometry });
     },
 
     evtKeydownBody(evt) {
