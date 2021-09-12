@@ -155,14 +155,14 @@ class TableDocument {
    * @returns {Number}
    */
   calculateCellValue(sheet = 'sheet1', cellName) {
-    console.time('calculateCellValue');
+    // console.time('calculateCellValue');
     const cell = this.getCell(sheet, cellName);
     const cellFormula = cell.formula.slice(1);
     const context = { row: cell.rowName, column: getColumnNumberForName(cell.columnName), sheet };
     let result = null;
     result = this.parseFormula.parse(cellFormula, context);
     this.setCellValue(sheet, cellName, result);
-    console.timeEnd('calculateCellValue');
+    // console.timeEnd('calculateCellValue');
     return result || 0;
   }
 
@@ -1085,7 +1085,6 @@ class TableDocument {
   getSectionSettings(sectionName) {
     const sectionSettings = this.documentSettings
       .find((setting) => Object.keys(setting).includes(sectionName));
-    console.log(Object.values(sectionSettings)[0]);
     return Object.values(sectionSettings)[0];
   }
 
@@ -1175,7 +1174,7 @@ class TableDocument {
    * @param {Enum} shiftType - тип сдвига
    */
   insertArea(sheet = 'sheet1', numberColumn, numberRow, area, shiftType = null) {
-    console.time('insertArea');
+    // console.time('insertArea');
     const namedAreas = [];
     const {
       // cells: insertCells,
@@ -1247,7 +1246,7 @@ class TableDocument {
     this.sheets[sheet].columnCount = this.getLastColumn(sheet);
 
     shiftInsert[shiftType]();
-    console.timeEnd('insertArea');
+    // console.timeEnd('insertArea');
   }
 
   /**

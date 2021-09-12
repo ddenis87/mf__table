@@ -34,8 +34,8 @@ const FORMAT_DATE = {
 const exportDocument = {
   // type: 'document',
   version: '1.2',
-  sheetsList: [],
-  sheets: {},
+  // sheetsList: [],
+  sheets: [],
   styles: [],
   namedAreas: []
 };
@@ -74,20 +74,20 @@ function openPromt() {
 
 function exportAllSheetsJSON(type) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheets = ss.getSheets(); //.slice(4);
+  const sheets = ss.getSheets().slice(2);
 
   // type document
   exportDocument.type = type;
 
   // sheet lists
-  ss.getSheets().forEach((sheet) => {
-    const sheetId = sheet.getSheetId();
-    const sheetNameView = sheet.getSheetName();
-    const sheetName = sheetNameView.replace(/(^|\s)\S/g, (a) => a.toUpperCase()).replace(/[ ]/g, '');
-    // console.log(sheetName);
-    // const sheetNameView = sheet.getSheetName();
-    exportDocument.sheetsList.push({ name: sheetName, nameView: sheetNameView });
-  });
+  // ss.getSheets().forEach((sheet) => {
+  //   const sheetId = sheet.getSheetId();
+  //   const sheetNameView = sheet.getSheetName();
+  //   const sheetName = sheetNameView.replace(/(^|\s)\S/g, (a) => a.toUpperCase()).replace(/[ ]/g, '');
+  //   // console.log(sheetName);
+  //   // const sheetNameView = sheet.getSheetName();
+  //   exportDocument.sheetsList.push({ name: sheetName, nameView: sheetNameView });
+  // });
 
   sheets.forEach((sheet) => {
     // const sheetId = sheet.getSheetId();
@@ -101,17 +101,32 @@ function exportAllSheetsJSON(type) {
     const namedRanges = getNamedAreas(sheet, sheetName); // for find cell parameters
 
     const cellsAndStyles = getCells(sheet, rowCount, columnCount, values, sheetName, namedRanges);
-    exportDocument.sheets[sheetName] = {
+
+    const sheetData = {
+      name: sheetName,
+      nameView: sheetNameView,
       editAccess: 'closedExceptOpen',
       rows: getRows(sheet, rowCount),
       rowCount,
       columns: getColumns(sheet, columnCount),
       columnCount,
       cells: cellsAndStyles.cells,
-      // styles: cellsAndStyles.styles,
     };
+    exportDocument.sheets.push(sheetData);
     exportDocument.styles.push(...cellsAndStyles.styles);
     exportDocument.namedAreas.push(...namedRanges);
+  
+    // exportDocument.sheets[sheetName] = {
+    //   editAccess: 'closedExceptOpen',
+    //   rows: getRows(sheet, rowCount),
+    //   rowCount,
+    //   columns: getColumns(sheet, columnCount),
+    //   columnCount,
+    //   cells: cellsAndStyles.cells,
+    //   // styles: cellsAndStyles.styles,
+    // };
+    // exportDocument.styles.push(...cellsAndStyles.styles);
+    // exportDocument.namedAreas.push(...namedRanges);
   });
   displayText_(buildJson(exportDocument));
   // console.log(exportDocument);
@@ -131,7 +146,7 @@ function getRows(sheet, rowCount) {
   const rows = {};
   // rowsFixed
   for (var i = 0; i < frozenRows; i++) {
-    rows[i + 1] = { height: sheet.getRowHeight(i + 1), fixed: true };
+    rows[i + 1] = { height: sheet.getRowHeight(i + 1), isFrozen: true };
   }
   // rows, rowsGroup
   for (var i = frozenRows; i < rowCount; i++) {
@@ -153,7 +168,7 @@ function getColumns(sheet, columnCount) {
   const frozenColumns = sheet.getFrozenColumns();
   const columns = {};
   for (var i = 0; i < frozenColumns; i++) {
-    columns[getColumnNameForNumber(i + 1)] = { width: sheet.getColumnWidth(i + 1), fixed: true };
+    columns[getColumnNameForNumber(i + 1)] = { width: sheet.getColumnWidth(i + 1), isFrozen: true };
   }
   // column, columnGroup
   for (var i = frozenColumns; i < columnCount; i++) {
@@ -189,9 +204,6 @@ function getBorders(sheet) {
   return dataBordersArray;
 }
 
-/**
- * 
- */
 function getCells(sheet, countRow, countColumn, values, sheetName, namedAreas) {
   const range = sheet.getDataRange();
   const cells = {};
@@ -225,7 +237,8 @@ function getCells(sheet, countRow, countColumn, values, sheetName, namedAreas) {
         // console.log(cellName, formula);
         if (formula.includes('!')) {
           const [sheetName, formul] = formula.split('!');
-          const sheet = exportDocument.sheetsList.find((sheetItem) => sheetName.includes(sheetItem.nameView)) || { name: undefined };
+          // const sheet = exportDocument.sheetsList.find((sheetItem) => sheetName.includes(sheetItem.nameView)) || { name: undefined };
+          const sheet = exportDocument.sheets.find((sheetItem) => sheetName.includes(sheetItem.nameView)) || { name: undefined };
           formula = `='${sheet.name}'!${formul}`;
           // const formulaSplit = formula.split('!');
           // const sheetNameView = formulaSplit[0].slice(1).replace(/\'/g,'')
@@ -305,7 +318,7 @@ function getCellValue(cellValue) {
       style: ' no-print ',
     };
     if (img) cellProperty.image = img;
-    if (action) cellProperty.scripts = { action };
+    if (action) cellProperty.action = action;
     if (value) cellProperty.value = value;
     return cellProperty;
   }

@@ -1,10 +1,21 @@
 <template>
-  <div></div>
+  <div class="editing"
+       :style="position">
+    <div class="label" v-if="isLabel">{{ cellName }}</div>
+    <field-wrapper ref="wrapper"
+                   :field-type="fieldType"
+                   v-model="fieldValue"
+                   @keydown:control="evtKeydownControl"
+                   @blur:wrapper="editAccept"></field-wrapper>
+  </div>
 </template>
 
 <script>
+import FieldWrapper from './FieldWrapper.vue';
+
 export default {
   name: 'SpreadSheetEditing',
+  components: { FieldWrapper },
   props: {
     // Объект содержащий сведения о редактируемой ячейки
     cell: {
@@ -28,13 +39,15 @@ export default {
         };
       },
     },
+    // Отображает имя редактируемой ячейки
+    isLabel: { type: Boolean, defalut: false },
     // Смещение компонента от левого края
     shiftLeft: { type: Number, default: 0 },
     // Смещение компонента от верхнего края
     shiftTop: { type: Number, default: 0 },
   },
   computed: {
-    stylePosition() {
+    position() {
       return {
         top: `${this.cellGeometry.top + this.shiftTop}px`,
         left: `${this.cellGeometry.left + this.shiftLeft}px`,
@@ -42,6 +55,10 @@ export default {
         height: `${this.cellGeometry.height}px`,
       };
     },
+  },
+  methods: {
+    editAccept() {},
+    evtKeydownControl() {},
   },
 };
 </script>
