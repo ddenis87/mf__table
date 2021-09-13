@@ -40,9 +40,23 @@ class TableDocument {
   constructor({
     version = null,
     methodName = null,
-    sheetsList = [{ name: 'sheet1', nameView: 'Лист 1' }],
+    // sheetsList = [{ name: 'sheet1', nameView: 'Лист 1' }],
+    // sheets = [
+    //   {
+    //     name: 'sheet1',
+    //     nameView: 'Лист 1',
+    //     editAccess: undefined,
+    //     columns: {},
+    //     columnCount: 26,
+    //     rows: {},
+    //     rowCount: 100,
+    //     cells: {},
+    //   },
+    // ],
     sheets = {
       sheet1: {
+        nameView: 'Лист 1',
+        index: 0,
         editAccess: undefined,
         columns: {},
         columnCount: 26,
@@ -51,7 +65,7 @@ class TableDocument {
         cells: {},
       },
     },
-    styles = [],
+    styles = {},
     scripts = {},
     images = {},
     namedAreas = [],
@@ -64,9 +78,9 @@ class TableDocument {
       ({
         version: this.version = null,
         methodName: this.methodName = null,
-        sheetsList: this.sheetsList = [],
+        // sheetsList: this.sheetsList = [],
         sheets: this.sheets = {},
-        styles: this.styles = [],
+        styles: this.styles = {},
         scripts: this.scripts = {},
         images: this.images = {},
         namedAreas: this.namedAreas = [],
@@ -77,7 +91,7 @@ class TableDocument {
     }
     this.version = version;
     this.methodName = methodName;
-    this.sheetsList = sheetsList;
+    // this.sheetsList = sheetsList;
     this.sheets = sheets;
     this.styles = styles;
     this.scripts = scripts;
@@ -246,7 +260,7 @@ class TableDocument {
     console.time('deserialize');
     const documentData = getObjectOfJSON(data);
     // this.editAccess = this.documentTemplate.editAccess;
-    this.sheetsList = this.documentTemplate.sheetsList;
+    this.sheetsList = this.documentTemplate.getSheetsList();
     this.sheets = {};
     this.sheetsList.forEach((sheet) => {
       this.sheets[sheet.name] = {
@@ -740,24 +754,34 @@ class TableDocument {
    * @param {String} sheet
    * @returns Object
    */
-  getPropsForView(sheet) {
-    if (!this.sheets[sheet]) return {};
+  getPropsForView(sheetName) {
+    const sheetIndex = this.sheets.findIndex((name) => name === sheetName);
+    if (sheetIndex === -1) return {};
     // console.log(sheet);
+    const styles = [];
+    Object.entries(this.styles).forEach((style) => {
+      const [styleName, styleList] = style;
+      styles.push({
+        name: styleName.split('|')[1],
+        list: styleList,
+      });
+    });
     return {
-      columns: this.sheets[sheet].columns,
-      columnCount: this.sheets[sheet].columnCount || 26,
-      rows: this.sheets[sheet].rows,
-      rowCount: this.sheets[sheet].rowCount || 100,
-      cells: this.sheets[sheet].cells,
-      styles: this.styles
-        .filter((style) => style.name.split('|')[0] === sheet)
-        .map((st) => {
-          const item = {
-            name: st.name.split('|')[1],
-            list: st.list,
-          };
-          return item;
-        }),
+      columns: this.sheets[sheetIndex].columns,
+      columnCount: this.sheets[sheetIndex].columnCount || 26,
+      rows: this.sheets[sheetIndex].rows,
+      rowCount: this.sheets[sheetIndex].rowCount || 100,
+      cells: this.sheets[sheetIndex].cells,
+      styles,
+      // styles: this.styles
+      //   .filter((style) => style.name.split('|')[0] === sheet)
+      //   .map((st) => {
+      //     const item = {
+      //       name: st.name.split('|')[1],
+      //       list: st.list,
+      //     };
+      //     return item;
+      //   }),
     };
   }
 
@@ -1075,6 +1099,21 @@ class TableDocument {
       },
     };
     return rowSet[type]();
+  }
+
+  /**
+   * Возвращает список листов документа
+   * @returns {Object} // { name: sheetName, nameView: sheetNameView }
+   */
+  getSheetsList() {
+    const sheetsList = Object.values(this.sheets);
+    console.log(sheetsList);
+    return sheetsList.sort((a, b) => a.index - b.index);
+    // console.log(this.sheets);
+    // this.sheets.forEach((sheet) => {
+    //   sheetsList.push({ name: sheet.name, nameView: sheet.nameView });
+    // });
+    // return sheetsList;
   }
 
   /**

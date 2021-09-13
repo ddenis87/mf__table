@@ -2,20 +2,20 @@
   <div class="editing"
        :style="position">
     <div class="label" v-if="isLabel">{{ cellName }}</div>
-    <field-wrapper ref="wrapper"
+    <!-- <field-wrapper ref="wrapper"
                    :field-type="fieldType"
                    v-model="fieldValue"
                    @keydown:control="evtKeydownControl"
-                   @blur:wrapper="editAccept"></field-wrapper>
+                   @blur:wrapper="editAccept"></field-wrapper> -->
   </div>
 </template>
 
 <script>
-import FieldWrapper from './FieldWrapper.vue';
+// import FieldWrapper from './FieldWrapper.vue';
 
 export default {
   name: 'SpreadSheetEditing',
-  components: { FieldWrapper },
+  // components: { FieldWrapper },
   props: {
     // Объект содержащий сведения о редактируемой ячейки
     cell: {

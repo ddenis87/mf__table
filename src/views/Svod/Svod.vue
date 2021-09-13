@@ -98,27 +98,24 @@ export default {
   },
   computed: {
     sheetName() {
+      console.log(this.currentList);
       return this.lists[this.currentList].name;
     },
     lists() {
-      const lists = [];
-      this.tableDocument.sheetsList.forEach((sheet) => {
-        lists.push({
-          name: sheet.name,
-          nameView: sheet.nameView,
-        });
-      });
-      return lists;
+      console.log(this.tableDocument.getSheetsList());
+      return this.tableDocument.getSheetsList();
+      // const lists = [];
+      // this.tableDocument.sheetsList.forEach((sheet) => {
+      //   lists.push({
+      //     name: sheet.name,
+      //     nameView: sheet.nameView,
+      //   });
+      // });
+      // return lists;
     },
-    // spreadSheetProps() {
-    //   return {
-    //     ...this[`tableDocument_list${this.currentList + 1}`],
-    //     'is-show-grid': !(this[`tableDocument_list${this.currentList + 1}`].documentTemplate),
-    //   };
-    // },
     spreadSheetProps() {
       return {
-        ...this.tableDocument,
+        // ...this.tableDocument,
         ...this.tableDocument.getPropsForView(this.sheetName),
         'is-show-grid': false,
       };
@@ -143,7 +140,7 @@ export default {
   async mounted() {
     this.isLoading = true;
     const tableDocumentPrepare = new TableDocumentApi();
-    let template = await import('@/assets/json/svod/templateMultiGood.json');
+    let template = await import('@/assets/json/svod/templateModify.json');
     template = template.default;
     // console.log(template);
     if (template.type === 'document') {
@@ -156,10 +153,10 @@ export default {
       return;
     }
     tableDocumentPrepare.setTableDocumentTemplate(template);
-    let settings = await import('@/assets/json/svod/settingsMulti.json');
+    let settings = await import('@/assets/json/svod/settings.json');
     settings = settings.default;
     tableDocumentPrepare.setTableDocumentSettings(settings);
-    let data = await import('@/assets/json/svod/dataMulti5.json');
+    let data = await import('@/assets/json/svod/data5.json');
     data = data.default;
     try {
       await tableDocumentPrepare.deserialize(data);

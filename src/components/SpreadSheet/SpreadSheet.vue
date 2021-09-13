@@ -1,6 +1,5 @@
 <template>
   <table-layout :padding="tableLayoutPadding"
-                :display="tableLayoutDisplay"
                 :border-off="isPrintMode || isOuterBorderOff">
     <div :class="{
             'spread-sheet': !isPrintMode,
@@ -50,13 +49,13 @@
                          :is-show-grid="isShowGrid"
                          :is-show-group="isShowGroup"
                          :is-show-title="isShowTitle"
-                         @click:cell="evtClickCell"
-                         @dblclick:cell="evtDblclickCell"
-                         @keydown:cell="evtKeydownCell"
-                         @buffer:copy="evtBufferCopy"
-                         @buffer:paste="evtBufferPaste"
+                         @click:cell="onClickCell"
+                         @dblclick:cell="onDblclickCell"
+                         @keydown:cell="onKeydownCell"
+                         @buffer:copy="onBufferCopy"
+                         @buffer:paste="onBufferPaste"
                          @open-group:row="toggleRowGroup"
-                         @scroll-body-x="scrollBodyX"></spread-sheet-body>
+                         @scroll-body-x="onScrollBodyX"></spread-sheet-body>
     </div>
   </table-layout>
 </template>
@@ -86,6 +85,7 @@ import {
 
 export default {
   name: 'SpreadSheet',
+
   components: {
     TableLayout,
     SpreadSheetAngle,
@@ -93,46 +93,52 @@ export default {
     SpreadSheetBody,
     SpreadSheetBodyPrint,
   },
-  /**
-   * @param {Object} cells - ячейки
-   * @param {Number} cellHeight - высота ячеек
-   * @param {Number} cellWidth - ширина ячеек
-   * @param {Number} columnCount - количество столбцов
-   * @param {Object} columns - колонки
-   * @param {Number} deltaHeightVirtualList - разница высоты виртуального скролла
-   * @param {Number} rowCount - количество строк
-   * @param {Object} rows - строки
-   * @param {Map} representations - представление значений ячеек (ссылки на внешнии источники)
-   * @param {Array} styles - стили
-   * @param {String} tableLayoutDisplay - стиль отображения
-   * @param {String} tableLayoutPadding - внутренний отступ таблицы
-   * @param {Object} images - изображения
-   * @param {Boolean} isShowGrid - отображать сетку
-   * @param {Boolean} isShowGroup - отображать группировки
-   * @param {Boolean} isShowTitle - отображать заголовки
-   * @param {Boolean} isPrintMode - режим печати
-   * @param {Boolean} isOuterBorderOff - отображать внешнюю границу
-   */
+
   props: {
+    // Объект содержащит информацию о ячейках.
     cells: { type: Object, default() { return {}; } },
-    cellHeight: { type: Number, default: CELL_HEIGHT_BODY },
-    cellWidth: { type: Number, default: CELL_WIDTH_BODY },
-    columnCount: { type: Number, default: 50 },
+    // Высота ячеек
+    cellHeight: {
+      type: Number,
+      // CELL_HEIGHT_BODY = 22
+      default: CELL_HEIGHT_BODY,
+    },
+    // Ширина ячеек
+    cellWidth: {
+      type: Number,
+      // CELL_WIDTH_BODY = 94
+      default: CELL_WIDTH_BODY,
+    },
+    // Количество столбцов
+    columnCount: { type: Number, default: 26 },
+    // Объект содержащит информацию о колонках
     columns: { type: Object, default() { return {}; } },
+    // Разница высоты виртуального скролла
     deltaHeightVirtualList: { type: Number, default: 168 },
-    rowCount: { type: Number, default: 1000 },
-    rows: { type: Object, default() { return {}; } },
-    representations: { type: Map, default() { return new Map(); } },
-    styles: { type: Array, default() { return []; } },
-    tableLayoutDisplay: { type: String, default: 'block' },
-    tableLayoutPadding: { type: String, default: '4px 4px 4px 4px' },
+    // Изображения документа
     images: { type: Object, default() { return {}; } },
-    isShowGrid: { type: Boolean, default: true },
-    isShowGroup: { type: Boolean, default: true },
-    isShowTitle: { type: Boolean, default: true },
-    isPrintMode: { type: Boolean, default: false },
+    // Отключить отображение внешней границы
     isOuterBorderOff: { type: Boolean, default: false },
+    // Режим печати
+    isPrintMode: { type: Boolean, default: false },
+    // Отображать сетку
+    isShowGrid: { type: Boolean, default: true },
+    // Отображать группировки
+    isShowGroup: { type: Boolean, default: true },
+    // Отображать заголовки
+    isShowTitle: { type: Boolean, default: true },
+    // Количество строк
+    rowCount: { type: Number, default: 1000 },
+    // Объект содержащит информацию о строках
+    rows: { type: Object, default() { return {}; } },
+    // Ссылки на внешнии источники
+    representations: { type: Map, default() { return new Map(); } },
+    // Стили документа
+    styles: { type: Array, default() { return []; } },
+    // Внутренний отступ таблицы
+    tableLayoutPadding: { type: String, default: '4px 4px 4px 4px' },
   },
+
   data() {
     return {
       setOpenGroupColumns: [],
@@ -140,6 +146,7 @@ export default {
       setExcludedCells: {},
     };
   },
+
   computed: {
     maxColumnGroupingLevel() {
       const maxLevelGroup = [0];
@@ -323,6 +330,7 @@ export default {
       return style;
     },
   },
+
   watch: {
     cells() {
       this.setExcludedCells = {};
@@ -362,22 +370,31 @@ export default {
    * Methods
    */
   methods: {
-    evtClickCell(options) {
+    onClickCell(options) {
+      // Клик мыши по ячейке
+      // @arg { cellName, MouseEvent }
       this.$emit('click:cell', options);
     },
 
-    evtDblclickCell(options) {
-      console.log(options);
+    onDblclickCell(options) {
+      // Двойной клике мыши по ячейке
+      // @arg { cellName, MouseEvent }
       this.$emit('dblclick:cell', options);
     },
 
-    evtKeydownCell(options) {
+    onKeydownCell(options) {
+      // Нажатие кнопки клавиатуры
+      // @arg { cellName, KeyboardEvent }
       this.$emit('keydown:cell', options);
     },
-    evtBufferCopy(cellName) {
+    onBufferCopy(cellName) {
+      // Нажатие сочетания кнопок клавиатуры Ctrl+C (копирование в буфер обмена)
+      // @arg cellName - имя ячейки
       this.$emit('buffer:copy', cellName);
     },
-    evtBufferPaste(cellName) {
+    onBufferPaste(cellName) {
+      // Нажатие сочетания кнопок клавиатуры Ctrl+V (вставка из буфера обмена)
+      // @arg cellName - имя ячейки
       this.$emit('buffer:paste', cellName);
     },
 
@@ -429,8 +446,9 @@ export default {
       console.log(this.setOpenGroupRows);
     },
 
-    scrollBodyX(scrollLeft) {
+    onScrollBodyX(scrollLeft) {
       this.$refs.SheetHead.$el.scrollLeft = scrollLeft;
+      // Скролл таблицы
       this.$emit('scroll:body');
     },
 
@@ -528,20 +546,18 @@ export default {
       return JSON.stringify(object).replace(/","/g, ';').replace(/"/g, '').replace(/}/g, ';}');
     },
 
-    /**
-     * Сброс компонента
-     * @public Это публичный метод
-     */
-    newDocument() {
+    // @vuese
+    // Сброс компонента
+    resetSpreadSheet() {
       this.setOpenGroupColumns = [];
       this.setOpenGroupRows = [];
       this.setExcludedCells = {};
     },
-    /**
-     * Вызывается после завершения редактирования ячейки
-     * @param {Event} evt - событие
-     * @public Это публичный метод
-     */
+
+    // @vuese
+    // Вызывается по завершению редактирования.
+    // Используется для перемещения курсока на следующую ячейку.
+    // @arg Объект события
     editingComplete(evt) {
       this.$refs.SpreadSheetBody.nextElement(evt);
     },
