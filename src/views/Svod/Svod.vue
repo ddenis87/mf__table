@@ -26,7 +26,7 @@
                       v-bind="spreadSheetProps"
                       :isOuterBorderOff="true"
                       :delta-height-virtual-list="140"
-                      :is-show-title="false"
+                      :is-show-title="true"
                       :is-show-group="false"
                       table-layout-padding="0px 4px 4px 4px"
                       @click:cell="evtClickCell"
@@ -102,6 +102,7 @@ export default {
       return this.lists[this.currentList].name;
     },
     lists() {
+      // console.log(this.tableDocument.getSheetsList());
       console.log(this.tableDocument.getSheetsList());
       return this.tableDocument.getSheetsList();
       // const lists = [];
@@ -114,10 +115,11 @@ export default {
       // return lists;
     },
     spreadSheetProps() {
+      console.log(this.sheetName);
       return {
         // ...this.tableDocument,
         ...this.tableDocument.getPropsForView(this.sheetName),
-        'is-show-grid': false,
+        'is-show-grid': true,
       };
     },
   },
@@ -135,7 +137,6 @@ export default {
   async created() {
     await this.$store.dispatch('Lists/readList', 'region');
     await this.$store.dispatch('Lists/readList', 'kodLgot');
-    // await this.$store.dispatch('DataTable/REQUEST_OPTIONS', { tableName: 'organization' });
   },
   async mounted() {
     this.isLoading = true;

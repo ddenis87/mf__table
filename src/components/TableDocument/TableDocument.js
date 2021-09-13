@@ -260,11 +260,12 @@ class TableDocument {
     console.time('deserialize');
     const documentData = getObjectOfJSON(data);
     // this.editAccess = this.documentTemplate.editAccess;
-    this.sheetsList = this.documentTemplate.getSheetsList();
+    // this.sheetsList = this.documentTemplate.getSheetsList();
     this.sheets = {};
-    this.sheetsList.forEach((sheet) => {
+    this.documentTemplate.getSheetsList().forEach((sheet) => {
       this.sheets[sheet.name] = {
         editAccess: this.documentTemplate.sheets[sheet.name].editAccess,
+        nameView: this.documentTemplate.sheets[sheet.name].nameView,
         columns: {},
         rows: {},
         cells: {},
@@ -280,8 +281,10 @@ class TableDocument {
       if (!Array.isArray(sectionData)) sectionData = [sectionData];
       sectionData.forEach((sectionDataItem) => {
         try {
+          console.log(sectionKey, sectionDataItem);
           this.deserializeArea(sectionKey, sectionDataItem);
         } catch (err) {
+          console.log(err);
           if (err instanceof TableDocumentGeneralError) throw err;
           deserializeError.push(...err);
         }
@@ -312,12 +315,15 @@ class TableDocument {
       return;
     }
     let area = null;
+    console.log(sectionValue.templateSectionName, sectionValue.sheet);
     area = this.documentTemplate
       .getNamedArea(sectionValue.templateSectionName, sectionValue.sheet)
       .getAreaCopy();
+    console.log(area);
     try {
       area.fillArea(sectionDataItem, sectionValue.parameters, sectionValue.sheet);
     } finally {
+      console.log(area);
       insertMethods[sectionValue.methodName](area, sectionValue.sheet);
     }
     const { nestedData } = sectionValue;
@@ -420,7 +426,7 @@ class TableDocument {
       },
     };
 
-    const styles = [];
+    const styles = {};
     const namedAreas = [];
     const scripts = {};
     const images = {};
@@ -438,8 +444,11 @@ class TableDocument {
       sheets[sheet].columns[cellColumnShift] = this.sheets[sheet].columns[cellColumnCurrent];
       sheets[sheet].rows[cellRowShift] = this.sheets[sheet].rows[cellRowCurrent];
 
-      const cellStyles = this.getCellStyles(`${sheet}|${cellNameCurrent}`);
-      if (cellStyles) styles.push(cellStyles);
+      // const cellStyles = this.getCellStyles(`${sheet}|${cellNameCurrent}`);
+      // if (cellStyles) styles.push(cellStyles);
+      if (Object.keys(this.styles).includes(`${sheet}|${cellNameCurrent}`)) {
+        styles[`${sheet}|${cellNameCurrent}`] = this.styles[`${sheet}|${cellNameCurrent}`];
+      }
 
       if (Object.keys(cellValueCurrent).includes('image')) {
         const imageName = cellValueCurrent.image;
@@ -755,9 +764,10 @@ class TableDocument {
    * @returns Object
    */
   getPropsForView(sheetName) {
-    const sheetIndex = this.sheets.findIndex((name) => name === sheetName);
-    if (sheetIndex === -1) return {};
-    // console.log(sheet);
+    // const sheetIndex = this.sheets.findIndex((name) => name === sheetName);
+    // if (sheetIndex === -1) return {};
+    console.log(sheetName);
+    if (!this.sheets[sheetName]) return {};
     const styles = [];
     Object.entries(this.styles).forEach((style) => {
       const [styleName, styleList] = style;
@@ -767,14 +777,14 @@ class TableDocument {
       });
     });
     return {
-      columns: this.sheets[sheetIndex].columns,
-      columnCount: this.sheets[sheetIndex].columnCount || 26,
-      rows: this.sheets[sheetIndex].rows,
-      rowCount: this.sheets[sheetIndex].rowCount || 100,
-      cells: this.sheets[sheetIndex].cells,
+      columns: this.sheets[sheetName].columns,
+      columnCount: this.sheets[sheetName].columnCount || 26,
+      rows: this.sheets[sheetName].rows,
+      rowCount: this.sheets[sheetName].rowCount || 100,
+      cells: this.sheets[sheetName].cells,
       styles,
       // styles: this.styles
-      //   .filter((style) => style.name.split('|')[0] === sheet)
+      //   .filter((style) => style.name.split('|')[0] === sheetName)
       //   .map((st) => {
       //     const item = {
       //       name: st.name.split('|')[1],
@@ -800,7 +810,7 @@ class TableDocument {
           .includes(CELL_ATTRIBUTES.FORMULA));
       return cellFormulas;
     }
-    this.sheetsList.forEach((sheetItem) => {
+    this.getSheetsList().forEach((sheetItem) => {
       const { name: sheetName } = sheetItem;
       cellFormulas[sheetName] = [];
       const cellFormulasSheet = Object.keys(this.sheets[sheetName].cells)
@@ -820,7 +830,7 @@ class TableDocument {
    */
   getFormularsCellsSet() {
     let formulasCellsSet = [];
-    this.sheetsList.forEach((sheet) => {
+    this.getSheetsList().forEach((sheet) => {
       const { name: sheetName } = sheet;
       formulasCellsSet = [
         ...formulasCellsSet,
@@ -938,7 +948,7 @@ class TableDocument {
   getNamedArea(areaName) {
     const namedAreas = [];
     const range = this.getRangeByAreaName(areaName);
-    // console.log(range);
+    console.log(range);
     range.forEach((rangeItem) => {
       // console.log(rangeItem);
       namedAreas.push(this.getAreaForRange(rangeItem));
@@ -1106,14 +1116,17 @@ class TableDocument {
    * @returns {Object} // { name: sheetName, nameView: sheetNameView }
    */
   getSheetsList() {
-    const sheetsList = Object.values(this.sheets);
-    console.log(sheetsList);
-    return sheetsList.sort((a, b) => a.index - b.index);
-    // console.log(this.sheets);
-    // this.sheets.forEach((sheet) => {
-    //   sheetsList.push({ name: sheet.name, nameView: sheet.nameView });
-    // });
-    // return sheetsList;
+    const sheetsListArray = Object.entries(this.sheets);
+    const sheetsListArraySort = sheetsListArray.sort((a, b) => a[1].index - b[1].index);
+    const sheetsList = [];
+    sheetsListArraySort.forEach((sheet) => {
+      // console.log(sheet);
+      sheetsList.push({
+        name: sheet[0],
+        nameView: sheet[1].nameView,
+      });
+    });
+    return sheetsList;
   }
 
   /**
@@ -1442,7 +1455,8 @@ class TableDocument {
       });
       return;
     }
-    this.sheetsList.forEach((sheetItem) => {
+    // this.sheetsList.forEach((sheetItem) => {
+    this.getSheetsList().forEach((sheetItem) => {
       Object.values(this.sheets[sheetItem].cells).forEach((cellValue) => {
         if (cellValue.includes('formula')) cellValue.calculated = state;
       });
@@ -1454,10 +1468,11 @@ class TableDocument {
    * @param {Array} stylesArea - массив стилей
    */
   setStyles(stylesArea) {
-    stylesArea.forEach((styleItem) => {
-      const styles = this.styles.find((style) => style.name === styleItem.name);
-      if (!styles) this.styles.push(styleItem);
-    });
+    this.styles = { ...this.styles, ...stylesArea };
+    // stylesArea.forEach((styleItem) => {
+    //   const styles = this.styles.find((style) => style.name === styleItem.name);
+    //   if (!styles) this.styles.push(styleItem);
+    // });
   }
 
   /**

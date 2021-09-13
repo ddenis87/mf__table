@@ -81,7 +81,8 @@ class TableDocumentApi extends TableDocument {
   //   await Promise.all(promises);
   // }
   async getRepresentationStore() { // getRepresentationAtApi
-    const promises = this.sheetsList.map(async (sheet) => {
+    // const promises = this.sheetsList.map(async (sheet) => {
+    const promises = this.getSheetsList().map(async (sheet) => {
       const prom = Object.values(this.sheets[sheet.name].cells).map(async (cellValue) => {
         const { type, value, relatedModelView } = cellValue;
         if (type?.includes('field') && value) {
@@ -155,7 +156,8 @@ class TableDocumentApi extends TableDocument {
     // console.log('before await');
     await this.getRepresentationStore(); // .then(() => {
     // console.log('after await');
-    this.sheetsList.forEach((sheet) => {
+    // this.sheetsList.forEach((sheet) => {
+    this.getSheetsList().forEach((sheet) => {
       this.sheets[sheet.name].cells = { ...this.sheets[sheet.name].cells };
     });
     // this.sheets = { ...this.sheets };
