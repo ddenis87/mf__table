@@ -17,7 +17,7 @@
         <v-tab v-for="list in lists"
               :key="list.name"
               class="nav-list"
-              active-class="nav-list_active">{{ list.nameView }}</v-tab>
+              active-class="nav-list_active">{{ list.title }}</v-tab>
       </v-tabs>
     </div>
     <div class="svod__body">

@@ -40,19 +40,6 @@ class TableDocument {
   constructor({
     version = null,
     methodName = null,
-    // sheetsList = [{ name: 'sheet1', nameView: 'Лист 1' }],
-    // sheets = [
-    //   {
-    //     name: 'sheet1',
-    //     nameView: 'Лист 1',
-    //     editAccess: undefined,
-    //     columns: {},
-    //     columnCount: 26,
-    //     rows: {},
-    //     rowCount: 100,
-    //     cells: {},
-    //   },
-    // ],
     sheets = {
       sheet1: {
         nameView: 'Лист 1',
@@ -78,7 +65,6 @@ class TableDocument {
       ({
         version: this.version = null,
         methodName: this.methodName = null,
-        // sheetsList: this.sheetsList = [],
         sheets: this.sheets = {},
         styles: this.styles = {},
         scripts: this.scripts = {},
@@ -91,7 +77,6 @@ class TableDocument {
     }
     this.version = version;
     this.methodName = methodName;
-    // this.sheetsList = sheetsList;
     this.sheets = sheets;
     this.styles = styles;
     this.scripts = scripts;
@@ -767,7 +752,7 @@ class TableDocument {
         list: styleList,
       });
     });
-    
+
     return {
       columns: this.sheets[sheetName].columns,
       columnCount: this.sheets[sheetName].columnCount || 26,
@@ -1111,10 +1096,9 @@ class TableDocument {
     const sheetsListArraySort = sheetsListArray.sort((a, b) => a[1].index - b[1].index);
     const sheetsList = [];
     sheetsListArraySort.forEach((sheet) => {
-      // console.log(sheet);
       sheetsList.push({
         name: sheet[0],
-        nameView: sheet[1].nameView,
+        title: sheet[1].nameView,
       });
     });
     return sheetsList;
