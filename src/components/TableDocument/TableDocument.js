@@ -257,10 +257,8 @@ class TableDocument {
    * @param {Object} data - данные
    */
   deserialize(data) {
-    console.time('deserialize');
+    // console.time('deserialize');
     const documentData = getObjectOfJSON(data);
-    // this.editAccess = this.documentTemplate.editAccess;
-    // this.sheetsList = this.documentTemplate.getSheetsList();
     this.sheets = {};
     this.documentTemplate.getSheetsList().forEach((sheet) => {
       this.sheets[sheet.name] = {
@@ -281,10 +279,8 @@ class TableDocument {
       if (!Array.isArray(sectionData)) sectionData = [sectionData];
       sectionData.forEach((sectionDataItem) => {
         try {
-          console.log(sectionKey, sectionDataItem);
           this.deserializeArea(sectionKey, sectionDataItem);
         } catch (err) {
-          console.log(err);
           if (err instanceof TableDocumentGeneralError) throw err;
           deserializeError.push(...err);
         }
@@ -293,7 +289,7 @@ class TableDocument {
     if (deserializeError.length) {
       throw new TableDocumentDeserializeError('deserialize', deserializeError);
     }
-    console.timeEnd('deserialize');
+    // console.timeEnd('deserialize');
   }
 
   /**
@@ -315,15 +311,12 @@ class TableDocument {
       return;
     }
     let area = null;
-    console.log(sectionValue.templateSectionName, sectionValue.sheet);
     area = this.documentTemplate
       .getNamedArea(sectionValue.templateSectionName, sectionValue.sheet)
       .getAreaCopy();
-    console.log(area);
     try {
       area.fillArea(sectionDataItem, sectionValue.parameters, sectionValue.sheet);
     } finally {
-      console.log(area);
       insertMethods[sectionValue.methodName](area, sectionValue.sheet);
     }
     const { nestedData } = sectionValue;
@@ -444,9 +437,9 @@ class TableDocument {
       sheets[sheet].columns[cellColumnShift] = this.sheets[sheet].columns[cellColumnCurrent];
       sheets[sheet].rows[cellRowShift] = this.sheets[sheet].rows[cellRowCurrent];
 
-      // const cellStyles = this.getCellStyles(`${sheet}|${cellNameCurrent}`);
+      const cellStyles = this.getStyleForName(`${sheet}|${cellNameCurrent}`);
       // if (cellStyles) styles.push(cellStyles);
-      if (Object.keys(this.styles).includes(`${sheet}|${cellNameCurrent}`)) {
+      if (cellStyles) {
         styles[`${sheet}|${cellNameCurrent}`] = this.styles[`${sheet}|${cellNameCurrent}`];
       }
 
@@ -538,6 +531,16 @@ class TableDocument {
   }
 
   /**
+   * Возвращает имя метода ячейки или null
+   * @param {String} sheet - имя листа
+   * @param {String} cellName - имя ячейки
+   * @returns {String}
+   */
+  getCellAction(sheet = 'sheet1', cellName) {
+    return this.getCell(sheet, cellName).action || null;
+  }
+
+  /**
    * Возвращает все ячейки для указанного листа
    * @param {String} sheet - имя листа
    * @returns {Object}
@@ -548,28 +551,16 @@ class TableDocument {
     return this.sheets[sheet].cells || {};
   }
 
-  /**
-   * Возвращает значение поля scripts ячейки или null
-   * @param {String} sheet - имя листа
-   * @param {String} cellName - имя ячейки
-   * @returns {Object}
-   */
-  getCellScripts(sheet = 'sheet1', cellName) {
-    const { scripts } = this.getCell(sheet, cellName) || null;
-    return scripts || null;
-  }
-
-  /**
-   * Возвращает имя метода ячейки или null
-   * @param {String} sheet - имя листа
-   * @param {String} cellName - имя ячейки
-   * @returns {String}
-   */
-  getCellAction(sheet = 'sheet1', cellName) {
-    // console.log(this.getCellScripts(sheet, cellName));
-    const { action } = this.getCellScripts(sheet, cellName) || {};
-    return action || null;
-  }
+  // /**
+  //  * Возвращает значение поля scripts ячейки или null
+  //  * @param {String} sheet - имя листа
+  //  * @param {String} cellName - имя ячейки
+  //  * @returns {Object}
+  //  */
+  // getCellScripts(sheet = 'sheet1', cellName) {
+  //   const { scripts } = this.getCell(sheet, cellName) || null;
+  //   return scripts || null;
+  // }
 
   /**
    * Возвращает значение ячейки или null
@@ -582,27 +573,29 @@ class TableDocument {
     // return this.sheets[sheet].cells[cellName]?.value || null;
   }
 
-  /**
-   * Возвращает значене параметра
-   * @param {String} sheet - имя листа
-   * @param {String} cellName - имя ячейки
-   * @param {Enum} cellParameter - поле
-   * @returns {String|Number|Boolean}
-   */
-  getCellParameter(sheet = 'sheet1', cellName, cellParameter) { // разбить на получение каждого атрибута
-    if (!this.sheets[sheet].cells[cellName]) return null;
-    return this.sheets[sheet].cells[cellName][cellParameter] || null;
-  }
+  // /**
+  //  * Возвращает значене параметра
+  //  * @param {String} sheet - имя листа
+  //  * @param {String} cellName - имя ячейки
+  //  * @param {Enum} cellParameter - поле
+  //  * @returns {String|Number|Boolean}
+  //  */
+  // getCellParameter(sheet = 'sheet1', cellName, cellParameter) { // разбить на получение каждого атрибута
+  //   if (!this.sheets[sheet].cells[cellName]) return null;
+  //   return this.sheets[sheet].cells[cellName][cellParameter] || null;
+  // }
 
   /**
    * Возвращает стиль по имени
    * @param {*} styleName - имя стиля
    * @returns {Object}
    */
-  getCellStyles(styleName) {
-    const cellStyle = this.styles.find((item) => item.name === styleName);
-    if (!cellStyle) return null;
-    return cellStyle;
+  getStyleForName(styleName) {
+    if (!Object.keys(this.styles).includes(styleName)) return null;
+    return this.styles[styleName];
+    // const cellStyle = this.styles.find((item) => item.name === styleName);
+    // if (!cellStyle) return null;
+    // return cellStyle;
   }
 
   /**
@@ -764,18 +757,17 @@ class TableDocument {
    * @returns Object
    */
   getPropsForView(sheetName) {
-    // const sheetIndex = this.sheets.findIndex((name) => name === sheetName);
-    // if (sheetIndex === -1) return {};
-    console.log(sheetName);
     if (!this.sheets[sheetName]) return {};
     const styles = [];
     Object.entries(this.styles).forEach((style) => {
       const [styleName, styleList] = style;
+      if (styleName.split('|')[0] !== sheetName) return;
       styles.push({
         name: styleName.split('|')[1],
         list: styleList,
       });
     });
+    
     return {
       columns: this.sheets[sheetName].columns,
       columnCount: this.sheets[sheetName].columnCount || 26,
@@ -948,7 +940,6 @@ class TableDocument {
   getNamedArea(areaName) {
     const namedAreas = [];
     const range = this.getRangeByAreaName(areaName);
-    console.log(range);
     range.forEach((rangeItem) => {
       // console.log(rangeItem);
       namedAreas.push(this.getAreaForRange(rangeItem));

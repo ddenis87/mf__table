@@ -277,8 +277,8 @@ export default {
       const rows = [];
       let showLevel = 0;
       this.prepareRows.forEach((row) => {
-        const { level, fixed } = row;
-        if ((level === showLevel && !fixed)
+        const { level, isFrozen } = row;
+        if ((level === showLevel && !isFrozen)
           || (level < showLevel)) {
           rows.push(row);
         }
@@ -292,7 +292,7 @@ export default {
     },
 
     tableRowsFixed() {
-      return this.prepareRows.filter((row) => row.fixed);
+      return this.prepareRows.filter((row) => row.isFrozen);
     },
 
     templateColumnWidth() {
@@ -518,7 +518,7 @@ export default {
         pseudoBorder.list.left = `-${(1 * +style.list.borderLeft[0])}px`;
       }
       const { parthDigit: cellRow } = getParseAtSymbolDigit(style.name);
-      if (this.rows[cellRow].fixed) {
+      if (this.rows[cellRow].isFrozen) {
         pseudoBorder.list.borderBottom = 'thin solid black';
       }
       return pseudoBorder;

@@ -76,15 +76,8 @@ export default {
   },
   data() {
     return {
-      // lists: [
-      //   { name: 'list1', value: 'Нежилые помещения' },
-      //   { name: 'list2', value: 'Лист 2' },
-      //   { name: 'list3', value: 'Лист 3' },
-      // ],
       currentList: 0,
       tableDocument: new TableDocumentApi(),
-      // tableDocument_list2: new TableDocumentApi({ rowCount: 100, columnCount: 30 }),
-      // tableDocument_list3: new TableDocumentApi({ rowCount: 100, columnCount: 30 }),
 
       editableCell: null,
       editableCellType: 'string',
@@ -98,26 +91,13 @@ export default {
   },
   computed: {
     sheetName() {
-      console.log(this.currentList);
       return this.lists[this.currentList].name;
     },
     lists() {
-      // console.log(this.tableDocument.getSheetsList());
-      console.log(this.tableDocument.getSheetsList());
       return this.tableDocument.getSheetsList();
-      // const lists = [];
-      // this.tableDocument.sheetsList.forEach((sheet) => {
-      //   lists.push({
-      //     name: sheet.name,
-      //     nameView: sheet.nameView,
-      //   });
-      // });
-      // return lists;
     },
     spreadSheetProps() {
-      console.log(this.sheetName);
       return {
-        // ...this.tableDocument,
         ...this.tableDocument.getPropsForView(this.sheetName),
         'is-show-grid': true,
       };
@@ -130,7 +110,6 @@ export default {
         this.tableDocument.recalculateFormulas();
         this.tableDocument.recalculateFormulas();
       }, 10);
-      // this.tableDocument.recalculateFormulas(); // косяк в получении формул
       console.timeEnd('watchRecalc');
     },
   },
