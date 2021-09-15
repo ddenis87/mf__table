@@ -132,7 +132,7 @@ export default {
     },
 
     hasCell(columnName) {
-      return (this.cells[this.getCellName(columnName)]) || false;
+      return this.cells[this.getCellName(columnName)] || false;
     },
 
     hasImg(columnName) {
@@ -233,6 +233,7 @@ export default {
     },
 
     getImg(columnName) {
+      console.log(this.images[this.hasCell(columnName)?.image]);
       return this.images[this.hasCell(columnName)?.image];
     },
 

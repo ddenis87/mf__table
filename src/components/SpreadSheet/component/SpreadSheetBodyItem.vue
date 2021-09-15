@@ -256,6 +256,7 @@ export default {
     },
 
     getImg(columnName) {
+      console.log(this.hasCell(columnName)?.image);
       return this.images[this.hasCell(columnName)?.image];
     },
 

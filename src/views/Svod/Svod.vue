@@ -162,28 +162,7 @@ export default {
         this[action]();
         return;
       }
-      // try {
       this.tableDocument.executeCellAction(this.sheetName, cellName);
-      // } catch (err) {
-      // this.showDialogMessage(err.getMessagesText());
-      // }
-      // if (scripts) {
-      //   // console.log(scripts);
-      //   const { action } = scripts;
-      //   // console.log(action);
-      //   // console.log(Object.keys(this));
-      //   if (Object.keys(this).includes(action)) {
-      //     this[action]();
-      //     return;
-      //   }
-      // }
-      // if (cellName) {
-      //   try {
-      //     // this.tableDocument.actionCell(cellName, this.sheetName);
-      //   } catch (err) {
-      //     this.showDialogMessage(err.getMessagesText());
-      //   }
-      // }
     },
     evtDblClickCell(options) {
       console.log(options);
