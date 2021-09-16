@@ -1014,7 +1014,6 @@ class TableDocument {
     const sheetsListArraySort = sheetsListArray.sort((a, b) => a[1].index - b[1].index);
     const sheetsList = [];
     sheetsListArraySort.forEach((sheet) => {
-      console.log(sheet[1]);
       sheetsList.push({
         name: sheet[0],
         title: sheet[1].title,
@@ -1381,16 +1380,17 @@ class TableDocument {
           });
           return result;
         },
-      },
-      functions: {
-        OBJECTPROPERTY: (cellName, propertyName) => { // переделать в ближайшем будущем
+        OBJECTPROPERTY: (context, cellName, propertyName) => { // переделать в ближайшем будущем
           const cellNameSource = cellName.value.toLowerCase();
-          const { type, value } = this.cells[cellNameSource];
+          const { sheet } = context.position;
+          // const { type, value } = this.cells[cellNameSource];
+          const { type, value } = this.getCell(sheet, cellNameSource);
           const property = `{${propertyName.value.toLowerCase()}}`;
           const result = getRepresentationAtStore(type.split('.')[1], value, property);
           return result;
         },
       },
+      functions: {},
       onCell: ({ sheet, row, col }) => {
         const value = this.getCellValue(sheet, `${getColumnNameForNumber(col)}${row}`);
         return value;

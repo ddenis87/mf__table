@@ -86,7 +86,7 @@ class TableDocumentApi extends TableDocument {
       const prom = Object.values(this.sheets[sheet.name].cells).map(async (cellValue) => {
         const { type, value, relatedModelView } = cellValue;
         if (type?.includes('field') && value) {
-          // console.log(type, value, relatedModelView);
+          console.log(type, value, relatedModelView);
           const { parthSource: sourceName } = parseType(type);
           await requestRepresentation(sourceName, value);
           const representation = store
