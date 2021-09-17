@@ -21,29 +21,14 @@ function requestRepresentation(sourceName, value) {
   });
 }
 
-// function getRepresentationAtStore(sourceName, value, relatedModelView) {
-//   const representation = store
-//     .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({
-//       tableName: sourceName,
-//       id: value,
-//       relatedModelView,
-//     });
-//   return representation;
-// }
-
 /**
  * @constructor
  */
 class TableDocumentApi extends TableDocument {
-  // constructor(params) {
-  //   super(params);
-  //   console.log(this.columnCount);
-  //   // this.prepareRepresentation();
-  // }
-
-  // BASE_CLASS = TableDocumentApi; // заменить на this.constructor
-
-  representations = new Map();
+  constructor(params) {
+    super(params);
+    this.representations = new Map();
+  }
 
   async deserialize(data, template, settings) {
     try {
@@ -67,21 +52,13 @@ class TableDocumentApi extends TableDocument {
     super.editingCell(sheet, cellName, cellValue);
   }
 
-  // async getRepresentationStore() { // getRepresentationAtApi
-  //   const promises = Object.values(this.cells).map(async (cellValue) => {
-  //     const { type, value, relatedModelView } = cellValue;
-  //     if (type?.includes('field') && value) {
-  //       const { parthSource: sourceName } = parseType(type);
-  //       await requestRepresentation(sourceName, value);
-  //       const representation = store
-  //         .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value, relatedModelView });
-  //       this.setRepresentation(value, representation);
-  //     }
-  //   });
-  //   await Promise.all(promises);
-  // }
+  getPropsForView(sheetName) {
+    const result = super.getPropsForView(sheetName);
+    result.representations = this.representations;
+    return result;
+  }
+
   async getRepresentationStore() { // getRepresentationAtApi
-    // const promises = this.sheetsList.map(async (sheet) => {
     const promises = this.getSheetsList().map(async (sheet) => {
       const prom = Object.values(this.sheets[sheet.name].cells).map(async (cellValue) => {
         const { type, value, relatedModelView } = cellValue;
@@ -91,24 +68,12 @@ class TableDocumentApi extends TableDocument {
           await requestRepresentation(sourceName, value);
           const representation = store
             .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: +value, relatedModelView });
-          // console.log(representation);
           this.setRepresentation(value, representation);
         }
       });
       await Promise.all(prom);
     });
     await Promise.all(promises);
-    // const promises = Object.values(this.cells).map(async (cellValue) => {
-    //   const { type, value, relatedModelView } = cellValue;
-    //   if (type?.includes('field') && value) {
-    //     const { parthSource: sourceName } = parseType(type);
-    //     await requestRepresentation(sourceName, value);
-    //     const representation = store
-    //       .getters['DataTable/GET_LIST_DATA_ITEM_REPRESENTATION']({ tableName: sourceName, id: value, relatedModelView });
-    //     this.setRepresentation(value, representation);
-    //   }
-    // });
-    // await Promise.all(promises);
   }
 
   getDocument(sheet, JSONFormat = false) {
@@ -153,15 +118,10 @@ class TableDocumentApi extends TableDocument {
   }
 
   async prepareRepresentation() {
-    // console.log('before await');
-    await this.getRepresentationStore(); // .then(() => {
-    // console.log('after await');
-    // this.sheetsList.forEach((sheet) => {
+    await this.getRepresentationStore();
     this.getSheetsList().forEach((sheet) => {
       this.sheets[sheet.name].cells = { ...this.sheets[sheet.name].cells };
     });
-    // this.sheets = { ...this.sheets };
-    // });
   }
 
   setRepresentation(key, value) {

@@ -853,15 +853,6 @@ class TableDocument {
       cells: this.sheets[sheetName].cells,
       styles,
       images: this.images,
-      // styles: this.styles
-      //   .filter((style) => style.name.split('|')[0] === sheetName)
-      //   .map((st) => {
-      //     const item = {
-      //       name: st.name.split('|')[1],
-      //       list: st.list,
-      //     };
-      //     return item;
-      //   }),
     };
   }
 
