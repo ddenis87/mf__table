@@ -74,10 +74,10 @@ const routes = [
     component: () => import('@/views/Svod/Svod.vue'),
   },
   {
-    path: '/Test',
-    name: 'Test',
+    path: '/VDocument',
+    name: 'VDocument',
     meta: { layout: 'Main' },
-    component: () => import('@/views/Test.vue'),
+    component: () => import('@/views/VDocument.vue'),
   },
 ];
 
