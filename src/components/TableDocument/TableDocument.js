@@ -1051,7 +1051,7 @@ class TableDocument {
     if (!Object.keys(this.styles).includes(styleName)) return null;
     return this.styles[styleName];
   }
-  
+
   /**
    * Проверка редактирования
    * @param {*} sheet - имя листа

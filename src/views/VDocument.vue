@@ -14,6 +14,9 @@ export default {
   },
   mounted() {
     console.log(this.tableDocument);
+    const sheetsList = this.tableDocument.getSheetsList();
+    sheetsList[0].version = '2.2.2';
+    console.log(this.tableDocument);
   },
 };
 </script>

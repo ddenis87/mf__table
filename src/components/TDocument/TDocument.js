@@ -66,6 +66,16 @@ class TDocument {
     return this.sheets[sheetName].rows[rowName] || {};
   }
 
+  getSheetsList() {
+    let sheetsList = Object.values(this.sheets);
+    const sheetsListSort = sheetsList.sort((a, b) => a.index - b.index);
+    sheetsList = [];
+    sheetsListSort.forEach((sheet) => {
+      sheetsList.push(sheet);
+    });
+    return sheetsList;
+  }
+
   setCell(sheetName = 'sheet1', cellName, cell) {
     this.sheets[sheetName].cells[cellName] = cell;
   }
