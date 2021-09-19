@@ -66,6 +66,10 @@ class TDocument {
     return this.sheets[sheetName].rows[rowName] || {};
   }
 
+  /**
+   * Возвращает список листов документа
+   * @returns {Object} // { name: sheetName, title: sheetTitle }
+   */
   getSheetsList() {
     let sheetsList = Object.values(this.sheets);
     const sheetsListSort = sheetsList.sort((a, b) => a.index - b.index);
@@ -74,6 +78,29 @@ class TDocument {
       sheetsList.push(sheet);
     });
     return sheetsList;
+  }
+
+  getPropsForView(sheetName) {
+    if (!this.sheets[sheetName]) return {};
+    const styles = [];
+    Object.entries(this.styles).forEach((style) => {
+      const [styleName, styleList] = style;
+      if (styleName.split('|')[0] !== sheetName) return;
+      styles.push({
+        name: styleName.split('|')[1],
+        list: styleList,
+      });
+    });
+
+    return {
+      columns: this.sheets[sheetName].columns,
+      columnCount: this.sheets[sheetName].columnCount || 26,
+      rows: this.sheets[sheetName].rows,
+      rowCount: this.sheets[sheetName].rowCount || 100,
+      cells: this.sheets[sheetName].cells,
+      styles,
+      images: this.images,
+    };
   }
 
   setCell(sheetName = 'sheet1', cellName, cell) {

@@ -2,7 +2,7 @@
 
 export const DEFAULT_COLUMN_COUNT = 26;
 
-export const DEFAULT_ROW_COUNT = 100;
+export const DEFAULT_ROW_COUNT = 1000;
 
 /**
  * Тип редактирования листа
