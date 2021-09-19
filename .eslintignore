@@ -4,6 +4,7 @@
 /src/tests/unit/Elements
 /src/tests/unit/Profile
 /src/store
+/src/views
 /src/components/Elements
 /src/components/DataTableSingle
 /src/components/DataTableLazy

@@ -102,10 +102,12 @@ class TableDocument {
    * @param {String} areaName - имя области
    * @param {Enum} shiftType - тип сдвига докумета при вставки
    */
-  addArea(sheet, cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) { // надо удалить используется только в скрипте для добавления строки
+  addArea(sheet, cellName, areaName, shiftType = SHIFT_TYPE.VERTICAL) {
+    // надо удалить используется только в скрипте для добавления строки
     const area = this.documentTemplate.getNamedArea(areaName).getAreaCopy(); // getAreaCopy() убрать
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
-    const cellColumnNumber = (shiftType === SHIFT_TYPE.VERTICAL) ? 1 : getColumnNumberForName(cellColumn);
+    const cellColumnNumber = (shiftType === SHIFT_TYPE.VERTICAL)
+      ? 1 : getColumnNumberForName(cellColumn);
     const cellRowNumber = (shiftType === SHIFT_TYPE.HORIZONTAL) ? 1 : cellRow;
     this.insertArea(sheet, cellColumnNumber, cellRowNumber, area, shiftType);
     this.recalculateFormulas();
@@ -140,7 +142,8 @@ class TableDocument {
     const rangeType = getRangeType(range);
     this.deleteRange(`${sheet}!${range}`);
 
-    if (shiftType && [RANGE_TYPE.CELL, RANGE_TYPE.RANGE].includes(rangeType)) return; // if delete only data at not shift
+    // if delete only data at not shift
+    if (shiftType && [RANGE_TYPE.CELL, RANGE_TYPE.RANGE].includes(rangeType)) return;
 
     const [rangeFrom, rangeTo] = getRangeSplit(range);
     const rangeShiftFrom = getRangeShift(rangeTo, shiftType, 1);
@@ -376,8 +379,12 @@ class TableDocument {
     cellsInRange.forEach((cell) => {
       const [cellNameCurrent, cellValueCurrent] = cell;
       const cellNameShift = moveCell(cellNameCurrent, undefined, range);
-      const { parthSymbol: cellColumnCurrent, parthDigit: cellRowCurrent } = getParseAtSymbolDigit(cellNameCurrent);
-      const { parthSymbol: cellColumnShift, parthDigit: cellRowShift } = getParseAtSymbolDigit(cellNameShift);
+      const {
+        parthSymbol: cellColumnCurrent, parthDigit: cellRowCurrent,
+      } = getParseAtSymbolDigit(cellNameCurrent);
+      const {
+        parthSymbol: cellColumnShift, parthDigit: cellRowShift,
+      } = getParseAtSymbolDigit(cellNameShift);
 
       sheets[sheet].cells[cellNameShift] = {
         ...this.sheets[sheet].cells[cellNameCurrent],
@@ -463,7 +470,8 @@ class TableDocument {
    */
   getAreaWidth(sheet = 'sheet1') {
     const columns = [];
-    Object.keys(this.columns[sheet]).forEach((column) => columns.push(getColumnNumberForName(column)));
+    Object.keys(this.columns[sheet])
+      .forEach((column) => columns.push(getColumnNumberForName(column)));
     return Math.max(...columns);
   }
 
@@ -530,14 +538,16 @@ class TableDocument {
     const cells = [];
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(range);
     if (rangeType === RANGE_TYPE.ROW) {
-      for (let row = cellRow; row < Object.keys(this.sheets[sheet].rows).length + 1; row += 1) { // ??? непонятка с length
+      const rowCount = Object.keys(this.sheets[sheet].rows).length;
+      for (let row = cellRow; row < rowCount + 1; row += 1) { // ??? непонятка с length
         if (this.sheets[sheet].rows[row].level === level) cells.push(`${cellColumn}${row}`);
         if (this.sheets[sheet].rows[row].level < level) break;
       }
     }
     if (rangeType === RANGE_TYPE.COLUMN) {
       const columnNumber = getColumnNumberForName(cellColumn);
-      for (let column = columnNumber - 1; column < Object.keys(this.sheets[sheet].columns).length; column += 1) {
+      const columnCount = Object.keys(this.sheets[sheet].columns).length;
+      for (let column = columnNumber - 1; column < columnCount; column += 1) {
         const columnName = getColumnNameForNumber(column);
         if (this.sheets[sheet].columns[columnName].level === level) cells.push(`${columnName}${cellRow}`);
         if (this.sheets[sheet].columns[columnName].level < level) break;
@@ -588,7 +598,8 @@ class TableDocument {
    */
   getCellType(sheet = 'sheet1', cellName) {
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
-    const cellType = (this.sheets[sheet].cells[cellName]) ? this.sheets[sheet].cells[cellName].type || null : null;
+    const cellType = (this.sheets[sheet].cells[cellName])
+      ? this.sheets[sheet].cells[cellName].type || null : null;
     return cellType
       || this.getColumnType(sheet, cellColumn)
       || this.getRowType(sheet, cellRow)
@@ -774,7 +785,9 @@ class TableDocument {
     const range = upperRange.toLowerCase();
     const namedAreas = [];
     const [rangeFrom, rangeTo] = getRangeSplit(range);
-    let { parthSymbol: rangeFromColumn, parthDigit: rangeFromRow } = getParseAtSymbolDigit(rangeFrom);
+    let {
+      parthSymbol: rangeFromColumn, parthDigit: rangeFromRow,
+    } = getParseAtSymbolDigit(rangeFrom);
     if (rangeFromColumn === '') rangeFromColumn = 'a';
     if (rangeFromRow === '') rangeFromRow = 1;
     let {
@@ -1076,7 +1089,8 @@ class TableDocument {
     }
     // console.log(isEditAccessSheet, isEditAccessCell);
     // console.log(isEditCell);
-    if (isEditAccessSheet === EDIT_ACCESS.CLOSED_EXCEPT_OPEN && isEditAccessCell === true) return true;
+    if (isEditAccessSheet === EDIT_ACCESS.CLOSED_EXCEPT_OPEN
+      && isEditAccessCell === true) return true;
     if (isEditAccessSheet === EDIT_ACCESS.OPEN && isEditAccessCell !== false) return true;
     if (!isEditAccessSheet && isEditAccessCell === false) return false;
     return false;
@@ -1148,15 +1162,23 @@ class TableDocument {
     Object.entries(area.getCells(sheet)).forEach((cell) => {
       const [currentCellName] = cell;
       const shiftCellName = moveCell(currentCellName, `${getColumnNameForNumber(numberColumn)}${numberRow}`);
-      const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(currentCellName);
-      const { parthSymbol: shiftColumn, parthDigit: shiftRow } = getParseAtSymbolDigit(shiftCellName);
+      const {
+        parthSymbol: currentColumn, parthDigit: currentRow,
+      } = getParseAtSymbolDigit(currentCellName);
+      const {
+        parthSymbol: shiftColumn, parthDigit: shiftRow,
+      } = getParseAtSymbolDigit(shiftCellName);
 
       this.setColumn(sheet, shiftColumn, area.getColumn(sheet, currentColumn));
       this.setRow(sheet, shiftRow, area.getRow(sheet, currentRow));
 
       const cellValue = area.getCell(sheet, currentCellName);
       if (Object.keys(cellValue).includes('formula')) {
-        cellValue.formula = moveFormula(cellValue.formula, shiftCellName, cellValue.cellNameTemplate);
+        cellValue.formula = moveFormula(
+          cellValue.formula,
+          shiftCellName,
+          cellValue.cellNameTemplate,
+        );
         cellValue.calculated = false;
       }
 
