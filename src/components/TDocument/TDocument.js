@@ -4,10 +4,14 @@ import {
   EDIT_ACCESS,
 } from './TDocumentConst';
 
+import {
+  getJSONParse,
+} from './TDocumentHelpers';
+
 class TDocument {
   constructor(options = {}) {
-    this.createDocument(options);
     this.BaseClass = this.constructor;
+    this.createDocument(options);
   }
 
   createDocument(options) {
@@ -57,6 +61,34 @@ class TDocument {
   }
 
   /**
+   * Возвращает поля для передачи в визуальный компонент
+   * @param {String} sheetName
+   * @returns {Object}
+   */
+  getPropsForView(sheetName) {
+    if (!this.sheets[sheetName]) return {};
+    const styles = [];
+    Object.entries(this.styles).forEach((style) => {
+      const [styleName, styleList] = style;
+      if (styleName.split('|')[0] !== sheetName) return;
+      styles.push({
+        name: styleName.split('|')[1],
+        list: styleList,
+      });
+    });
+
+    return {
+      columns: this.sheets[sheetName].columns,
+      columnCount: this.sheets[sheetName].columnCount,
+      rows: this.sheets[sheetName].rows,
+      rowCount: this.sheets[sheetName].rowCount,
+      cells: this.sheets[sheetName].cells,
+      styles,
+      images: this.images,
+    };
+  }
+
+  /**
    * Возвращает объект строки, если строка отсутствует возвращает пустой объект
    * @param {String} sheetName - имя листа
    * @param {String} rowName - имя строки
@@ -80,31 +112,33 @@ class TDocument {
     return sheetsList;
   }
 
-  getPropsForView(sheetName) {
-    if (!this.sheets[sheetName]) return {};
-    const styles = [];
-    Object.entries(this.styles).forEach((style) => {
-      const [styleName, styleList] = style;
-      if (styleName.split('|')[0] !== sheetName) return;
-      styles.push({
-        name: styleName.split('|')[1],
-        list: styleList,
-      });
-    });
-
-    return {
-      columns: this.sheets[sheetName].columns,
-      columnCount: this.sheets[sheetName].columnCount || 26,
-      rows: this.sheets[sheetName].rows,
-      rowCount: this.sheets[sheetName].rowCount || 100,
-      cells: this.sheets[sheetName].cells,
-      styles,
-      images: this.images,
-    };
-  }
-
   setCell(sheetName = 'sheet1', cellName, cell) {
     this.sheets[sheetName].cells[cellName] = cell;
+  }
+
+  /**
+   * Устанавливает шаблон в документ
+   * @param {String|Object} template - объект или JSON строка 
+   */
+  setTemplate(template) {
+    // let templateParse = null;
+    // try {
+    const templateParse = getJSONParse(template);
+    // } catch (err) {
+    //   throw new TableDocumentGeneralError(
+    //     'setTableDocumentTemplate',
+    //     'Ошибка парсинга шаблона',
+    //   );
+    // }
+    // const { type } = templateParse;
+    // if (!type || type !== 'template') {
+    //   throw new TableDocumentGeneralError(
+    //     'setTableDocumentTemplate',
+    //     'Неверный формат файла "Шаблон"',
+    //   );
+    // }
+    // this.version = version;
+    this.documentTemplate = new this.BaseClass(templateParse);
   }
 }
 

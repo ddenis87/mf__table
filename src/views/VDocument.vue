@@ -64,8 +64,10 @@ export default {
       };
     },
   },
-  mounted() {
-    console.log(this.tableDocument);
+  async mounted() {
+    let template = await import('@/assets/json/svod/templateModify.json');
+    template = template.default;
+    this.tableDocument.setTemplate(template);
   },
 };
 </script>
