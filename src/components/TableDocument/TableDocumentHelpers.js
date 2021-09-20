@@ -6,15 +6,21 @@ import {
   getParseAtSymbolDigit,
 } from '../../helpers/spreadSheet';
 
-import CONST from './TableDocumentConst';
-
-const {
+import {
   REG_SYMBOLS,
   REG_DIGITS,
   REG_OPERATORS,
   RANGE_TYPE,
   SHIFT_TYPE,
-} = CONST;
+} from './TableDocumentConst';
+
+// const {
+//   REG_SYMBOLS,
+//   REG_DIGITS,
+//   REG_OPERATORS,
+//   RANGE_TYPE,
+//   SHIFT_TYPE,
+// } = CONST;
 
 /**
  * Возвращает объект полученный путем парсинга JSON строки

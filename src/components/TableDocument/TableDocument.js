@@ -22,77 +22,107 @@ import {
   getParseAtSymbolDigit,
 } from '../../helpers/spreadSheet';
 
-import CONST from './TableDocumentConst';
-
-const {
-  EDIT_ACCESS,
+import {
   CELL_ATTRIBUTES,
-  CELL_HEIGHT,
-  CELL_WIDTH,
+  DEFAULT_COLUMN_COUNT,
+  DEFAULT_ROW_COUNT,
   DELETE_MODE,
+  EDIT_ACCESS,
   RANGE_TYPE,
   RETURN_FORMAT,
   SHIFT_TYPE,
-} = CONST;
+} from './TableDocumentConst';
 
 /**
  * Класс реализующий методы работы с табличным документом
  * @module TableDocument
  */
 class TableDocument {
-  constructor({
-    version = null,
-    methodName = null,
-    sheets = {
-      sheet1: {
-        title: 'Лист 1',
-        index: 0,
-        editAccess: undefined,
-        columns: {},
-        columnCount: 26,
-        rows: {},
-        rowCount: 100,
-        cells: {},
-      },
-    },
-    styles = {},
-    scripts = {},
-    images = {},
-    namedAreas = [],
-    cellWidth = CELL_WIDTH,
-    cellHeight = CELL_HEIGHT,
-    JSONString = null,
-  } = {}) {
-    if (JSONString) {
-      const JSONStringParse = JSON.parse(JSONString);
-      ({
-        version: this.version = null,
-        methodName: this.methodName = null,
-        sheets: this.sheets = {},
-        styles: this.styles = {},
-        scripts: this.scripts = {},
-        images: this.images = {},
-        namedAreas: this.namedAreas = [],
-        cellWidth: this.cellWidth = CELL_WIDTH,
-        cellHeight: this.cellHeight = CELL_HEIGHT,
-      } = JSONStringParse);
+  // constructor({
+  //   version = null,
+  //   methodName = null,
+  //   sheets = {
+  //     sheet1: {
+  //       title: 'Лист 1',
+  //       index: 0,
+  //       editAccess: undefined,
+  //       columns: {},
+  //       columnCount: 26,
+  //       rows: {},
+  //       rowCount: 100,
+  //       cells: {},
+  //     },
+  //   },
+  //   styles = {},
+  //   scripts = {},
+  //   images = {},
+  //   namedAreas = [],
+  //   cellWidth = CELL_WIDTH,
+  //   cellHeight = CELL_HEIGHT,
+  //   JSONString = null,
+  // } = {}) {
+  //   if (JSONString) {
+  //     const JSONStringParse = JSON.parse(JSONString);
+  //     ({
+  //       version: this.version = null,
+  //       methodName: this.methodName = null,
+  //       sheets: this.sheets = {},
+  //       styles: this.styles = {},
+  //       scripts: this.scripts = {},
+  //       images: this.images = {},
+  //       namedAreas: this.namedAreas = [],
+  //       cellWidth: this.cellWidth = CELL_WIDTH,
+  //       cellHeight: this.cellHeight = CELL_HEIGHT,
+  //     } = JSONStringParse);
 
-      this.BaseClass = this.constructor;
-      this.overridingFormulaParser();
-      return;
-    }
-    this.version = version;
-    this.methodName = methodName;
-    this.sheets = sheets;
-    this.styles = styles;
-    this.scripts = scripts;
-    this.images = images;
-    this.namedAreas = namedAreas;
-    this.cellWidth = cellWidth;
-    this.cellHeight = cellHeight;
+  //     this.BaseClass = this.constructor;
+  //     this.overridingFormulaParser();
+  //     return;
+  //   }
+  //   this.version = version;
+  //   this.methodName = methodName;
+  //   this.sheets = sheets;
+  //   this.styles = styles;
+  //   this.scripts = scripts;
+  //   this.images = images;
+  //   this.namedAreas = namedAreas;
+  //   this.cellWidth = cellWidth;
+  //   this.cellHeight = cellHeight;
 
+  //   this.BaseClass = this.constructor;
+  //   this.overridingFormulaParser();
+  // }
+
+  constructor(options = {}) {
     this.BaseClass = this.constructor;
+    this.createDocument(options);
     this.overridingFormulaParser();
+  }
+
+  createDocument(options) {
+    let args;
+    ({
+      images: this.images = {},
+      namedAreas: this.namedAreas = [],
+      scripts: this.scripts = {},
+      sheets: this.sheets = {
+        sheet1: {
+          cells: {},
+          columnCount: DEFAULT_COLUMN_COUNT,
+          columns: {},
+          editAccess: EDIT_ACCESS.OPEN,
+          index: 0,
+          rows: {},
+          rowCount: DEFAULT_ROW_COUNT,
+          title: 'Лист 1',
+        },
+      },
+      styles: this.styles = {},
+      version: this.version = '0.0.1',
+      ...args
+    } = options);
+    if (!Object.keys(args).includes('JSONDocument')) return;
+    this.createDocument(JSON.parse(args.JSONDocument));
   }
 
   /**
@@ -214,11 +244,13 @@ class TableDocument {
     this.sheets = {};
     this.documentTemplate.getSheetsList().forEach((sheet) => {
       this.sheets[sheet.name] = {
-        editAccess: this.documentTemplate.sheets[sheet.name].editAccess,
-        title: this.documentTemplate.sheets[sheet.name].title,
-        columns: {},
-        rows: {},
         cells: {},
+        columnCount: 0,
+        columns: {},
+        editAccess: this.documentTemplate.sheets[sheet.name].editAccess,
+        rowCount: 0,
+        rows: {},
+        title: this.documentTemplate.sheets[sheet.name].title,
       };
     });
     this.scripts = this.documentTemplate.scripts;
@@ -365,9 +397,11 @@ class TableDocument {
     const [sheet, range] = areaRange.split('!');
     const sheets = {
       [sheet]: {
-        columns: {},
-        rows: {},
         cells: {},
+        columnCount: 0,
+        columns: {},
+        rowCount: 0,
+        rows: {},
       },
     };
 
@@ -477,14 +511,12 @@ class TableDocument {
 
   /**
    * Возвращает объект ячейки, если ячейка отсутствует возвращает пустой объект
-   * @param {String} sheet - имя листа
+   * @param {String} sheetName - имя листа
    * @param {String} cellName - имя ячейки
    * @returns {Object}
-   * @example getCell('sheet1', 'k5')
    */
-  getCell(sheet = 'sheet1', cellName) {
-    if (!this.sheets[sheet].cells) return {};
-    return this.sheets[sheet].cells[cellName] || {};
+  getCell(sheetName = 'sheet1', cellName) {
+    return this.sheets[sheetName].cells[cellName] || {};
   }
 
   /**
@@ -628,14 +660,14 @@ class TableDocument {
 
   /**
    * Возвращает объект колонки, если колонка отсутствует возвращает пустой объект
-   * @param {String} sheet - имя листа
+   * @param {String} sheetName - имя листа
    * @param {String|Number} columnName - имя или номер колонки
    * @returns {Object}
    */
-  getColumn(sheet = 'sheet1', columnName) {
+  getColumn(sheetName = 'sheet1', columnName) {
     let columnNameText = columnName;
     if (+columnName) columnNameText = getColumnNameForNumber(columnName);
-    return this.sheets[sheet].columns[columnNameText] || {};
+    return this.sheets[sheetName].columns[columnNameText] || {};
   }
 
   /**
@@ -684,12 +716,12 @@ class TableDocument {
 
   /**
    * Возвращает тип колонки или undefined
-   * @param {String} sheet - лист
+   * @param {String} sheetName - лист
    * @param {String|Number} columnName - имя или номер колонки
    * @returns {String}
    */
-  getColumnType(sheet = 'sheet1', columnName) {
-    return this.getColumn(sheet, columnName).type || undefined;
+  getColumnType(sheetName = 'sheet1', columnName) {
+    return this.getColumn(sheetName, columnName).type || undefined;
   }
 
   /**
@@ -955,22 +987,22 @@ class TableDocument {
 
   /**
    * Возвращает объект строки, если строка отсутствует возвращает пустой объект
-   * @param {String} sheet - имя листа
+   * @param {String} sheetName - имя листа
    * @param {String} rowName - имя строки
    * @returns {Object}
    */
-  getRow(sheet = 'sheet1', rowName) {
-    return this.sheets[sheet].rows[rowName] || {};
+  getRow(sheetName = 'sheet1', rowName) {
+    return this.sheets[sheetName].rows[rowName] || {};
   }
 
   /**
    * Возвращает тип строки или undefined
-   * @param {*} sheet - имя листа
+   * @param {*} sheetName - имя листа
    * @param {*} rowName - имя строки
    * @returns {String}
    */
-  getRowType(sheet = 'sheet1', rowName) {
-    return this.getRow(sheet, rowName).type || undefined;
+  getRowType(sheetName = 'sheet1', rowName) {
+    return this.getRow(sheetName, rowName).type || undefined;
   }
 
   /**
