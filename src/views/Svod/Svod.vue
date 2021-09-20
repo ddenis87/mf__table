@@ -34,25 +34,6 @@
                       @keydown:cell="evtKeydownCell"
                       @scroll:body="scrollBody"></spread-sheet>
       </div>
-      <!-- <v-tabs-items v-model="currentList">
-        <v-tab-item :transition="false"
-                    v-for="list in lists"
-                    :key="list.name">
-          <div class="body-table">
-            <spread-sheet ref="SpreadSheet"
-                          v-bind="spreadSheetProps"
-                          :isOuterBorderOff="true"
-                          :delta-height-virtual-list="136"
-                          :is-show-title="false"
-                          :is-show-group="false"
-                          table-layout-padding="0px 4px 4px 4px"
-                          @click:cell="evtClickCell"
-                          @dblclick:cell="evtDblClickCell"
-                          @keydown:cell="evtKeydownCell"
-                          @scroll:body="scrollBody"></spread-sheet>
-          </div>
-        </v-tab-item>
-      </v-tabs-items> -->
     </div>
   </div>
 </template>
@@ -62,7 +43,6 @@ import ElProgressBar from '@/components/Elements/ElProgressBar/ElProgressBar.vue
 import SpreadSheet from '@/components/SpreadSheet/SpreadSheet.vue';
 import SpreadSheetEditing from '@/components/SpreadSheetEditing/SpreadSheetEditing.vue';
 
-// import api from '@/logics/ApiRest';
 import apiSpreadSheet from '@/plugins/apiSpreadSheet/apiSpreadSheet';
 import TableDocumentApi from '@/components/TableDocument/TableDocumentApi';
 import TableDocumentGeneralError from '@/components/TableDocument/TableDocumentGeneralError';
