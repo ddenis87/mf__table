@@ -6,5 +6,6 @@
  * @return {Object}
  */
 export function getJSONParse(JSONString) {
-  return JSON.parse(JSONString);
+  if (typeof JSONString === 'string') return JSON.parse(JSONString);
+  return JSONString;
 }

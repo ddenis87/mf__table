@@ -58,7 +58,7 @@ export default {
     //   return this.lists[this.currentList].name;
     // },
     spreadSheetProps() {
-      console.log(this.lists[this.currentList]);
+      // console.log(this.lists[this.currentList]);
       return {
         ...this.lists[this.currentList],
       };
@@ -68,6 +68,7 @@ export default {
     let template = await import('@/assets/json/svod/templateModify.json');
     template = template.default;
     this.tableDocument.setTemplate(template);
+    console.log(this.tableDocument);
   },
 };
 </script>

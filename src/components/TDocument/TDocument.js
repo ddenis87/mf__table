@@ -1,3 +1,5 @@
+import TSheet from './TSheet';
+
 import {
   DEFAULT_COLUMN_COUNT,
   DEFAULT_ROW_COUNT,
@@ -36,6 +38,11 @@ class TDocument {
       version: this.version = '0.0.1',
       ...args
     } = options);
+
+    Object.entries(this.sheets).forEach((sheet) => {
+      const [sheetName, sheetValue] = sheet;
+      this.sheets[sheetName] = new TSheet(sheetValue);
+    });
     if (!Object.keys(args).includes('JSONDocument')) return;
     this.createDocument(JSON.parse(args.JSONDocument));
   }
@@ -46,9 +53,9 @@ class TDocument {
    * @param {String} cellName - имя ячейки
    * @returns {Object}
    */
-  getCell(sheetName = 'sheet1', cellName) {
-    return this.sheets[sheetName].cells[cellName] || {};
-  }
+  // getCell(sheetName = 'sheet1', cellName) {
+  //   return this.sheets[sheetName].cells[cellName] || {};
+  // }
 
   /**
    * Возвращает объект колонки, если колонка отсутствует возвращает пустой объект
@@ -56,9 +63,9 @@ class TDocument {
    * @param {String} cellName - имя колонки
    * @returns {Object}
    */
-  getColumn(sheetName = 'sheet1', columnName) {
-    return this.sheets[sheetName].columns[columnName] || {};
-  }
+  // getColumn(sheetName = 'sheet1', columnName) {
+  //   return this.sheets[sheetName].columns[columnName] || {};
+  // }
 
   /**
    * Возвращает поля для передачи в визуальный компонент
@@ -94,9 +101,9 @@ class TDocument {
    * @param {String} rowName - имя строки
    * @returns {Object}
    */
-  getRow(sheetName = 'sheet1', rowName) {
-    return this.sheets[sheetName].rows[rowName] || {};
-  }
+  // getRow(sheetName = 'sheet1', rowName) {
+  //   return this.sheets[sheetName].rows[rowName] || {};
+  // }
 
   /**
    * Возвращает список листов документа
@@ -112,32 +119,16 @@ class TDocument {
     return sheetsList;
   }
 
-  setCell(sheetName = 'sheet1', cellName, cell) {
-    this.sheets[sheetName].cells[cellName] = cell;
-  }
+  // setCell(sheetName = 'sheet1', cellName, cell) {
+  //   this.sheets[sheetName].cells[cellName] = cell;
+  // }
 
   /**
    * Устанавливает шаблон в документ
-   * @param {String|Object} template - объект или JSON строка 
+   * @param {String|Object} template - объект или JSON строка
    */
   setTemplate(template) {
-    // let templateParse = null;
-    // try {
     const templateParse = getJSONParse(template);
-    // } catch (err) {
-    //   throw new TableDocumentGeneralError(
-    //     'setTableDocumentTemplate',
-    //     'Ошибка парсинга шаблона',
-    //   );
-    // }
-    // const { type } = templateParse;
-    // if (!type || type !== 'template') {
-    //   throw new TableDocumentGeneralError(
-    //     'setTableDocumentTemplate',
-    //     'Неверный формат файла "Шаблон"',
-    //   );
-    // }
-    // this.version = version;
     this.documentTemplate = new this.BaseClass(templateParse);
   }
 }

@@ -1,8 +1,12 @@
+import {
+  DEFAULT_CELL_TYPE,
+} from './TDocumentConst';
+
 /**
  * Класс реализующий методы ячейки
- * @module Cell
+ * @module TCell
  */
-class Cell {
+class TCell {
   constructor(cell = {}) {
     this.BaseClass = this.constructor;
     this.createCell(cell);
@@ -40,6 +44,21 @@ class Cell {
   }
 
   /**
+   * Возвращает имя стиля или null если отсутствует или не определен
+   * @returns {String|null}
+   */
+  getStyleName() {
+    return this.style || null;
+  }
+
+  /**
+   * Возвращает тип если отсутствует или не определен 'string'
+   * @returns {String} - 'string'
+   */
+  getType() {
+    return this.type || DEFAULT_CELL_TYPE;
+  }
+  /**
    * Возвращает скрипт валидации или null если отсутствует или не определен
    * @returns {String|null}
    */
@@ -56,4 +75,4 @@ class Cell {
   }
 }
 
-export default Cell;
+export default TCell;

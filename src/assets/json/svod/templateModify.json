@@ -79,7 +79,7 @@
       }
     },
     "НежилыеПомещения":{
-      "editAccess":"closedExceptOpen",
+      "editAccess":"open",
       "cells":{
         "r2":{"style":"r2 "},"r3":{"style":"r3 ","value":"Примечание","rowspan":2},
         "r4":{"style":"r4 "},"r5":{"value":"16","style":"r5 "},

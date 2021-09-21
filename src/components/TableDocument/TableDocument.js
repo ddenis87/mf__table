@@ -630,8 +630,9 @@ class TableDocument {
    */
   getCellType(sheet = 'sheet1', cellName) {
     const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
-    const cellType = (this.sheets[sheet].cells[cellName])
-      ? this.sheets[sheet].cells[cellName].type || null : null;
+    // const cellType = (this.sheets[sheet].cells[cellName])
+    //   ? this.sheets[sheet].cells[cellName].type || null : null;
+    const cellType = this.getCell(sheet, cellName).type || null;
     return cellType
       || this.getColumnType(sheet, cellColumn)
       || this.getRowType(sheet, cellRow)
