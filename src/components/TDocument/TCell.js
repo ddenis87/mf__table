@@ -28,6 +28,14 @@ class TCell {
   }
 
   /**
+   * Возвращает строку форматирования или null если отсутствует или не определено
+   * @returns {String}
+   */
+  getFormatString() {
+    return this.formatString || null;
+  }
+
+  /**
    * Возвращает формулу или null если отсутствует или не определена
    * @returns {String|null}
    */
@@ -41,6 +49,14 @@ class TCell {
    */
   getParameter() {
     return this.parameter || null;
+  }
+
+  /**
+   * Возвращает модель представления данных
+   * @returns {String}
+   */
+  getRelatedModelView() {
+    return this.relatedModelView || null;
   }
 
   /**
@@ -58,6 +74,7 @@ class TCell {
   getType() {
     return this.type || DEFAULT_CELL_TYPE;
   }
+
   /**
    * Возвращает скрипт валидации или null если отсутствует или не определен
    * @returns {String|null}
@@ -68,10 +85,55 @@ class TCell {
 
   /**
    * Возвращает значение или null если отсутствует или не определено
-   * @returns {String|Number|Date|null}
+   * @returns {String|Number|Boolean|null}
    */
   getValue() {
     return this.value || null;
+  }
+
+  /** Устанавливает имя действия */
+  setActionName(value) {
+    this.action = value;
+  }
+
+  /** Устанавливает строку форматирования */
+  setFormatString(value) {
+    this.formatString = value;
+  }
+
+  /** Устанавливает формулу */
+  setFormula(value) {
+    this.formula = value;
+  }
+
+  /** Устанавливает параметр */
+  setParameter(value) {
+    this.parameter = value;
+  }
+
+  /** Устанавливает модель представления данных */
+  setRelatedModelView(value) {
+    this.relatedModelView = value;
+  }
+
+  /** Устанавливает имя стиля */
+  setStyleName(value) {
+    this.style = value;
+  }
+
+  /** Устанавливает тип */
+  setType(value) {
+    this.type = value;
+  }
+
+  /** Устанавливает скрипт валидации */
+  setValidator(value) {
+    this.validators = value;
+  }
+
+  /** Устанавливает значение */
+  setValue(value) {
+    this.value = value;
   }
 }
 
