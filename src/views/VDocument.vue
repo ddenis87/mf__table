@@ -54,13 +54,13 @@ export default {
     lists() {
       return this.tableDocument.getSheetsList();
     },
-    // sheetName() {
-    //   return this.lists[this.currentList].name;
-    // },
+    sheetName() {
+      return this.lists[this.currentList].name;
+    },
     spreadSheetProps() {
       // console.log(this.lists[this.currentList]);
       return {
-        ...this.lists[this.currentList],
+        ...this.tableDocument.getPropsForView(this.sheetName),
       };
     },
   },
@@ -69,6 +69,16 @@ export default {
     template = template.default;
     this.tableDocument.setTemplate(template);
     console.log(this.tableDocument);
+    setTimeout(() => {
+      let range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('a3');
+      console.log(range);
+      range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('a3:d4');
+      console.log(range);
+      range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('3:5');
+      console.log(range);
+      range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('b:d');
+      console.log(range);
+    }, 2000);
   },
 };
 </script>

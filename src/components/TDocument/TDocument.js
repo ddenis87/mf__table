@@ -1,6 +1,10 @@
 import TSheet from './TSheet';
 
 import {
+  getColumnNameForNumber,
+} from '../../helpers/spreadSheet';
+
+import {
   DEFAULT_COLUMN_COUNT,
   DEFAULT_ROW_COUNT,
   EDIT_ACCESS,
@@ -84,12 +88,20 @@ class TDocument {
       });
     });
 
+    const cells = {};
+    for (let i = 0; i < this.rowCount; i += 1) {
+      for (let j = 0; j < this.columnCount; j += 1) {
+        const cellName = `${getColumnNameForNumber(j + 1)}${i}`;
+        cells[cellName] = this.sheets[sheetName].cells[i][j];
+      }
+    }
+    console.log(cells);
     return {
       columns: this.sheets[sheetName].columns,
       columnCount: this.sheets[sheetName].columnCount,
       rows: this.sheets[sheetName].rows,
       rowCount: this.sheets[sheetName].rowCount,
-      cells: this.sheets[sheetName].cells,
+      cells,
       styles,
       images: this.images,
     };
@@ -110,11 +122,14 @@ class TDocument {
    * @returns {Object} // { name: sheetName, title: sheetTitle }
    */
   getSheetsList() {
-    let sheetsList = Object.values(this.sheets);
-    const sheetsListSort = sheetsList.sort((a, b) => a.index - b.index);
+    let sheetsList = Object.entries(this.sheets);
+    const sheetsListSort = sheetsList.sort((a, b) => a[1].index - b[1].index);
     sheetsList = [];
     sheetsListSort.forEach((sheet) => {
-      sheetsList.push(sheet);
+      sheetsList.push({
+        name: sheet[0],
+        title: sheet[1].title,
+      });
     });
     return sheetsList;
   }
