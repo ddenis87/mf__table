@@ -130,8 +130,12 @@ export function getRangeShift(range, shiftType = SHIFT_TYPE.VERTICAL, step = 1) 
     [RANGE_TYPE.RANGE]: () => {
       let rezult = rangeString;
       const [rangeFrom, rangeTo] = getRangeSplit(rangeString);
-      const { parthSymbol: rangeFromColumn, parthDigit: rangeFromRow } = getParseAtSymbolDigit(rangeFrom);
-      const { parthSymbol: rangeToColumn, parthDigit: rangeToRow } = getParseAtSymbolDigit(rangeTo);
+      const {
+        parthSymbol: rangeFromColumn, parthDigit: rangeFromRow,
+      } = getParseAtSymbolDigit(rangeFrom);
+      const {
+        parthSymbol: rangeToColumn, parthDigit: rangeToRow,
+      } = getParseAtSymbolDigit(rangeTo);
       if (shiftType === SHIFT_TYPE.VERTICAL) rezult = `${rangeFromColumn}${rangeFromRow + step}:${rangeToColumn}${rangeToRow + step}`;
       if (shiftType === SHIFT_TYPE.HORIZONTAL) rezult = `${getColumnNameForNumber(getColumnNumberForName(rangeFromColumn) + step)}${rangeFromRow}:${getColumnNameForNumber(getColumnNumberForName(rangeToColumn) + step)}${rangeToRow}`;
       return rezult;
@@ -168,7 +172,9 @@ export function moveCell(cellName, rangeFrom = 'a1', rangeLimit = 'a1:a1') {
   const [rangeLimitFrom] = getRangeSplit(rangeLimit);
   const { parthSymbol: fromColumn, parthDigit: fromRow } = getParseAtSymbolDigit(rangeFrom);
   const fromColumnNumber = getColumnNumberForName(fromColumn);
-  let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
+  let {
+    parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow,
+  } = getParseAtSymbolDigit(rangeLimitFrom);
   if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
   if (rangeLimitFromRow === '') rangeLimitFromRow = 1;
   const rangeLimitFromColumnNumber = getColumnNumberForName(rangeLimitFromColumn);
@@ -189,9 +195,14 @@ export function moveCell(cellName, rangeFrom = 'a1', rangeLimit = 'a1:a1') {
 export function moveFormula(cellFormula, cellNameCurrent, cellNameTemplate) {
   if (cellNameCurrent === cellNameTemplate) return cellFormula;
   const operands = cellFormula.slice(1).replace(REG_OPERATORS, '$').split('$');
-  const { parthSymbol: currentColumn, parthDigit: currentRow } = getParseAtSymbolDigit(cellNameCurrent);
-  const { parthSymbol: templateColumn, parthDigit: templateRow } = getParseAtSymbolDigit(cellNameTemplate);
-  const deltaColumn = getColumnNumberForName(currentColumn) - getColumnNumberForName(templateColumn);
+  const {
+    parthSymbol: currentColumn, parthDigit: currentRow,
+  } = getParseAtSymbolDigit(cellNameCurrent);
+  const {
+    parthSymbol: templateColumn, parthDigit: templateRow,
+  } = getParseAtSymbolDigit(cellNameTemplate);
+  const deltaColumn = getColumnNumberForName(currentColumn)
+    - getColumnNumberForName(templateColumn);
   const deltaRow = currentRow - templateRow;
   const operandsShift = new Map();
   operands.forEach((operand) => {
@@ -222,7 +233,9 @@ export function moveRange(areaRange, from, rangeLimit = 'a1:a1') {
   const [sheet, upperRange] = areaRange.split('!');
   const range = upperRange.toLowerCase();
   const [rangeLimitFrom] = getRangeSplit(rangeLimit);
-  let { parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow } = getParseAtSymbolDigit(rangeLimitFrom);
+  let {
+    parthSymbol: rangeLimitFromColumn, parthDigit: rangeLimitFromRow,
+  } = getParseAtSymbolDigit(rangeLimitFrom);
   if (rangeLimitFromColumn === '') rangeLimitFromColumn = 'a';
   if (rangeLimitFromRow === '') rangeLimitFromRow = 1;
   const rangeType = getRangeType(range);

@@ -65,21 +65,21 @@ export default {
     },
   },
   async mounted() {
-    console.log(this.tableDocument);
-    // let template = await import('@/assets/json/svod/templateModify.json');
-    // template = template.default;
-    // this.tableDocument.setTemplate(template);
     // console.log(this.tableDocument);
-    // setTimeout(() => {
-    //   let range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('a3');
-    //   console.log(range);
-    //   range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('a3:d4');
-    //   console.log(range);
-    //   range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('3:5');
-    //   console.log(range);
-    //   range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('b:d');
-    //   console.log(range);
-    // }, 2000);
+    let template = await import('@/assets/json/svod/templateModify.json');
+    template = template.default;
+    this.tableDocument.setTemplate(template);
+    console.log(this.tableDocument);
+    setTimeout(() => {
+      let range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange();
+      console.log(range);
+      range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('a3:d4');
+      console.log(range);
+      range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('3:5');
+      console.log(range);
+      range = this.tableDocument.documentTemplate.sheets['ЖилыеПомещения'].getRange('b:d');
+      console.log(range);
+    }, 2000);
   },
 };
 </script>

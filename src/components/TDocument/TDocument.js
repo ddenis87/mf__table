@@ -1,7 +1,9 @@
 import TSheet from './TSheet';
+import TCell from './TCell';
 
 import {
   getColumnNameForNumber,
+  getColumnNumberForName,
 } from '../../helpers/spreadSheet';
 
 import {
@@ -12,6 +14,7 @@ import {
 
 import {
   getJSONParse,
+  getParseAtSymbolDigit,
 } from './TDocumentHelpers';
 
 class TDocument {
@@ -28,7 +31,7 @@ class TDocument {
       scripts: this.scripts = {},
       sheets: this.sheets = {
         sheet1: {
-          cells: {},
+          cells: [],
           columnCount: DEFAULT_COLUMN_COUNT,
           columns: {},
           editAccess: EDIT_ACCESS.OPEN,
@@ -45,31 +48,30 @@ class TDocument {
 
     Object.entries(this.sheets).forEach((sheet) => {
       const [sheetName, sheetValue] = sheet;
-      this.sheets[sheetName] = new TSheet(sheetValue);
+
+      const cells = [sheetValue.rowCount];
+      for (let i = 0; i < sheetValue.rowCount; i += 1) {
+        cells[i] = [sheetValue.columnCount];
+        for (let j = 0; j < sheetValue.columnCount; j += 1) {
+          cells[i][j] = new TCell();
+        }
+      }
+
+      Object.entries(sheetValue.cells).forEach((cell) => {
+        const [cellName, cellValue] = cell;
+        const { parthSymbol, parthDigit } = getParseAtSymbolDigit(cellName);
+        const rowIndex = parthDigit - 1;
+        const columnIndex = getColumnNumberForName(parthSymbol) - 1;
+        cells[rowIndex][columnIndex] = new TCell(cellValue);
+      });
+      // убрать в впродакшене
+      const sheetValueNew = JSON.parse(JSON.stringify(sheetValue));
+      // заменить sheetValueNew -> sheetValue
+      this.sheets[sheetName] = new TSheet({ ...sheetValueNew, cells });
     });
     if (!Object.keys(args).includes('JSONDocument')) return;
     this.createDocument(JSON.parse(args.JSONDocument));
   }
-
-  /**
-   * Возвращает объект ячейки, если ячейка отсутствует возвращает пустой объект
-   * @param {String} sheetName - имя листа
-   * @param {String} cellName - имя ячейки
-   * @returns {Object}
-   */
-  // getCell(sheetName = 'sheet1', cellName) {
-  //   return this.sheets[sheetName].cells[cellName] || {};
-  // }
-
-  /**
-   * Возвращает объект колонки, если колонка отсутствует возвращает пустой объект
-   * @param {String} sheetName - имя листа
-   * @param {String} cellName - имя колонки
-   * @returns {Object}
-   */
-  // getColumn(sheetName = 'sheet1', columnName) {
-  //   return this.sheets[sheetName].columns[columnName] || {};
-  // }
 
   /**
    * Возвращает поля для передачи в визуальный компонент
@@ -108,16 +110,6 @@ class TDocument {
   }
 
   /**
-   * Возвращает объект строки, если строка отсутствует возвращает пустой объект
-   * @param {String} sheetName - имя листа
-   * @param {String} rowName - имя строки
-   * @returns {Object}
-   */
-  // getRow(sheetName = 'sheet1', rowName) {
-  //   return this.sheets[sheetName].rows[rowName] || {};
-  // }
-
-  /**
    * Возвращает список листов документа
    * @returns {Object} // { name: sheetName, title: sheetTitle }
    */
@@ -133,10 +125,6 @@ class TDocument {
     });
     return sheetsList;
   }
-
-  // setCell(sheetName = 'sheet1', cellName, cell) {
-  //   this.sheets[sheetName].cells[cellName] = cell;
-  // }
 
   /**
    * Устанавливает шаблон в документ

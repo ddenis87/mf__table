@@ -3,52 +3,45 @@ import {
   getColumnNumberForName,
 } from '../../helpers/spreadSheet';
 
-import TCell from './TCell';
-
 import {
   getParseAtSymbolDigit,
   isInRange,
 } from './TDocumentHelpers';
 
 class TSheet {
-  constructor(options = { cells: {} }) {
+  constructor(options = {}) {
+    this.BaseClass = this.constructor;
     Object.entries(options).forEach((property) => {
       const [propertyName, propertyValue] = property;
       this[propertyName] = propertyValue;
     });
-
-    if (Array.isArray(this.cells)) return;
-    const dataCells = options.cells;
-    this.cells = [this.rowCount];
-    for (let i = 0; i < this.rowCount; i += 1) {
-      this.cells[i] = [this.columnCount];
-      for (let j = 0; j < this.columnCount; j += 1) {
-        this.cells[i][j] = new TCell();
-      }
-    }
-    Object.entries(dataCells).forEach((cell) => {
-      const [cellName, cellValue] = cell;
-      const rangeIndexes = this.getRangeIndexes(cellName);
-      this.cells[rangeIndexes.indexesRow[0]][rangeIndexes.indexesColumn[0]] = new TCell(cellValue);
-    });
   }
 
   /**
-   * Возвращает двухмерный массив объектов TCell
-   * @param {String} range 'b2:d3'
+   * Возвращает двумерный массив объектов TCell
+   * @param {String|undefined} range 'b2:d3'
    * @return {Array}
    */
   getRange(rangeA1Notation) {
     const rangeIndexes = this.getRangeIndexes(rangeA1Notation);
-    return this.cells
+    const cells = this.cells
       .filter((item, indexRow) => isInRange(indexRow, rangeIndexes.indexesRow))
       .map((cell) => cell
         .filter((item, indexColumn) => isInRange(indexColumn, rangeIndexes.indexesColumn)));
+    return new this.BaseClass({
+      cells,
+    });
   }
 
+  /**
+   * Возвращает индексы диапазона начиная с 0
+   * @param {String|undefined} rangeA1Notation 'b2:c4'
+   * @returns {Object} '{ [1, 3], [1, 2] }'
+   */
   getRangeIndexes(rangeA1Notation) {
-    const [rangeFrom, rangeTo] = (rangeA1Notation.includes(':'))
-      ? rangeA1Notation.split(':') : `${rangeA1Notation}:${rangeA1Notation}`.split(':');
+    const range = rangeA1Notation || '';
+    const [rangeFrom, rangeTo] = (range.includes(':'))
+      ? range.split(':') : `${range}:${range}`.split(':');
     const {
       parthSymbol: columnFrom = 'a', parthDigit: rowFromIndex = 1,
     } = getParseAtSymbolDigit(rangeFrom);
