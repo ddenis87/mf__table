@@ -4,7 +4,7 @@ export const DEFAULT_CELL_TYPE = 'string';
 
 export const DEFAULT_COLUMN_COUNT = 26;
 
-export const DEFAULT_ROW_COUNT = 1000;
+export const DEFAULT_ROW_COUNT = 10000;
 
 /**
  * Тип редактирования листа
