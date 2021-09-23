@@ -299,6 +299,9 @@ class TableDocument {
       .getNamedArea(sectionValue.templateSectionName, sectionValue.sheet)
       .getAreaCopy();
     try {
+      console.log(sectionDataItem);
+      console.log(sectionValue.parameters);
+      console.log(sectionValue.sheet);
       area.fillArea(sectionDataItem, sectionValue.parameters, sectionValue.sheet);
     } finally {
       insertMethods[sectionValue.methodName](area, sectionValue.sheet);

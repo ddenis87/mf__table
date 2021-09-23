@@ -1,9 +1,9 @@
 import TCell from './TCell';
 
 import {
-  getColumnNumberForName,
-  getParseAtSymbolDigit,
-} from '../../helpers/spreadSheet';
+  isInRange,
+  getRangeIndexes,
+} from './TDocumentHelpers';
 
 class TSheet {
   constructor(options = { cells: {} }) {
@@ -21,36 +21,24 @@ class TSheet {
         this.cells[i][j] = new TCell();
       }
     }
-    // console.log(dataCells);
     Object.entries(dataCells).forEach((cell) => {
       const [cellName, cellValue] = cell;
-      const { parthSymbol: cellColumn, parthDigit: cellRow } = getParseAtSymbolDigit(cellName);
-      this.cells[cellRow - 1][getColumnNumberForName(cellColumn) - 1] = new TCell(cellValue);
+      const rangeIndexes = getRangeIndexes(cellName, this.rowCount, this.columnCount);
+      this.cells[rangeIndexes.indexesRow[0]][rangeIndexes.indexesColumn[0]] = new TCell(cellValue);
     });
   }
 
   /**
-   *
-   * @param {*} range 'b2:d3'
+   * Возвращает двухмерный массив объектов TCell
+   * @param {String} range 'b2:d3'
+   * @return {Array}
    */
-  getRange(range) {
-    const [rangeFrom, rangeTo] = (range.includes(':'))
-      ? range.split(':') : `${range}:${range}`.split(':');
-    const { parthSymbol: columnFrom, parthDigit: rowFrom = 1 } = getParseAtSymbolDigit(rangeFrom);
-    const {
-      parthSymbol: columnTo, parthDigit: rowTo = this.rowCount,
-    } = getParseAtSymbolDigit(rangeTo);
-    const columnFromIndex = (columnFrom.length) ? getColumnNumberForName(columnFrom) : 1;
-    const columnToIndex = (columnTo.length) ? getColumnNumberForName(columnTo) : this.columnCount;
-    const rowFromIndex = (rowFrom === 0) ? 1 : rowFrom;
-    const rowToIndex = (rowTo === 0) ? this.rowCount : rowTo;
-    // console.log(columnFrom, columnTo);
-    // console.log(rowFrom, rowTo);
-    let cells = this.cells.filter((cell, indexRow) => (indexRow >= rowFromIndex - 1
-      && indexRow <= rowToIndex - 1));
-    cells = cells.map((cell) => cell.filter((item, index) => (index >= columnFromIndex - 1
-      && index <= columnToIndex - 1)));
-    return cells;
+  getRange(rangeA1Notation) {
+    const rangeIndexes = getRangeIndexes(rangeA1Notation, this.rowCount, this.columnCount);
+    return this.cells
+      .filter((item, indexRow) => isInRange(indexRow, rangeIndexes.indexesRow))
+      .map((cell) => cell
+        .filter((item, indexColumn) => isInRange(indexColumn, rangeIndexes.indexesColumn)));
   }
 }
 

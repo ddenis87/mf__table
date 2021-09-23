@@ -20,3 +20,6 @@ export const EDIT_ACCESS = {
   CLOSED: 1,
   CLOSED_EXCEPT_OPEN: 2,
 };
+
+export const REG_SYMBOLS = /[A-Z]/gi;
+export const REG_DIGITS = /[0-9]/g;
