@@ -18,18 +18,43 @@ class TSheet {
   }
 
   /**
+   * Заполняет параметры области значениями
+   * @param {Object} parametersData
+   * @param {Object} parametersList
+   */
+  fillInParameters(parametersData, parametersList) {
+    if (!parametersList) return;
+    this.cells.forEach((cell) => {
+      const cellParameterName = cell.getParameter();
+      if (!cellParameterName) return;
+      if (!parametersList[cellParameterName]) return;
+      cell.setValue(parametersData[parametersList[cellParameterName]]);
+    });
+  }
+
+  /**
    * Возвращает двумерный массив объектов TCell
    * @param {String|undefined} range 'b2:d3'
    * @return {Array}
    */
   getRange(rangeA1Notation) {
     const rangeIndexes = this.getRangeIndexes(rangeA1Notation);
+    const rangeIndexesRow = [rangeIndexes.from[0], rangeIndexes.to[0]];
+    const rangeIndexesColumn = [rangeIndexes.from[1], rangeIndexes.to[1]];
     const cells = this.cells
-      .filter((item, indexRow) => isInRange(indexRow, rangeIndexes.indexesRow))
+      .filter((item, indexRow) => isInRange(
+        indexRow, rangeIndexesRow,
+      ))
       .map((cell) => cell
-        .filter((item, indexColumn) => isInRange(indexColumn, rangeIndexes.indexesColumn)));
+        .filter((item, indexColumn) => isInRange(
+          indexColumn, rangeIndexesColumn,
+        )));
+    const rows = this.rows.filter((row, indexRow) => isInRange(indexRow, rangeIndexesRow));
+    const columns = this.columns.filter((column, indexColumn) => isInRange(indexColumn, rangeIndexesColumn));
     return new this.BaseClass({
       cells,
+      rows,
+      columns,
     });
   }
 
@@ -52,8 +77,8 @@ class TSheet {
     const columnFromIndex = getColumnNumberForName(columnFrom);
     const columnToIndex = getColumnNumberForName(columnTo);
     return {
-      indexesRow: [rowFromIndex - 1, rowToIndex - 1],
-      indexesColumn: [columnFromIndex - 1, columnToIndex - 1],
+      from: [rowFromIndex - 1, columnFromIndex - 1],
+      to: [rowToIndex - 1, columnToIndex - 1],
     };
   }
 }

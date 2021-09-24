@@ -33,10 +33,10 @@ class TDocument {
         sheet1: {
           cells: [],
           columnCount: DEFAULT_COLUMN_COUNT,
-          columns: {},
+          columns: [],
           editAccess: EDIT_ACCESS.OPEN,
           index: 0,
-          rows: {},
+          rows: [],
           rowCount: DEFAULT_ROW_COUNT,
           title: 'Лист 1',
         },
@@ -57,17 +57,45 @@ class TDocument {
         }
       }
 
-      Object.entries(sheetValue.cells).forEach((cell) => {
-        const [cellName, cellValue] = cell;
-        const { parthSymbol, parthDigit } = getParseAtSymbolDigit(cellName);
-        const rowIndex = parthDigit - 1;
-        const columnIndex = getColumnNumberForName(parthSymbol) - 1;
-        cells[rowIndex][columnIndex] = new TCell(cellValue);
-      });
+      if (!Array.isArray(sheetValue.cells)) {
+        Object.entries(sheetValue.cells).forEach((cell) => {
+          const [cellName, cellValue] = cell;
+          const { parthSymbol, parthDigit } = getParseAtSymbolDigit(cellName);
+          const rowIndex = parthDigit - 1;
+          const columnIndex = getColumnNumberForName(parthSymbol) - 1;
+          cells[rowIndex][columnIndex] = new TCell(cellValue);
+        });
+      }
+
+      const rows = [this.rowCount];
+      if (!Array.isArray(sheetValue.rows)) {
+        Object.entries(sheetValue.rows).forEach((row) => {
+          const [rowName, rowValue] = row;
+          const { parthDigit } = getParseAtSymbolDigit(rowName);
+          const rowIndex = parthDigit - 1;
+          rows[rowIndex] = rowValue;
+        });
+      }
+
+      const columns = [this.columnCount];
+      if (!Array.isArray(sheetValue.columns)) {
+        Object.entries(sheetValue.columns).forEach((column) => {
+          const [columnName, columnValue] = column;
+          const { parthSymbol } = getParseAtSymbolDigit(columnName);
+          const columnIndex = getColumnNumberForName(parthSymbol) - 1;
+          columns[columnIndex] = columnValue;
+        });
+      }
+
       // убрать в впродакшене
-      const sheetValueNew = JSON.parse(JSON.stringify(sheetValue));
+      // const sheetValueNew = JSON.parse(JSON.stringify(sheetValue));
       // заменить sheetValueNew -> sheetValue
-      this.sheets[sheetName] = new TSheet({ ...sheetValueNew, cells });
+      this.sheets[sheetName] = new TSheet({
+        ...sheetValue,
+        cells,
+        rows,
+        columns,
+      });
     });
     if (!Object.keys(args).includes('JSONDocument')) return;
     this.createDocument(JSON.parse(args.JSONDocument));
@@ -97,11 +125,21 @@ class TDocument {
         cells[cellName] = this.sheets[sheetName].cells[i][j];
       }
     }
-    console.log(cells);
+
+    const rows = {};
+    this.sheets[sheetName].rows.forEach((row, index) => {
+      rows[index + 1] = row;
+    });
+
+    const columns = {};
+    this.sheets[sheetName].columns.forEach((column, index) => {
+      columns[getColumnNameForNumber(index + 1)] = column;
+    });
+    // console.log(cells);
     return {
-      columns: this.sheets[sheetName].columns,
+      columns,
       columnCount: this.sheets[sheetName].columnCount,
-      rows: this.sheets[sheetName].rows,
+      rows,
       rowCount: this.sheets[sheetName].rowCount,
       cells,
       styles,
